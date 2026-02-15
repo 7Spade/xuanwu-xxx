@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "使用者個人資料",
+      "description": "代表使用者的公開個人資料，包含其個人簡介、照片和專業領域。",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "使用者個人資料的唯一識別碼，與使用者的驗證 ID 相符。"
+        },
+        "bio": {
+          "type": "string",
+          "description": "使用者的簡短自傳。"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "使用者個人頭像的 URL。"
+        },
+        "expertiseBadges": {
+          "type": "array",
+          "description": "代表使用者專業領域的徽章列表。"
+        }
+      }
+    }
+  },
+  "auth": {
+    "providers": [
+      "email",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "儲存使用者的個人資料資訊。"
+    }
+  }
+}

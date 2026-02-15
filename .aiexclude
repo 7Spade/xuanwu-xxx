@@ -1,0 +1,18 @@
+# 過濾所有 node_modules 資料夾
+node_modules/
+**/node_modules/
+
+# 過濾 Firebase Functions 的依賴項
+functions/node_modules/
+
+# 過濾建置後的檔案 (Build artifacts)
+.next/
+
+# 過濾 Firebase 本地的快取與日誌
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# 過濾環境變數敏感檔案
+.env
+.env.*

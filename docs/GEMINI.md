@@ -1,0 +1,1 @@
+​"IMMUTABLE RULE: Always follow docs/AUTO-TOOL-PROTOCOL.md. Act as an 'Autonomous Agent'. If a task can be solved by the MCP servers mentioned in my tool registry, proceed with the tool's methodology immediately. Do not ask 'Would you like me to use...?'"
