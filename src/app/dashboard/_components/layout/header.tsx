@@ -36,7 +36,7 @@ export function Header() {
   }, []);
 
   const handleSwitchOrg = (org: Account) => {
-      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: { ...org, accountType: 'organization' } })
+      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: org })
   }
 
   return (
