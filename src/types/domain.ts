@@ -231,7 +231,7 @@ export interface DailyLog {
 
 export interface AuditLog {
   id: string;
-  orgId: string;
+  accountId: string;
   workspaceId?: string;
   recordedAt: any; // Event Timestamp
   actor: string;
@@ -260,14 +260,6 @@ export interface ExpertiseBadge {
   id: string;
   name: string;
   icon?: string; // e.g., a lucide-react icon name
-}
-
-export interface UserCollection {
-  id: string;
-  name: string;
-  description?: string;
-  logIds: string[];
-  createdAt: any; // Firestore Timestamp
 }
 
 export interface Notification {

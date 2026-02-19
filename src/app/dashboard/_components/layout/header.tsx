@@ -20,7 +20,7 @@ export function Header() {
   
   const visibleWorkspaces = useVisibleWorkspaces()
 
-  const organizationsArray: Account[] = Object.values(accounts)
+  const organizationsArray: Account[] = Object.values(accounts).filter(a => a.accountType === 'organization')
   const activeOrg = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null
   const activeOrgMembers = activeOrg?.members ?? []
 

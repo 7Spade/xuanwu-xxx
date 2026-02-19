@@ -63,3 +63,5 @@ export const createScheduleItem = repositories.createScheduleItem
 export const assignMemberToScheduleItem = repositories.assignMemberToScheduleItem
 export const unassignMemberFromScheduleItem = repositories.unassignMemberFromScheduleItem
 export const updateScheduleItemStatus = repositories.updateScheduleItemStatus
+export const toggleDailyLogLike = repositories.toggleDailyLogLike
+export const addDailyLogComment = repositories.addDailyLogComment

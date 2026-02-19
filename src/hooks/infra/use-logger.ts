@@ -49,7 +49,7 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
       target,
       type,
       recordedAt: serverTimestamp(),
-      orgId: activeAccount.id,
+      accountId: activeAccount.id,
       workspaceId: workspaceId || undefined
     };
 

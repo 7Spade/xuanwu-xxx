@@ -71,7 +71,7 @@ export default function DashboardPage() {
   const { accounts, activeAccount } = appState;
   const { user } = authState;
 
-  const organizationsArray = useMemo(() => Object.values(accounts), [accounts]);
+  const organizationsArray = useMemo(() => Object.values(accounts).filter(a => a.accountType === 'organization'), [accounts]);
   const dimensionWorkspaces = useVisibleWorkspaces();
   
   useEffect(() => {

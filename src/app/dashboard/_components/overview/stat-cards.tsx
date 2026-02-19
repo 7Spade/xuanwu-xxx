@@ -34,7 +34,7 @@ export function StatCards({ orgId, orgName }: StatCardsProps) {
   }, [orgWorkspaces]);
 
   const pulseRate = useMemo(() => {
-    const recentPulseCount = auditLogsArray.filter(l => l.orgId === orgId).length;
+    const recentPulseCount = auditLogsArray.filter(l => l.accountId === orgId).length;
     const val = (recentPulseCount / 20) * 100;
     return isFinite(val) ? Math.min(val, 100) : 0;
   }, [auditLogsArray, orgId]);
