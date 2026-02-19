@@ -1,11 +1,12 @@
 /**
  * @fileoverview Cloud Storage Facade.
  *
- * This file provides all Cloud Storage operations for the application.
+ * This file acts as a simplified, high-level interface to the Storage adapters.
+ * Its purpose is to encapsulate more complex business-specific operations.
  */
 
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from './storage.client';
+import { uploadFile } from './storage.write.adapter';
+import { getFileDownloadURL } from './storage.read.adapter';
 
 /**
  * Uploads a photo for a daily log entry to a structured path and returns its public URL.
@@ -21,8 +22,10 @@ export const uploadDailyPhoto = async (
 ): Promise<string> => {
   const fileId = Math.random().toString(36).substring(2, 11);
   const storagePath = `daily-photos/${accountId}/${workspaceId}/${fileId}/${file.name}`;
-  await uploadBytes(ref(storage, storagePath), file);
-  return getDownloadURL(ref(storage, storagePath));
+
+  await uploadFile(storagePath, file);
+
+  return getFileDownloadURL(storagePath);
 };
 
 
@@ -38,8 +41,10 @@ export const uploadTaskAttachment = async (
 ): Promise<string> => {
   const fileId = Math.random().toString(36).substring(2, 11);
   const storagePath = `task-attachments/${workspaceId}/${fileId}/${file.name}`;
-  await uploadBytes(ref(storage, storagePath), file);
-  return getDownloadURL(ref(storage, storagePath));
+
+  await uploadFile(storagePath, file);
+
+  return getFileDownloadURL(storagePath);
 };
 
 /**
@@ -52,7 +57,10 @@ export const uploadProfilePicture = async (
   userId: string,
   file: File
 ): Promise<string> => {
+  // Use a consistent path to allow for easy overwriting.
   const storagePath = `user-profiles/${userId}/avatar.jpg`;
-  await uploadBytes(ref(storage, storagePath), file, { contentType: 'image/jpeg' });
-  return getDownloadURL(ref(storage, storagePath));
+
+  await uploadFile(storagePath, file, { contentType: 'image/jpeg' });
+
+  return getFileDownloadURL(storagePath);
 };
