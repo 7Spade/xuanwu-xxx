@@ -8,14 +8,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useDailyActions } from '@/hooks/actions/use-daily-actions';
-import { DailyLog, User } from "@/types/domain";
+import { DailyLog, Account } from "@/types/domain";
 import { Button } from "@/app/_components/ui/button";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LikeButtonProps {
   log: DailyLog;
-  currentUser: User | null;
+  currentUser: Account | null;
 }
 
 export function LikeButton({ log, currentUser }: LikeButtonProps) {

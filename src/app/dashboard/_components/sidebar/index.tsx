@@ -62,11 +62,14 @@ export function DashboardSidebar() {
   // ========================================
   const { state: authState, logout } = useAuth()
   const { user } = authState
-  const { profile: userProfile } = useUser()
+  const { profile } = useUser()
   const { state: appState, dispatch } = useApp()
   const { accounts, activeAccount } = appState
   const visibleWorkspaces = useVisibleWorkspaces()
   const { createOrganization } = useOrganization()
+
+  // Merge Firestore profile with auth user: profile has photoURL etc., user is always available
+  const currentUser = profile ?? user
 
   // ========================================
   // Render - Assembling the Sidebar
@@ -76,8 +79,7 @@ export function DashboardSidebar() {
       {/* Sidebar Header: Contains the logo and the account switcher dropdown */}
       <SidebarHeader className="p-4">
         <AccountSwitcher
-          user={user}
-          userProfile={userProfile}
+          user={currentUser}
           accounts={accounts}
           activeAccount={activeAccount}
           dispatch={dispatch}
@@ -115,8 +117,7 @@ export function DashboardSidebar() {
       {/* Sidebar Footer: Contains user profile info, settings, and logout */}
       <SidebarFooter className="p-4 bg-muted/5">
         <NavUser
-          user={user}
-          userProfile={userProfile}
+          user={currentUser}
           accounts={accounts}
           activeAccount={activeAccount}
           logout={logout}

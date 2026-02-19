@@ -32,11 +32,6 @@ export interface Account {
   createdAt?: any
 }
 
-// Type aliases for backward compatibility during migration
-export type User = Account
-export type UserProfile = Account
-export type Organization = Account
-
 export interface Workspace {
   id: string;
   dimensionId: string; // The ID of the User or Organization this workspace belongs to.
@@ -59,9 +54,6 @@ export interface Workspace {
 // =================================================================
 // == Relational & Structural Types
 // =================================================================
-
-// SwitchableAccount is now replaced by Account with accountType discriminator
-export type SwitchableAccount = Account
 
 export interface MemberReference {
   id: string;

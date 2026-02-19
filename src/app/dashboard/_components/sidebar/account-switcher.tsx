@@ -20,7 +20,6 @@ import { OrgCreateDialog } from "./org-create-dialog"
 
 interface AccountSwitcherProps {
   user: Account | null
-  userProfile: Account | null
   accounts: Record<string, Account>
   activeAccount: Account | null
   dispatch: React.Dispatch<any>
@@ -32,18 +31,18 @@ const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
 function AccountSwitcherItem({
   account,
-  userProfile,
+  user,
   activeAccount,
   dispatch,
 }: {
   account: Account
-  userProfile: Account | null
+  user: Account | null
   activeAccount: Account | null
   dispatch: React.Dispatch<any>
 }) {
   const isUser = account.accountType === "user"
   const avatarClass = isUser ? "bg-accent/10 text-accent border-accent/20" : "bg-primary/10 text-primary border-primary/20"
-  const showUserAvatar = isUser && userProfile?.photoURL
+  const showUserAvatar = isUser && user?.photoURL
 
   return (
     <DropdownMenuItem
@@ -53,7 +52,7 @@ function AccountSwitcherItem({
     >
       <div className="flex items-center gap-3">
         <Avatar className={cn("w-8 h-8 border", avatarClass)}>
-          {showUserAvatar ? <AvatarImage src={userProfile.photoURL} alt={account.name} /> : null}
+          {showUserAvatar ? <AvatarImage src={user.photoURL} alt={account.name} /> : null}
           <AvatarFallback className={cn("font-bold text-xs", avatarClass)}>
             {getAccountInitial(account.name)}
           </AvatarFallback>
@@ -69,7 +68,6 @@ function AccountSwitcherItem({
 
 export function AccountSwitcher({
   user,
-  userProfile,
   accounts,
   activeAccount,
   dispatch,
@@ -100,8 +98,8 @@ export function AccountSwitcher({
             <div className="flex items-center gap-3 truncate">
               {activeAccount ? (
                 <Avatar className="w-6 h-6">
-                  {activeAccount.accountType === 'user' && userProfile?.photoURL ? (
-                    <AvatarImage src={userProfile.photoURL} alt={activeAccount.name} />
+                  {activeAccount.accountType === 'user' && user?.photoURL ? (
+                    <AvatarImage src={user.photoURL} alt={activeAccount.name} />
                   ) : null}
                   <AvatarFallback className={cn("font-bold text-xs shadow-inner", activeAccount.accountType === "user" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                     {getAccountInitial(activeAccount.name)}
@@ -120,7 +118,7 @@ export function AccountSwitcher({
             {t('sidebar.switchAccountContext')}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} userProfile={userProfile} activeAccount={activeAccount} dispatch={dispatch} />)}
+          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} user={user} activeAccount={activeAccount} dispatch={dispatch} />)}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"

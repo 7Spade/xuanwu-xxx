@@ -14,7 +14,7 @@ import {
   updateOrganizationSettings as updateOrganizationSettingsFacade,
   deleteOrganization as deleteOrganizationFacade,
 } from '@/infra/firebase/firestore/firestore.facade';
-import type { MemberReference, User, ThemeConfig } from '@/types/domain';
+import type { MemberReference, Account, ThemeConfig } from '@/types/domain';
 
 /**
  * @fileoverview A hook for managing organization-level actions.

@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
-import { DailyLog, DailyLogComment, User } from "@/types/domain";
+import { DailyLog, DailyLogComment, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
 import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
@@ -33,7 +33,7 @@ import { CornerUpLeft, Loader2 } from "lucide-react";
 
 interface DailyLogDialogProps {
   log: DailyLog | null;
-  currentUser: User | null;
+  currentUser: Account | null;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }

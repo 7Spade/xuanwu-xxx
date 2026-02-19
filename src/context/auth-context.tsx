@@ -3,16 +3,16 @@
 import React, { createContext, useReducer, useContext, useEffect, ReactNode } from 'react';
 import { type User as FirebaseUser } from "firebase/auth";
 import { authAdapter } from '@/infra/firebase/auth/auth.adapter';
-import { User } from '@/types/domain';
+import { Account } from '@/types/domain';
 
 interface AuthState {
-  user: User | null;
+  user: Account | null;
   authInitialized: boolean;
 }
 
 type Action =
-  | { type: 'SET_AUTH_STATE'; payload: { user: User | null, initialized: boolean } }
-  | { type: 'UPDATE_USER_PROFILE'; payload: Partial<User> };
+  | { type: 'SET_AUTH_STATE'; payload: { user: Account | null, initialized: boolean } }
+  | { type: 'UPDATE_USER_PROFILE'; payload: Partial<Account> };
 
 const authReducer = (state: AuthState, action: Action): AuthState => {
   switch (action.type) {
@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             user: { 
               id: firebaseUser.uid, 
               name: firebaseUser.displayName || 'Dimension Member', 
-              email: firebaseUser.email || '' 
+              email: firebaseUser.email || '',
+              accountType: 'user',
             },
             initialized: true,
           }

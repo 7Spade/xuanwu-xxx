@@ -19,7 +19,6 @@ import { useMemo } from "react"
 
 interface NavUserProps {
   user: Account | null
-  userProfile: Account | null
   accounts: Record<string, Account>
   activeAccount: Account | null
   logout: () => void
@@ -28,7 +27,7 @@ interface NavUserProps {
 
 const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
-export function NavUser({ user, userProfile, accounts, activeAccount, logout, t }: NavUserProps) {
+export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserProps) {
   const router = useRouter()
 
   const handleLogout = () => {
@@ -58,7 +57,7 @@ export function NavUser({ user, userProfile, accounts, activeAccount, logout, t 
             <SidebarMenuButton size="lg" className="w-full hover:bg-primary/5">
                 <div className="flex items-center gap-3 w-full">
                   <Avatar className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
-                    {userProfile?.photoURL ? <AvatarImage src={userProfile.photoURL} alt={user?.name} /> : null}
+                    {user?.photoURL ? <AvatarImage src={user.photoURL} alt={user?.name} /> : null}
                     <AvatarFallback className="bg-primary/10 text-primary font-bold">{getAccountInitial(user?.name)}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col overflow-hidden text-left flex-1">

@@ -12,16 +12,16 @@ import {
 import { Badge } from "@/app/_components/ui/badge";
 import { Globe, Layers, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Organization, Workspace, MemberReference, SwitchableAccount } from "@/types/domain";
+import { Account, Workspace, MemberReference } from "@/types/domain";
 
 interface GlobalSearchProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  organizations: Organization[];
+  organizations: Account[];
   workspaces: Workspace[];
   members: MemberReference[];
   activeOrgId: string | null;
-  onSwitchOrg: (org: Organization) => void;
+  onSwitchOrg: (org: Account) => void;
 }
 
 export function GlobalSearch({

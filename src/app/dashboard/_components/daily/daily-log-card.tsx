@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/app/_components/ui/card";
-import { DailyLog, User } from "@/types/domain";
+import { DailyLog, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
 import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar";
 
@@ -63,7 +63,7 @@ function TimeAgo({ date }: { date: any }) {
 
 interface DailyLogCardProps {
   log: DailyLog;
-  currentUser: User | null;
+  currentUser: Account | null;
   onOpen: () => void;
 }
 
