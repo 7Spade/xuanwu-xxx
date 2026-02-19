@@ -1,4 +1,4 @@
-// [職責] 組織視圖 (全寬度時間軸)
+// [Responsibility] Organization view (full-width timeline)
 "use client";
 
 import { useApp } from "@/hooks/state/use-app";
@@ -6,9 +6,9 @@ import { useAccount } from "@/hooks/state/use-account";
 import { useMemo, useState } from "react";
 import { AlertCircle, Terminal } from "lucide-react";
 import { AuditLog } from "@/types/domain";
-import { AuditTimeline } from "../../_components/audit/audit-timeline";
-import { AuditEventItem } from "../../_components/audit/audit-event-item";
-import { AuditDetailSheet } from "../../_components/audit/audit-detail-sheet";
+import { AuditTimeline } from "../../../../_components/audit/audit-timeline";
+import { AuditEventItem } from "../../../../_components/audit/audit-event-item";
+import { AuditDetailSheet } from "../../../../_components/audit/audit-detail-sheet";
 
 export function OrganizationAuditComponent() {
   const { state: appState } = useApp();

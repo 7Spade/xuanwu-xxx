@@ -1,4 +1,4 @@
-// @/app/dashboard/account/schedule/_components/governance-sidebar.tsx
+// @/app/dashboard/workspaces/[id]/capabilities/schedule/_components/governance-sidebar.tsx
 "use client";
 
 import { ScheduleItem } from "@/types/domain";
