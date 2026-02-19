@@ -53,6 +53,7 @@ export function WorkspaceSchedule() {
       const newItemData = {
         accountId: workspace.dimensionId,
         workspaceId: workspace.id,
+        workspaceName: workspace.name,
         title: data.title.trim(),
         description: data.description?.trim(),
         startDate: data.startDate,

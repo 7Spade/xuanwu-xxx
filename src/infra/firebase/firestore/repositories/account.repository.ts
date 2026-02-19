@@ -143,13 +143,9 @@ export const deleteOrganization = async (orgId: string): Promise<void> => {
 export const createScheduleItem = async (
   itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
-  const wsDoc = await getDoc(doc(db, 'workspaces', itemData.workspaceId))
-  const wsName = wsDoc.exists() ? wsDoc.data().name : 'Unknown'
-
   const dataWithTimestamp = {
     ...itemData,
     assigneeIds: itemData.assigneeIds || [],
-    workspaceName: wsName,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   }

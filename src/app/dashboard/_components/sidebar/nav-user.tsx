@@ -36,9 +36,7 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
   }
 
   const activeOrg = useMemo(() =>
-    activeAccount?.accountType === "organization" && activeAccount
-      ? accounts[activeAccount.id]
-      : null,
+    activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
