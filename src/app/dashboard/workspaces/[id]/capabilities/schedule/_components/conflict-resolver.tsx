@@ -1,2 +1,2 @@
-// This file is obsolete. This functionality has not been implemented yet
-// and this placeholder file is no longer needed.
+// Placeholder kept for compatibility. Conflict resolution logic is currently
+// not implemented in this capability module.
