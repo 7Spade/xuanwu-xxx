@@ -1,4 +1,4 @@
-// [職責] 工作區入口 (側邊欄式的輕量事件流)
+// [職責] Projection — 單一 Workspace 事件流 (本地、唯讀)
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
@@ -27,7 +27,7 @@ export function WorkspaceAudit() {
         <CardContent className="p-0 flex-1">
           <ScrollArea className="h-full p-6">
             <div className="space-y-6">
-              {localAuditLogs.map((log, index) => (
+              {localAuditLogs.map((log) => (
                 <div key={log.id} className="relative pl-8 cursor-pointer" onClick={() => setSelectedLog(log)}>
                   <div className="absolute left-[7px] top-1 h-full w-px bg-border/50" />
                   <div className="absolute left-1.5 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-background border-2 border-primary/40">

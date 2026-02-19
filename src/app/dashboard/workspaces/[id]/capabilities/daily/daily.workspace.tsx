@@ -1,7 +1,7 @@
-// @/app/dashboard/workspaces/[id]/capabilities/daily/workspace-daily.tsx
+// [職責] Business — 單一 Workspace 日誌撰寫與檢視
 /**
  * @fileoverview WorkspaceDaily - The entry point for the daily log feature within a workspace.
- * @description This component acts as a "smart" container. It fetches data, manages state,
+ * @description Smart container: fetches workspace-scoped daily logs, manages composer state,
  * and coordinates actions between child components and backend services.
  *
  * @responsibility

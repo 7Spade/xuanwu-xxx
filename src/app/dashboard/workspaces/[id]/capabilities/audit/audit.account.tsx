@@ -1,4 +1,4 @@
-// [Responsibility] Organization view (full-width timeline)
+// [職責] Projection — Account 層跨 Workspace 稽核事件流 (全維度、唯讀)
 "use client";
 
 import { useApp } from "@/hooks/state/use-app";
@@ -10,7 +10,7 @@ import { AuditTimeline } from "../../../../_components/audit/audit-timeline";
 import { AuditEventItem } from "../../../../_components/audit/audit-event-item";
 import { AuditDetailSheet } from "../../../../_components/audit/audit-detail-sheet";
 
-export function OrganizationAuditComponent() {
+export function AccountAuditComponent() {
   const { state: appState } = useApp();
   const { state: accountState } = useAccount();
   const { activeAccount } = appState;

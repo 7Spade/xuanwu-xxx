@@ -1,7 +1,12 @@
-
+// [職責] Business — 單一 Workspace 排程提案與檢視
+/**
+ * @fileoverview WorkspaceSchedule - The "Proposer" view for a single workspace's schedule.
+ * @description Smart container: manages state for proposal dialogs and passes callbacks
+ * to the `UnifiedCalendarGrid`. It no longer contains logic for member assignment.
+ */
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useWorkspace } from "../../../../../../context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccount } from "@/hooks/state/use-account";
@@ -11,12 +16,6 @@ import { ProposalDialog } from "./_components/proposal-dialog";
 import { addMonths, subMonths } from "date-fns";
 import type { ScheduleItem, Location } from "@/types/domain";
 
-/**
- * @fileoverview WorkspaceScheduleComponent - The "Proposer" view for a single workspace's schedule.
- * @description REFACTORED: This component now manages state for its child dialogs
- * and passes callbacks to the dumb `UnifiedCalendarGrid` component, adhering to SRP.
- * It no longer contains logic for member assignment.
- */
 export function WorkspaceSchedule() {
   const { workspace, createScheduleItem } = useWorkspace();
   const { state: appState, dispatch: appDispatch } = useApp();

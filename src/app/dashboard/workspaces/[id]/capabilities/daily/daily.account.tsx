@@ -1,15 +1,13 @@
-// @/app/dashboard/workspaces/[id]/capabilities/daily/organization-daily.component.tsx
+// [職責] Projection — Account 層跨 Workspace 聚合日誌牆 (全維度、唯讀)
 /**
- * @fileoverview OrganizationDailyComponent - The main view for the aggregated daily log wall.
- * @description This component is a "smart" container that fetches aggregated logs
- * and manages the state for the detail-view dialog. It arranges `DailyLogCard`
- * components in a masonry-style layout.
+ * @fileoverview AccountDailyComponent - Aggregated daily log wall across all workspaces.
+ * @description Smart container that fetches all daily logs for the active account and
+ * renders them in a masonry-style layout. Manages dialog state for log detail view.
  *
  * @responsibility
- * - Fetches and sorts all daily logs for the organization using the `useAggregatedLogs` hook.
- * - Manages the state for the `DailyLogDialog` (which log is selected and if the dialog is open).
+ * - Fetches and sorts all daily logs for the account using the `useAggregatedLogs` hook.
+ * - Manages the state for the `DailyLogDialog`.
  * - Renders the masonry layout for the log cards.
- * - Handles the click event on each card to open the detail dialog.
  */
 "use client";
 
@@ -23,7 +21,7 @@ import { DailyLog } from "@/types/domain";
 import { DailyLogDialog } from "../../../../_components/daily/daily-log-dialog";
 import { WorkspaceProvider } from "@/context/workspace-context";
 
-export function OrganizationDailyComponent() {
+export function AccountDailyComponent() {
   const { state: appState } = useApp();
   const { state: authState } = useAuth();
   const { user } = authState;

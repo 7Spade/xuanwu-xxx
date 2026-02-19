@@ -73,18 +73,41 @@ Implemented in: `_components/workspace-tabs.tsx`
 
 ---
 
-## Cross-Workspace (Account-Level) Projections
+## "One Core, Two Views" Pattern
 
-Some capabilities have a **second component** that renders an **account-wide aggregated view**
-across all workspaces. These are Projection-layer views at the *account* level, NOT workspace capabilities:
+Several capabilities have **two view implementations** sharing the same core data model:
 
-| Capability | Workspace component                         | Account (cross-workspace) component              |
-|------------|---------------------------------------------|--------------------------------------------------|
-| audit      | `capabilities/audit/workspace-audit.tsx`    | `capabilities/audit/organization-audit.component.tsx` |
-| daily      | `capabilities/daily/workspace-daily.tsx`    | `capabilities/daily/organization-daily.component.tsx` |
-| schedule   | `capabilities/schedule/workspace-schedule.component.tsx` | `capabilities/schedule/organization-schedule.component.tsx` |
+- `{capability}.workspace.tsx` — **Workspace view**: scoped to a single workspace
+- `{capability}.account.tsx` — **Account view**: aggregated across all workspaces in the account
+
+```
+Capability (e.g. audit)
+      │
+      ├─ audit.workspace.tsx  ←── Used by: workspace-tabs.tsx [Projection tab]
+      │   WorkspaceAudit          Context: single workspace
+      │   Scope: local events      Data: localAuditLogs from WorkspaceContext
+      │
+      └─ audit.account.tsx   ←── Used by: /dashboard/account/audit page
+          AccountAuditComponent   Context: entire account dimension
+          Scope: cross-workspace  Data: auditLogs from AccountContext
+```
+
+### Dual-view capabilities
+
+| Capability | Workspace view file            | Account view file             | Workspace scope       | Account scope              |
+|------------|-------------------------------|-------------------------------|----------------------|----------------------------|
+| `audit`    | `audit/audit.workspace.tsx`   | `audit/audit.account.tsx`     | Local event stream   | All-workspace event log     |
+| `daily`    | `daily/daily.workspace.tsx`   | `daily/daily.account.tsx`     | Write + read (feed)  | Aggregated read-only wall   |
+| `schedule` | `schedule/schedule.workspace.tsx` | `schedule/schedule.account.tsx` | Proposer view     | Governor view (approve/reject) |
 
 The account-level components are consumed by `/dashboard/account/{audit,daily,schedule}` pages.
+
+### File naming rules
+
+- Always use `{capability}.workspace.tsx` for the workspace-scoped view
+- Always use `{capability}.account.tsx` for the account-scoped aggregated view
+- Export function names: `WorkspaceXxx` for workspace views, `AccountXxxComponent` for account views
+- Barrel re-exports for workspace views live in `capabilities/index.ts` (workspace views only)
 
 ---
 
