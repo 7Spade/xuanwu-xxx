@@ -126,7 +126,7 @@ export default function DashboardPage() {
 
       {isOrgContext && (
         <>
-          <StatCards orgId={activeOrg.id} orgName={activeOrg.name} />
+          <StatCards accountId={activeOrg.id} accountName={activeOrg.name} />
           <OrgGrid organizations={organizationsArray.filter(o => o.id !== activeOrg.id).slice(0, 3)} />
         </>
       )}

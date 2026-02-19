@@ -9,11 +9,11 @@ import { ShieldCheck, Activity, Layers, Zap } from "lucide-react";
 import { Workspace } from "@/types/domain";
 
 interface StatCardsProps {
-    orgId: string;
-    orgName: string;
+    accountId: string;
+    accountName: string;
 }
 
-export function StatCards({ orgId, orgName }: StatCardsProps) {
+export function StatCards({ accountId, accountName }: StatCardsProps) {
   const { state: accountState } = useAccount();
   const { auditLogs, workspaces } = accountState;
 
@@ -21,8 +21,8 @@ export function StatCards({ orgId, orgName }: StatCardsProps) {
   const workspacesArray = useMemo(() => Object.values(workspaces), [workspaces]);
   
   const orgWorkspaces = useMemo(() => 
-    workspacesArray.filter(w => w.dimensionId === orgId),
-    [workspacesArray, orgId]
+    workspacesArray.filter(w => w.dimensionId === accountId),
+    [workspacesArray, accountId]
   );
   
   const consistency = useMemo(() => {
@@ -34,10 +34,10 @@ export function StatCards({ orgId, orgName }: StatCardsProps) {
   }, [orgWorkspaces]);
 
   const pulseRate = useMemo(() => {
-    const recentPulseCount = auditLogsArray.filter(l => l.accountId === orgId).length;
+    const recentPulseCount = auditLogsArray.filter(l => l.accountId === accountId).length;
     const val = (recentPulseCount / 20) * 100;
     return isFinite(val) ? Math.min(val, 100) : 0;
-  }, [auditLogsArray, orgId]);
+  }, [auditLogsArray, accountId]);
 
   const capabilityLoad = useMemo(() => {
     const totalCapabilities = orgWorkspaces.reduce((acc, w) => acc + (w.capabilities?.length || 0), 0);
@@ -55,7 +55,7 @@ export function StatCards({ orgId, orgName }: StatCardsProps) {
         <CardContent>
           <div className="text-2xl font-bold font-headline">{consistency}% Protocol Alignment</div>
           <p className="text-[10px] text-muted-foreground mt-1">
-            Dimension {orgName} currently has {orgWorkspaces.length} workspace nodes mounted.
+            Dimension {accountName} currently has {orgWorkspaces.length} workspace nodes mounted.
           </p>
           <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between text-[9px] uppercase font-bold tracking-tighter">

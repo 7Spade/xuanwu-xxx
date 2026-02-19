@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useReducer, useEffect, ReactNode, useMemo } from 'react'
+import React, { createContext, useReducer, useEffect, ReactNode } from 'react'
 import { useFirebase } from "@/context/firebase-context"
 import { collection, query, where, onSnapshot, QuerySnapshot } from "firebase/firestore"
 import { Account, CapabilitySpec, Notification } from '@/types/domain'
@@ -16,7 +16,7 @@ interface AppState {
 }
 
 type Action =
-  | { type: 'SET_ORGANIZATIONS'; payload: { snapshot: QuerySnapshot, user: Account } }
+  | { type: 'SET_ACCOUNTS'; payload: { snapshot: QuerySnapshot, user: Account } }
   | { type: 'SET_ACTIVE_ACCOUNT'; payload: Account | null }
   | { type: 'RESET_STATE' }
   | { type: 'ADD_NOTIFICATION', payload: Omit<Notification, 'id' | 'timestamp' | 'read'> }
@@ -60,7 +60,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
     case 'RESET_STATE':
       return initialState
 
-    case 'SET_ORGANIZATIONS': {
+    case 'SET_ACCOUNTS': {
       const { snapshot, user } = action.payload
       if (!snapshot?.docs) return state
 
@@ -131,7 +131,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     if (user?.id && db) {
       const accountQuery = query(collection(db, "accounts"), where("memberIds", "array-contains", user.id))
-      unsubscribe = onSnapshot(accountQuery, (snap) => dispatch({ type: 'SET_ORGANIZATIONS', payload: { snapshot: snap, user } }))
+      unsubscribe = onSnapshot(accountQuery, (snap) => dispatch({ type: 'SET_ACCOUNTS', payload: { snapshot: snap, user } }))
     } else {
       dispatch({ type: 'RESET_STATE' })
     }

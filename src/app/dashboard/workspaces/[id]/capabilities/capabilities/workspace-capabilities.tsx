@@ -56,7 +56,7 @@ export function WorkspaceCapabilities() {
   const [selectedCaps, setSelectedCaps] = useState<Set<string>>(new Set());
 
   const ownerType = useMemo(() => 
-    accounts[workspace.dimensionId] ? 'organization' : 'user',
+    accounts[workspace.dimensionId]?.accountType ?? 'user',
     [accounts, workspace.dimensionId]
   );
 
