@@ -2,6 +2,7 @@
 // == Primitive Types & Enums
 // =================================================================
 
+export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
 export type WorkspaceRole = 'Manager' | 'Contributor' | 'Viewer';
 export type WorkspaceLifecycleState = 'preparatory' | 'active' | 'stopped';
@@ -11,32 +12,24 @@ export type ScheduleStatus = 'PROPOSAL' | 'OFFICIAL' | 'REJECTED';
 // == Core Business Entities
 // =================================================================
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  photoURL?: string;
-}
-
-export interface UserProfile {
-  id: string;
-  bio?: string;
-  photoURL?: string;
-  achievements?: string[];
-  expertiseBadges?: ExpertiseBadge[];
-}
-
-export interface Organization {
-  id: string;
-  name: string;
-  description: string;
-  ownerId: string;
-  role: OrganizationRole;
-  theme?: ThemeConfig;
-  members: MemberReference[];
-  memberIds: string[]; // Derived field for security rules
-  teams: Team[];
-  createdAt: any; // FirestoreTimestamp
+export interface Account {
+  id: string
+  name: string
+  accountType: AccountType
+  email?: string
+  photoURL?: string
+  bio?: string
+  achievements?: string[]
+  expertiseBadges?: ExpertiseBadge[]
+  // org-specific
+  description?: string
+  ownerId?: string
+  role?: OrganizationRole   // current user's role in this org
+  theme?: ThemeConfig
+  members?: MemberReference[]
+  memberIds?: string[]
+  teams?: Team[]
+  createdAt?: any
 }
 
 export interface Workspace {
@@ -61,12 +54,6 @@ export interface Workspace {
 // =================================================================
 // == Relational & Structural Types
 // =================================================================
-
-export interface SwitchableAccount {
-  id: string;
-  name: string;
-  type: 'user' | 'organization';
-}
 
 export interface MemberReference {
   id: string;
@@ -244,7 +231,7 @@ export interface DailyLog {
 
 export interface AuditLog {
   id: string;
-  orgId: string;
+  accountId: string;
   workspaceId?: string;
   recordedAt: any; // Event Timestamp
   actor: string;
@@ -273,14 +260,6 @@ export interface ExpertiseBadge {
   id: string;
   name: string;
   icon?: string; // e.g., a lucide-react icon name
-}
-
-export interface UserCollection {
-  id: string;
-  name: string;
-  description?: string;
-  logIds: string[];
-  createdAt: any; // Firestore Timestamp
 }
 
 export interface Notification {

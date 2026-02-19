@@ -17,7 +17,7 @@
 import { useCallback } from "react";
 import { useApp } from "@/hooks/state/use-app";
 import { useAuth } from "@/context/auth-context";
-import { toggleDailyLogLike } from "@/infra/firebase/firestore/repositories/account.repository";
+import { toggleDailyLogLike } from "@/infra/firebase/firestore/firestore.facade";
 import { toast } from "@/hooks/ui/use-toast";
 
 export function useDailyActions() {
@@ -28,7 +28,7 @@ export function useDailyActions() {
 
   const toggleLike = useCallback(
     async (logId: string) => {
-      if (!user || !activeAccount || activeAccount.type !== "organization") {
+      if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
         toast({
           variant: "destructive",
           title: "Authentication Error",

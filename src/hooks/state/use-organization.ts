@@ -14,7 +14,7 @@ import {
   updateOrganizationSettings as updateOrganizationSettingsFacade,
   deleteOrganization as deleteOrganizationFacade,
 } from '@/infra/firebase/firestore/firestore.facade';
-import type { MemberReference, User, ThemeConfig } from '@/types/domain';
+import type { MemberReference, Account, ThemeConfig } from '@/types/domain';
 
 /**
  * @fileoverview A hook for managing organization-level actions.
@@ -29,7 +29,7 @@ export function useOrganization() {
   const { state: authState } = useAuth();
   const { user } = authState;
 
-  const orgId = activeAccount?.type === 'organization' ? activeAccount.id : null;
+  const orgId = activeAccount?.accountType === 'organization' ? activeAccount.id : null
 
   const createOrganization = useCallback(async (orgName: string) => {
     if (!user) throw new Error("User must be authenticated to create an organization.");

@@ -1,11 +1,12 @@
 
 "use client";
 
-import React, { createContext, useReducer, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import { useFirebase } from "@/context/firebase-context";
 import { collection, query, where, onSnapshot, QuerySnapshot, orderBy, limit } from "firebase/firestore";
 import { Workspace, DailyLog, AuditLog, PartnerInvite, ScheduleItem } from '@/types/domain';
 import { useApp } from '@/hooks/state/use-app';
+import { snapshotToRecord } from '@/infra/firebase/firestore/firestore.utils';
 
 // State and Action Types
 interface AccountState {
@@ -32,16 +33,6 @@ const initialState: AccountState = {
   invites: {},
   schedule_items: {},
 };
-
-function snapshotToRecord<T extends { id: string }>(snap: QuerySnapshot): Record<string, T> {
-    const record: Record<string, T> = {};
-    if (snap && typeof snap.forEach === 'function') {
-        snap.forEach(doc => {
-        record[doc.id] = { id: doc.id, ...doc.data() } as T;
-        });
-    }
-    return record;
-}
 
 // Reducer
 const accountReducer = (state: AccountState, action: Action): AccountState => {
@@ -104,35 +95,35 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!activeAccount?.id || !db) {
-            dispatch({ type: 'RESET_STATE' });
-            return;
+            dispatch({ type: 'RESET_STATE' })
+            return
         };
 
-        const unsubs: (() => void)[] = [];
+        const unsubs: (() => void)[] = []
 
         // 1. Listen to top-level collections for the active account
-        if (activeAccount.type === 'organization') {
-            const dailyLogsQuery = query(collection(db, "organizations", activeAccount.id, "dailyLogs"), orderBy("recordedAt", "desc"), limit(50));
-            unsubs.push(onSnapshot(dailyLogsQuery, (snap) => dispatch({ type: 'SET_DAILY_LOGS', payload: snap })));
+        if (activeAccount.accountType === 'organization') {
+            const dailyLogsQuery = query(collection(db, "accounts", activeAccount.id, "dailyLogs"), orderBy("recordedAt", "desc"), limit(50))
+            unsubs.push(onSnapshot(dailyLogsQuery, (snap) => dispatch({ type: 'SET_DAILY_LOGS', payload: snap })))
 
-            const auditLogsQuery = query(collection(db, "organizations", activeAccount.id, "auditLogs"), orderBy("recordedAt", "desc"), limit(50));
-            unsubs.push(onSnapshot(auditLogsQuery, (snap) => dispatch({ type: 'SET_AUDIT_LOGS', payload: snap })));
+            const auditLogsQuery = query(collection(db, "accounts", activeAccount.id, "auditLogs"), orderBy("recordedAt", "desc"), limit(50))
+            unsubs.push(onSnapshot(auditLogsQuery, (snap) => dispatch({ type: 'SET_AUDIT_LOGS', payload: snap })))
             
-            const invitesQuery = query(collection(db, "organizations", activeAccount.id, "invites"), orderBy("invitedAt", "desc"));
-            unsubs.push(onSnapshot(invitesQuery, (snap) => dispatch({ type: 'SET_INVITES', payload: snap })));
+            const invitesQuery = query(collection(db, "accounts", activeAccount.id, "invites"), orderBy("invitedAt", "desc"))
+            unsubs.push(onSnapshot(invitesQuery, (snap) => dispatch({ type: 'SET_INVITES', payload: snap })))
 
-            const scheduleQuery = query(collection(db, "organizations", activeAccount.id, "schedule_items"), orderBy("createdAt", "desc"));
-            unsubs.push(onSnapshot(scheduleQuery, (snap) => dispatch({ type: 'SET_SCHEDULE_ITEMS', payload: snap })));
+            const scheduleQuery = query(collection(db, "accounts", activeAccount.id, "schedule_items"), orderBy("createdAt", "desc"))
+            unsubs.push(onSnapshot(scheduleQuery, (snap) => dispatch({ type: 'SET_SCHEDULE_ITEMS', payload: snap })))
         }
         
-        const wsQuery = query(collection(db, "workspaces"), where("dimensionId", "==", activeAccount.id));
-        unsubs.push(onSnapshot(wsQuery, (snap) => dispatch({ type: 'SET_WORKSPACES', payload: snap })));
+        const wsQuery = query(collection(db, "workspaces"), where("dimensionId", "==", activeAccount.id))
+        unsubs.push(onSnapshot(wsQuery, (snap) => dispatch({ type: 'SET_WORKSPACES', payload: snap })))
         
         return () => {
-            unsubs.forEach(unsub => unsub());
-        };
+            unsubs.forEach(unsub => unsub())
+        }
 
-    }, [activeAccount, db]);
+    }, [activeAccount, db])
 
     return (
         <AccountContext.Provider value={{ state, dispatch }}>

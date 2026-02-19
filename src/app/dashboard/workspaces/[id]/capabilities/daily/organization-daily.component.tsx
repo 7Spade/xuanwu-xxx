@@ -32,7 +32,7 @@ export function OrganizationDailyComponent() {
   
   const [selectedLog, setSelectedLog] = useState<DailyLog | null>(null);
 
-  if (activeAccount?.type !== 'organization') {
+  if (activeAccount?.accountType !== 'organization') {
     return (
       <div className="p-8 text-center flex flex-col items-center gap-4">
         <AlertCircle className="w-10 h-10 text-muted-foreground" />

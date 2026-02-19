@@ -1,9 +1,9 @@
 
-"use client";
+"use client"
 
-import { useMemo, useState } from "react";
-import { Button } from "@/app/_components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
+import { useMemo, useState } from "react"
+import { Button } from "@/app/_components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,39 +11,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react";
-import { SwitchableAccount, User, UserProfile, Organization } from "@/types/domain";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { OrgCreateDialog } from "./org-create-dialog";
+} from "@/app/_components/ui/dropdown-menu"
+import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
+import { Account } from "@/types/domain"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { OrgCreateDialog } from "./org-create-dialog"
 
 interface AccountSwitcherProps {
-  user: User | null;
-  userProfile: UserProfile | null;
-  organizations: Record<string, Organization>;
-  activeAccount: SwitchableAccount | null;
-  dispatch: React.Dispatch<any>;
-  createOrganization: (name: string) => Promise<string>;
-  t: (key: string) => string;
+  user: Account | null
+  accounts: Record<string, Account>
+  activeAccount: Account | null
+  dispatch: React.Dispatch<any>
+  createOrganization: (name: string) => Promise<string>
+  t: (key: string) => string
 }
 
-const getAccountInitial = (name?: string) => name?.[0] ?? "";
+const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
 function AccountSwitcherItem({
   account,
-  userProfile,
   activeAccount,
   dispatch,
 }: {
-  account: SwitchableAccount;
-  userProfile: UserProfile | null;
-  activeAccount: SwitchableAccount | null;
-  dispatch: React.Dispatch<any>;
+  account: Account
+  activeAccount: Account | null
+  dispatch: React.Dispatch<any>
 }) {
-  const isUser = account.type === "user";
-  const avatarClass = isUser ? "bg-accent/10 text-accent border-accent/20" : "bg-primary/10 text-primary border-primary/20";
-  const showUserAvatar = isUser && userProfile?.photoURL;
+  const isUser = account.accountType === "user"
+  const avatarClass = isUser ? "bg-accent/10 text-accent border-accent/20" : "bg-primary/10 text-primary border-primary/20"
 
   return (
     <DropdownMenuItem
@@ -53,7 +49,7 @@ function AccountSwitcherItem({
     >
       <div className="flex items-center gap-3">
         <Avatar className={cn("w-8 h-8 border", avatarClass)}>
-          {showUserAvatar ? <AvatarImage src={userProfile.photoURL} alt={account.name} /> : null}
+          {account.photoURL ? <AvatarImage src={account.photoURL} alt={account.name} /> : null}
           <AvatarFallback className={cn("font-bold text-xs", avatarClass)}>
             {getAccountInitial(account.name)}
           </AvatarFallback>
@@ -64,29 +60,27 @@ function AccountSwitcherItem({
       </div>
       {activeAccount?.id === account.id && <Check className="w-4 h-4 text-primary" />}
     </DropdownMenuItem>
-  );
+  )
 }
 
 export function AccountSwitcher({
   user,
-  userProfile,
-  organizations,
+  accounts,
   activeAccount,
   dispatch,
   createOrganization,
   t,
 }: AccountSwitcherProps) {
-  const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const availableAccounts = useMemo(() => {
-    if (!user) return [];
-    const personalAccount: SwitchableAccount = { id: user.id, name: `${user.name} (Personal)`, type: "user" };
-    const orgAccounts: SwitchableAccount[] = Object.values(organizations).map((org) => ({ id: org.id, name: org.name, type: "organization" }));
-    return [personalAccount, ...orgAccounts];
-  }, [user, organizations]);
+    if (!user) return []
+    const personalAccount: Account = { ...user, name: `${user.name} (Personal)` }
+    return [personalAccount, ...Object.values(accounts)]
+  }, [user, accounts])
 
-  const accountLabel = activeAccount?.name ?? t('sidebar.selectAccount');
+  const accountLabel = activeAccount?.name ?? t('sidebar.selectAccount')
 
   return (
     <>
@@ -100,10 +94,10 @@ export function AccountSwitcher({
             <div className="flex items-center gap-3 truncate">
               {activeAccount ? (
                 <Avatar className="w-6 h-6">
-                  {activeAccount.type === 'user' && userProfile?.photoURL ? (
-                    <AvatarImage src={userProfile.photoURL} alt={activeAccount.name} />
+                  {activeAccount.accountType === 'user' && user?.photoURL ? (
+                    <AvatarImage src={user.photoURL} alt={activeAccount.name} />
                   ) : null}
-                  <AvatarFallback className={cn("font-bold text-xs shadow-inner", activeAccount.type === "user" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
+                  <AvatarFallback className={cn("font-bold text-xs shadow-inner", activeAccount.accountType === "user" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
                     {getAccountInitial(activeAccount.name)}
                   </AvatarFallback>
                 </Avatar>
@@ -120,9 +114,7 @@ export function AccountSwitcher({
             {t('sidebar.switchAccountContext')}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {availableAccounts.map((account) => (
-            <AccountSwitcherItem key={account.id} account={account} userProfile={userProfile} activeAccount={activeAccount} dispatch={dispatch} />
-          ))}
+          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} activeAccount={activeAccount} dispatch={dispatch} />)}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
@@ -141,9 +133,9 @@ export function AccountSwitcher({
         onOpenChange={setIsCreateOrgOpen}
         createOrganization={createOrganization}
         dispatch={dispatch}
-        organizations={organizations}
+        accounts={accounts}
         t={t}
       />
     </>
-  );
+  )
 }

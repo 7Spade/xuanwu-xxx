@@ -1,8 +1,8 @@
 
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/app/_components/ui/button";
+import { useRouter } from "next/navigation"
+import { Button } from "@/app/_components/ui/button"
 import {
   Card,
   CardContent,
@@ -10,25 +10,25 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/app/_components/ui/card";
-import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react";
-import { useApp } from "@/hooks/state/use-app";
-import { Organization, SwitchableAccount } from "@/types/domain";
+} from "@/app/_components/ui/card"
+import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react"
+import { useApp } from "@/hooks/state/use-app"
+import { Account } from "@/types/domain"
 
 interface OrgGridProps {
-    organizations: Organization[];
+    organizations: Account[]
 }
 
-function OrganizationCard({ organization }: { organization: Organization }) {
-    const router = useRouter();
-    const { state, dispatch } = useApp();
+function OrganizationCard({ organization }: { organization: Account }) {
+    const router = useRouter()
+    const { state, dispatch } = useApp()
   
     const handleClick = () => {
       if (state.activeAccount?.id !== organization.id) {
-        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: {id: organization.id, name: organization.name, type: 'organization'} as SwitchableAccount });
+        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: organization })
       }
-      router.push('/dashboard');
-    };
+      router.push('/dashboard')
+    }
   
     return (
       <Card 
@@ -102,10 +102,8 @@ export function OrgGrid({ organizations }: OrgGridProps) {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {organizations.map(o => (
-          <OrganizationCard key={o.id} organization={o} />
-        ))}
+        {organizations.map((o) => <OrganizationCard key={o.id} organization={o} />)}
       </div>
     </div>
-  );
+  )
 }

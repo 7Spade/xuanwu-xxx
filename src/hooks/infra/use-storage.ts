@@ -22,7 +22,7 @@ export function useStorage(workspaceId: string) {
    * @returns A promise that resolves with the public download URL of the uploaded file.
    */
   const uploadDailyPhoto = useCallback(async (file: File) => {
-    if (!activeAccount || activeAccount.type !== 'organization') {
+    if (!activeAccount || activeAccount.accountType !== 'organization') {
       throw new Error("Photo uploads are only supported in an organization context.");
     }
     // Delegates the actual upload logic to the infrastructure facade.

@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
-import { DailyLog, DailyLogComment, User } from "@/types/domain";
+import { DailyLog, DailyLogComment, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
 import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
@@ -24,7 +24,7 @@ import { BookmarkButton } from "./actions/bookmark-button";
 import { ShareButton } from './actions/share-button';
 import { useFirebase } from "@/context/firebase-context";
 import { useAuth } from "@/context/auth-context";
-import { addDailyLogComment } from "@/infra/firebase/firestore/repositories/account.repository";
+import { addDailyLogComment } from "@/infra/firebase/firestore/firestore.facade";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { toast } from "@/hooks/ui/use-toast";
 import { Textarea } from "@/app/_components/ui/textarea";
@@ -33,7 +33,7 @@ import { CornerUpLeft, Loader2 } from "lucide-react";
 
 interface DailyLogDialogProps {
   log: DailyLog | null;
-  currentUser: User | null;
+  currentUser: Account | null;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
@@ -90,7 +90,7 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
     }
 
     const commentsQuery = query(
-        collection(db, `organizations/${log.accountId}/dailyLogs/${log.id}/comments`),
+        collection(db, `accounts/${log.accountId}/dailyLogs/${log.id}/comments`),
         orderBy("createdAt", "asc")
     );
 

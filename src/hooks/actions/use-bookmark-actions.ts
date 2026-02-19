@@ -13,7 +13,7 @@ import { collection, onSnapshot, query } from 'firebase/firestore';
 import { 
     addBookmark as addBookmarkRepo,
     removeBookmark as removeBookmarkRepo
-} from '@/infra/firebase/firestore/repositories/user.repository';
+} from '@/infra/firebase/firestore/firestore.facade';
 import { toast } from '@/hooks/ui/use-toast';
 
 export function useBookmarkActions() {
@@ -32,7 +32,7 @@ export function useBookmarkActions() {
         };
 
         setLoading(true);
-        const bookmarksQuery = query(collection(db, `users/${user.id}/bookmarks`));
+        const bookmarksQuery = query(collection(db, `accounts/${user.id}/bookmarks`));
         const unsubscribe = onSnapshot(bookmarksQuery, (snapshot) => {
             const bookmarkedIds = new Set(snapshot.docs.map(doc => doc.id));
             setBookmarks(bookmarkedIds);

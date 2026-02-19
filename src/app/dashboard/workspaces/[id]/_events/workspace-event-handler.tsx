@@ -195,7 +195,7 @@ export function WorkspaceEventHandler() {
             assigneeIds: [],
             createdAt: serverTimestamp(),
           };
-          await addDocument(`organizations/${workspace.dimensionId}/schedule_items`, scheduleData);
+          await addDocument(`accounts/${workspace.dimensionId}/schedule_items`, scheduleData);
           
           toast({ 
             title: "Schedule Request Created", 

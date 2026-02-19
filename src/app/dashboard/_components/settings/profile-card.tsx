@@ -8,8 +8,8 @@ import { User, Loader2, Upload } from "lucide-react";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
 import { Checkbox } from "@/app/_components/ui/checkbox";
-import { ExpertiseBadge, User as UserType, UserProfile } from "@/types/domain";
-import React from "react";
+import { ExpertiseBadge, Account } from "@/types/domain"
+import React from "react"
 
 // A mock list of available expertise badges
 const AVAILABLE_BADGES: ExpertiseBadge[] = [
@@ -18,27 +18,25 @@ const AVAILABLE_BADGES: ExpertiseBadge[] = [
     { id: 'nodejs', name: 'Node.js' },
     { id: 'python', name: 'Python' },
     { id: 'ai', name: 'GenAI' },
-];
+]
 
 interface ProfileCardProps {
-  user: UserType | null;
-  profile: UserProfile | null;
-  name: string;
-  setName: (name: string) => void;
-  bio: string;
-  setBio: (bio: string) => void;
-  selectedBadges: ExpertiseBadge[];
-  handleBadgeToggle: (badge: ExpertiseBadge) => void;
-  handleSaveProfile: () => void;
-  handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isSaving: boolean;
-  isUploading: boolean;
-  avatarInputRef: React.RefObject<HTMLInputElement>;
+  account: Account | null
+  name: string
+  setName: (name: string) => void
+  bio: string
+  setBio: (bio: string) => void
+  selectedBadges: ExpertiseBadge[]
+  handleBadgeToggle: (badge: ExpertiseBadge) => void
+  handleSaveProfile: () => void
+  handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
+  isSaving: boolean
+  isUploading: boolean
+  avatarInputRef: React.RefObject<HTMLInputElement>
 }
 
 export function ProfileCard({
-  user,
-  profile,
+  account,
   name,
   setName,
   bio,
@@ -65,7 +63,7 @@ export function ProfileCard({
         <div className="flex items-center gap-6">
           <div className="relative">
             <Avatar className="w-20 h-20 border-2 border-primary/20">
-              <AvatarImage src={profile?.photoURL} />
+              <AvatarImage src={account?.photoURL} />
               <AvatarFallback className="text-2xl font-bold bg-primary/5 text-primary">
                 {name?.[0]}
               </AvatarFallback>
@@ -115,7 +113,7 @@ export function ProfileCard({
 
         <div className="grid gap-2">
           <Label htmlFor="user-email">Email</Label>
-          <Input id="user-email" defaultValue={user?.email} disabled />
+          <Input id="user-email" defaultValue={account?.email} disabled />
           <p className="text-[10px] text-muted-foreground italic">Email address cannot be changed.</p>
         </div>
       </CardContent>

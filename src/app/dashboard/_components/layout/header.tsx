@@ -9,20 +9,20 @@ import { NotificationCenter } from "./notification-center";
 import { GlobalSearch } from "./global-search";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccount } from "@/hooks/state/use-account";
-import { Organization, SwitchableAccount } from '@/types/domain';
+import { Account } from '@/types/domain'
 import { useVisibleWorkspaces } from '@/hooks/state/use-visible-workspaces';
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { state: appState, dispatch } = useApp();
 
-  const { organizations, notifications, activeAccount } = appState;
+  const { accounts, notifications, activeAccount } = appState
   
-  const visibleWorkspaces = useVisibleWorkspaces();
+  const visibleWorkspaces = useVisibleWorkspaces()
 
-  const organizationsArray = Object.values(organizations);
-  const activeOrg = activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null;
-  const activeOrgMembers = activeOrg?.members ?? [];
+  const organizationsArray: Account[] = Object.values(accounts).filter(a => a.accountType === 'organization')
+  const activeOrg = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null
+  const activeOrgMembers = activeOrg?.members ?? []
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -35,8 +35,8 @@ export function Header() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const handleSwitchOrg = (org: Organization) => {
-      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: {id: org.id, type: 'organization', name: org.name} as SwitchableAccount });
+  const handleSwitchOrg = (org: Account) => {
+      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: org })
   }
 
   return (

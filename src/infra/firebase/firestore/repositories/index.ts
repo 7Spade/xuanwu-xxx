@@ -4,6 +4,5 @@
  * for the Firestore facade to access the data layer.
  */
 
-export * from './account.repository';
-export * from './workspace.repository';
-export * from './user.repository';
+export * from './account.repository'
+export * from './workspace.repository'

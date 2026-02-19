@@ -51,7 +51,7 @@ function PageHeader({ title, description, children, badge }: PageHeaderProps) {
 export default function PartnersPage() {
   const { state } = useApp();
   const { t } = useI18n();
-  const { organizations, activeAccount } = state;
+  const { accounts, activeAccount } = state;
   const { createTeam } = useOrganization();
   const [mounted, setMounted] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -63,8 +63,8 @@ export default function PartnersPage() {
   }, []);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
 
   if (!mounted) return null;

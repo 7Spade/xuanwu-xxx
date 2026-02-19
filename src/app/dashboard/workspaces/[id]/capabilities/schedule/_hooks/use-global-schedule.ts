@@ -15,11 +15,11 @@ export function useGlobalSchedule() {
   const { state: appState } = useApp();
   const { state: accountState } = useAccount();
   const { workspaces, schedule_items } = accountState;
-  const { organizations, activeAccount } = appState;
+  const { accounts, activeAccount } = appState;
 
   const activeOrg = useMemo(() =>
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
 
   const orgMembers = useMemo(() => activeOrg?.members || [], [activeOrg]);

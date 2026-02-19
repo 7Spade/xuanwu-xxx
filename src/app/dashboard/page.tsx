@@ -68,10 +68,10 @@ export default function DashboardPage() {
   const { state: appState } = useApp();
   const { state: authState } = useAuth();
 
-  const { organizations, activeAccount } = appState;
+  const { accounts, activeAccount } = appState;
   const { user } = authState;
 
-  const organizationsArray = useMemo(() => Object.values(organizations), [organizations]);
+  const organizationsArray = useMemo(() => Object.values(accounts).filter(a => a.accountType === 'organization'), [accounts]);
   const dimensionWorkspaces = useVisibleWorkspaces();
   
   useEffect(() => {
@@ -79,8 +79,8 @@ export default function DashboardPage() {
   }, []);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
   
   const currentUserRoleInOrg = useMemo(() => {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
 
   if (!mounted || !activeAccount) return null;
 
-  const isOrgContext = activeAccount.type === 'organization' && activeOrg;
+  const isOrgContext = activeAccount.accountType === 'organization' && activeOrg;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700 pb-20">
@@ -126,7 +126,7 @@ export default function DashboardPage() {
 
       {isOrgContext && (
         <>
-          <StatCards orgId={activeOrg.id} orgName={activeOrg.name} />
+          <StatCards />
           <OrgGrid organizations={organizationsArray.filter(o => o.id !== activeOrg.id).slice(0, 3)} />
         </>
       )}

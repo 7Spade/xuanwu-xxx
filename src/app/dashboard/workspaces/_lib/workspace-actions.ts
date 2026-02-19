@@ -7,14 +7,14 @@ import {
   updateWorkspaceSettings as updateWorkspaceSettingsFacade,
   deleteWorkspace as deleteWorkspaceFacade,
 } from "@/infra/firebase/firestore/firestore.facade";
-import type { SwitchableAccount, WorkspaceLifecycleState } from "@/types/domain";
+import type { Account, WorkspaceLifecycleState } from "@/types/domain";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 export const handleCreateWorkspace = async (
   name: string,
-  activeAccount: SwitchableAccount | null,
+  activeAccount: Account | null,
   onSuccess: () => void,
   t: (key: string) => string
 ) => {

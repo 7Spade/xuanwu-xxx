@@ -39,15 +39,15 @@ const getErrorMessage = (error: unknown, fallback: string) =>
 export function WorkspaceMembers() {
   const { workspace, logAuditEvent, authorizeWorkspaceTeam, revokeWorkspaceTeam, grantIndividualWorkspaceAccess, revokeIndividualWorkspaceAccess } = useWorkspace();
   const { state } = useApp();
-  const { organizations, activeAccount } = state;
-  const activeOrgId = activeAccount?.type === 'organization' ? activeAccount.id : null;
+  const { accounts, activeAccount } = state;
+  const activeOrgId = activeAccount?.accountType === 'organization' ? activeAccount.id : null;
 
   const [grantTarget, setGrantTarget] = useState<MemberReference | null>(null);
   const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('Contributor');
 
   const activeOrg = useMemo(() => 
-    activeOrgId ? organizations[activeOrgId] : null,
-    [organizations, activeOrgId]
+    activeOrgId ? accounts[activeOrgId] : null,
+    [accounts, activeOrgId]
   );
 
   const handleToggleTeam = async (team: Team, isAuthorized: boolean) => {

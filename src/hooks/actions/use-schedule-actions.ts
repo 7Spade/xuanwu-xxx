@@ -25,7 +25,7 @@ export function useScheduleActions() {
   const { user } = authState;
 
   const assignMember = useCallback(async (item: ScheduleItem, memberId: string) => {
-    if (!user || !activeAccount || activeAccount.type !== "organization") {
+    if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
       toast({
         variant: "destructive",
         title: "Authentication Error",
@@ -35,7 +35,7 @@ export function useScheduleActions() {
     }
 
     try {
-      await assignMemberToScheduleItem(item.workspaceId, item.id, memberId);
+      await assignMemberToScheduleItem(item.accountId, item.id, memberId);
       toast({ title: "Member Assigned", description: "The schedule item has been updated." });
     } catch (error) {
       console.error("Failed to assign member:", error);
@@ -49,7 +49,7 @@ export function useScheduleActions() {
   }, [user, activeAccount]);
 
   const unassignMember = useCallback(async (item: ScheduleItem, memberId: string) => {
-    if (!user || !activeAccount || activeAccount.type !== "organization") {
+    if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
       toast({
         variant: "destructive",
         title: "Authentication Error",
@@ -59,7 +59,7 @@ export function useScheduleActions() {
     }
 
     try {
-      await unassignMemberFromScheduleItem(item.workspaceId, item.id, memberId);
+      await unassignMemberFromScheduleItem(item.accountId, item.id, memberId);
       toast({ title: "Member Unassigned" });
     } catch (error) {
       console.error("Failed to unassign member:", error);

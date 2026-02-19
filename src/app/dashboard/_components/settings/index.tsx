@@ -107,8 +107,7 @@ export function UserSettings() {
   return (
       <div className="grid gap-6">
         <ProfileCard
-          user={user}
-          profile={profile}
+          account={profile ?? user}
           name={name}
           setName={setName}
           bio={bio}
