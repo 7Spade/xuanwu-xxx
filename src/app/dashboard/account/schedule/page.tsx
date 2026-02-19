@@ -3,7 +3,7 @@
 
 import { useApp } from "@/hooks/state/use-app";
 import { AlertCircle } from "lucide-react";
-import { AccountScheduleComponent } from "./schedule.component";
+import { AccountScheduleComponent } from "@/app/dashboard/workspaces/[id]/capabilities/schedule/organization-schedule.component";
 import { ReactNode } from "react";
 
 interface PageHeaderProps {

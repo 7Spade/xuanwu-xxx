@@ -1,7 +1,7 @@
 // [職責] 組織入口 (頁面外框與標題)
 "use client";
 
-import { OrganizationAuditComponent } from "./audit.component";
+import { OrganizationAuditComponent } from "@/app/dashboard/workspaces/[id]/capabilities/audit/organization-audit.component";
 import { ReactNode } from "react";
 
 interface PageHeaderProps {

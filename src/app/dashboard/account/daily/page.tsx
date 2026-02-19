@@ -1,7 +1,7 @@
 
 "use client";
 
-import { OrganizationDailyComponent } from "./daily.component";
+import { OrganizationDailyComponent } from "@/app/dashboard/workspaces/[id]/capabilities/daily/organization-daily.component";
 import { ReactNode } from "react";
 
 interface PageHeaderProps {
