@@ -66,12 +66,11 @@ const appReducer = (state: AppState, action: Action): AppState => {
       if (!snapshot?.docs) return state
 
       const newAccounts = snapshotToRecord<Account>(snapshot)
-      const personalAccount: Account = { ...user, accountType: 'user' as const }
-      
+
       let newActiveAccount = state.activeAccount
-      const availableAccountIds = [personalAccount.id, ...Object.keys(newAccounts)]
+      const availableAccountIds = [user.id, ...Object.keys(newAccounts)]
       if (!newActiveAccount || !availableAccountIds.includes(newActiveAccount.id)) {
-        newActiveAccount = personalAccount
+        newActiveAccount = user
       }
       
       return { ...state, accounts: newAccounts, activeAccount: newActiveAccount }

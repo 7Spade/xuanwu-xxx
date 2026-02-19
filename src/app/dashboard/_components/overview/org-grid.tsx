@@ -25,7 +25,7 @@ function OrganizationCard({ organization }: { organization: Account }) {
   
     const handleClick = () => {
       if (state.activeAccount?.id !== organization.id) {
-        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: { ...organization, accountType: 'organization' } })
+        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: organization })
       }
       router.push('/dashboard')
     }

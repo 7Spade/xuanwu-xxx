@@ -31,18 +31,15 @@ const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
 function AccountSwitcherItem({
   account,
-  user,
   activeAccount,
   dispatch,
 }: {
   account: Account
-  user: Account | null
   activeAccount: Account | null
   dispatch: React.Dispatch<any>
 }) {
   const isUser = account.accountType === "user"
   const avatarClass = isUser ? "bg-accent/10 text-accent border-accent/20" : "bg-primary/10 text-primary border-primary/20"
-  const showUserAvatar = isUser && user?.photoURL
 
   return (
     <DropdownMenuItem
@@ -52,7 +49,7 @@ function AccountSwitcherItem({
     >
       <div className="flex items-center gap-3">
         <Avatar className={cn("w-8 h-8 border", avatarClass)}>
-          {showUserAvatar ? <AvatarImage src={user.photoURL} alt={account.name} /> : null}
+          {account.photoURL ? <AvatarImage src={account.photoURL} alt={account.name} /> : null}
           <AvatarFallback className={cn("font-bold text-xs", avatarClass)}>
             {getAccountInitial(account.name)}
           </AvatarFallback>
@@ -79,9 +76,8 @@ export function AccountSwitcher({
 
   const availableAccounts = useMemo(() => {
     if (!user) return []
-    const personalAccount: Account = { ...user, name: `${user.name} (Personal)`, accountType: "user" }
-    const orgAccounts: Account[] = Object.values(accounts).map((org) => ({ ...org, accountType: "organization" }))
-    return [personalAccount, ...orgAccounts]
+    const personalAccount: Account = { ...user, name: `${user.name} (Personal)` }
+    return [personalAccount, ...Object.values(accounts)]
   }, [user, accounts])
 
   const accountLabel = activeAccount?.name ?? t('sidebar.selectAccount')
@@ -118,7 +114,7 @@ export function AccountSwitcher({
             {t('sidebar.switchAccountContext')}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} user={user} activeAccount={activeAccount} dispatch={dispatch} />)}
+          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} activeAccount={activeAccount} dispatch={dispatch} />)}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
