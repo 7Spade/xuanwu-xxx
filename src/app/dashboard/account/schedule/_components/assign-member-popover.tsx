@@ -1,2 +1,2 @@
-// This file is obsolete and its logic has been moved to account/schedule/schedule.component.tsx.
-// It can be safely deleted.
+// This file is obsolete and its logic has moved under
+// @/app/dashboard/workspaces/[id]/capabilities/schedule/_components/assign-member-popover.tsx.
