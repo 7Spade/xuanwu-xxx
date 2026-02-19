@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react"
 import { toast } from "@/hooks/ui/use-toast"
 import { Account } from "@/types/domain"
 
-interface OrgCreateDialogProps {
+interface AccountCreateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   createOrganization: (name: string) => Promise<string>
@@ -26,14 +26,14 @@ interface OrgCreateDialogProps {
   t: (key: string) => string
 }
 
-export function OrgCreateDialog({
+export function AccountCreateDialog({
   open,
   onOpenChange,
   createOrganization,
   dispatch,
   accounts,
   t,
-}: OrgCreateDialogProps) {
+}: AccountCreateDialogProps) {
   const [newOrgName, setNewOrgName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [pendingOrgId, setPendingOrgId] = useState<string | null>(null)
@@ -54,7 +54,7 @@ export function OrgCreateDialog({
     }
   }, [pendingOrgId, accounts, dispatch])
 
-  const handleCreateOrg = async () => {
+  const handleCreate = async () => {
     if (!newOrgName.trim()) return
     setIsLoading(true)
     try {
@@ -92,7 +92,7 @@ export function OrgCreateDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl" disabled={isLoading}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCreateOrg} className="rounded-xl px-8 shadow-lg shadow-primary/20" disabled={isLoading}>
+          <Button onClick={handleCreate} className="rounded-xl px-8 shadow-lg shadow-primary/20" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

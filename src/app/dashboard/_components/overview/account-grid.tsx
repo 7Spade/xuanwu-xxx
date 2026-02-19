@@ -15,17 +15,17 @@ import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react"
 import { useApp } from "@/hooks/state/use-app"
 import { Account } from "@/types/domain"
 
-interface OrgGridProps {
-    organizations: Account[]
+interface AccountGridProps {
+    accounts: Account[]
 }
 
-function OrganizationCard({ organization }: { organization: Account }) {
+function AccountCard({ account }: { account: Account }) {
     const router = useRouter()
     const { state, dispatch } = useApp()
   
     const handleClick = () => {
-      if (state.activeAccount?.id !== organization.id) {
-        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: organization })
+      if (state.activeAccount?.id !== account.id) {
+        dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: account })
       }
       router.push('/dashboard')
     }
@@ -44,28 +44,28 @@ function OrganizationCard({ organization }: { organization: Account }) {
               variant="ghost" 
               size="icon" 
               className="h-8 w-8 text-muted-foreground hover:bg-accent/10" 
-              onClick={(e) => { e.stopPropagation(); /* onAction?.(organization.id); */ }}
+              onClick={(e) => { e.stopPropagation(); }}
             >
               <MoreVertical className="w-4 h-4" />
             </Button>
           </div>
-          <CardTitle className="mt-4 font-headline text-lg group-hover:text-primary transition-colors">{organization.name}</CardTitle>
+          <CardTitle className="mt-4 font-headline text-lg group-hover:text-primary transition-colors">{account.name}</CardTitle>
           <CardDescription className="text-[9px] uppercase tracking-widest font-bold opacity-60">
-            Sovereignty Role: {organization.role}
+            Sovereignty Role: {account.role}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[32px]">{organization.description || "No dimension identity description provided."}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[32px]">{account.description || "No dimension identity description provided."}</p>
         </CardContent>
         <CardFooter className="pt-0 flex justify-between items-center border-t border-border/20 mt-4 py-4">
           <div className="flex items-center gap-2">
             <Users className="w-3 h-3 text-primary opacity-50" />
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
-              {(organization.members || []).length} authorized members
+              {(account.members || []).length} authorized members
             </span>
           </div>
           <div className="flex -space-x-1.5">
-            {(organization.members || []).slice(0, 3).map((m, i) => (
+            {(account.members || []).slice(0, 3).map((m, i) => (
               <div key={i} className="w-6 h-6 rounded-full border-2 border-background bg-muted text-[8px] flex items-center justify-center font-bold shadow-sm">
                 {m.name?.[0]}
               </div>
@@ -76,10 +76,10 @@ function OrganizationCard({ organization }: { organization: Account }) {
     );
   }
 
-export function OrgGrid({ organizations }: OrgGridProps) {
+export function AccountGrid({ accounts }: AccountGridProps) {
   const router = useRouter();
 
-  if (organizations.length === 0) {
+  if (accounts.length === 0) {
     return (
         <div className="col-span-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-muted/5 border-border/40">
             <Globe className="w-8 h-8 text-muted-foreground mb-3 opacity-20" />
@@ -102,7 +102,7 @@ export function OrgGrid({ organizations }: OrgGridProps) {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {organizations.map((o) => <OrganizationCard key={o.id} organization={o} />)}
+        {accounts.map((a) => <AccountCard key={a.id} account={a} />)}
       </div>
     </div>
   )

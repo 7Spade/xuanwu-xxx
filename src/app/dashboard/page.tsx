@@ -27,7 +27,7 @@ import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";
 // Internal Dependencies - Overview Components
 // ============================================================================
 import { StatCards } from "./_components/overview/stat-cards";
-import { OrgGrid } from "./_components/overview/org-grid";
+import { AccountGrid } from "./_components/overview/account-grid";
 import { WorkspaceList } from "./_components/overview/workspace-list";
 import { PermissionTree } from "./_components/overview/permission-tree";
 
@@ -127,7 +127,7 @@ export default function DashboardPage() {
       {isOrgContext && (
         <>
           <StatCards />
-          <OrgGrid organizations={organizationsArray.filter(o => o.id !== activeOrg.id).slice(0, 3)} />
+          <AccountGrid accounts={organizationsArray.filter(o => o.id !== activeOrg.id).slice(0, 3)} />
         </>
       )}
 

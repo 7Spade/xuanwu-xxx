@@ -19,7 +19,7 @@ import { Input } from "@/app/_components/ui/input";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/ui/use-toast";
 import { useApp } from "@/hooks/state/use-app";
-import { useOrganization } from "@/hooks/state/use-organization";
+import { useAccountManagement } from "@/hooks/state/use-account-management";
 import { useI18n } from "@/context/i18n-context";
 
 interface PageHeaderProps {
@@ -52,7 +52,7 @@ export default function PartnersPage() {
   const { state } = useApp();
   const { t } = useI18n();
   const { accounts, activeAccount } = state;
-  const { createTeam } = useOrganization();
+  const { createTeam } = useAccountManagement();
   const [mounted, setMounted] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
