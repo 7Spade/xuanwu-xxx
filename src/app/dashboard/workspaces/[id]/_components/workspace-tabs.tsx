@@ -37,20 +37,25 @@ const CAPABILITY_DETAILS = {
 
 const CORE_CAPABILITY = { id: "capabilities", name: "Capabilities" };
 
+// Governance capabilities are always visible and are not dynamically mountable.
+const GOVERNANCE_CAPABILITY_IDS = new Set(["members"]);
+const GOVERNANCE_CAPABILITIES = [{ id: "members", name: "Members" }];
+
 export function WorkspaceTabs() {
   const { workspace } = useWorkspace();
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get('capability') || 'capabilities';
 
   const mountedCapabilities = useMemo(() => {
-    const dynamicCapabilities = (workspace.capabilities || []).map(
-      (capability) => ({
+    // Business capabilities are the dynamic ones, excluding those promoted to Governance.
+    const businessCapabilities = (workspace.capabilities || [])
+      .filter((capability) => !GOVERNANCE_CAPABILITY_IDS.has(capability.id))
+      .map((capability) => ({
         id: capability.id,
         name: capability.name,
-      })
-    );
+      }));
 
-    return [CORE_CAPABILITY, ...dynamicCapabilities];
+    return [CORE_CAPABILITY, ...GOVERNANCE_CAPABILITIES, ...businessCapabilities];
   }, [workspace.capabilities]);
 
   return (

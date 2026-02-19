@@ -70,8 +70,8 @@ export function WorkspaceCapabilities() {
     if (ownerType === 'user') {
       specs = specs.filter(spec => PERSONAL_CAPABILITY_IDS.has(spec.id));
     }
-    // "Capabilities" capability should not be mountable
-    return specs.filter(spec => spec.id !== 'capabilities' && !mountedCapIds.includes(spec.id));
+    // "Capabilities" (Core) and "Members" (Governance) are permanent tabs and not mountable.
+    return specs.filter(spec => spec.id !== 'capabilities' && spec.id !== 'members' && !mountedCapIds.includes(spec.id));
   }, [capabilitySpecs, ownerType, mountedCapIds]);
 
 
