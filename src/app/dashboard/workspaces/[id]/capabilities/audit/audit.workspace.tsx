@@ -1,20 +1,16 @@
 // [職責] Projection — 單一 Workspace 事件流 (本地、唯讀)
 "use client";
 
-import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { Activity } from "lucide-react";
 import { format } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
+import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import { AuditTypeIcon } from "../../../../_components/audit/audit-type-icon";
-import { useState } from "react";
 import { AuditDetailSheet } from "../../../../_components/audit/audit-detail-sheet";
-import { AuditLog } from "@/types/domain";
+import { useWorkspaceAudit } from "./_hooks/use-workspace-audit";
 
 export function WorkspaceAudit() {
-  const { localAuditLogs } = useWorkspace();
-  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
-  const hasLogs = localAuditLogs.length > 0;
+  const { localAuditLogs, selectedLog, setSelectedLog, clearSelection } = useWorkspaceAudit();
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -39,7 +35,7 @@ export function WorkspaceAudit() {
                   </p>
                 </div>
               ))}
-              {!hasLogs && (
+              {localAuditLogs.length === 0 && (
                 <div className="pt-20 text-center text-xs text-muted-foreground italic opacity-50">
                   No audit events recorded for this space yet.
                 </div>
@@ -48,11 +44,11 @@ export function WorkspaceAudit() {
           </ScrollArea>
         </CardContent>
       </Card>
-      
-      <AuditDetailSheet 
+
+      <AuditDetailSheet
         log={selectedLog}
         isOpen={!!selectedLog}
-        onOpenChange={(open) => { if (!open) setSelectedLog(null); }}
+        onOpenChange={(open) => { if (!open) clearSelection(); }}
       />
     </div>
   );
