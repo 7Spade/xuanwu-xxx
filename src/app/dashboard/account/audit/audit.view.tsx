@@ -1,7 +1,6 @@
 "use client";
 
 import { OrganizationAuditComponent } from "@/app/dashboard/workspaces/[id]/capabilities/audit/organization-audit.component";
-import { PageHeader } from "../_components/page-header";
 
 /**
  * AccountAuditView - Responsibility: Displays the audit trail (Audit Logs) for the entire dimension.
@@ -9,10 +8,12 @@ import { PageHeader } from "../_components/page-header";
 export default function AccountAuditView() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700 pb-20">
-      <PageHeader
-        title="Audit"
-        description="Architectural event log for the entire dimension."
-      />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight font-headline">Audit</h1>
+          <p className="text-muted-foreground">Architectural event log for the entire dimension.</p>
+        </div>
+      </div>
       <OrganizationAuditComponent />
     </div>
   );

@@ -3,7 +3,6 @@
 import { useApp } from "@/hooks/state/use-app";
 import { AlertCircle } from "lucide-react";
 import { AccountScheduleComponent } from "@/app/dashboard/workspaces/[id]/capabilities/schedule/organization-schedule.component";
-import { PageHeader } from "../_components/page-header";
 
 export default function AccountScheduleView() {
   const { state } = useApp();
@@ -23,10 +22,12 @@ export default function AccountScheduleView() {
 
   return (
     <div className="flex flex-col h-full max-w-full mx-auto animate-in fade-in duration-700">
-      <PageHeader
-        title="Organization Schedule"
-        description="Aggregated view of all proposed and official schedule items across all workspaces."
-      />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight font-headline">Organization Schedule</h1>
+          <p className="text-muted-foreground">Aggregated view of all proposed and official schedule items across all workspaces.</p>
+        </div>
+      </div>
       <AccountScheduleComponent />
     </div>
   );
