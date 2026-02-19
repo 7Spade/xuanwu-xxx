@@ -171,39 +171,19 @@ export const updateScheduleItemStatus = async (
 
 
 export const assignMemberToScheduleItem = async (
-  workspaceId: string,
+  accountId: string,
   itemId: string,
   memberId: string
 ): Promise<void> => {
-  const wsSnap = await getDoc(doc(db, 'workspaces', workspaceId))
-  if (!wsSnap.exists()) throw new Error("Workspace not found during member assignment.")
-  const orgId = wsSnap.data().dimensionId
-
-  const updates = {
-    assigneeIds: arrayUnion(memberId),
-  }
-  return updateDocument(
-    `accounts/${orgId}/schedule_items/${itemId}`,
-    updates
-  )
+  return updateDocument(`accounts/${accountId}/schedule_items/${itemId}`, { assigneeIds: arrayUnion(memberId) })
 }
 
 export const unassignMemberFromScheduleItem = async (
-  workspaceId: string,
+  accountId: string,
   itemId: string,
   memberId: string
 ): Promise<void> => {
-  const wsSnap = await getDoc(doc(db, 'workspaces', workspaceId))
-  if (!wsSnap.exists()) throw new Error("Workspace not found during member unassignment.")
-  const orgId = wsSnap.data().dimensionId
-
-  const updates = {
-    assigneeIds: arrayRemove(memberId),
-  }
-  return updateDocument(
-    `accounts/${orgId}/schedule_items/${itemId}`,
-    updates
-  )
+  return updateDocument(`accounts/${accountId}/schedule_items/${itemId}`, { assigneeIds: arrayRemove(memberId) })
 }
 
 export const toggleDailyLogLike = async (orgId: string, logId: string, userId: string): Promise<void> => {

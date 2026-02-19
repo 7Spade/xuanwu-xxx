@@ -1,11 +1,12 @@
 
 "use client";
 
-import React, { createContext, useReducer, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import { useFirebase } from "@/context/firebase-context";
 import { collection, query, where, onSnapshot, QuerySnapshot, orderBy, limit } from "firebase/firestore";
 import { Workspace, DailyLog, AuditLog, PartnerInvite, ScheduleItem } from '@/types/domain';
 import { useApp } from '@/hooks/state/use-app';
+import { snapshotToRecord } from '@/infra/firebase/firestore/firestore.utils';
 
 // State and Action Types
 interface AccountState {
@@ -32,16 +33,6 @@ const initialState: AccountState = {
   invites: {},
   schedule_items: {},
 };
-
-function snapshotToRecord<T extends { id: string }>(snap: QuerySnapshot): Record<string, T> {
-    const record: Record<string, T> = {};
-    if (snap && typeof snap.forEach === 'function') {
-        snap.forEach(doc => {
-        record[doc.id] = { id: doc.id, ...doc.data() } as T;
-        });
-    }
-    return record;
-}
 
 // Reducer
 const accountReducer = (state: AccountState, action: Action): AccountState => {

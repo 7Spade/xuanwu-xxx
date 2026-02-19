@@ -21,8 +21,7 @@ const AVAILABLE_BADGES: ExpertiseBadge[] = [
 ]
 
 interface ProfileCardProps {
-  user: Account | null
-  profile: Account | null
+  account: Account | null
   name: string
   setName: (name: string) => void
   bio: string
@@ -37,8 +36,7 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard({
-  user,
-  profile,
+  account,
   name,
   setName,
   bio,
@@ -65,7 +63,7 @@ export function ProfileCard({
         <div className="flex items-center gap-6">
           <div className="relative">
             <Avatar className="w-20 h-20 border-2 border-primary/20">
-              <AvatarImage src={profile?.photoURL} />
+              <AvatarImage src={account?.photoURL} />
               <AvatarFallback className="text-2xl font-bold bg-primary/5 text-primary">
                 {name?.[0]}
               </AvatarFallback>
@@ -115,7 +113,7 @@ export function ProfileCard({
 
         <div className="grid gap-2">
           <Label htmlFor="user-email">Email</Label>
-          <Input id="user-email" defaultValue={user?.email} disabled />
+          <Input id="user-email" defaultValue={account?.email} disabled />
           <p className="text-[10px] text-muted-foreground italic">Email address cannot be changed.</p>
         </div>
       </CardContent>

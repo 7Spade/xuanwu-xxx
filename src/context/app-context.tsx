@@ -5,6 +5,7 @@ import { useFirebase } from "@/context/firebase-context"
 import { collection, query, where, onSnapshot, QuerySnapshot } from "firebase/firestore"
 import { Account, CapabilitySpec, Notification } from '@/types/domain'
 import { useAuth } from './auth-context'
+import { snapshotToRecord } from '@/infra/firebase/firestore/firestore.utils'
 
 // State and Action Types
 interface AppState {
@@ -102,17 +103,6 @@ const appReducer = (state: AppState, action: Action): AppState => {
       return state
   }
 }
-
-function snapshotToRecord<T extends { id: string }>(snap: QuerySnapshot): Record<string, T> {
-  const record: Record<string, T> = {}
-  if (snap && typeof snap.forEach === 'function') {
-    snap.forEach(doc => {
-      record[doc.id] = { id: doc.id, ...doc.data() } as T
-    })
-  }
-  return record
-}
-
 
 // Context
 export const AppContext = createContext<{ state: AppState; dispatch: React.Dispatch<Action> } | null>(null)
