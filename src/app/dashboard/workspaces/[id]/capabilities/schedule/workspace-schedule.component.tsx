@@ -21,7 +21,7 @@ export function WorkspaceSchedule() {
   const { workspace, createScheduleItem } = useWorkspace();
   const { state: appState, dispatch: appDispatch } = useApp();
   const { state: accountState } = useAccount();
-  const { organizations, activeAccount, scheduleTaskRequest } = appState;
+  const { accounts, activeAccount, scheduleTaskRequest } = appState;
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -38,8 +38,8 @@ export function WorkspaceSchedule() {
   }, [scheduleTaskRequest, workspace.id, appDispatch]);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
   
   const orgMembers = useMemo(() => activeOrg?.members || [], [activeOrg]);

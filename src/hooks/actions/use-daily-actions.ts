@@ -28,7 +28,7 @@ export function useDailyActions() {
 
   const toggleLike = useCallback(
     async (logId: string) => {
-      if (!user || !activeAccount || activeAccount.type !== "organization") {
+      if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
         toast({
           variant: "destructive",
           title: "Authentication Error",

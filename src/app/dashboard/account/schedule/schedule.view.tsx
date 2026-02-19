@@ -8,7 +8,7 @@ export default function AccountScheduleView() {
   const { state } = useApp();
   const { activeAccount } = state;
 
-  if (activeAccount?.type !== 'organization') {
+  if (activeAccount?.accountType !== 'organization') {
     return (
       <div className="p-8 text-center flex flex-col items-center gap-4">
         <AlertCircle className="w-10 h-10 text-muted-foreground" />

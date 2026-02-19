@@ -51,13 +51,13 @@ const getErrorMessage = (error: unknown, fallback: string) =>
 export function WorkspaceCapabilities() {
   const { workspace, logAuditEvent, mountCapabilities, unmountCapability } = useWorkspace();
   const { state } = useApp();
-  const { capabilitySpecs, organizations } = state;
+  const { capabilitySpecs, accounts } = state;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCaps, setSelectedCaps] = useState<Set<string>>(new Set());
 
   const ownerType = useMemo(() => 
-    organizations[workspace.dimensionId] ? 'organization' : 'user',
-    [organizations, workspace.dimensionId]
+    accounts[workspace.dimensionId] ? 'organization' : 'user',
+    [accounts, workspace.dimensionId]
   );
 
   const mountedCapIds = useMemo(() => 

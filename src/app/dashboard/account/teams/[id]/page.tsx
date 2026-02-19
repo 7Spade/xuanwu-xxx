@@ -40,7 +40,7 @@ export default function AccountTeamDetailPage() {
   const router = useRouter();
   
   const { state } = useApp();
-  const { organizations, activeAccount } = state;
+  const { accounts, activeAccount } = state;
   const { updateTeamMembers } = useOrganization();
   const activeOrgId = activeAccount?.id;
   const [mounted, setMounted] = useState(false);
@@ -50,8 +50,8 @@ export default function AccountTeamDetailPage() {
   }, []);
 
   const activeOrg = useMemo(() => 
-    activeOrgId ? organizations[activeOrgId] : null,
-    [organizations, activeOrgId]
+    activeOrgId ? accounts[activeOrgId] : null,
+    [accounts, activeOrgId]
   );
   
   const team = activeOrg?.teams?.find(t => t.id === id);

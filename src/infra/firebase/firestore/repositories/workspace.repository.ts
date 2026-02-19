@@ -23,13 +23,13 @@ import type {
   Workspace,
   WorkspaceRole,
   WorkspaceGrant,
-  SwitchableAccount,
+  Account,
   WorkspaceIssue,
   IssueComment,
   WorkspaceTask,
   Capability,
   WorkspaceLifecycleState,
-} from '@/types/domain';
+} from '@/types/domain'
 
 /**
  * Creates a new workspace with default values, based on the active account context.
@@ -39,20 +39,20 @@ import type {
  */
 export const createWorkspace = async (
   name: string,
-  account: SwitchableAccount
+  account: Account
 ): Promise<string> => {
   const workspaceData: Omit<Workspace, 'id'> = {
     name: name.trim(),
     dimensionId: account.id, // The single source of truth for ownership.
     lifecycleState: 'preparatory',
-    visibility: account.type === 'organization' ? 'visible' : 'hidden',
+    visibility: account.accountType === 'organization' ? 'visible' : 'hidden',
     protocol: 'Standard Access Protocol',
     scope: ['Authentication', 'Compute'],
     capabilities: [],
     grants: [],
     teamIds: [],
     createdAt: serverTimestamp(),
-  };
+  }
 
   const docRef = await addDocument('workspaces', workspaceData);
   return docRef.id;

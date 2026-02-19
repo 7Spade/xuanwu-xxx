@@ -64,7 +64,7 @@ export default function PartnerTeamDetailPage() {
 
   const { state: appState } = useApp();
   const { state: accountState } = useAccount();
-  const { organizations, activeAccount } = appState;
+  const { accounts, activeAccount } = appState;
   const { invites } = accountState;
   const { sendPartnerInvite, dismissPartnerMember } = useOrganization();
   
@@ -77,8 +77,8 @@ export default function PartnerTeamDetailPage() {
   }, []);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
 
   const team = useMemo(() => 

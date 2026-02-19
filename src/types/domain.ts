@@ -2,6 +2,7 @@
 // == Primitive Types & Enums
 // =================================================================
 
+export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
 export type WorkspaceRole = 'Manager' | 'Contributor' | 'Viewer';
 export type WorkspaceLifecycleState = 'preparatory' | 'active' | 'stopped';
@@ -11,33 +12,30 @@ export type ScheduleStatus = 'PROPOSAL' | 'OFFICIAL' | 'REJECTED';
 // == Core Business Entities
 // =================================================================
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  photoURL?: string;
+export interface Account {
+  id: string
+  name: string
+  accountType: AccountType
+  email?: string
+  photoURL?: string
+  bio?: string
+  achievements?: string[]
+  expertiseBadges?: ExpertiseBadge[]
+  // org-specific
+  description?: string
+  ownerId?: string
+  role?: OrganizationRole   // current user's role in this org
+  theme?: ThemeConfig
+  members?: MemberReference[]
+  memberIds?: string[]
+  teams?: Team[]
+  createdAt?: any
 }
 
-export interface UserProfile {
-  id: string;
-  bio?: string;
-  photoURL?: string;
-  achievements?: string[];
-  expertiseBadges?: ExpertiseBadge[];
-}
-
-export interface Organization {
-  id: string;
-  name: string;
-  description: string;
-  ownerId: string;
-  role: OrganizationRole;
-  theme?: ThemeConfig;
-  members: MemberReference[];
-  memberIds: string[]; // Derived field for security rules
-  teams: Team[];
-  createdAt: any; // FirestoreTimestamp
-}
+// Type aliases for backward compatibility during migration
+export type User = Account
+export type UserProfile = Account
+export type Organization = Account
 
 export interface Workspace {
   id: string;
@@ -62,11 +60,8 @@ export interface Workspace {
 // == Relational & Structural Types
 // =================================================================
 
-export interface SwitchableAccount {
-  id: string;
-  name: string;
-  type: 'user' | 'organization';
-}
+// SwitchableAccount is now replaced by Account with accountType discriminator
+export type SwitchableAccount = Account
 
 export interface MemberReference {
   id: string;

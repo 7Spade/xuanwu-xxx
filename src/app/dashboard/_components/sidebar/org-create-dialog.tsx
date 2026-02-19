@@ -1,7 +1,7 @@
 
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,21 +9,21 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/app/_components/ui/dialog";
-import { Button } from "@/app/_components/ui/button";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
-import { Loader2 } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
-import { Organization, SwitchableAccount } from "@/types/domain";
+} from "@/app/_components/ui/dialog"
+import { Button } from "@/app/_components/ui/button"
+import { Label } from "@/app/_components/ui/label"
+import { Input } from "@/app/_components/ui/input"
+import { Loader2 } from "lucide-react"
+import { toast } from "@/hooks/ui/use-toast"
+import { Account } from "@/types/domain"
 
 interface OrgCreateDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  createOrganization: (name: string) => Promise<string>;
-  dispatch: React.Dispatch<any>;
-  organizations: Record<string, Organization>;
-  t: (key: string) => string;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  createOrganization: (name: string) => Promise<string>
+  dispatch: React.Dispatch<any>
+  accounts: Record<string, Account>
+  t: (key: string) => string
 }
 
 export function OrgCreateDialog({
@@ -31,44 +31,44 @@ export function OrgCreateDialog({
   onOpenChange,
   createOrganization,
   dispatch,
-  organizations,
+  accounts,
   t,
 }: OrgCreateDialogProps) {
-  const [newOrgName, setNewOrgName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [pendingOrgId, setPendingOrgId] = useState<string | null>(null);
+  const [newOrgName, setNewOrgName] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [pendingOrgId, setPendingOrgId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) {
-      setNewOrgName("");
-      setIsLoading(false);
-      setPendingOrgId(null);
+      setNewOrgName("")
+      setIsLoading(false)
+      setPendingOrgId(null)
     }
-  }, [open]);
+  }, [open])
 
   useEffect(() => {
-    if (pendingOrgId && organizations[pendingOrgId]) {
-      const org = organizations[pendingOrgId];
-      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { id: org.id, name: org.name, type: "organization" } as SwitchableAccount });
-      setPendingOrgId(null);
+    if (pendingOrgId && accounts[pendingOrgId]) {
+      const org = accounts[pendingOrgId]
+      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { ...org, accountType: "organization" } })
+      setPendingOrgId(null)
     }
-  }, [pendingOrgId, organizations, dispatch]);
+  }, [pendingOrgId, accounts, dispatch])
 
   const handleCreateOrg = async () => {
-    if (!newOrgName.trim()) return;
-    setIsLoading(true);
+    if (!newOrgName.trim()) return
+    setIsLoading(true)
     try {
-      const newOrgId = await createOrganization(newOrgName);
-      setPendingOrgId(newOrgId);
-      onOpenChange(false);
-      toast({ title: t('dimension.newDimensionCreated') });
+      const newOrgId = await createOrganization(newOrgName)
+      setPendingOrgId(newOrgId)
+      onOpenChange(false)
+      toast({ title: t('dimension.newDimensionCreated') })
     } catch (error: any) {
-      toast({ variant: "destructive", title: t('dimension.failedToCreate'), description: error.message });
-      setPendingOrgId(null);
+      toast({ variant: "destructive", title: t('dimension.failedToCreate'), description: error.message })
+      setPendingOrgId(null)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

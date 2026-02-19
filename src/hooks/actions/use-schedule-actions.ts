@@ -25,7 +25,7 @@ export function useScheduleActions() {
   const { user } = authState;
 
   const assignMember = useCallback(async (item: ScheduleItem, memberId: string) => {
-    if (!user || !activeAccount || activeAccount.type !== "organization") {
+    if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
       toast({
         variant: "destructive",
         title: "Authentication Error",
@@ -49,7 +49,7 @@ export function useScheduleActions() {
   }, [user, activeAccount]);
 
   const unassignMember = useCallback(async (item: ScheduleItem, memberId: string) => {
-    if (!user || !activeAccount || activeAccount.type !== "organization") {
+    if (!user || !activeAccount || activeAccount.accountType !== 'organization') {
       toast({
         variant: "destructive",
         title: "Authentication Error",

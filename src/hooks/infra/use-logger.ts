@@ -20,7 +20,7 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
   const { activeAccount } = appState;
 
   const logDaily = useCallback(async (content: string, photoURLs: string[] | undefined, user: User) => {
-    if (!activeAccount || activeAccount.type !== 'organization' || !user || !db) return;
+    if (!activeAccount || activeAccount.accountType !== 'organization' || !user || !db) return;
 
     const dailyData = {
       content,
@@ -37,11 +37,11 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
       photoURLs: photoURLs || [],
     };
 
-    return addDocument(`organizations/${activeAccount.id}/dailyLogs`, dailyData);
+    return addDocument(`accounts/${activeAccount.id}/dailyLogs`, dailyData);
   }, [db, activeAccount, workspaceId, workspaceName]);
 
   const logAudit = useCallback(async (action: string, target: string, type: AuditLog['type'], user: User) => {
-    if (!activeAccount || activeAccount.type !== 'organization' || !user || !db) return;
+    if (!activeAccount || activeAccount.accountType !== 'organization' || !user || !db) return;
 
     const eventData: Omit<AuditLog, 'id'| 'recordedAt'> & { recordedAt: any } = {
       actor: user.name,
@@ -53,7 +53,7 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
       workspaceId: workspaceId || undefined
     };
 
-    return addDocument(`organizations/${activeAccount.id}/auditLogs`, eventData);
+    return addDocument(`accounts/${activeAccount.id}/auditLogs`, eventData);
   }, [db, activeAccount, workspaceId]);
 
   return { logDaily, logAudit };

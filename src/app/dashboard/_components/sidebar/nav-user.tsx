@@ -1,8 +1,8 @@
 
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,45 +10,45 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
-import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/app/_components/ui/sidebar";
-import { UserCircle, LogOut, ChevronUp } from "lucide-react";
-import { User, UserProfile, Organization, SwitchableAccount } from "@/types/domain";
-import { useMemo } from "react";
+} from "@/app/_components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar"
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/app/_components/ui/sidebar"
+import { UserCircle, LogOut, ChevronUp } from "lucide-react"
+import { Account } from "@/types/domain"
+import { useMemo } from "react"
 
 interface NavUserProps {
-  user: User | null;
-  userProfile: UserProfile | null;
-  organizations: Record<string, Organization>;
-  activeAccount: SwitchableAccount | null;
-  logout: () => void;
-  t: (key: string) => void;
+  user: Account | null
+  userProfile: Account | null
+  accounts: Record<string, Account>
+  activeAccount: Account | null
+  logout: () => void
+  t: (key: string) => void
 }
 
-const getAccountInitial = (name?: string) => name?.[0] ?? "";
+const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
-export function NavUser({ user, userProfile, organizations, activeAccount, logout, t }: NavUserProps) {
-  const router = useRouter();
+export function NavUser({ user, userProfile, accounts, activeAccount, logout, t }: NavUserProps) {
+  const router = useRouter()
 
   const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
+    logout()
+    router.push("/login")
+  }
 
   const activeOrg = useMemo(() =>
-    activeAccount?.type === "organization" && activeAccount
-      ? organizations[activeAccount.id]
+    activeAccount?.accountType === "organization" && activeAccount
+      ? accounts[activeAccount.id]
       : null,
-    [organizations, activeAccount]
-  );
+    [accounts, activeAccount]
+  )
 
   const currentUserRoleInOrg = useMemo(() => {
-    if (!activeOrg || !user) return null;
-    if (activeOrg.ownerId === user.id) return t('sidebar.owner');
-    const member = activeOrg.members?.find((m) => m.id === user.id);
-    return member?.role || t('sidebar.guest');
-  }, [activeOrg, user, t]);
+    if (!activeOrg || !user) return null
+    if (activeOrg.ownerId === user.id) return t('sidebar.owner')
+    const member = activeOrg.members?.find((m) => m.id === user.id)
+    return member?.role || t('sidebar.guest')
+  }, [activeOrg, user, t])
 
   return (
     <SidebarMenu>
@@ -64,7 +64,7 @@ export function NavUser({ user, userProfile, organizations, activeAccount, logou
                   <div className="flex flex-col overflow-hidden text-left flex-1">
                     <span className="text-xs font-bold truncate">{user?.name}</span>
                     <span className="text-[9px] text-muted-foreground truncate uppercase">
-                      {activeAccount?.type === 'organization' ? currentUserRoleInOrg : user?.email}
+                      {activeAccount?.accountType === 'organization' ? currentUserRoleInOrg : user?.email}
                     </span>
                   </div>
                   <ChevronUp className="ml-auto w-4 h-4 text-muted-foreground opacity-50" />

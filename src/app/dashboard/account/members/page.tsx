@@ -38,7 +38,7 @@ export default function AccountMembersPage() {
   const [mounted, setMounted] = useState(false);
   const { t } = useI18n();
   const { state } = useApp();
-  const { organizations, activeAccount } = state;
+  const { accounts, activeAccount } = state;
   const { recruitMember, dismissMember } = useOrganization();
 
   useEffect(() => {
@@ -46,8 +46,8 @@ export default function AccountMembersPage() {
   }, []);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
 
   if (!mounted) return null;

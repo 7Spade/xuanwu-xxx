@@ -104,35 +104,35 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!activeAccount?.id || !db) {
-            dispatch({ type: 'RESET_STATE' });
-            return;
+            dispatch({ type: 'RESET_STATE' })
+            return
         };
 
-        const unsubs: (() => void)[] = [];
+        const unsubs: (() => void)[] = []
 
         // 1. Listen to top-level collections for the active account
-        if (activeAccount.type === 'organization') {
-            const dailyLogsQuery = query(collection(db, "organizations", activeAccount.id, "dailyLogs"), orderBy("recordedAt", "desc"), limit(50));
-            unsubs.push(onSnapshot(dailyLogsQuery, (snap) => dispatch({ type: 'SET_DAILY_LOGS', payload: snap })));
+        if (activeAccount.accountType === 'organization') {
+            const dailyLogsQuery = query(collection(db, "accounts", activeAccount.id, "dailyLogs"), orderBy("recordedAt", "desc"), limit(50))
+            unsubs.push(onSnapshot(dailyLogsQuery, (snap) => dispatch({ type: 'SET_DAILY_LOGS', payload: snap })))
 
-            const auditLogsQuery = query(collection(db, "organizations", activeAccount.id, "auditLogs"), orderBy("recordedAt", "desc"), limit(50));
-            unsubs.push(onSnapshot(auditLogsQuery, (snap) => dispatch({ type: 'SET_AUDIT_LOGS', payload: snap })));
+            const auditLogsQuery = query(collection(db, "accounts", activeAccount.id, "auditLogs"), orderBy("recordedAt", "desc"), limit(50))
+            unsubs.push(onSnapshot(auditLogsQuery, (snap) => dispatch({ type: 'SET_AUDIT_LOGS', payload: snap })))
             
-            const invitesQuery = query(collection(db, "organizations", activeAccount.id, "invites"), orderBy("invitedAt", "desc"));
-            unsubs.push(onSnapshot(invitesQuery, (snap) => dispatch({ type: 'SET_INVITES', payload: snap })));
+            const invitesQuery = query(collection(db, "accounts", activeAccount.id, "invites"), orderBy("invitedAt", "desc"))
+            unsubs.push(onSnapshot(invitesQuery, (snap) => dispatch({ type: 'SET_INVITES', payload: snap })))
 
-            const scheduleQuery = query(collection(db, "organizations", activeAccount.id, "schedule_items"), orderBy("createdAt", "desc"));
-            unsubs.push(onSnapshot(scheduleQuery, (snap) => dispatch({ type: 'SET_SCHEDULE_ITEMS', payload: snap })));
+            const scheduleQuery = query(collection(db, "accounts", activeAccount.id, "schedule_items"), orderBy("createdAt", "desc"))
+            unsubs.push(onSnapshot(scheduleQuery, (snap) => dispatch({ type: 'SET_SCHEDULE_ITEMS', payload: snap })))
         }
         
-        const wsQuery = query(collection(db, "workspaces"), where("dimensionId", "==", activeAccount.id));
-        unsubs.push(onSnapshot(wsQuery, (snap) => dispatch({ type: 'SET_WORKSPACES', payload: snap })));
+        const wsQuery = query(collection(db, "workspaces"), where("dimensionId", "==", activeAccount.id))
+        unsubs.push(onSnapshot(wsQuery, (snap) => dispatch({ type: 'SET_WORKSPACES', payload: snap })))
         
         return () => {
-            unsubs.forEach(unsub => unsub());
-        };
+            unsubs.forEach(unsub => unsub())
+        }
 
-    }, [activeAccount, db]);
+    }, [activeAccount, db])
 
     return (
         <AccountContext.Provider value={{ state, dispatch }}>

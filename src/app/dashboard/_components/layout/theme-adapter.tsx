@@ -12,9 +12,9 @@ interface ThemeAdapterProps {
 
 export function ThemeAdapter({ children }: ThemeAdapterProps) {
   const { state: appState } = useApp();
-  const { organizations, activeAccount } = appState;
+  const { accounts, activeAccount } = appState;
 
-  const activeOrg = activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null;
+  const activeOrg = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null;
 
   const [isAdapting, setIsAdapting] = useState(false);
   const adaptingId = useRef<string | null>(null);

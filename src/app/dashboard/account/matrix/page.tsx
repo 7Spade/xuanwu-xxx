@@ -34,7 +34,7 @@ function PageHeader({ title, description, children, badge }: PageHeaderProps) {
 export default function PermissionMatrixPage() {
   const { state: appState } = useApp();
   const { state: accountState } = useAccount();
-  const { organizations, activeAccount } = appState;
+  const { accounts, activeAccount } = appState;
   const { workspaces } = accountState;
 
   const [mounted, setMounted] = useState(false);
@@ -43,8 +43,8 @@ export default function PermissionMatrixPage() {
   const workspacesArray = useMemo(() => Object.values(workspaces), [workspaces]);
 
   const activeOrg = useMemo(() => 
-    activeAccount?.type === 'organization' ? organizations[activeAccount.id] : null,
-    [organizations, activeAccount]
+    activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
   );
   
   if (!mounted) return null;

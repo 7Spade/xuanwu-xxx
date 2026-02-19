@@ -60,13 +60,13 @@ export function DashboardSidebar() {
   // ========================================
   // State Management - Data Fetching from Hooks
   // ========================================
-  const { state: authState, logout } = useAuth();
-  const { user } = authState;
-  const { profile: userProfile } = useUser();
-  const { state: appState, dispatch } = useApp();
-  const { organizations, activeAccount } = appState;
-  const visibleWorkspaces = useVisibleWorkspaces();
-  const { createOrganization } = useOrganization();
+  const { state: authState, logout } = useAuth()
+  const { user } = authState
+  const { profile: userProfile } = useUser()
+  const { state: appState, dispatch } = useApp()
+  const { accounts, activeAccount } = appState
+  const visibleWorkspaces = useVisibleWorkspaces()
+  const { createOrganization } = useOrganization()
 
   // ========================================
   // Render - Assembling the Sidebar
@@ -78,7 +78,7 @@ export function DashboardSidebar() {
         <AccountSwitcher
           user={user}
           userProfile={userProfile}
-          organizations={organizations}
+          accounts={accounts}
           activeAccount={activeAccount}
           dispatch={dispatch}
           createOrganization={createOrganization}
@@ -96,7 +96,7 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <NavMain
               pathname={pathname}
-              isOrganizationAccount={activeAccount?.type === "organization"}
+              isOrganizationAccount={activeAccount?.accountType === "organization"}
               t={t}
             />
           </SidebarGroupContent>
@@ -117,7 +117,7 @@ export function DashboardSidebar() {
         <NavUser
           user={user}
           userProfile={userProfile}
-          organizations={organizations}
+          accounts={accounts}
           activeAccount={activeAccount}
           logout={logout}
           t={t}

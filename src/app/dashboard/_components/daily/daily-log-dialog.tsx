@@ -90,7 +90,7 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
     }
 
     const commentsQuery = query(
-        collection(db, `organizations/${log.accountId}/dailyLogs/${log.id}/comments`),
+        collection(db, `accounts/${log.accountId}/dailyLogs/${log.id}/comments`),
         orderBy("createdAt", "asc")
     );
 

@@ -8,8 +8,8 @@ import { User, Loader2, Upload } from "lucide-react";
 import { Textarea } from "@/app/_components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
 import { Checkbox } from "@/app/_components/ui/checkbox";
-import { ExpertiseBadge, User as UserType, UserProfile } from "@/types/domain";
-import React from "react";
+import { ExpertiseBadge, Account } from "@/types/domain"
+import React from "react"
 
 // A mock list of available expertise badges
 const AVAILABLE_BADGES: ExpertiseBadge[] = [
@@ -18,22 +18,22 @@ const AVAILABLE_BADGES: ExpertiseBadge[] = [
     { id: 'nodejs', name: 'Node.js' },
     { id: 'python', name: 'Python' },
     { id: 'ai', name: 'GenAI' },
-];
+]
 
 interface ProfileCardProps {
-  user: UserType | null;
-  profile: UserProfile | null;
-  name: string;
-  setName: (name: string) => void;
-  bio: string;
-  setBio: (bio: string) => void;
-  selectedBadges: ExpertiseBadge[];
-  handleBadgeToggle: (badge: ExpertiseBadge) => void;
-  handleSaveProfile: () => void;
-  handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isSaving: boolean;
-  isUploading: boolean;
-  avatarInputRef: React.RefObject<HTMLInputElement>;
+  user: Account | null
+  profile: Account | null
+  name: string
+  setName: (name: string) => void
+  bio: string
+  setBio: (bio: string) => void
+  selectedBadges: ExpertiseBadge[]
+  handleBadgeToggle: (badge: ExpertiseBadge) => void
+  handleSaveProfile: () => void
+  handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
+  isSaving: boolean
+  isUploading: boolean
+  avatarInputRef: React.RefObject<HTMLInputElement>
 }
 
 export function ProfileCard({
