@@ -47,7 +47,7 @@ export function LoginForm({
       <div className="space-y-2">
         <div className="flex justify-between items-center px-1">
           <Label htmlFor="l-pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.securityKey')}</Label>
-          <button onClick={onForgotPassword} className="text-[10px] font-black text-primary/60 hover:text-primary transition-colors uppercase">{t('auth.forgotPassword')}</button>
+          <Button variant="ghost" size="sm" type="button" onClick={onForgotPassword} className="h-auto p-0 text-[10px] font-black text-primary/60 hover:text-primary hover:bg-transparent transition-colors uppercase">{t('auth.forgotPassword')}</Button>
         </div>
         <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
           <InputGroupAddon className="pl-4">
