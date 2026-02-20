@@ -11,8 +11,8 @@
   - 匿名登入 (用於訪客體驗)
 - **職責分離**:
   - **UI 層**: 負責收集使用者憑證。
-  - **`infra/firebase/auth/auth.adapter.ts`**: 唯一負責與 Firebase Auth SDK 互動的模組。
-  - **`context/auth-context.tsx`**: 監聽全域身份驗證狀態，並將 `user` 物件提供給整個應用程式。
+  - **`firebase/auth/auth.adapter.ts`**: 唯一負責與 Firebase Auth SDK 互動的模組。
+  - **`shared/app-providers/auth-provider.tsx`**: 監聽全域身份驗證狀態，並將 `user` 物件提供給整個應用程式。
 
 ## 2. 授權 (Authorization)
 

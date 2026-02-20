@@ -64,13 +64,13 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
       {isOrganizationAccount && (
         <SidebarMenuItem>
           <Collapsible defaultOpen className="group/collapsible w-full">
-            <SidebarMenuButton asChild>
-                <CollapsibleTrigger>
-                  <FolderTree />
-                  <span className="font-semibold">{t("sidebar.accountGovernance")}</span>
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                </CollapsibleTrigger>
-            </SidebarMenuButton>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton>
+                <FolderTree />
+                <span className="font-semibold">{t("sidebar.accountGovernance")}</span>
+                <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarMenuSub>
                 {[
