@@ -168,7 +168,7 @@ And the feature module does the work:
 
 ```tsx
 // features/members/members-loader.tsx — RSC
-import { getMembers } from '@/actions/account'
+import { getMembers } from '@/server-commands/account'
 import { MembersView } from './members-view'
 
 export async function MembersLoader() {

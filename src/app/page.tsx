@@ -3,8 +3,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/shared/context/auth-context";
-import { useI18n } from "@/shared/context/i18n-context";
+import { useAuth } from "@/shared/app-providers/auth-provider";
+import { useI18n } from "@/shared/app-providers/i18n-provider";
 
 /**
  * Home - Responsibility: Serves as the landing page and entry point.

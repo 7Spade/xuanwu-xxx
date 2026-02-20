@@ -41,4 +41,4 @@ export const VALIDATION = {
 
 ## Note
 
-Domain-specific constants should live in their respective domain directories (e.g., `src/types/domain.ts`).
+Domain-specific constants should live in their respective domain directories (e.g., `src/domain-types/domain.ts`).

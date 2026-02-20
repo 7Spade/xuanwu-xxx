@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/workspaces/[id]/capabilities/schedule/schedule.view';
+export { default } from '@/app/dashboard/workspaces/[id]/plugins/schedule/schedule.view';

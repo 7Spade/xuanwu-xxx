@@ -19,7 +19,7 @@ Pure, stateless helper functions with no side effects. Zero React, zero Firebase
 
 ## What does NOT belong here
 
-- Firebase SDK calls → `src/infra/`
+- Firebase SDK calls → `src/firebase/`
 - Business logic → `src/actions/`
 - React hooks → `src/shared/hooks/`
 - Domain-specific logic → `src/entities/`
@@ -31,17 +31,17 @@ Pure, stateless helper functions with no side effects. Zero React, zero Firebase
 ## Allowed imports
 
 ```ts
-import ... from '@/types/...'         // ✅
-import ... from '@/shared/types/...'  // ✅
+import ... from '@/domain-types/...'         // ✅
+import ... from '@/shared/i18n-types/...'  // ✅
 ```
 
 ## Forbidden imports
 
 ```ts
-import ... from '@/infra/...'    // ❌
-import ... from '@/hooks/...'    // ❌
-import ... from '@/context/...'  // ❌
-import ... from '@/actions/...'  // ❌
+import ... from '@/firebase/...'    // ❌
+import ... from '@/react-hooks/...'    // ❌
+import ... from '@/react-providers/...'  // ❌
+import ... from '@/server-commands/...'  // ❌
 import ... from '@/app/...'      // ❌
 import ... from 'react'          // ❌
 ```

@@ -1,6 +1,4 @@
-"use client"
-
-import { TeamDetailView } from "@/features/teams"
+import { TeamDetailView } from "@/use-cases/teams"
 
 /**
  * AccountTeamDetailPage - 職責：管理特定團隊內的成員 (Team Member 清單)

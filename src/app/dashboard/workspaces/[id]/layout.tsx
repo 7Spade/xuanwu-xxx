@@ -3,22 +3,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
-import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context";
+import { WorkspaceProvider, useWorkspace } from "@/react-providers/workspace-provider"
+import { useWorkspaceEventHandler } from "./_event-handlers/workspace-event-handler"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/shared/ui/dialog";
-import { WorkspaceSettingsDialog } from "./_components/workspace-settings";
-import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
-import { WorkspaceNavTabs } from "./_components/workspace-nav-tabs";
-import { handleDeleteWorkspace } from "../_lib/workspace-actions";
-import type { WorkspaceLifecycleState, Address } from "@/types/domain";
+} from "@/shared/shadcn-ui/dialog";
+import { WorkspaceStatusBar } from "./_route-components/workspace-status-bar";
+import { WorkspaceNavTabs } from "./_route-components/workspace-nav-tabs";
+import { handleDeleteWorkspace } from "../_route-utils/workspace-actions";
 
 interface PageHeaderProps {
   title: string;
@@ -44,20 +43,13 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode }) {
-  const { workspace, updateWorkspaceSettings } = useWorkspace();
+function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { workspaceId: string; pluginTab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
+  useWorkspaceEventHandler()
+  const { workspace } = useWorkspace()
   const router = useRouter();
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const onUpdateSettings = async (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState; address?: Address }) => {
-    setLoading(true);
-    await updateWorkspaceSettings(settings);
-    setIsSettingsOpen(false);
-    setLoading(false);
-  };
 
   const onDeleteWorkspace = async () => {
     setLoading(true);
@@ -110,7 +102,7 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId:
             variant="outline"
             size="sm"
             className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => router.push(`/dashboard/workspaces/${workspaceId}/settings`)}
           >
             <Settings className="w-3.5 h-3.5" /> Space Settings
           </Button>
@@ -125,16 +117,9 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId:
       )}
 
       <WorkspaceNavTabs workspaceId={workspaceId} />
-      {capability}
+      {pluginTab}
+      {panel}
       {modal}
-
-      <WorkspaceSettingsDialog
-        workspace={workspace}
-        open={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        onSave={onUpdateSettings}
-        loading={loading}
-      />
 
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="rounded-2xl">
@@ -168,18 +153,20 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId:
  * Its sole responsibility is to provide the WorkspaceContext.
  */
 export default function WorkspaceLayout({
-  capability,
+  "plugin-tab": pluginTab,
   modal,
+  panel,
   params,
 }: {
-  capability: React.ReactNode;
+  "plugin-tab": React.ReactNode;
   modal: React.ReactNode;
-  params: { id: string };
+  panel: React.ReactNode;
+  params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={capability} modal={modal} />
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} pluginTab={pluginTab} modal={modal} panel={panel} />
     </WorkspaceProvider>
   );
 }
