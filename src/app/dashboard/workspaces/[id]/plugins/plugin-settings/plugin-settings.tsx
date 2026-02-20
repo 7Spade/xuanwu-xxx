@@ -259,8 +259,10 @@ export function WorkspaceCapabilities() {
            <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
               <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
+                <span aria-live="polite" aria-busy={isMounting}>
                 {isMounting && <Spinner className="mr-1" />}
                 Mount Selected ({selectedCaps.size})
+                </span>
               </Button>
            </DialogFooter>
         </DialogContent>
