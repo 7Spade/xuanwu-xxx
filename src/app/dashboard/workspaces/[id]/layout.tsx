@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
-import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context"
-import { useWorkspaceEventHandler } from "./_events/workspace-event-handler"
+import { WorkspaceProvider, useWorkspace } from "@/react-providers/workspace-provider"
+import { useWorkspaceEventHandler } from "./_event-handlers/workspace-event-handler"
 import {
   Dialog,
   DialogContent,
@@ -15,9 +15,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
-import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
-import { WorkspaceNavTabs } from "./_components/workspace-nav-tabs";
-import { handleDeleteWorkspace } from "../_lib/workspace-actions";
+import { WorkspaceStatusBar } from "./_route-components/workspace-status-bar";
+import { WorkspaceNavTabs } from "./_route-components/workspace-nav-tabs";
+import { handleDeleteWorkspace } from "../_route-utils/workspace-actions";
 
 interface PageHeaderProps {
   title: string;
@@ -43,7 +43,7 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
+function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; pluginTab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
   useWorkspaceEventHandler()
   const { workspace } = useWorkspace()
   const router = useRouter();
@@ -117,7 +117,7 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { works
       )}
 
       <WorkspaceNavTabs workspaceId={workspaceId} />
-      {capability}
+      {pluginTab}
       {panel}
       {modal}
 
@@ -158,7 +158,7 @@ export default function WorkspaceLayout({
   panel,
   params,
 }: {
-  capability: React.ReactNode;
+  pluginTab: React.ReactNode;
   modal: React.ReactNode;
   panel: React.ReactNode;
   params: Promise<{ id: string }>;
@@ -166,7 +166,7 @@ export default function WorkspaceLayout({
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={capability} modal={modal} panel={panel} />
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={pluginTab} modal={modal} panel={panel} />
     </WorkspaceProvider>
   );
 }

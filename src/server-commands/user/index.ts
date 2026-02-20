@@ -9,8 +9,8 @@ import {
   createUserAccount as createUserAccountFacade,
   getUserProfile as getUserProfileFacade,
   updateUserProfile as updateUserProfileFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { Account } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { Account } from "@/domain-types/domain"
 
 export async function createUserAccount(
   userId: string,

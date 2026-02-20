@@ -9,7 +9,7 @@ import {
   uploadDailyPhoto as uploadDailyPhotoFacade,
   uploadTaskAttachment as uploadTaskAttachmentFacade,
   uploadProfilePicture as uploadProfilePictureFacade,
-} from "@/infra/firebase/storage/storage.facade"
+} from "@/firebase/storage/storage.facade"
 
 /**
  * Uploads a photo for a daily log entry.

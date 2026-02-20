@@ -17,8 +17,8 @@ This layer must remain independent of the application's UI and state management.
 - `src/lib`
 
 ### Disallowed Imports:
-- `import ... from '@/hooks/...'`
-- `import ... from '@/context/...'`
+- `import ... from '@/react-hooks/...'`
+- `import ... from '@/react-providers/...'`
 - `import ... from '@/components/...'`
 - `import ... from '@/app/...'`
 

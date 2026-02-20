@@ -5,7 +5,7 @@
  * without any React dependencies.
  */
 
-import { authAdapter } from "@/infra/firebase/auth/auth.adapter"
+import { authAdapter } from "@/firebase/auth/auth.adapter"
 
 /**
  * Signs in an existing user with email and password.

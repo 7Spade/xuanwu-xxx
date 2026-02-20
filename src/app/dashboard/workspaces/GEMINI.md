@@ -56,7 +56,7 @@ All changes to workspace capabilities MUST respect these layer definitions.
 
 `Core` → `Governance` → `[Business tabs in mount order]` → `Projection`
 
-Implemented in: `_components/workspace-tabs.tsx`
+Implemented in: `_route-components/workspace-tabs.tsx`
 
 ---
 
@@ -83,11 +83,11 @@ Several capabilities have **two view implementations** sharing the same core dat
 ```
 Capability (e.g. audit)
       │
-      ├─ audit.workspace.tsx  ←── Used by: workspace-tabs.tsx [Projection tab]
+      ├─ audit.workspace-view.tsx  ←── Used by: workspace-tabs.tsx [Projection tab]
       │   WorkspaceAudit          Context: single workspace
       │   Scope: local events      Data: localAuditLogs from WorkspaceContext
       │
-      └─ audit.account.tsx   ←── Used by: /dashboard/account/audit page
+      └─ audit.account-view.tsx   ←── Used by: /dashboard/account/audit page
           AccountAuditComponent   Context: entire account dimension
           Scope: cross-workspace  Data: auditLogs from AccountContext
 ```
@@ -96,9 +96,9 @@ Capability (e.g. audit)
 
 | Capability | Workspace view file            | Account view file             | Workspace scope       | Account scope              |
 |------------|-------------------------------|-------------------------------|----------------------|----------------------------|
-| `audit`    | `audit/audit.workspace.tsx`   | `audit/audit.account.tsx`     | Local event stream   | All-workspace event log     |
-| `daily`    | `daily/daily.workspace.tsx`   | `daily/daily.account.tsx`     | Write + read (feed)  | Aggregated read-only wall   |
-| `schedule` | `schedule/schedule.workspace.tsx` | `schedule/schedule.account.tsx` | Proposer view     | Governor view (approve/reject) |
+| `audit`    | `audit/audit.workspace-view.tsx`   | `audit/audit.account-view.tsx`     | Local event stream   | All-workspace event log     |
+| `daily`    | `daily/daily.workspace-view.tsx`   | `daily/daily.account-view.tsx`     | Write + read (feed)  | Aggregated read-only wall   |
+| `schedule` | `schedule/schedule.workspace-view.tsx` | `schedule/schedule.account-view.tsx` | Proposer view     | Governor view (approve/reject) |
 
 The account-level components are consumed by `/dashboard/account/{audit,daily,schedule}` pages.
 
@@ -107,7 +107,7 @@ The account-level components are consumed by `/dashboard/account/{audit,daily,sc
 - Always use `{capability}.workspace.tsx` for the workspace-scoped view
 - Always use `{capability}.account.tsx` for the account-scoped aggregated view
 - Export function names: `WorkspaceXxx` for workspace views, `AccountXxxComponent` for account views
-- Barrel re-exports for workspace views live in `capabilities/index.ts` (workspace views only)
+- Barrel re-exports for workspace views live in `plugins/index.ts` (workspace views only)
 
 ---
 

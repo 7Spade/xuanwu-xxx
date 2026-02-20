@@ -80,11 +80,11 @@ Every async data fetch must be wrapped in `<Suspense>` or be an async Server Com
 
 ```ts
 // ✅ Correct
-import { AuditView } from "@/features/audit/audit-view"
+import { AuditView } from "@/view-modules/audit/audit-view"
 import { getAuditLogs } from "@/server-commands/audit"
 
 // ❌ Never import infra directly from a route page
-import { firestoreFacade } from "@/infra/firebase/firestore/firestore.facade"
+import { firestoreFacade } from "@/firebase/firestore/firestore.facade"
 ```
 
 No cross-route-group global side effects.
@@ -96,7 +96,7 @@ No cross-route-group global side effects.
 import { createWorkspace } from "@/server-commands/workspace"
 
 // ❌ Never call Firebase SDK directly from a route component
-import { db } from "@/infra/firebase/firestore/db"
+import { db } from "@/firebase/firestore/db"
 ```
 
 Mutations and external API calls go through `src/actions/` or `app/api/` route handlers.
@@ -144,25 +144,25 @@ src/app/
 
 | Concern | Correct location |
 |---------|-----------------|
-| Reusable UI components | `src/shared/ui/` or `src/features/*/` |
-| Business / domain logic | `src/features/` or `src/entities/` |
-| Global state | `src/context/` |
+| Reusable UI components | `src/shared/ui/` or `src/use-cases/ or src/view-modules/*/` |
+| Business / domain logic | `src/use-cases/ or src/view-modules/` or `src/entities/` |
+| Global state | `src/react-providers/` |
 | Server-side reads/writes | `src/actions/` |
 | Pure utilities | `src/lib/` |
-| Real-time Firebase listeners | `src/hooks/` |
+| Real-time Firebase listeners | `src/react-hooks/` |
 
 ---
 
 ## Allowed Imports
 
 ```ts
-import ... from "@/features/..."   // ✅ view components, orchestration
+import ... from "@/use-cases/..."   // ✅ view components, orchestration
 import ... from "@/lib/..."         // ✅ pure utilities, event-bus
 import ... from "@/server-commands/..."     // ✅ server actions (mutations + reads)
-import ... from "@/hooks/..."       // ✅ client-side hooks
-import ... from "@/context/..."     // ✅ React context providers
+import ... from "@/react-hooks/..."       // ✅ client-side hooks
+import ... from "@/react-providers/..."     // ✅ React context providers
 import ... from "@/shared/ui/..."   // ✅ shadcn components
-import ... from "@/types/..."       // ✅ type definitions
+import ... from "@/domain-types/..."       // ✅ type definitions
 ```
 
 ## Forbidden

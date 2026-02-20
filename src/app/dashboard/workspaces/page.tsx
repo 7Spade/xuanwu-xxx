@@ -3,13 +3,13 @@
 
 import { useState, useEffect } from "react";
 import { Terminal } from "lucide-react";
-import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";
-import { useApp } from "@/hooks/state/use-app";
-import { useI18n } from "@/shared/context/i18n-context";
-import { useWorkspaceFilters } from "./_lib/use-workspace-filters";
-import { WorkspaceListHeader } from "./_components/workspace-list-header";
-import { WorkspaceGridView } from "./_components/workspace-grid-view";
-import { WorkspaceTableView } from "./_components/workspace-table-view";
+import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces";
+import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useI18n } from "@/shared/app-providers/i18n-provider";
+import { useWorkspaceFilters } from "./_route-utils/use-workspace-filters";
+import { WorkspaceListHeader } from "./_route-components/workspace-list-header";
+import { WorkspaceGridView } from "./_route-components/workspace-grid-view";
+import { WorkspaceTableView } from "./_route-components/workspace-table-view";
 import { Button } from "@/shared/shadcn-ui/button";
 import { useRouter } from "next/navigation";
 

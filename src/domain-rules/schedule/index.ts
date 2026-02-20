@@ -3,7 +3,7 @@
  * No async, no I/O, no React, no Firebase.
  */
 
-import type { ScheduleStatus } from "@/types/domain"
+import type { ScheduleStatus } from "@/domain-types/domain"
 
 // ---------------------------------------------------------------------------
 // Valid status transitions

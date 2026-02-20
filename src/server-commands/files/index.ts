@@ -6,8 +6,8 @@
 
 import {
   getWorkspaceFiles as getWorkspaceFilesFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { WorkspaceFile } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { WorkspaceFile } from "@/domain-types/domain"
 
 /**
  * Retrieves the file manifest for a workspace.

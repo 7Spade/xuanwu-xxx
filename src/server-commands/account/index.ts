@@ -16,8 +16,8 @@ import {
   dismissPartnerMember as dismissPartnerMemberFacade,
   updateOrganizationSettings as updateOrganizationSettingsFacade,
   deleteOrganization as deleteOrganizationFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { Account, MemberReference, ThemeConfig } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { Account, MemberReference, ThemeConfig } from "@/domain-types/domain"
 
 export async function createOrganization(
   orgName: string,

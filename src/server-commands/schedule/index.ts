@@ -11,8 +11,8 @@ import {
   createScheduleItem as createScheduleItemFacade,
   updateScheduleItemStatus as updateScheduleItemStatusFacade,
   getScheduleItems as getScheduleItemsFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { ScheduleItem } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { ScheduleItem } from "@/domain-types/domain"
 
 /**
  * Assigns a member to a schedule item.

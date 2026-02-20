@@ -16,18 +16,18 @@ Genkit flows for AI-powered features. Server-side only.
 ## Allowed imports
 
 ```ts
-import ... from '@/types/...'  // ✅
+import ... from '@/domain-types/...'  // ✅
 import ... from '@/lib/...'    // ✅
 ```
 
 ## Forbidden imports
 
 ```ts
-import ... from '@/hooks/...'     // ❌
-import ... from '@/context/...'   // ❌
+import ... from '@/react-hooks/...'     // ❌
+import ... from '@/react-providers/...'   // ❌
 import ... from '@/components/...' // ❌
 import ... from '@/app/...'       // ❌
-import ... from '@/infra/...'     // ❌
+import ... from '@/firebase/...'     // ❌
 ```
 
 ## Who depends on this layer

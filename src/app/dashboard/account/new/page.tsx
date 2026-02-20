@@ -7,10 +7,10 @@ import { Button } from "@/shared/shadcn-ui/button"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Input } from "@/shared/shadcn-ui/input"
 import { Loader2 } from "lucide-react"
-import { useI18n } from "@/shared/context/i18n-context"
-import { toast } from "@/shared/hooks/use-toast"
-import { useAccountManagement } from "@/hooks/state/use-account-management"
-import { useApp } from "@/hooks/state/use-app"
+import { useI18n } from "@/shared/app-providers/i18n-provider"
+import { toast } from "@/shared/utility-hooks/use-toast"
+import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management"
+import { useApp } from "@/react-hooks/state-hooks/use-app"
 
 export default function AccountNewPage() {
   const router = useRouter()

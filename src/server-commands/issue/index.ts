@@ -8,7 +8,7 @@
 import {
   createIssue as createIssueFacade,
   addCommentToIssue as addCommentToIssueFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
+} from "@/firebase/firestore/firestore.facade"
 
 export async function createIssue(
   workspaceId: string,

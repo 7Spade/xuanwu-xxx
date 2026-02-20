@@ -3,7 +3,7 @@
  * No async, no I/O, no React, no Firebase.
  */
 
-import type { Account } from "@/types/domain"
+import type { Account } from "@/domain-types/domain"
 
 // ---------------------------------------------------------------------------
 // Type guards

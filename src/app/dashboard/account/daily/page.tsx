@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/workspaces/[id]/capabilities/daily/daily.view';
+export { default } from '@/app/dashboard/workspaces/[id]/plugins/daily/daily.view';

@@ -16,8 +16,8 @@ import {
   unmountCapability as unmountCapabilityFacade,
   updateWorkspaceSettings as updateWorkspaceSettingsFacade,
   deleteWorkspace as deleteWorkspaceFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { Account, Capability, WorkspaceRole, WorkspaceLifecycleState } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { Account, Capability, WorkspaceRole, WorkspaceLifecycleState } from "@/domain-types/domain"
 
 export async function createWorkspace(
   name: string,

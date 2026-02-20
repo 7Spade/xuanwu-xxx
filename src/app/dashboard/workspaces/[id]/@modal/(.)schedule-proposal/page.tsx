@@ -3,10 +3,10 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { ProposalDialog } from "@/app/dashboard/workspaces/[id]/capabilities/schedule/_components/proposal-dialog"
-import { useWorkspace } from "@/context/workspace-context"
-import { toast } from "@/shared/hooks/use-toast"
-import type { ScheduleItem, Location } from "@/types/domain"
+import { ProposalDialog } from "@/app/dashboard/workspaces/[id]/plugins/schedule/_route-components/proposal-dialog"
+import { useWorkspace } from "@/react-providers/workspace-provider"
+import { toast } from "@/shared/utility-hooks/use-toast"
+import type { ScheduleItem, Location } from "@/domain-types/domain"
 import { parseISO } from "date-fns"
 
 export default function ScheduleProposalModalPage() {

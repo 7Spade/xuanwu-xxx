@@ -6,8 +6,8 @@
 
 import {
   getAuditLogs as getAuditLogsFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { AuditLog } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { AuditLog } from "@/domain-types/domain"
 
 /**
  * Retrieves audit logs for an account, optionally scoped to a workspace.

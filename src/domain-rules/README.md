@@ -29,10 +29,10 @@ src/entities/
 
 ## What does NOT belong here
 
-- Plain TypeScript interfaces / type aliases → `src/types/domain.ts`
-- Firebase read/write operations → `src/infra/`
+- Plain TypeScript interfaces / type aliases → `src/domain-types/domain.ts`
+- Firebase read/write operations → `src/firebase/`
 - Business-level orchestration (multiple entities) → `src/actions/`
-- React hooks → `src/hooks/`
+- React hooks → `src/react-hooks/`
 
 ## Naming convention
 
@@ -42,17 +42,17 @@ All exported functions start with a **verb**: `is*`, `has*`, `can*`, `get*`, `fi
 ## Allowed imports
 
 ```ts
-import ... from '@/types/...'  // ✅ domain interfaces as input/output shapes
+import ... from '@/domain-types/...'  // ✅ domain interfaces as input/output shapes
 import ... from '@/lib/...'    // ✅ pure utilities
 ```
 
 ## Forbidden imports
 
 ```ts
-import ... from '@/infra/...'    // ❌ no Firebase
+import ... from '@/firebase/...'    // ❌ no Firebase
 import ... from '@/server-commands/...'  // ❌ no orchestration
-import ... from '@/hooks/...'    // ❌ no React
-import ... from '@/context/...'  // ❌ no React
+import ... from '@/react-hooks/...'    // ❌ no React
+import ... from '@/react-providers/...'  // ❌ no React
 import ... from 'react'          // ❌ no React
 import ... from 'next'           // ❌ no Next.js
 ```
@@ -72,4 +72,4 @@ import ... from 'next'           // ❌ no Next.js
 
 ## Who depends on this layer
 
-`src/actions/`, `src/hooks/`, `src/context/` — any layer that needs domain rules.
+`src/actions/`, `src/react-hooks/`, `src/react-providers/` — any layer that needs domain rules.

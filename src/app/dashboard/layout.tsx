@@ -20,15 +20,15 @@ import { Loader2 } from "lucide-react";
 // Internal Dependencies - Components & Layout
 // ============================================================================
 import { SidebarProvider, SidebarInset } from "@/shared/shadcn-ui/sidebar";
-import { DashboardSidebar } from "@/app/dashboard/_components/sidebar";
-import { Header } from "@/app/dashboard/_components/layout/header";
-import { ThemeAdapter } from "@/app/dashboard/_components/layout/theme-adapter";
+import { DashboardSidebar } from "@/app/dashboard/_route-components/sidebar";
+import { Header } from "@/app/dashboard/_route-components/layout/header";
+import { ThemeAdapter } from "@/app/dashboard/_route-components/layout/theme-adapter";
 
 // ============================================================================
 // Internal Dependencies - Contexts & Providers
 // ============================================================================
-import { useAuth } from "@/shared/context/auth-context";
-import { AccountProvider } from "@/context/account-context";
+import { useAuth } from "@/shared/app-providers/auth-provider";
+import { AccountProvider } from "@/react-providers/account-provider";
 
 // ============================================================================
 // Type Definitions

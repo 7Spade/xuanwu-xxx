@@ -18,15 +18,15 @@ Each sub-directory is one domain aggregate; each `index.ts` contains only pure f
 ## Dependency rules
 
 ### Allowed
-- `@/types/` — domain interfaces as shapes
+- `@/domain-types/` — domain interfaces as shapes
 - `@/lib/` — pure utilities
 
 ### Forbidden
 - `react`, `firebase`, `next` — no framework dependencies
-- `@/infra/` — no data access
+- `@/firebase/` — no data access
 - `@/server-commands/` — no orchestration
-- `@/hooks/` — no React
-- `@/context/` — no React
+- `@/react-hooks/` — no React
+- `@/react-providers/` — no React
 
 ## Coding constraints
 

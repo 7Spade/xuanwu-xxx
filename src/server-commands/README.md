@@ -32,24 +32,24 @@ src/actions/
 ## What does NOT belong here
 
 - Business rules / permission logic → `src/entities/`
-- React hooks → `src/hooks/`
+- React hooks → `src/react-hooks/`
 - UI components → `src/shared/ui/` or `src/components/`
-- Direct Firestore reads/writes (use facade) → `src/infra/`
+- Direct Firestore reads/writes (use facade) → `src/firebase/`
 
 ## Allowed imports
 
 ```ts
-import ... from '@/infra/...'      // ✅ call the facade
+import ... from '@/firebase/...'      // ✅ call the facade
 import ... from '@/domain-rules/...'   // ✅ use pure domain rules for input validation
-import ... from '@/types/...'      // ✅ domain types
+import ... from '@/domain-types/...'      // ✅ domain types
 import ... from '@/lib/...'        // ✅ pure utilities
 ```
 
 ## Forbidden imports
 
 ```ts
-import ... from '@/hooks/...'      // ❌ no React hooks
-import ... from '@/context/...'    // ❌ no React context
+import ... from '@/react-hooks/...'      // ❌ no React hooks
+import ... from '@/react-providers/...'    // ❌ no React context
 import ... from 'react'            // ❌ no React
 import ... from '@/shared/ui/...'  // ❌ no UI components
 import ... from '@/app/...'        // ❌ no app layer

@@ -3,7 +3,7 @@
  * No async, no I/O, no React, no Firebase.
  */
 
-import type { Workspace, Account } from "@/types/domain"
+import type { Workspace, Account } from "@/domain-types/domain"
 import { isOrganization, isOwner, getUserTeamIds } from "@/domain-rules/account"
 
 // ---------------------------------------------------------------------------

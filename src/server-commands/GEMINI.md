@@ -25,15 +25,15 @@ Pure async functions with explicit parameters.
 ## Dependency rules
 
 ### Allowed
-- `@/infra/` — call facade or repositories
+- `@/firebase/` — call facade or repositories
 - `@/domain-rules/` — use pure domain rules for input validation
-- `@/types/` — domain types
+- `@/domain-types/` — domain types
 - `@/lib/` — pure utilities
 
 ### Forbidden
 - `react` — no React hooks or context
-- `@/hooks/` — no hook calls
-- `@/context/` — no context reads
+- `@/react-hooks/` — no hook calls
+- `@/react-providers/` — no context reads
 - `@/shared/ui/` — no UI components
 - `@/app/` — no app layer
 

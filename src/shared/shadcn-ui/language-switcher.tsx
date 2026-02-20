@@ -1,7 +1,7 @@
 "use client"
 
-import { useI18n } from "@/shared/context/i18n-context"
-import { Locale } from "@/shared/types/i18n"
+import { useI18n } from "@/shared/app-providers/i18n-provider"
+import { Locale } from "@/shared/i18n-types/i18n"
 import { Button } from "@/shared/shadcn-ui/button"
 import {
   DropdownMenu,

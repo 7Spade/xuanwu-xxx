@@ -10,8 +10,8 @@ import {
   updateTask as updateTaskFacade,
   deleteTask as deleteTaskFacade,
   getWorkspaceTasks as getWorkspaceTasksFacade,
-} from "@/infra/firebase/firestore/firestore.facade"
-import type { WorkspaceTask } from "@/types/domain"
+} from "@/firebase/firestore/firestore.facade"
+import type { WorkspaceTask } from "@/domain-types/domain"
 
 export async function createTask(
   workspaceId: string,
