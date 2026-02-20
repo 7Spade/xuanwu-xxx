@@ -1,264 +1,183 @@
-🏗️ 重構結構樹：高內聚四層架構
-Core → Governance → Business → Projection（一核兩視圖）
+🏗️ 結構樹：一核多層架構（與現行代碼保持一致）
+依賴流向：types → lib → infra → hooks → context → app（ai 為平行層）
 
 📐 架構設計理念
+遵循 Occam's Razor：不引入非必要的複雜度。
+依賴方向嚴格單向，每層只能依賴其下層，杜絕循環依賴。
+
 Account = User（個人）+ Organization（組織）
 Workspace = 屬於 Account 的業務執行單元
 
-四層劃分：
-┌─────────────┬──────────────────────────────────────┐
-│ Core        │ 基礎設施、認證、Firebase、共用 UI      │
-│ Governance  │ 帳號治理、權限、成員、稽核              │
-│ Business    │ 實際業務邏輯（tasks/daily/finance...） │
-│ Projection  │ 一個核心資料 → Account視圖 + WS視圖   │
-└─────────────┴──────────────────────────────────────┘
+六層依賴鏈：
+┌──────────────────────────────────────────────────────────────┐
+│  app/（路由 / 視圖 / 頁面組裝）         ← 頂層，可依賴所有下層 │
+├──────────────────────────────────────────────────────────────┤
+│  context/（全域 React Context）         ← 消費 hooks / infra  │
+├──────────────────────────────────────────────────────────────┤
+│  hooks/（可重用 React 邏輯）            ← 消費 infra / context │
+├──────────────────────────────────────────────────────────────┤
+│  infra/（Firebase 外部服務）            ← 消費 lib / types     │
+├──────────────────────────────────────────────────────────────┤
+│  lib/（純工具函式，無副作用）           ← 消費 types           │
+├──────────────────────────────────────────────────────────────┤
+│  types/（核心型別，零依賴）             ← 底層，所有層可依賴   │
+└──────────────────────────────────────────────────────────────┘
+
+ai/（平行層：Genkit 流程，僅被 app/ 消費，不進入上述六層）
+
+Workspace 視圖內部採四層能力模型（capability 四層）：
+┌─────────────────────────────────────────────────────────────────┐
+│  Layer 1 — CORE        capabilities/   能力掛載管理（永遠顯示）  │
+│  Layer 2 — GOVERNANCE  members/        成員授權（永遠顯示）      │
+│  Layer 3 — BUSINESS    可掛載模組       產品功能（按需掛載）      │
+│  Layer 4 — PROJECTION  audit/          唯讀事件流（永遠顯示）    │
+└─────────────────────────────────────────────────────────────────┘
 
 
 🌳 完整結構樹
 src/
 │
-├── 📦 core/                          # [CORE] 基礎設施層
-│   ├── infra/
-│   │   └── firebase/
-│   │       ├── app.client.ts
-│   │       ├── firebase.config.ts
-│   │       ├── auth/
-│   │       │   ├── auth.client.ts
-│   │       │   └── auth.adapter.ts
-│   │       ├── firestore/
-│   │       │   ├── firestore.client.ts
-│   │       │   ├── firestore.converter.ts
-│   │       │   ├── firestore.facade.ts
-│   │       │   ├── firestore.read.adapter.ts
-│   │       │   ├── firestore.write.adapter.ts
-│   │       │   └── firestore.utils.ts
-│   │       ├── storage/
-│   │       │   ├── storage.client.ts
-│   │       │   ├── storage.facade.ts
-│   │       │   ├── storage.read.adapter.ts
-│   │       │   └── storage.write.adapter.ts
-│   │       ├── messaging/
-│   │       │   ├── messaging.client.ts
-│   │       │   └── messaging.adapter.ts
-│   │       └── analytics/
-│   │           ├── analytics.client.ts
-│   │           └── analytics.adapter.ts
-│   │
-│   ├── context/                      # 全域 Context
-│   │   ├── auth-context.tsx
-│   │   ├── app-context.tsx
-│   │   ├── firebase-context.tsx
-│   │   ├── theme-context.tsx
-│   │   └── i18n-context.tsx
-│   │
-│   ├── hooks/                        # 純基礎 Hooks
-│   │   ├── use-logger.ts
-│   │   ├── use-storage.ts
-│   │   ├── use-mobile.tsx
-│   │   └── use-toast.ts
-│   │
-│   ├── lib/
-│   │   ├── utils.ts
-│   │   ├── format.ts
-│   │   └── i18n.ts
-│   │
-│   ├── types/
-│   │   ├── domain.ts
-│   │   ├── i18n.ts
-│   │   └── i18n.schema.ts
-│   │
-│   └── ui/                           # shadcn/ui 元件（僅此一處）
-│       ├── accordion.tsx
-│       ├── alert.tsx
-│       ├── alert-dialog.tsx
-│       ├── avatar.tsx
-│       ├── badge.tsx
-│       ├── button.tsx
-│       ├── button-group.tsx
-│       ├── calendar.tsx
-│       ├── card.tsx
-│       ├── carousel.tsx
-│       ├── chart.tsx
-│       ├── checkbox.tsx
-│       ├── command.tsx
-│       ├── dialog.tsx
-│       ├── drawer.tsx
-│       ├── dropdown-menu.tsx
-│       ├── empty.tsx
-│       ├── field.tsx
-│       ├── form.tsx
-│       ├── input.tsx
-│       ├── input-group.tsx
-│       ├── input-otp.tsx
-│       ├── item.tsx
-│       ├── kbd.tsx
-│       ├── label.tsx
-│       ├── navigation-menu.tsx
-│       ├── pagination.tsx
-│       ├── popover.tsx
-│       ├── progress.tsx
-│       ├── radio-group.tsx
-│       ├── scroll-area.tsx
-│       ├── select.tsx
-│       ├── separator.tsx
-│       ├── sheet.tsx
-│       ├── sidebar.tsx
-│       ├── skeleton.tsx
-│       ├── slider.tsx
-│       ├── sonner.tsx
-│       ├── spinner.tsx
-│       ├── switch.tsx
-│       ├── table.tsx
-│       ├── tabs.tsx
-│       ├── textarea.tsx
-│       ├── timeline.tsx
-│       ├── toast.tsx
-│       ├── toaster.tsx
-│       ├── toggle.tsx
-│       ├── toggle-group.tsx
-│       └── tooltip.tsx
+├── 📋 types/                              # [底層] 核心型別，零依賴
+│   ├── domain.ts                          # 所有領域型別（Account、Workspace、AuditLog…）
+│   ├── i18n.ts                            # 多語系型別
+│   └── i18n.schema.ts                     # 語言包結構定義
 │
-├── 🏛️ governance/                    # [GOVERNANCE] 治理層
-│   │                                 # 帳號/成員/權限/稽核/設定
-│   ├── account/                      # Account = User + Organization
-│   │   ├── context/
-│   │   │   ├── account-context.tsx   # 當前 account 狀態
-│   │   │   └── workspace-context.tsx # workspace 清單狀態
-│   │   │
-│   │   ├── repositories/             # Firestore 存取層
-│   │   │   ├── account.repository.ts
-│   │   │   └── workspace.repository.ts
-│   │   │
-│   │   ├── hooks/
-│   │   │   ├── use-account.ts
-│   │   │   ├── use-account-management.ts
-│   │   │   └── use-visible-workspaces.ts
-│   │   │
-│   │   ├── members/                  # 成員管理（Organization 維度）
-│   │   │   ├── members.service.ts
-│   │   │   ├── members.repository.ts
-│   │   │   └── hooks/
-│   │   │       └── use-members.ts
-│   │   │
-│   │   ├── teams/                    # 團隊管理
-│   │   │   ├── teams.service.ts
-│   │   │   ├── teams.repository.ts
-│   │   │   └── hooks/
-│   │   │       └── use-teams.ts
-│   │   │
-│   │   ├── partners/                 # 合作夥伴
-│   │   │   ├── partners.service.ts
-│   │   │   ├── partners.repository.ts
-│   │   │   └── hooks/
-│   │   │       └── use-partners.ts
-│   │   │
-│   │   ├── audit/                    # 稽核（Account 維度）
-│   │   │   ├── audit.service.ts
-│   │   │   ├── audit.repository.ts
-│   │   │   └── hooks/
-│   │   │       └── use-account-audit.ts
-│   │   │
-│   │   └── settings/                 # 帳號設定
-│   │       ├── settings.service.ts
-│   │       └── hooks/
-│   │           └── use-account-settings.ts
-│   │
-│   └── workspace/                    # Workspace 治理
-│       ├── workspace.service.ts
-│       ├── workspace-actions.ts
-│       │
-│       ├── members/                  # WS 成員管理
-│       │   ├── ws-members.service.ts
-│       │   └── hooks/
-│       │       └── use-workspace-members.ts
-│       │
-│       └── audit/                    # 稽核（Workspace 維度）
-│           ├── ws-audit.service.ts
-│           └── hooks/
-│               └── use-workspace-audit.ts
+├── 🔧 lib/                                # [工具層] 純函式，無副作用
+│   ├── utils.ts                           # 通用工具（cn、clsx…）
+│   ├── format.ts                          # 格式化（日期、金額…）
+│   └── i18n.ts                            # 多語系工具函式
 │
-├── 💼 business/                      # [BUSINESS] 業務邏輯層
-│   │                                 # 純邏輯，不含任何視圖
-│   │
-│   ├── daily/                        # 日誌模組
-│   │   ├── daily.service.ts
-│   │   ├── daily.repository.ts
-│   │   ├── daily.types.ts
-│   │   └── hooks/
-│   │       ├── use-daily-actions.ts
-│   │       ├── use-daily-upload.ts
-│   │       └── use-aggregated-logs.ts
-│   │
-│   ├── schedule/                     # 行程/決策模組
-│   │   ├── schedule.service.ts
-│   │   ├── schedule.repository.ts
-│   │   ├── schedule.types.ts
-│   │   └── hooks/
-│   │       ├── use-schedule-actions.ts
-│   │       └── use-global-schedule.ts
-│   │
-│   ├── tasks/                        # 任務模組
-│   │   ├── tasks.service.ts
-│   │   ├── tasks.repository.ts
-│   │   ├── tasks.types.ts
-│   │   └── hooks/
-│   │       └── use-tasks.ts
-│   │
-│   ├── finance/                      # 財務模組
-│   │   ├── finance.service.ts
-│   │   ├── finance.repository.ts
-│   │   ├── finance.types.ts
-│   │   └── hooks/
-│   │       └── use-finance.ts
-│   │
-│   ├── files/                        # 檔案模組
-│   │   ├── files.service.ts
-│   │   ├── files.repository.ts
-│   │   └── hooks/
-│   │       └── use-files.ts
-│   │
-│   ├── issues/                       # 問題追蹤
-│   │   ├── issues.service.ts
-│   │   ├── issues.repository.ts
-│   │   └── hooks/
-│   │       └── use-issues.ts
-│   │
-│   ├── qa/                           # QA 模組
-│   │   ├── qa.service.ts
-│   │   ├── qa.repository.ts
-│   │   └── hooks/
-│   │       └── use-qa.ts
-│   │
-│   ├── bookmarks/                    # 書籤互動
-│   │   ├── bookmarks.service.ts
-│   │   └── hooks/
-│   │       └── use-bookmark-actions.ts
-│   │
-│   └── document-parser/              # AI 文件解析 (Genkit)
-│       ├── parser.service.ts
-│       ├── parser.actions.ts         # Server Actions
-│       └── hooks/
-│           └── use-document-parser.ts
+├── 🔌 infra/                              # [基礎設施層] Firebase 外部服務封裝
+│   └── firebase/                          # adapter → facade → repository 三層遞進
+│       ├── app.client.ts                  # Firebase App 初始化
+│       ├── firebase.config.ts             # Firebase 設定
+│       ├── auth/
+│       │   ├── auth.client.ts             # Firebase Auth 客戶端
+│       │   └── auth.adapter.ts            # Auth 操作介面卡
+│       ├── firestore/
+│       │   ├── firestore.client.ts        # Firestore 客戶端
+│       │   ├── firestore.converter.ts     # Firestore 型別轉換器
+│       │   ├── firestore.facade.ts        # 高層業務操作（組合多個 adapter）
+│       │   ├── firestore.read.adapter.ts  # 讀取介面卡
+│       │   ├── firestore.write.adapter.ts # 寫入介面卡
+│       │   ├── firestore.utils.ts         # Firestore 工具函式
+│       │   └── repositories/             # 依聚合根分割的資料存取層
+│       │       ├── account.repository.ts  # Account 讀寫
+│       │       ├── workspace.repository.ts # Workspace 讀寫
+│       │       └── index.ts               # Barrel 匯出
+│       ├── storage/
+│       │   ├── storage.client.ts
+│       │   ├── storage.facade.ts
+│       │   ├── storage.read.adapter.ts
+│       │   └── storage.write.adapter.ts
+│       ├── messaging/
+│       │   ├── messaging.client.ts
+│       │   └── messaging.adapter.ts
+│       └── analytics/
+│           ├── analytics.client.ts
+│           └── analytics.adapter.ts
 │
-├── 🤖 ai/                            # [AI / GENKIT] AI 層
-│   ├── genkit.ts                     # Genkit 初始化
-│   ├── dev.ts
-│   │
+├── 🪝 hooks/                              # [邏輯層] 可重用 React Hooks（橋接 UI 與 infra）
+│   ├── state/                             # 狀態存取（消費 context）
+│   │   ├── use-account.ts                 # 當前 account 狀態
+│   │   ├── use-account-management.ts      # 帳號管理操作
+│   │   ├── use-app.ts                     # AppContext 存取
+│   │   ├── use-user.ts                    # 使用者個人資料
+│   │   └── use-visible-workspaces.ts      # 可見 workspace 清單
+│   ├── actions/                           # 動作 Hooks（封裝 infra 呼叫）
+│   │   ├── use-daily-actions.ts           # 日誌互動（like / comment）
+│   │   ├── use-schedule-actions.ts        # 行程操作（assign / propose）
+│   │   └── use-bookmark-actions.ts        # 書籤操作
+│   ├── infra/                             # 基礎設施 Hooks
+│   │   ├── use-logger.ts                  # 日誌記錄
+│   │   └── use-storage.ts                 # Storage 操作
+│   └── ui/                               # UI Hooks
+│       ├── use-mobile.tsx                 # 行動裝置偵測
+│       └── use-toast.ts                   # Toast 通知
+│
+├── 🌐 context/                            # [全域狀態層] React Context Providers
+│   ├── firebase-context.tsx               # 提供 Firebase SDK 實例（db / auth / storage）
+│   ├── auth-context.tsx                   # 認證使用者狀態（currentUser）
+│   ├── app-context.tsx                    # App 頂層狀態（accounts / activeAccount）
+│   ├── account-context.tsx                # 當前 account 資料（workspaces / logs）
+│   ├── workspace-context.tsx              # 單一 workspace 詳細狀態（tasks / members）
+│   ├── theme-context.tsx                  # 主題狀態
+│   └── i18n-context.tsx                   # 多語系狀態
+│
+├── 🤖 ai/                                 # [AI 層] Genkit 流程（平行層，僅 app/ 消費）
+│   ├── genkit.ts                          # Genkit 初始化
+│   ├── dev.ts                             # 開發模式入口
 │   ├── flows/
-│   │   ├── extract-invoice-items.ts
-│   │   ├── adapt-ui-color-to-account-context.ts
-│   │   └── _index.ts
-│   │
+│   │   ├── adapt-ui-color-to-account-context.ts  # UI 色彩自動適配
+│   │   └── extract-invoice-items.ts       # 發票項目提取
 │   └── schemas/
-│       └── docu-parse.ts
+│       └── docu-parse.ts                  # 文件解析 Schema（Zod）
 │
-└── app/                              # [PROJECTION] Next.js App Router
-    │                                 # 純視圖層，只組合 business/ + governance/
-    ├── layout.tsx
-    ├── page.tsx
-    ├── globals.css
+└── 📱 app/                                # [視圖層] Next.js App Router（頂層組裝）
+    ├── layout.tsx                         # 根佈局
+    ├── page.tsx                           # 首頁（重定向至 /dashboard）
+    ├── globals.css                        # 全域樣式
     │
-    ├── (auth)/                       # 認證流程
+    ├── _components/                       # App 層共用元件
+    │   ├── language-switcher.tsx          # 語言切換器
+    │   └── ui/                            # shadcn/ui 原子元件（唯一來源）
+    │       ├── accordion.tsx
+    │       ├── alert.tsx
+    │       ├── alert-dialog.tsx
+    │       ├── aspect-ratio.tsx
+    │       ├── avatar.tsx
+    │       ├── badge.tsx
+    │       ├── breadcrumb.tsx
+    │       ├── button.tsx
+    │       ├── button-group.tsx
+    │       ├── calendar.tsx
+    │       ├── card.tsx
+    │       ├── carousel.tsx
+    │       ├── chart.tsx
+    │       ├── checkbox.tsx
+    │       ├── collapsible.tsx
+    │       ├── command.tsx
+    │       ├── context-menu.tsx
+    │       ├── dialog.tsx
+    │       ├── drawer.tsx
+    │       ├── dropdown-menu.tsx
+    │       ├── empty.tsx
+    │       ├── field.tsx
+    │       ├── form.tsx
+    │       ├── hover-card.tsx
+    │       ├── input.tsx
+    │       ├── input-group.tsx
+    │       ├── input-otp.tsx
+    │       ├── item.tsx
+    │       ├── kbd.tsx
+    │       ├── label.tsx
+    │       ├── menubar.tsx
+    │       ├── navigation-menu.tsx
+    │       ├── pagination.tsx
+    │       ├── popover.tsx
+    │       ├── progress.tsx
+    │       ├── radio-group.tsx
+    │       ├── scroll-area.tsx
+    │       ├── select.tsx
+    │       ├── separator.tsx
+    │       ├── sheet.tsx
+    │       ├── sidebar.tsx
+    │       ├── skeleton.tsx
+    │       ├── slider.tsx
+    │       ├── sonner.tsx
+    │       ├── spinner.tsx
+    │       ├── switch.tsx
+    │       ├── table.tsx
+    │       ├── tabs.tsx
+    │       ├── textarea.tsx
+    │       ├── timeline.tsx
+    │       ├── toast.tsx
+    │       ├── toaster.tsx
+    │       ├── toggle.tsx
+    │       ├── toggle-group.tsx
+    │       └── tooltip.tsx
+    │
+    ├── (auth)/                            # 認證流程（Next.js Route Group）
     │   └── login/
     │       ├── page.tsx
     │       └── _components/
@@ -269,10 +188,10 @@ src/
     │           └── reset-password-dialog.tsx
     │
     └── dashboard/
-        ├── layout.tsx                # Dashboard Shell（Sidebar + Header）
-        ├── page.tsx                  # Overview
+        ├── layout.tsx                     # Dashboard Shell（Sidebar + Header）
+        ├── page.tsx                       # Overview（account-grid + stat-cards）
         │
-        ├── _components/             # Dashboard 共用 UI
+        ├── _components/                   # Dashboard 共用 UI
         │   ├── layout/
         │   │   ├── header.tsx
         │   │   ├── global-search.tsx
@@ -297,178 +216,202 @@ src/
         │       ├── account-switcher.tsx
         │       └── account-create-dialog.tsx
         │
-        ├── account/                  # 🔵 PROJECTION：Account 視圖
-        │   │                         # 消費 governance/ + business/ 的 Account 維度
-        │   ├── layout.tsx
-        │   │
-        │   ├── @overview/            # ── 平行路由 Slot ──
-        │   │   └── default.tsx
-        │   ├── @governance/          # 平行路由：治理面板
-        │   │   └── default.tsx
-        │   │
-        │   ├── members/
-        │   │   └── page.tsx          # → governance/account/members
-        │   ├── teams/
+        ├── account/                       # 🔵 Account 維度路由
+        │   │                              # 治理頁面 + 一核兩視圖的 Account 側
+        │   ├── members/page.tsx           # 成員管理
+        │   ├── teams/                     # 內部團隊
         │   │   ├── page.tsx
-        │   │   └── [id]/
-        │   │       └── page.tsx
-        │   ├── partners/
+        │   │   └── [id]/page.tsx
+        │   ├── partners/                  # 合作夥伴
         │   │   ├── page.tsx
-        │   │   └── [id]/
-        │   │       └── page.tsx
-        │   ├── audit/
-        │   │   └── page.tsx          # → governance/account/audit
-        │   ├── schedule/
-        │   │   └── page.tsx          # → business/schedule (account scope)
-        │   ├── daily/
-        │   │   └── page.tsx          # → business/daily (account scope)
-        │   ├── matrix/
-        │   │   └── page.tsx
-        │   └── settings/
-        │       └── page.tsx
+        │   │   └── [id]/page.tsx
+        │   ├── audit/page.tsx             # → capabilities/audit/audit.account.tsx
+        │   ├── daily/page.tsx             # → capabilities/daily/daily.account.tsx
+        │   ├── schedule/page.tsx          # → capabilities/schedule/schedule.account.tsx
+        │   ├── matrix/page.tsx            # 權限矩陣
+        │   └── settings/page.tsx          # 帳號設定
         │
-        └── workspaces/               # 🟢 PROJECTION：Workspace 視圖
-            │                         # 消費 governance/ + business/ 的 WS 維度
-            ├── page.tsx              # Workspace 列表
-            │
-            ├── _components/          # WS 列表 UI
+        └── workspaces/                    # 🟢 Workspace 維度路由
+            ├── page.tsx                   # Workspace 列表
+            ├── _components/               # WS 列表 UI
             │   ├── workspace-card.tsx
             │   ├── workspace-grid-view.tsx
             │   ├── workspace-table-view.tsx
             │   ├── workspace-list-header.tsx
             │   └── create-workspace-dialog.tsx
-            │
             ├── _lib/
-            │   └── use-workspace-filters.ts
+            │   ├── use-workspace-filters.ts
+            │   └── workspace-actions.ts   # WS 列表層 Server Actions
             │
-            └── [id]/                 # 單一 Workspace
-                ├── layout.tsx        # WS Shell（Tabs + StatusBar）
-                ├── page.tsx          # WS Overview
+            └── [id]/                      # 單一 Workspace
+                ├── layout.tsx             # WS Shell（Tabs + StatusBar）
+                ├── page.tsx               # WS Overview
                 │
-                ├── _components/
+                ├── _components/           # WS Shell UI
                 │   ├── workspace-tabs.tsx
                 │   ├── workspace-status-bar.tsx
                 │   └── workspace-settings.tsx
                 │
-                ├── _events/          # WS 事件匯流排
+                ├── _events/               # WS 事件匯流排
                 │   ├── workspace-event-bus.ts
                 │   ├── workspace-events.ts
                 │   └── workspace-event-handler.tsx
                 │
-                │   # ── 平行路由（一核兩視圖的 WS 內部實現）──
-                ├── @main/            # 主內容 Slot
-                │   └── default.tsx
-                ├── @sidebar/         # 側邊工具列 Slot
-                │   └── default.tsx
-                │
-                │   # ── Workspace Capabilities（對應 business/ 模組）──
-                ├── daily/
-                │   ├── page.tsx
-                │   └── _view/        # WS 維度的 daily 視圖元件
-                │       ├── daily.workspace.tsx
-                │       ├── composer.tsx
-                │       ├── daily-log-card.tsx
-                │       ├── daily-log-dialog.tsx
-                │       ├── image-carousel.tsx
-                │       └── actions/
-                │           ├── like-button.tsx
-                │           ├── comment-button.tsx
-                │           ├── bookmark-button.tsx
-                │           └── share-button.tsx
-                ├── schedule/
-                │   ├── page.tsx
-                │   └── _view/
-                │       ├── schedule.workspace.tsx
-                │       ├── unified-calendar-grid.tsx
-                │       ├── governance-sidebar.tsx
-                │       ├── proposal-dialog.tsx
-                │       ├── schedule-data-table.tsx
-                │       ├── upcoming-events-columns.tsx
-                │       └── decision-history-columns.tsx
-                ├── tasks/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-tasks.tsx
-                ├── finance/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-finance.tsx
-                ├── files/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-files.tsx
-                ├── issues/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-issues.tsx
-                ├── qa/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-qa.tsx
-                ├── audit/
-                │   ├── page.tsx
-                │   └── _view/
-                │       ├── audit.workspace.tsx
-                │       ├── audit-timeline.tsx
-                │       ├── audit-event-item.tsx
-                │       ├── audit-detail-sheet.tsx
-                │       └── audit-type-icon.tsx
-                ├── members/
-                │   ├── page.tsx
-                │   └── _view/
-                │       ├── workspace-members.tsx
-                │       └── workspace-members-management.tsx
-                ├── document-parser/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-document-parser.tsx
-                ├── acceptance/
-                │   ├── page.tsx
-                │   └── _view/
-                │       └── workspace-acceptance.tsx
-                └── capabilities/
-                    ├── page.tsx
-                    └── _view/
-                        └── workspace-capabilities.tsx
+                └── capabilities/          # Workspace Capability 系統（四層模型）
+                    ├── index.ts           # Barrel 匯出（workspace 視圖）
+                    │
+                    │   # ── Layer 1: CORE（永遠顯示）── Workspace 生命週期管理
+                    ├── capabilities/
+                    │   └── workspace-capabilities.tsx   # Capability 掛載 / 卸載管理
+                    │
+                    │   # ── Layer 2: GOVERNANCE（永遠顯示）── 存取控制
+                    ├── members/
+                    │   ├── workspace-members.tsx
+                    │   └── workspace-members-management.tsx
+                    │
+                    │   # ── Layer 3: BUSINESS（可掛載）── 產品功能模組
+                    │   #    每個模組使用「一核兩視圖」模式（見下方說明）
+                    ├── daily/                            # 日誌模組
+                    │   ├── daily.workspace.tsx           # Workspace 視圖（寫 + 讀）
+                    │   ├── daily.account.tsx             # Account 視圖（聚合唯讀）
+                    │   ├── daily.view.tsx                # 共用視圖邏輯
+                    │   ├── _components/
+                    │   │   ├── composer.tsx
+                    │   │   ├── daily-log-card.tsx
+                    │   │   ├── daily-log-dialog.tsx
+                    │   │   ├── image-carousel.tsx
+                    │   │   └── actions/
+                    │   │       ├── like-button.tsx
+                    │   │       ├── comment-button.tsx
+                    │   │       ├── bookmark-button.tsx
+                    │   │       └── share-button.tsx
+                    │   └── _hooks/
+                    │       ├── use-workspace-daily.ts
+                    │       ├── use-daily-upload.ts
+                    │       └── use-aggregated-logs.ts
+                    ├── schedule/                         # 行程 / 決策模組
+                    │   ├── schedule.workspace.tsx        # Workspace 視圖（提案方）
+                    │   ├── schedule.account.tsx          # Account 視圖（核准方）
+                    │   ├── schedule.view.tsx             # 共用視圖邏輯
+                    │   ├── _components/
+                    │   │   ├── unified-calendar-grid.tsx
+                    │   │   ├── governance-sidebar.tsx
+                    │   │   ├── proposal-dialog.tsx
+                    │   │   ├── schedule-data-table.tsx
+                    │   │   ├── upcoming-events-columns.tsx
+                    │   │   └── decision-history-columns.tsx
+                    │   └── _hooks/
+                    │       ├── use-workspace-schedule.ts
+                    │       └── use-global-schedule.ts
+                    ├── tasks/                            # 任務模組
+                    │   ├── workspace-tasks.component.tsx
+                    │   ├── workspace-tasks.logic.ts
+                    │   └── workspace-tasks.types.ts
+                    ├── finance/                          # 財務模組
+                    │   └── workspace-finance.tsx
+                    ├── files/                            # 檔案模組
+                    │   └── workspace-files.tsx
+                    ├── issues/                           # 問題追蹤
+                    │   └── workspace-issues.tsx
+                    ├── qa/                               # QA 模組
+                    │   └── workspace-qa.tsx
+                    ├── acceptance/                       # 驗收模組
+                    │   └── workspace-acceptance.tsx
+                    ├── document-parser/                  # AI 文件解析
+                    │   ├── actions.ts                    # Server Actions（呼叫 ai/flows）
+                    │   └── workspace-document-parser.component.tsx
+                    │
+                    │   # ── Layer 4: PROJECTION（永遠顯示）── 唯讀事件流
+                    └── audit/
+                        ├── audit.workspace.tsx           # Workspace 視圖（本地事件流）
+                        ├── audit.account.tsx             # Account 視圖（跨 WS 彙總）
+                        ├── audit.view.tsx                # 共用視圖邏輯
+                        ├── _components/
+                        │   ├── audit-timeline.tsx
+                        │   ├── audit-event-item.tsx
+                        │   ├── audit-detail-sheet.tsx
+                        │   └── audit-type-icon.tsx
+                        └── _hooks/
+                            ├── use-workspace-audit.ts
+                            └── use-account-audit.ts
 
 
-🧭 四層依賴流向圖
-┌─────────────────────────────────────────────────────┐
-│                  app/ (Projection)                  │
-│         account/視圖  ←→  workspaces/視圖            │
-│           平行路由 @slot  +  [id]/@slot              │
-└───────────────────┬─────────────────────────────────┘
-                    │ 只消費，不含邏輯
-          ┌─────────┴──────────┐
-          ▼                    ▼
-┌──────────────────┐  ┌─────────────────────┐
-│  governance/     │  │     business/        │
-│  account/        │  │  daily / schedule    │
-│  workspace/      │  │  tasks / finance     │
-│  members/audit   │  │  files / issues / qa │
-└─────────┬────────┘  └──────────┬───────────┘
-          └──────────┬───────────┘
-                     │ 共用
-                     ▼
-          ┌─────────────────────┐
-          │       core/         │
-          │  firebase / ui /    │
-          │  hooks / lib / types│
-          └─────────────────────┘
+🧭 依賴流向圖
+┌─────────────────────────────────────────────────────────────┐
+│                    app/（視圖層 / 頂層）                      │
+│    account/ 路由          workspaces/[id]/capabilities/     │
+│  （治理 + Account 視圖）    （WS 四層能力模型）               │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ 組裝（只消費，不含基礎設施邏輯）
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+┌─────────────────────┐       ┌──────────────────────┐
+│     context/         │       │       hooks/          │
+│  firebase / auth /  │       │  state / actions /    │
+│  app / account /    │◄──────│  infra / ui           │
+│  workspace / theme  │       └──────────┬────────────┘
+│  / i18n             │                  │
+└─────────────────────┘                  │
+              │                          │
+              └──────────────┬───────────┘
+                             │ 消費
+                             ▼
+              ┌─────────────────────────┐
+              │         infra/          │
+              │  firebase/              │
+              │  auth / firestore /     │
+              │  storage / messaging /  │
+              │  analytics              │
+              └──────────────┬──────────┘
+                             │ 消費
+                             ▼
+              ┌─────────────────────────┐
+              │          lib/           │
+              │  utils / format / i18n  │
+              └──────────────┬──────────┘
+                             │ 消費
+                             ▼
+              ┌─────────────────────────┐
+              │         types/          │
+              │   domain / i18n / ...   │
+              └─────────────────────────┘
+
+ai/（平行層）：只由 app/ 消費，不參與上述六層依賴鏈
+┌─────────────────────────────────────┐
+│  app/dashboard/workspaces/[id]/     │
+│  capabilities/document-parser/      │
+│  actions.ts                         │
+└────────────┬────────────────────────┘
+             │ 呼叫 Genkit flows
+             ▼
+┌─────────────────────────────────────┐
+│  ai/flows/                          │
+│  extract-invoice-items.ts           │
+│  adapt-ui-color-to-account-context  │
+└─────────────────────────────────────┘
 
 
-💡 關鍵設計原則說明
-原則
-說明
-一核兩視圖
-business/daily 是核心，account/daily/page.tsx 與 workspaces/[id]/daily/page.tsx 是兩個 Projection
-_view/ 資料夾
-WS 內每個 capability 的視圖元件放 _view/，與路由 page.tsx 分離
-平行路由
-Dashboard 層用 @overview/@governance，WS 層用 @main/@sidebar
-business/ 無視圖
-純 service + repository + hooks，完全不含 JSX
-governance/ 不含業務
-只管權限、成員、稽核、設定，不碰 daily/tasks/finance
-core/ui 唯一 UI 來源
-所有 shadcn 元件只在 core/ui/ 一個地方，不重複散落
+💡 關鍵設計原則
+
+┌─────────────────────────┬──────────────────────────────────────────────────────────────────┐
+│ 原則                    │ 說明                                                             │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ 單向依賴                │ 每層只能依賴下層；禁止反向 import，杜絕循環依賴                  │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ 一核兩視圖              │ daily / schedule / audit 各有一份核心資料，分別映射至：           │
+│                         │ • {cap}.workspace.tsx（WS 維度）                                 │
+│                         │ • {cap}.account.tsx（Account 維度）                              │
+│                         │ Account 視圖由 account/{cap}/page.tsx 消費                       │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ Capability 四層模型     │ WS 內能力按 Core → Governance → Business → Projection 排列       │
+│                         │ Core / Governance / Projection 永遠顯示；Business 按需掛載       │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ _components / _hooks    │ 每個能力模組自帶 _components/（視圖元件）與 _hooks/（邏輯）       │
+│ 就近共置                │ 邏輯與視圖緊鄰，不跨模組共用，易維護易刪除                       │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ ui/ 唯一來源            │ shadcn/ui 原子元件只在 app/_components/ui/ 一處，不重複散落       │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ infra 不知 React        │ infra/ 只依賴 lib / types；不 import hooks / context / 元件       │
+├─────────────────────────┼──────────────────────────────────────────────────────────────────┤
+│ ai/ 與業務解耦          │ ai/flows/ 是純函式；只由 app/ 的 Server Actions 呼叫             │
+└─────────────────────────┴──────────────────────────────────────────────────────────────────┘
