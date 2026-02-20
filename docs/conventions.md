@@ -23,15 +23,18 @@
 本專案強制執行嚴格的**單向依賴架構 (One-Way Dependency Architecture)**。每一層只能依賴於其層級結構中「下方」的層級。這可以防止循環依賴，並創建一個清晰、可測試的結構。
 
 **依賴流向:**
-`app` -> `components` -> `context` -> `hooks` -> `infra` -> `lib` -> `types`
+`app` -> `view-modules` -> `use-cases` -> `react-providers` -> `react-hooks` -> `server-commands` -> `firebase` / `shared` -> `domain-rules` -> `domain-types`
 
 -   **`src/app`**: **應用入口層 (Entry Layer)。** 包含頁面 (pages) 和佈局 (layouts)。作為最高層級，負責組合 UI。*不應被任何其他層級導入。*
--   **`src/components`**: **UI 層 (UI Layer)。** 包含可重用的「啞」UI 元件 (dumb components)。它會消費來自 hooks 和 context 的邏輯與狀態。
--   **`src/context`**: **狀態管理層 (State Management Layer)。** 透過清晰的提供者 (providers) 層級結構，管理共享的全域應用程式狀態。
--   **`src/hooks`**: **可重用邏輯層 (Reusable Logic Layer)。** 封裝 UI 邏輯，或為較低層級的服務提供乾淨的接口。
--   **`src/infra`**: **基礎設施層 (Infrastructure Layer)。** 與外部服務（如 Firebase）互動。封裝 SDK 和 API。
--   **`src/lib`**: **工具層 (Utility Layer)。** 包含沒有外部依賴的、純粹的、通用的輔助函式。
--   **`src/types`**: **基礎層 (Foundation Layer)。** 定義所有核心資料結構。*對專案中其他層級的依賴為零。*
+-   **`src/view-modules`**: **UI 層 (UI Layer)。** 包含可重用的「智慧」UI 視圖元件。它組合 use-cases 和 hooks 的邏輯與狀態。
+-   **`src/use-cases`**: **用例層 (Use Case Layer)。** 協調 server-commands 和 domain 邏輯的業務操作。
+-   **`src/react-providers`**: **狀態管理層 (State Management Layer)。** 透過清晰的提供者 (providers) 層級結構，管理共享的全域應用程式狀態。
+-   **`src/react-hooks`**: **可重用邏輯層 (Reusable Logic Layer)。** 封裝 UI 邏輯，或為較低層級的服務提供乾淨的接口。
+-   **`src/server-commands`**: **伺服器命令層 (Server Commands Layer)。** `"use server"` 非同步函式，資料修改的唯一入口。
+-   **`src/firebase`**: **基礎設施層 (Infrastructure Layer)。** 與外部服務（如 Firebase）互動。封裝 SDK 和 API。
+-   **`src/shared`**: **共享工具層 (Shared Layer)。** 包含全域共享的工具、shadcn/ui 元件、常數和 i18n 類型。
+-   **`src/domain-rules`**: **業務規則層 (Business Rules Layer)。** 純粹的業務邏輯函式，無副作用，無框架依賴。
+-   **`src/domain-types`**: **基礎層 (Foundation Layer)。** 定義所有核心資料結構。*對專案中其他層級的依賴為零。*
 
 ---
 

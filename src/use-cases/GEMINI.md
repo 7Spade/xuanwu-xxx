@@ -1,74 +1,63 @@
 # Use Cases Layer (`src/use-cases/`)
 
-## 1. Responsibility
+## Role
 
-This directory serves two related but distinct purposes:
+Application-layer orchestration: combines multiple `server-commands` calls into one atomic workflow. Also provides view-bridge re-exports so `app/` has one stable import surface per domain.
 
-### A. Multi-step Orchestration Use Cases (pure async, no React)
+## Boundary Rules
 
-Combine multiple `server-commands` calls into one atomic use case. Zero React dependency.
+- 負責應用層業務流程編排（≥ 2 個 server-commands 的組合）。
+- 可依賴 `server-commands`、`domain-rules`、`domain-types`、`shared`、`view-modules`（僅 re-export）。
+- 不得依賴 `firebase` 直接（必須透過 `server-commands`）。
+- 不得依賴 `genkit-flows` 直接（必須透過 `server-commands`）。
+- 不得依賴 `react-hooks`、`react-providers`（不含 React 狀態）。
+- 不得包含 UI 狀態管理或 React 任何引用（orchestration modules 必須是 React-free）。
+
+## Module Map
 
 | Module | Logic file | Key exports |
 |--------|-----------|-------------|
-| `auth/` | `auth.use-cases.ts` | `completeRegistration` — registers Firebase Auth + creates Firestore profile |
-| `account/` | `account.use-cases.ts` | `setupOrganizationWithTeam` — creates org + provisions initial team |
-| `workspace/` | `workspace.use-cases.ts` | `createWorkspaceWithCapabilities` — creates workspace + mounts capabilities |
-| `schedule/` | `schedule.use-cases.ts` | `approveScheduleItem`, `rejectScheduleItem` — validates state transitions before persisting |
+| `auth/` | `auth.use-cases.ts` | `completeRegistration` |
+| `account/` | `account.use-cases.ts` | `setupOrganizationWithTeam` |
+| `workspace/` | `workspace.use-cases.ts` | `createWorkspaceWithCapabilities` |
+| `schedule/` | `schedule.use-cases.ts` | `approveScheduleItem`, `rejectScheduleItem` |
 
-Each module also has a thin `index.ts` that re-exports from the named file (e.g., `export * from "./auth.use-cases"`).
+## Input / Output Contracts
 
-### B. View Component Re-exports
+| Function | Input | Output | Side effects |
+|----------|-------|--------|-------------|
+| `completeRegistration(email, password, name)` | 3 strings | `Promise<void>` | Firebase Auth + Firestore write |
+| `setupOrganizationWithTeam(orgName, owner, teamName, type)` | strings + Account | `Promise<string>` | 2× Firestore writes |
+| `createWorkspaceWithCapabilities(name, account, caps)` | strings + Account + Capability[] | `Promise<string>` | 1–2× Firestore writes |
+| `approveScheduleItem(item)` | `ScheduleItem` | `Promise<void>` | 1× Firestore write |
+| `rejectScheduleItem(item)` | `ScheduleItem` | `Promise<void>` | 1× Firestore write |
 
-Re-export composable view components from `src/view-modules/` so `app/` has a single stable import surface per domain.
+## Allowed Imports
 
-| Module | What it re-exports |
-|--------|--------------------|
-| `teams/` | `TeamsView`, `TeamDetailView` |
-| `members/` | `MembersView` |
-| `partners/` | `PartnersView`, `PartnerDetailView` |
-| `user-settings/` | `UserSettingsView` |
+```ts
+import ... from "@/server-commands/..."   // ✅ Firebase operations
+import ... from "@/domain-rules/..."      // ✅ pure validation before calling infra
+import ... from "@/domain-types/..."      // ✅ domain interfaces
+import ... from "@/shared/..."            // ✅ pure utilities / constants
+import ... from "@/view-modules/..."      // ✅ ONLY for view-bridge re-export modules
+```
 
-## 2. Input / Output contracts
+## Forbidden Imports
 
-| Function | Input | Output | Throws? |
-|----------|-------|--------|---------|
-| `completeRegistration(email, password, name)` | 3 strings | `Promise<void>` | Yes (Firebase errors) |
-| `setupOrganizationWithTeam(orgName, owner, teamName, teamType)` | strings + Account | `Promise<string>` (orgId) | Yes |
-| `createWorkspaceWithCapabilities(name, account, capabilities)` | strings + Account + Capability[] | `Promise<string>` (workspaceId) | Yes |
-| `approveScheduleItem(item)` | `ScheduleItem` | `Promise<void>` | Yes (invalid transition) |
-| `rejectScheduleItem(item)` | `ScheduleItem` | `Promise<void>` | Yes (invalid transition) |
+```ts
+import ... from "@/firebase/..."          // ❌ must go through server-commands
+import ... from "@/genkit-flows/..."      // ❌ must go through server-commands
+import ... from "@/react-hooks/..."       // ❌ orchestration must be React-free
+import ... from "@/react-providers/..."   // ❌ no context reads
+import ... from "@/app/..."               // ❌ no upward dependency
+```
 
-## 3. Side effects
+## Rule of Thumb
 
-**All orchestration use cases produce Firebase side effects** via the server-commands they call.
+- If logic combines **≥ 2 server-command calls** → belongs here as an orchestration function.
+- If a module only re-exports a view → `index.ts` contains only `export * from "@/view-modules/..."`.
+- Orchestration modules: **zero React imports** required.
 
-- `completeRegistration` → Firebase Auth write + Firestore write
-- `setupOrganizationWithTeam` → 2× Firestore writes
-- `createWorkspaceWithCapabilities` → 1–2× Firestore writes
-- `approveScheduleItem` / `rejectScheduleItem` → 1× Firestore write
+## Who Depends on This Layer?
 
-## 4. Dependency rules
-
-### Allowed
-- `@/server-commands/` — for orchestration functions
-- `@/domain-rules/` — for business rule validation before calling infra
-- `@/domain-types/` — domain interfaces
-- `@/lib/` — pure utilities
-- `@/view-modules/` — **only** for re-exporting view components (type B sub-dirs)
-
-### Forbidden
-- `react` — orchestration use cases must be React-free
-- `@/react-hooks/` — no hook imports
-- `@/react-providers/` — no context reads
-- `@/firebase/` — always go through `server-commands`
-- `@/app/` — no upward dependency
-
-## 5. Who depends on this layer?
-
-`src/app/` pages and layouts, `src/react-hooks/` (for orchestration functions), `src/view-modules/` (for view bridges).
-
-## 6. Rule of Thumb
-
-- If the logic combines **≥ 2 server-command calls**, it belongs here as an orchestration function.
-- If the module only re-exports a view, `index.ts` contains nothing except `export * from "@/view-modules/..."`.
-- Orchestration modules must have **zero React imports**; view-bridge modules may **only** import from `@/view-modules/`.
+`src/react-hooks/` (calls orchestration functions).

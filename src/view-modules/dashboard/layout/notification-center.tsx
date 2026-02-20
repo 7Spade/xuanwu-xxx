@@ -18,12 +18,12 @@ export function NotificationCenter({ notifications, dispatch }: NotificationCent
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="relative p-2 hover:bg-accent rounded-full transition-colors">
+        <Button variant="ghost" size="icon" className="relative rounded-full">
           <Bell className="w-5 h-5 text-muted-foreground" />
           {unreadCount > 0 && (
             <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background" />
           )}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="p-4 border-b flex items-center justify-between">

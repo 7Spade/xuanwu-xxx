@@ -27,7 +27,6 @@ import {
   MessageSquare,
   History
 } from "lucide-react";
-import { cn } from "@/shared/utils/utils";
 import { ROUTES } from "@/shared/constants/routes";
 
 interface NavMainProps {
@@ -62,15 +61,15 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
       </SidebarMenuItem>
 
       {isOrganizationAccount && (
-        <SidebarMenuItem>
-          <Collapsible defaultOpen className="group/collapsible w-full">
-            <SidebarMenuButton asChild>
-                <CollapsibleTrigger>
-                  <FolderTree />
-                  <span className="font-semibold">{t("sidebar.accountGovernance")}</span>
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                </CollapsibleTrigger>
-            </SidebarMenuButton>
+        <Collapsible asChild defaultOpen className="group/collapsible">
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton>
+                <FolderTree />
+                <span className="font-semibold">{t("sidebar.accountGovernance")}</span>
+                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarMenuSub>
                 {[
@@ -93,8 +92,8 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
                 ))}
               </SidebarMenuSub>
             </CollapsibleContent>
-          </Collapsible>
-        </SidebarMenuItem>
+          </SidebarMenuItem>
+        </Collapsible>
       )}
     </SidebarMenu>
   );

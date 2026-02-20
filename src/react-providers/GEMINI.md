@@ -1,31 +1,54 @@
-# Project: State Management Layer (Context)
+# React Providers Layer (`src/react-providers/`)
 
-## 1. Responsibility
+## Role
 
-This directory manages React context and application state. It acts as the primary bridge between the UI/hooks layers and the infrastructure layer. It is organized into a clear hierarchy to ensure separation of concerns and efficient data loading.
+React Context providers and global state containers. Acts as the bridge between infrastructure (Firebase real-time listeners) and the UI layer. Provides typed context values consumed by hooks and view-modules.
 
-- **`firebase-context.tsx`**: Provides the raw, initialized Firebase SDK instances (db, auth, etc.).
-- **`auth-context.tsx`**: Manages user authentication state (the currently logged-in user).
-- **`app-context.tsx`**: Manages top-level application state, such as the list of available organizations and the currently selected `activeAccount`. It does **not** load detailed data for the active account.
-- **`account-context.tsx`**: Manages the data associated with the `activeAccount`. It listens for changes to the `activeAccount` and loads the corresponding workspaces, logs, and other account-level data on demand.
-- **`workspace-context.tsx`**: (Used within `/dashboard/workspaces/[id]`) Manages the detailed state for a *single* workspace, including its sub-collections like tasks and issues.
+## Boundary Rules
 
-## 2. Dependency Rules
+- 僅提供 Context 與全域狀態容器。
+- 可依賴 `react-hooks`、`firebase`（real-time listeners）、`domain-types`、`shared`。
+- 不得包含業務流程（邏輯在 `use-cases` 或 `domain-rules`）。
+- 不得直接依賴 `domain-rules`（必須透過 `react-hooks`）。
+- 不得依賴 `use-cases`（禁止上層依賴）。
+- 不得依賴 `genkit-flows`（AI 呼叫透過 `server-commands`）。
+- 不得依賴 `view-modules`（禁止 UI 元件引用）。
 
-- Contexts can depend on contexts "above" them (e.g., `AccountProvider` can use `useApp`), but not below.
-- The context layer MUST NOT have knowledge of specific UI components.
+## Provider Hierarchy
 
-### Allowed Imports:
-- `src/types`
-- `src/lib`
-- `src/infra`
-- `src/hooks`
+```
+FirebaseProvider     ← raw Firebase SDK instances
+AuthProvider         ← current authenticated user
+AppProvider          ← active account, account list
+AccountProvider      ← detailed account data (workspaces, members)
+WorkspaceProvider    ← single workspace detailed state
+```
 
-### Disallowed Imports:
-- `import ... from '@/components/...'`
-- `import ... from '@/genkit-flows/...'`
-- `import ... from '@/app/...'`
+Context objects are in `*-context.ts`; Provider render logic is in `*-provider.tsx`.
 
-## 3. Who Depends on This Layer?
+## Allowed Imports
 
-The `hooks`, `components`, and `app` layers. Any component that needs access to global state will consume it via this layer, typically through a helper hook like `useApp()` or `useAccount()`.
+```ts
+import ... from "@/react-hooks/..."       // ✅ complex hook logic
+import ... from "@/firebase/..."          // ✅ onSnapshot real-time listeners
+import ... from "@/domain-types/..."      // ✅ typed context values
+import ... from "@/shared/..."            // ✅ utilities, constants
+```
+
+## Forbidden Imports
+
+```ts
+import ... from "@/domain-rules/..."      // ❌ must go through react-hooks
+import ... from "@/genkit-flows/..."      // ❌ no AI calls
+import ... from "@/use-cases/..."         // ❌ no upward dependency
+import ... from "@/view-modules/..."      // ❌ no UI components
+import ... from "@/app/..."               // ❌ no upward dependency
+```
+
+## Side Effects
+
+Providers set up Firebase `onSnapshot` listeners on mount and clean them up on unmount. Context values change in response to real-time data updates.
+
+## Who Depends on This Layer?
+
+`src/react-hooks/state-hooks/` (consume context values) and `src/view-modules/` (consume context via hooks).

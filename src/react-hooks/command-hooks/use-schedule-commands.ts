@@ -2,21 +2,23 @@
 /**
  * @fileoverview use-schedule-actions.ts - Hook for managing schedule-related write operations.
  * @description This hook centralizes business logic for interactive features
- * on schedule items, such as assigning members. It acts as the bridge
- * between UI components and the infrastructure layer, respecting architectural
- * boundaries.
+ * on schedule items, such as assigning members and approving/rejecting proposals.
+ * It acts as the bridge between UI components and the infrastructure layer,
+ * respecting architectural boundaries.
  */
 "use client";
 
 import { useCallback } from "react";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { 
+import {
     assignMember as assignMemberAction,
     unassignMember as unassignMemberAction,
+    updateScheduleItemStatus,
 } from "@/server-commands/schedule";
+import { canTransitionScheduleStatus } from "@/domain-rules/schedule";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { ScheduleItem } from "@/domain-types/domain";
+import type { ScheduleItem } from "@/domain-types/domain";
 
 export function useScheduleActions() {
   const { state: appState } = useApp();
@@ -72,5 +74,19 @@ export function useScheduleActions() {
     }
   }, [user, activeAccount]);
 
-  return { assignMember, unassignMember };
+  const approveItem = useCallback(async (item: ScheduleItem) => {
+    if (!canTransitionScheduleStatus(item.status, "OFFICIAL")) {
+      throw new Error(`Cannot approve: invalid transition ${item.status} → OFFICIAL`);
+    }
+    await updateScheduleItemStatus(item.accountId, item.id, "OFFICIAL");
+  }, []);
+
+  const rejectItem = useCallback(async (item: ScheduleItem) => {
+    if (!canTransitionScheduleStatus(item.status, "REJECTED")) {
+      throw new Error(`Cannot reject: invalid transition ${item.status} → REJECTED`);
+    }
+    await updateScheduleItemStatus(item.accountId, item.id, "REJECTED");
+  }, []);
+
+  return { assignMember, unassignMember, approveItem, rejectItem };
 }

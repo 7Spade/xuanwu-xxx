@@ -1,7 +1,16 @@
-import nextPlugin from "@next/eslint-plugin-next";
+import js from "@eslint/js";
+// flatConfig is a named export — default export only has { rules, configs }
+import { flatConfig as nextFlatConfig } from "@next/eslint-plugin-next";
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import reactPlugin from "eslint-plugin-react";
 import * as reactHooks from "eslint-plugin-react-hooks";
+// eslint-plugin-tailwindcss ships without TypeScript declarations; use require().
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tailwindPlugin = require("eslint-plugin-tailwindcss") as {
+  configs: { "flat/recommended": import("typescript-eslint").ConfigWithExtends[] };
+  rules: Record<string, import("eslint").Rule.RuleModule>;
+};
 import tseslint from "typescript-eslint";
 
 const importRecommended = importPlugin.flatConfigs.recommended;
@@ -26,10 +35,20 @@ export default tseslint.config(
   },
 
   // ── Base rule sets ────────────────────────────────────────────────────────
+  // Explicit JS baseline — covers vanilla JS best-practices before TypeScript
+  // layer adds its own recommended rules on top.
+  js.configs.recommended,
+
   ...tseslint.configs.recommended,
 
-  // Next.js core-web-vitals rules (flat config)
-  nextPlugin.flatConfig.coreWebVitals,
+  // Next.js core-web-vitals rules — flatConfig is a named export, not a
+  // property on the default export. Cast bridges the string-keyed rules type.
+  nextFlatConfig.coreWebVitals as unknown as import("typescript-eslint").ConfigWithExtends,
+
+  // React recommended + JSX-runtime (React 17+ / React 19 new JSX transform;
+  // no need to import React in every file for JSX).
+  reactPlugin.configs.flat.recommended,
+  reactPlugin.configs.flat["jsx-runtime"],
 
   // React Hooks rules
   reactHooksRecommended,
@@ -48,10 +67,68 @@ export default tseslint.config(
         },
         node: true,
       },
+      // Tell eslint-plugin-react to auto-detect the installed React version
+      react: { version: "detect" },
     },
   },
   importRecommended,
   importTypescript,
+
+  // Tailwind CSS — flat/recommended registers the plugin + sets sane defaults
+  // (classnames-order: warn, no-custom-classname: warn, no-contradicting-classname: error)
+  ...tailwindPlugin.configs["flat/recommended"],
+
+  // ── TypeScript & React quality rules ─────────────────────────────────────
+  // Enforce `import type` for type-only imports so runtime bundles stay lean
+  // and cross-layer type imports never create accidental runtime coupling.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      ],
+      // Ban accidental `any` — surfaces hidden type holes
+      "@typescript-eslint/no-explicit-any": "error",
+      // Dead code: unused variables are always errors
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      // React list-rendering correctness
+      "react/jsx-key": "error",
+      "react/no-array-index-key": "warn",
+      // JSX hygiene
+      "react/jsx-no-useless-fragment": "error",
+      "react/self-closing-comp": "error",
+      // React Hooks correctness
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      // Prefer absolute @/* imports; forbid ../../ parent-relative imports
+      "import/no-relative-parent-imports": "warn",
+      // Override flat/recommended severities where we want stricter control
+      "tailwindcss/no-custom-classname": "warn",
+      "tailwindcss/classnames-order": "warn",
+      "tailwindcss/no-contradicting-classname": "error",
+    },
+  },
+
+  // ── TypeScript type-aware rules ───────────────────────────────────────────
+  // These rules require full TypeScript type information (parserServices).
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
+    rules: {
+      // Catches async callbacks passed where synchronous callbacks are expected
+      "@typescript-eslint/no-misused-promises": "error",
+      // Warns when non-boolean values are used in boolean contexts
+      "@typescript-eslint/strict-boolean-expressions": "warn",
+    },
+  },
 
   // ── One-way layer dependency rules ───────────────────────────────────────
   // Each config block covers one src/ layer and forbids imports from layers
@@ -59,6 +136,29 @@ export default tseslint.config(
   // Architecture: domain-types → domain-rules/firebase/genkit-flows/shared
   //   → server-commands → react-hooks/react-providers → use-cases
   //   → view-modules → app
+
+  // ── "use client" protection ──────────────────────────────────────────────
+  // The five layers below are always server-side or framework-agnostic.
+  // A "use client" directive in any of them is a hard architectural mistake.
+  {
+    files: [
+      "src/domain-types/**/*.{ts,tsx}",
+      "src/domain-rules/**/*.{ts,tsx}",
+      "src/firebase/**/*.{ts,tsx}",
+      "src/genkit-flows/**/*.{ts,tsx}",
+      "src/server-commands/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ExpressionStatement > Literal[value='use client']",
+          message:
+            "This layer must never contain a 'use client' directive — it is server-side or framework-agnostic.",
+        },
+      ],
+    },
+  },
 
   // domain-types: foundation — zero internal dependencies
   {
@@ -154,7 +254,10 @@ export default tseslint.config(
     },
   },
 
-  // server-commands: server boundary — no React, no UI, no higher layers
+  // server-commands: server boundary — no React, no UI, no higher layers.
+  // CAN use: @/firebase, @/genkit-flows, @/domain-rules, @/domain-types,
+  //          @/shared/utils, @/shared/constants, @/shared/i18n-types.
+  // MUST NOT use React UI parts of shared or any higher layer.
   {
     files: ["src/server-commands/**/*.{ts,tsx}"],
     rules: {
@@ -165,10 +268,11 @@ export default tseslint.config(
             { group: ["react", "react/**", "react-dom", "react-dom/**"], message: "server-commands must not depend on React" },
             { group: ["@/react-hooks", "@/react-hooks/**"], message: "server-commands must not import from react-hooks" },
             { group: ["@/react-providers", "@/react-providers/**"], message: "server-commands must not import from react-providers" },
-            { group: ["@/shared", "@/shared/**"], message: "server-commands must not import from shared" },
+            { group: ["@/shared/shadcn-ui", "@/shared/shadcn-ui/**"], message: "server-commands must not import shadcn UI components" },
+            { group: ["@/shared/app-providers", "@/shared/app-providers/**"], message: "server-commands must not import React context providers" },
+            { group: ["@/shared/utility-hooks", "@/shared/utility-hooks/**"], message: "server-commands must not import React hooks from shared" },
             { group: ["@/use-cases", "@/use-cases/**"], message: "server-commands must not import from use-cases" },
             { group: ["@/view-modules", "@/view-modules/**"], message: "server-commands must not import from view-modules" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "server-commands must not import from genkit-flows" },
             { group: ["@/app", "@/app/**"], message: "server-commands must not import from app layer" },
           ],
         },

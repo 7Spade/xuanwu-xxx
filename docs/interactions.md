@@ -11,15 +11,15 @@
 ```mermaid
 graph TD
     subgraph UI Layer
-        A[應用層 (Pages & Layouts)] --> B(可重用 UI 元件)
+        A[應用層 app] --> B(視圖模組 view-modules)
     end
     subgraph Logic & State Layer
-        B --> C{Hooks (業務/UI 邏輯)}
-        C --> D[Context (全域狀態)]
+        B --> C{react-hooks / use-cases}
+        C --> D[react-providers 全域狀態]
     end
-    subgraph Data Layer
-        D --> E(基礎設施 Facades)
-        E --> F[Firebase Adapters]
+    subgraph Server & Data Layer
+        D --> E(server-commands 伺服器命令)
+        E --> F[firebase / Adapters]
     end
     subgraph External Services
         F --> G((Firebase 服務))
@@ -35,11 +35,12 @@ graph TD
 ```
 
 **流程解讀**:
-1.  **應用層 (`app`)** 組合 UI 元件來建構頁面。
-2.  **UI 元件 (`components`)** 從 Hooks 中獲取邏輯和數據，並將使用者互動傳遞給它們。
-3.  **Hooks (`hooks`)** 封裝業務邏輯，並從 Context 中讀取或更新狀態。
-4.  **Context (`context`)** 作為狀態容器，並呼叫基礎設施層來執行數據操作。
-5.  **基礎設施層 (`infra`)** 是唯一與外部服務（如 Firebase）直接通訊的地方。
+1.  **應用層 (`app`)** 組合 UI 視圖元件來建構頁面。
+2.  **視圖模組 (`view-modules`)** 從 hooks 和 use-cases 中獲取邏輯和數據，並將使用者互動傳遞給它們。
+3.  **Hooks (`react-hooks`)** 封裝業務邏輯，並從 Providers 中讀取或更新狀態。
+4.  **Providers (`react-providers`)** 作為狀態容器，並呼叫伺服器命令層來執行資料操作。
+5.  **伺服器命令層 (`server-commands`)** 是 `"use server"` 資料修改的唯一入口。
+6.  **基礎設施層 (`firebase`)** 是唯一與外部服務（如 Firebase）直接通訊的地方。
 
 ---
 

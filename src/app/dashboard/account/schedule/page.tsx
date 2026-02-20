@@ -1,1 +1,5 @@
-export { default } from '@/app/dashboard/workspaces/[id]/plugins/schedule/schedule.view';
+import AccountScheduleSection from "@/view-modules/workspaces/plugins/schedule/account-schedule-section";
+
+export default function AccountSchedulePage() {
+  return <AccountScheduleSection />;
+}

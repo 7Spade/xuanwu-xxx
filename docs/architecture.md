@@ -23,16 +23,16 @@
 
 這是專案的基石。各層之間有嚴格的依賴方向，防止循環依賴，確保程式碼的可測試性和可維護性。
 
-**依賴鏈**: `app` → `components` → `context` → `hooks` → `infra` → `lib` → `types`
+**依賴鏈**: `app` → `view-modules` → `use-cases` → `react-providers` → `react-hooks` → `server-commands` → `firebase` / `genkit-flows` / `shared` → `domain-rules` → `domain-types`
 
 *詳細規則請參閱 `docs/boundaries.md`。*
 
 ### B. 關注點分離 (Separation of Concerns)
 
-- **UI 元件 (`components`)**: 只負責渲染，不應包含業務邏輯或直接的數據請求。
-- **邏輯 (`hooks`)**: 封裝可重用的 UI 邏輯或業務邏輯。
-- **狀態 (`context`)**: 作為 UI 與基礎設施層之間的橋樑，管理共享數據。
-- **外部通訊 (`infra`)**: 唯一負責與 Firebase 等外部服務互動的層。
+- **UI 元件 (`view-modules`)**: 只負責渲染，不應包含業務邏輯或直接的資料庫請求。
+- **邏輯 (`react-hooks`)**: 封裝可重用的 UI 邏輯或業務邏輯。
+- **狀態 (`react-providers`)**: 作為 UI 與基礎設施層之間的橋樑，管理共享數據。
+- **外部通訊 (`firebase`)**: 唯一負責與 Firebase 等外部服務互動的層。
 
 ### C. 事件驅動架構 (Event-Driven Architecture)
 
@@ -43,13 +43,16 @@
 ## 3. 目錄結構概覽 (Directory Structure Overview)
 
 - `src/app`: Next.js 的 App Router 根目錄，包含所有頁面、佈局和路由。
-- `src/components`: 可重用的「啞」UI 元件。
-- `src/context`: 全域狀態管理提供者 (`Providers`)。
-- `src/hooks`: 可重用的 React Hooks，封裝業務邏輯。
-- `src/infra`: 與外部服務（特別是 Firebase）互動的程式碼。
-- `src/lib`: 通用輔助函式，不與任何特定業務或框架綁定。
-- `src/types`: 專案中所有的 TypeScript 類型和介面定義。
-- `src/ai`: 包含所有 Genkit 流程和 AI 相關的 schema。
+- `src/view-modules`: 可重用的「智慧」UI 視圖元件（組合 hooks 和 use-cases）。
+- `src/use-cases`: 用例協調層，組合 server-commands 和 domain 邏輯。
+- `src/react-providers`: 全域狀態管理提供者 (`Providers`)。
+- `src/react-hooks`: 可重用的 React Hooks，封裝業務邏輯。
+- `src/server-commands`: 伺服器端 `"use server"` 動作，唯一負責資料修改的層。
+- `src/firebase`: 與外部服務（特別是 Firebase）互動的程式碼。
+- `src/genkit-flows`: 包含所有 Genkit 流程和 AI 相關的 schema。
+- `src/domain-rules`: 純粹的業務邏輯函式，無副作用。
+- `src/domain-types`: 專案中所有的 TypeScript 類型和介面定義。
+- `src/shared`: 全域共享的工具和 UI 元件（shadcn/ui、工具函式、常數）。
 - `docs`: 所有專案架構、規範和設計文件。
 
 ## 4. 狀態管理策略 (State Management Strategy)

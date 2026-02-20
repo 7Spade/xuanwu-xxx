@@ -7,7 +7,7 @@ import { use } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/shared/shadcn-ui/button"
-import { DailyLogDialog } from "@/app/dashboard/workspaces/[id]/plugins/daily/_plugin-components/daily-log-dialog"
+import { DailyLogDialog } from "@/view-modules/workspaces/plugins/daily/_plugin-components/daily-log-dialog"
 import { useAccount } from "@/react-hooks/state-hooks/use-account"
 import { useAuth } from "@/shared/app-providers/auth-provider"
 

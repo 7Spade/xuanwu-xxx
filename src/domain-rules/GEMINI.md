@@ -1,13 +1,20 @@
 # Domain Rules Layer (`src/domain-rules/`)
 
-## Responsibility
+## Role
 
-Pure domain logic — no I/O, no async, no frameworks.  
-Each sub-directory is one domain aggregate.
+Pure domain logic — business rules and invariant conditions. No I/O, no async, no frameworks. Each sub-directory is one domain aggregate.
 
-## File naming convention
+## Boundary Rules
 
-Each module uses an **explicit named file** for the logic, with `index.ts` as a thin re-export barrel:
+- 純業務規則與不變條件（invariants）。
+- 只可依賴 `domain-types`。
+- 不得依賴任何框架（React、Firebase、Genkit、Next.js）。
+- 不得有 I/O、副作用或網路呼叫。
+- 不得依賴 `shared`（純邏輯層，無需工具函式）。
+
+## File Naming Convention
+
+Each module uses an **explicit named file** for logic with `index.ts` as a thin re-export barrel:
 
 | Module | Logic file | What it provides |
 |--------|-----------|-----------------|
@@ -16,56 +23,55 @@ Each module uses an **explicit named file** for the logic, with `index.ts` as a 
 | `schedule/` | `schedule.rules.ts` | `canTransitionScheduleStatus`, `VALID_STATUS_TRANSITIONS` |
 | `task/` | `task.rules.ts` | `buildTaskTree` |
 | `user/` | `user.rules.ts` | `isAnonymousUser` |
-| `index.ts` | re-exports all sub-modules | — |
 
-## Input / Output contracts
+## Input / Output Contracts
 
-| Function | Input | Output | Throws? |
-|----------|-------|--------|---------|
-| `isOrganization(account)` | `Account` | `boolean` | No |
-| `isOwner(account, userId)` | `Account`, `string` | `boolean` | No |
-| `getUserTeamIds(account, userId)` | `Account`, `string` | `Set<string>` | No |
-| `filterVisibleWorkspaces(workspaces, userId, activeAccount, allAccounts)` | arrays/records of domain types | `Workspace[]` | No |
-| `canTransitionScheduleStatus(from, to)` | two `ScheduleStatus` | `boolean` | No |
-| `buildTaskTree(tasks)` | `WorkspaceTask[]` | `TaskWithChildren[]` | No |
+All functions are **pure**: same input → same output, zero mutations.
 
-## Side effects
+| Function | Input | Output |
+|----------|-------|--------|
+| `isOrganization(account)` | `Account` | `boolean` |
+| `isOwner(account, userId)` | `Account`, `string` | `boolean` |
+| `getUserTeamIds(account, userId)` | `Account`, `string` | `Set<string>` |
+| `filterVisibleWorkspaces(...)` | arrays + domain types | `Workspace[]` |
+| `canTransitionScheduleStatus(from, to)` | two `ScheduleStatus` | `boolean` |
+| `buildTaskTree(tasks)` | `WorkspaceTask[]` | `TaskWithChildren[]` |
 
-**None.** Every function is pure: same input → same output, zero I/O, zero mutation.
+## Side Effects
 
-## Dependency rules
+**None.** Every function is pure.
 
-### Allowed
-- `@/domain-types/` — domain interfaces as shapes
+## Allowed Imports
 
-### Forbidden
-- `react`, `firebase`, `next` — no framework dependencies
-- `@/firebase/` — no data access
-- `@/server-commands/` — no orchestration
-- `@/react-hooks/`, `@/react-providers/` — no React
-- `@/view-modules/`, `@/app/` — no UI
+```ts
+import type ... from "@/domain-types/..."  // ✅ type definitions only
+```
 
-## Coding constraints
+## Forbidden Imports
+
+```ts
+import ... from "react"                    // ❌ no framework
+import ... from "firebase/*"               // ❌ no I/O
+import ... from "next/*"                   // ❌ no framework
+import ... from "@/firebase/..."           // ❌ no data access
+import ... from "@/server-commands/..."    // ❌ no orchestration
+import ... from "@/shared/..."             // ❌ pure logic layer needs no utilities
+import ... from "@/react-hooks/..."        // ❌ no React
+import ... from "@/react-providers/..."    // ❌ no React
+import ... from "@/use-cases/..."          // ❌ no upward dependency
+import ... from "@/view-modules/..."       // ❌ no UI
+import ... from "@/genkit-flows/..."       // ❌ no AI
+import ... from "@/app/..."                // ❌ no upward dependency
+```
+
+## Coding Constraints
 
 1. **No `async` functions** — rules never perform I/O.
 2. **No side effects** — every function is pure.
 3. **Verb-prefixed exports** — all functions start with `is`, `has`, `can`, `get`, `filter`, or `build`.
-4. **Single aggregate per module** — each sub-directory encapsulates one domain object.
-5. **All permission logic here** — never place `isOwner` or `hasAccess` checks in hooks or UI.
-6. **All state-transition rules here** — never check status validity elsewhere.
+4. **All permission logic here** — never place `isOwner` or `hasAccess` checks in hooks or UI.
+5. **All state-transition rules here** — never check status validity in server-commands or hooks.
 
-## Dependency direction (absolute)
+## Who Depends on This Layer?
 
-```
-app → use-cases → server-commands → domain-rules
-                                         ↓
-                                    (domain-types only)
-```
-
-- **domain-rules → server-commands** ❌ forbidden
-- **domain-rules → firebase** ❌ forbidden
-- **domain-rules → react/firebase/next** ❌ forbidden
-
-## Ideal end state
-
-> Rules 變厚 (rich domain logic) · server-commands 變薄 (thin boundary) · UI 無規則 (zero business logic)
+`src/server-commands/`, `src/use-cases/`, `src/react-hooks/`, `src/view-modules/`.

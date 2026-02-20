@@ -1,4 +1,4 @@
-import { WorkspaceIssues } from "../../plugins"
+import { WorkspaceIssues } from "@/view-modules/workspaces/plugins"
 
 export default function IssuesCapabilityPage() {
   return <WorkspaceIssues />

@@ -4,7 +4,12 @@
  * 
  * Responsibility: Main layout structure for all dashboard pages.
  * It provides the core auth guard and provider setup. The actual UI shell
- * is now composed of smaller, single-responsibility components.
+ * is composed via parallel route slots (@sidebar, @header, @modal).
+ *
+ * Parallel route structure:
+ *   @sidebar  →  DashboardSidebar  (rendered inside SidebarProvider)
+ *   @header   →  Header            (rendered inside SidebarProvider via SidebarInset)
+ *   @modal    →  modal overlays    (rendered inside SidebarProvider)
  */
 
 "use client";
@@ -17,11 +22,9 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 // ============================================================================
-// Internal Dependencies - Components & Layout
+// Internal Dependencies - Layout Primitives
 // ============================================================================
 import { SidebarProvider, SidebarInset } from "@/shared/shadcn-ui/sidebar";
-import { DashboardSidebar } from "@/view-modules/dashboard/sidebar";
-import { Header } from "@/view-modules/dashboard/layout/header";
 import { ThemeAdapter } from "@/view-modules/dashboard/layout/theme-adapter";
 
 // ============================================================================
@@ -36,23 +39,42 @@ import { AccountProvider } from "@/react-providers/account-provider";
 
 type DashboardLayoutProps = {
   children: ReactNode;
+  /** @modal parallel route slot — dialog/overlay surfaces */
   modal?: ReactNode;
+  /** @sidebar parallel route slot — DashboardSidebar */
+  sidebar: ReactNode;
+  /** @header parallel route slot — Header with SidebarTrigger + Breadcrumb */
+  header: ReactNode;
 };
 
 // ============================================================================
 // Component: DashboardLayoutClient
-// Responsibility: Renders the authenticated layout shell.
+// Responsibility: Renders the authenticated layout shell using slot composition.
+//
+// Parallel route slot layout:
+//
+//   <SidebarProvider>              ← owns sidebar open/close state
+//     {sidebar}                    ← @sidebar slot  (peer element for CSS transitions)
+//     <SidebarInset>               ← expands when sidebar collapses
+//       {header}                   ← @header slot   (SidebarTrigger lives here)
+//       <main>{children}</main>
+//     </SidebarInset>
+//     {modal}                      ← @modal slot
+//   </SidebarProvider>
+//
+// Both {sidebar} and {header} are rendered inside SidebarProvider so that
+// useSidebar() context is available to DashboardSidebar and Header.
 // ============================================================================
-function DashboardLayoutClient({ children, modal }: DashboardLayoutProps) {
+function DashboardLayoutClient({ children, modal, sidebar, header }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
-      <DashboardSidebar />
+      {sidebar}
       <SidebarInset>
-        <Header />
+        {header}
         <ThemeAdapter>
-            <main className="flex-1 p-6 overflow-y-auto content-visibility-auto">
-              {children}
-            </main>
+          <main className="flex-1 p-6 overflow-y-auto">
+            {children}
+          </main>
         </ThemeAdapter>
       </SidebarInset>
       {modal}
@@ -64,7 +86,7 @@ function DashboardLayoutClient({ children, modal }: DashboardLayoutProps) {
 // Component: DashboardLayout (Default Export)
 // Responsibility: Auth guard and provider setup for the entire dashboard.
 // ============================================================================
-export default function DashboardLayout({ children, modal }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, modal, sidebar, header }: DashboardLayoutProps) {
   const { state } = useAuth();
   const { user, authInitialized } = state;
   const router = useRouter();
@@ -88,7 +110,9 @@ export default function DashboardLayout({ children, modal }: DashboardLayoutProp
 
   return (
     <AccountProvider>
-      <DashboardLayoutClient modal={modal}>{children}</DashboardLayoutClient>
+      <DashboardLayoutClient modal={modal} sidebar={sidebar} header={header}>
+        {children}
+      </DashboardLayoutClient>
     </AccountProvider>
   );
 }
