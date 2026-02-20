@@ -1,7 +1,7 @@
 // [職責] Business — 單一 Workspace 排程提案與檢視
 "use client";
 
-import { UnifiedCalendarGrid } from "@/app/dashboard/_components/schedule/unified-calendar-grid";
+import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
 import { ProposalDialog } from "./_components/proposal-dialog";
 import { useWorkspaceSchedule } from "./_hooks/use-workspace-schedule";
 

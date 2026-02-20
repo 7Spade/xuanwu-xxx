@@ -2,9 +2,9 @@
 "use client";
 
 import { AlertCircle, Terminal } from "lucide-react";
-import { AuditTimeline } from "../../../../_components/audit/audit-timeline";
-import { AuditEventItem } from "../../../../_components/audit/audit-event-item";
-import { AuditDetailSheet } from "../../../../_components/audit/audit-detail-sheet";
+import { AuditTimeline } from "./_components/audit-timeline";
+import { AuditEventItem } from "./_components/audit-event-item";
+import { AuditDetailSheet } from "./_components/audit-detail-sheet";
 import { useAccountAudit } from "./_hooks/use-account-audit";
 
 export function AccountAuditComponent() {

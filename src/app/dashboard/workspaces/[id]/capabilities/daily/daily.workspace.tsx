@@ -2,9 +2,9 @@
 "use client";
 
 import { MessageSquare } from "lucide-react";
-import { DailyLogCard } from "@/app/dashboard/_components/daily/daily-log-card";
-import { DailyLogComposer } from "@/app/dashboard/_components/daily/composer";
-import { DailyLogDialog } from "@/app/dashboard/_components/daily/daily-log-dialog";
+import { DailyLogCard } from "./_components/daily-log-card";
+import { DailyLogComposer } from "./_components/composer";
+import { DailyLogDialog } from "./_components/daily-log-dialog";
 import { useWorkspaceDailyLog } from "./_hooks/use-workspace-daily";
 
 export function WorkspaceDaily() {

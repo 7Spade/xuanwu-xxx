@@ -1,6 +1,6 @@
 "use client";
 
-import { AccountDailyComponent } from "@/app/dashboard/workspaces/[id]/capabilities/daily/daily.account";
+import { AccountDailyComponent } from "./daily.account";
 
 /**
  * AccountDailyView - Responsibility: The dynamic wall for the entire dimension.
