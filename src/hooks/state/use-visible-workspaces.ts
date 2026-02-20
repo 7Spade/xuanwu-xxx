@@ -4,7 +4,7 @@
 import { useMemo } from 'react'
 import { Workspace } from '@/types/domain'
 import { useApp } from './use-app'
-import { useAuth } from '@/context/auth-context'
+import { useAuth } from '@/shared/context/auth-context'
 import { useAccount } from './use-account'
 
 /**

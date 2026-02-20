@@ -3,7 +3,7 @@
 
 import { useMemo } from "react";
 import { useSearchParams } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { useWorkspace } from "@/context/workspace-context";
 import {
   WorkspaceFiles,

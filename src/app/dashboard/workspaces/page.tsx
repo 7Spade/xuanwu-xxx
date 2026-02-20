@@ -5,12 +5,12 @@ import { useState, useEffect } from "react";
 import { Terminal } from "lucide-react";
 import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";
 import { useApp } from "@/hooks/state/use-app";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 import { useWorkspaceFilters } from "./_lib/use-workspace-filters";
 import { WorkspaceListHeader } from "./_components/workspace-list-header";
 import { WorkspaceGridView } from "./_components/workspace-grid-view";
 import { WorkspaceTableView } from "./_components/workspace-table-view";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { CreateWorkspaceDialog } from "./_components/create-workspace-dialog";
 
 export default function WorkspacesPage() {

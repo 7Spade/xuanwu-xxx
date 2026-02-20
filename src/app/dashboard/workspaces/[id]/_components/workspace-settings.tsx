@@ -9,18 +9,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/app/_components/ui/dialog";
-import { Button } from "@/app/_components/ui/button";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
-import { Switch } from "@/app/_components/ui/switch";
+} from "@/shared/ui/dialog";
+import { Button } from "@/shared/ui/button";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Switch } from "@/shared/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/_components/ui/select";
+} from "@/shared/ui/select";
 import type { Workspace, WorkspaceLifecycleState, Address } from "@/types/domain";
 
 interface WorkspaceSettingsDialogProps {

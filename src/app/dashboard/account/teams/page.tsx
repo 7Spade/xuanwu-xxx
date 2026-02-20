@@ -1,9 +1,9 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { Users, Plus, FolderTree, ArrowRight, AlertCircle } from "lucide-react";
 import { useState, useEffect, useMemo, ReactNode } from "react";
 import { 
@@ -12,14 +12,14 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogFooter 
-} from "@/app/_components/ui/dialog";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
+} from "@/shared/ui/dialog";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccountManagement } from "@/hooks/state/use-account-management";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface PageHeaderProps {
   title: string;

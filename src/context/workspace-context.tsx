@@ -8,7 +8,7 @@ import { WorkspaceEventBus } from '@/app/dashboard/workspaces/[id]/_events/works
 import { Firestore } from 'firebase/firestore';
 import { useApp } from '@/hooks/state/use-app';
 import { useAccount } from '@/hooks/state/use-account';
-import { useFirebase } from '@/context/firebase-context';
+import { useFirebase } from '@/shared/context/firebase-context';
 import { Loader2 } from 'lucide-react';
 import { WorkspaceEventHandler } from '@/app/dashboard/workspaces/[id]/_events/workspace-event-handler';
 import { 

@@ -2,11 +2,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { Eye, EyeOff, Shield, Trash2, ArrowUpRight } from "lucide-react";
 import type { Workspace } from "@/types/domain";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface WorkspaceListItemProps {
   workspace: Workspace;

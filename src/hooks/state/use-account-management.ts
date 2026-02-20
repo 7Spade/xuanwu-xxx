@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { useApp } from './use-app';
-import { useAuth } from '@/context/auth-context';
+import { useAuth } from '@/shared/context/auth-context';
 import {
   createOrganization as createOrganizationAction,
   recruitMember as recruitMemberAction,

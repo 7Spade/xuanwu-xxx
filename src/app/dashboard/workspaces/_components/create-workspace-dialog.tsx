@@ -9,13 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/app/_components/ui/dialog";
-import { Button } from "@/app/_components/ui/button";
-import { Input } from "@/app/_components/ui/input";
-import { Label } from "@/app/_components/ui/label";
+} from "@/shared/ui/dialog";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 import { handleCreateWorkspace } from "../_lib/workspace-actions";
 import { useApp } from "@/hooks/state/use-app";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface CreateWorkspaceDialogProps {
   open: boolean;

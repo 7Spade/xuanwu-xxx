@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useFirebase } from "@/context/firebase-context";
+import { useFirebase } from "@/shared/context/firebase-context";
 import { serverTimestamp } from "firebase/firestore";
 import { addDocument } from "@/infra/firebase/firestore/firestore.write.adapter";
 import { useCallback } from "react";

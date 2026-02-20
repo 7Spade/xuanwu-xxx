@@ -1,13 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/app/_components/ui/card";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
 import { User, Loader2, Upload } from "lucide-react";
-import { Textarea } from "@/app/_components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar";
-import { Checkbox } from "@/app/_components/ui/checkbox";
+import { Textarea } from "@/shared/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { ExpertiseBadge, Account } from "@/types/domain"
 import React from "react"
 

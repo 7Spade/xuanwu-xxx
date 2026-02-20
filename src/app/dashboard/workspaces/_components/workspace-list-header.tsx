@@ -9,10 +9,10 @@ import {
   LayoutGrid,
   List as ListIcon,
 } from "lucide-react";
-import { Button } from "@/app/_components/ui/button";
-import { Input } from "@/app/_components/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
 import { CreateWorkspaceDialog } from "./create-workspace-dialog";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface PageHeaderProps {
   title: string;

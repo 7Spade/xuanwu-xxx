@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context";
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/app/_components/ui/dialog";
+} from "@/shared/ui/dialog";
 import { WorkspaceSettingsDialog } from "./_components/workspace-settings";
 import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
 import { handleDeleteWorkspace } from "../_lib/workspace-actions";

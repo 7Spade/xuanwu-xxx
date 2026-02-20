@@ -2,9 +2,9 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Card, CardDescription, CardHeader, CardTitle, CardFooter } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { 
   Box, 
   Trash2, 
@@ -24,13 +24,13 @@ import {
   Calendar,
   FileScan
 } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useCallback, useState, useMemo } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/app/_components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/shared/ui/dialog";
 import { Capability } from "@/types/domain";
 import { useApp } from "@/hooks/state/use-app";
-import { Checkbox } from "@/app/_components/ui/checkbox";
-import { Label } from "@/app/_components/ui/label";
+import { Checkbox } from "@/shared/ui/checkbox";
+import { Label } from "@/shared/ui/label";
 
 // Capabilities available for personal (user-owned) workspaces.
 const PERSONAL_CAPABILITY_IDS = new Set([

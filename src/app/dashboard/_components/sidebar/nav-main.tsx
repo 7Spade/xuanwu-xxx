@@ -6,7 +6,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/app/_components/ui/collapsible";
+} from "@/shared/ui/collapsible";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -14,7 +14,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarMenuButton,
-} from "@/app/_components/ui/sidebar";
+} from "@/shared/ui/sidebar";
 import {
   LayoutDashboard,
   Layers,

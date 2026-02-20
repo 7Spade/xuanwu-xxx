@@ -8,7 +8,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { ScheduleItem } from "@/types/domain";
 import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
 import { ScheduleDataTable } from "./_components/schedule-data-table";
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { Button } from "@/app/_components/ui/button";
+} from "@/shared/ui/dropdown-menu";
+import { Button } from "@/shared/ui/button";
 import { UserPlus, Calendar, ListChecks, History } from "lucide-react";
 import { useScheduleActions } from "@/hooks/actions/use-schedule-actions";
 

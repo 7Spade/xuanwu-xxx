@@ -1,7 +1,7 @@
 // [職責] 顯示 Mounted/Isolated 狀態
 "use client";
 
-import { Badge } from "@/app/_components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { Eye, EyeOff } from "lucide-react";
 import { useWorkspace } from "@/context/workspace-context";
 

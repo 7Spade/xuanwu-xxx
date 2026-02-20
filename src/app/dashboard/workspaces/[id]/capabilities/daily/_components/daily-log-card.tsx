@@ -12,10 +12,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/app/_components/ui/card";
+import { Card } from "@/shared/ui/card";
 import { DailyLog, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
-import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 
 // Import the new single-responsibility action components
 import { LikeButton } from "./actions/like-button";

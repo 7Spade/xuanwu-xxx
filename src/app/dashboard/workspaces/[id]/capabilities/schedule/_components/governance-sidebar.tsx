@@ -2,10 +2,10 @@
 "use client";
 
 import { ScheduleItem } from "@/types/domain";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
-import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { Check, X } from "lucide-react";
 
 interface GovernanceSidebarProps {

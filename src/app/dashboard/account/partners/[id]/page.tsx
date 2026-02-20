@@ -2,9 +2,9 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { 
   ArrowLeft, 
   MailPlus, 
@@ -15,7 +15,7 @@ import {
   SendHorizontal
 } from "lucide-react";
 import { useState, useEffect, useMemo, ReactNode } from "react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import type { PartnerInvite, MemberReference } from "@/types/domain";
 import { 
   Dialog, 
@@ -24,10 +24,10 @@ import {
   DialogTitle, 
   DialogDescription, 
   DialogFooter 
-} from "@/app/_components/ui/dialog";
-import { Input } from "@/app/_components/ui/input";
-import { Label } from "@/app/_components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
+} from "@/shared/ui/dialog";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccount } from "@/hooks/state/use-account";
 import { useAccountManagement } from "@/hooks/state/use-account-management";

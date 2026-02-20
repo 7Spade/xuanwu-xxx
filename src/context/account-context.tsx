@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
-import { useFirebase } from "@/context/firebase-context";
+import { useFirebase } from "@/shared/context/firebase-context";
 import { collection, query, where, onSnapshot, QuerySnapshot, orderBy, limit } from "firebase/firestore";
 import { Workspace, DailyLog, AuditLog, PartnerInvite, ScheduleItem } from '@/types/domain';
 import { useApp } from '@/hooks/state/use-app';

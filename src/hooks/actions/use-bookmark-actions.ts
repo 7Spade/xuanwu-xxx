@@ -7,11 +7,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { useFirebase } from '@/context/firebase-context';
+import { useAuth } from '@/shared/context/auth-context';
+import { useFirebase } from '@/shared/context/firebase-context';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { toggleBookmark as toggleBookmarkAction } from '@/actions/bookmark.actions';
-import { toast } from '@/hooks/ui/use-toast';
+import { toast } from '@/shared/hooks/use-toast';
 
 export function useBookmarkActions() {
     const { state: authState } = useAuth();

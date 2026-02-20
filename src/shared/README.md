@@ -1,68 +1,62 @@
-# `src/shared/` — Cross-Layer Shared Utilities (Reserved)
+# `src/shared/` — Globally Shared Code
 
-> **Status: Reserved for future use.**  
-> Code that is currently shared lives in `src/lib/` (pure utils) or `src/types/` (shared types).  
-> This directory is reserved for **non-trivial utilities that are too large or too specific for `src/lib/`** but still need to be shared across multiple feature areas.
+Everything in this directory is used across multiple unrelated features and layers.  
+**No domain-specific logic. No single-feature code.**
 
-## What belongs here (if used)
+## Sub-directories
 
-Utilities and helpers that are:
+| Directory | Contents | Import alias |
+|-----------|---------|-------------|
+| `ui/` | shadcn/ui primitive components (Button, Dialog, Card, …) | `@/shared/ui/` |
+| `hooks/` | `use-mobile.tsx`, `use-toast.ts` — framework-level UI hooks | `@/shared/hooks/` |
+| `context/` | `theme-context`, `i18n-context`, `auth-context`, `firebase-context` — global providers | `@/shared/context/` |
+| `utils/` | *(reserved)* additional shared pure helpers beyond `src/lib/` | `@/shared/utils/` |
+| `config/` | *(reserved)* shared app constants (name, version, feature flags) | `@/shared/config/` |
+| `constants/` | *(reserved)* shared domain-independent constants (route names, limits) | `@/shared/constants/` |
+| `types/` | *(reserved)* UI-layer shared type definitions (form schemas, display props) | `@/shared/types/` |
 
-- Used by **three or more** unrelated layers or features
-- Too domain-specific for `src/lib/` (e.g. contain business vocabulary)
-- Not tied to any single aggregate (those belong in `src/entities/`)
+## `ui/` — shadcn/ui components
 
-Examples:
+All shadcn primitive components live here. Install / update with:
 
+```bash
+npx shadcn@latest add <component>   # components.json points to @/shared/ui
 ```
-src/shared/
-  pagination.ts         ← cursor-based pagination helpers shared by hooks + actions
-  error-mapping.ts      ← Firebase error code → user-facing message map
-  date-range.ts         ← date range arithmetic used by schedule + daily + audit
-  constants.ts          ← shared business constants (max members, plan limits)
+
+✅ Import: `import { Button } from "@/shared/ui/button"`  
+❌ Never import ui primitives from `@/app/_components/ui/` — that path no longer exists.
+
+## `hooks/` — global UI hooks
+
+```ts
+import { useIsMobile } from "@/shared/hooks/use-mobile"
+import { useToast }    from "@/shared/hooks/use-toast"
 ```
+
+These are React-only, zero domain knowledge. Domain hooks belong in `src/hooks/`.
+
+## `context/` — global providers
+
+The four providers that wrap the entire app:
+
+| File | Hook | Purpose |
+|------|------|---------|
+| `theme-context.tsx` | `useTheme` | Dark / light mode |
+| `i18n-context.tsx` | `useI18n` | Translations |
+| `auth-context.tsx` | `useAuth` | Firebase Auth session |
+| `firebase-context.tsx` | `useFirebase` | Firebase SDK instances |
+
+Domain contexts (`app-context`, `account-context`, `workspace-context`) remain in `src/context/`.
 
 ## What does NOT belong here
 
-- Simple one-liner utilities → `src/lib/`
-- TypeScript interfaces / type aliases → `src/types/`
-- Single-domain logic → `src/actions/{domain}.actions.ts`
-- React hooks or components → `src/hooks/` or `src/app/`
+- Domain business logic → `src/actions/`
+- Domain-specific hooks → `src/hooks/`
+- Domain-specific contexts → `src/context/`
 - Firebase SDK calls → `src/infra/`
-
-## Naming convention
-
-`{concern}.ts` — e.g. `pagination.ts`, `error-mapping.ts`, `date-range.ts`
-
-No sub-directories unless the concern is large enough to warrant its own folder with an `index.ts`.
-
-## Allowed imports
-
-```ts
-import ... from '@/types/...'  // ✅ domain type definitions
-import ... from '@/lib/...'    // ✅ lower-level pure utils
-```
-
-## Forbidden imports
-
-```ts
-import ... from '@/infra/...'    // ❌ no Firebase
-import ... from '@/actions/...'  // ❌ no orchestration
-import ... from '@/hooks/...'    // ❌ no React
-import ... from '@/context/...'  // ❌ no React
-import ... from '@/app/...'      // ❌ no app layer
-import ... from 'react'          // ❌ no React
-```
-
-## Current guidance
-
-Do **not** create files here without first checking:
-
-1. Does `src/lib/utils.ts` already have (or could easily hold) this logic?
-2. Is the utility truly needed by **multiple independent areas**, not just one?
-
-If in doubt, start in `src/lib/` and move here only once duplication appears.
+- Simple one-liner utils → `src/lib/`
+- Domain type aliases → `src/types/`
 
 ## Who depends on this layer
 
-`src/actions/`, `src/hooks/`, `src/context/`, `src/app/` — any layer above `src/lib/`.
+Every layer above `src/lib/`: `src/hooks/`, `src/context/`, `src/actions/`, `src/app/`.

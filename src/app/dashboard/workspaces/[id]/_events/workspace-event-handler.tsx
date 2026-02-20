@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useWorkspace } from "@/context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
-import { toast } from "@/hooks/ui/use-toast";
-import { ToastAction } from "@/app/_components/ui/toast";
+import { toast } from "@/shared/hooks/use-toast";
+import { ToastAction } from "@/shared/ui/toast";
 import type { WorkspaceEventPayloadMap } from "./workspace-events";
 import { WorkspaceTask } from "@/types/domain";
 import { createIssue } from "@/actions/issue.actions";

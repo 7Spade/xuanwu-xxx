@@ -1,16 +1,16 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { UserPlus, Trash2, Mail, AlertCircle } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useState, useEffect, useMemo, ReactNode } from "react";
 import { MemberReference } from "@/types/domain";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccountManagement } from "@/hooks/state/use-account-management";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface PageHeaderProps {
   title: string;

@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useApp } from "@/hooks/state/use-app";
 import { hexToHsl } from "@/lib/utils";
-import { Skeleton } from "@/app/_components/ui/skeleton";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 interface ThemeAdapterProps {
     children: React.ReactNode;

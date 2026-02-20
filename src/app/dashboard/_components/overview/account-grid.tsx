@@ -2,7 +2,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Button } from "@/app/_components/ui/button"
+import { Button } from "@/shared/ui/button"
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/app/_components/ui/card"
+} from "@/shared/ui/card"
 import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react"
 import { useApp } from "@/hooks/state/use-app"
 import { Account } from "@/types/domain"

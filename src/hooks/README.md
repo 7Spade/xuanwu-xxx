@@ -9,7 +9,6 @@ Custom React hooks that bridge the UI and lower-level layers.
 | `state/` | Hooks that read from / write to context (e.g. `use-app.ts`, `use-user.ts`, `use-account-management.ts`) |
 | `actions/` | Hooks wrapping `src/actions/` with React concerns: auth guards, toasts, `useCallback` |
 | `infra/` | Hooks wrapping infra services: `use-logger.ts`, `use-storage.ts` |
-| `ui/` | Pure UI helpers: `use-toast.ts`, `use-mobile.ts` |
 
 ## Naming convention
 
@@ -21,7 +20,9 @@ Never export a hook from a file that does not start with `use-`.
 - Auth guard wrappers around action functions
 - Toast/error handling for user-facing write operations
 - Real-time Firestore listener hooks
-- UI state helpers (debounce, media query, etc.)
+- UI state helpers tied to domain logic (debounce on searches, etc.)
+
+> Pure framework-level UI hooks (`use-mobile`, `use-toast`) moved to `src/shared/hooks/`.
 
 ## What does NOT belong here
 

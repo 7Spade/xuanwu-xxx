@@ -1,21 +1,21 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { AlertCircle, Plus, ArrowRight, ShieldAlert, DollarSign, PenTool, MessageSquare, CornerUpLeft } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/app/_components/ui/dialog";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/_components/ui/select";
-import { useAuth } from "@/context/auth-context";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/app/_components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/ui/dialog";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { useAuth } from "@/shared/context/auth-context";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/shared/ui/sheet";
 import { WorkspaceIssue } from "@/types/domain";
 import { format } from "date-fns";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
-import { Textarea } from "@/app/_components/ui/textarea";
+import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Textarea } from "@/shared/ui/textarea";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;

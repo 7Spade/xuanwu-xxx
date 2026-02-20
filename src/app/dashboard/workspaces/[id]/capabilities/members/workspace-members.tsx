@@ -1,9 +1,9 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/app/_components/ui/card";
-import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { 
   Users, 
   Trash2, 
@@ -16,13 +16,13 @@ import {
   MoreVertical
 } from "lucide-react";
 import { useState, useMemo } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
-import { toast } from "@/hooks/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { toast } from "@/shared/hooks/use-toast";
 import { Team, WorkspaceGrant, WorkspaceRole, MemberReference } from "@/types/domain";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/app/_components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/_components/ui/select";
-import { Label } from "@/app/_components/ui/label";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/_components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { Label } from "@/shared/ui/label";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/hooks/state/use-app";
 

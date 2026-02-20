@@ -1,10 +1,10 @@
 "use client"
 
 import React, { createContext, useReducer, useEffect, ReactNode } from 'react'
-import { useFirebase } from "@/context/firebase-context"
+import { useFirebase } from "@/shared/context/firebase-context"
 import { collection, query, where, onSnapshot, QuerySnapshot } from "firebase/firestore"
 import { Account, CapabilitySpec, Notification } from '@/types/domain'
-import { useAuth } from './auth-context'
+import { useAuth } from "@/shared/context/auth-context"
 import { snapshotToRecord } from '@/infra/firebase/firestore/firestore.utils'
 
 // State and Action Types

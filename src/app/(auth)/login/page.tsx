@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { toast } from "@/hooks/ui/use-toast"
+import { toast } from "@/shared/hooks/use-toast"
 import { createUserAccount } from "@/actions/user.actions"
 import {
   signIn,
@@ -11,7 +11,7 @@ import {
   signInAnonymously,
   sendPasswordResetEmail,
 } from "@/actions/auth.actions"
-import { useI18n } from "@/context/i18n-context"
+import { useI18n } from "@/shared/context/i18n-context"
 import { AuthBackground } from "./_components/auth-background"
 import { AuthTabsRoot } from "./_components/auth-tabs-root"
 import { ResetPasswordDialog } from "./_components/reset-password-dialog"

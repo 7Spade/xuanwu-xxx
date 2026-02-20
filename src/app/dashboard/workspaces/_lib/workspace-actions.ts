@@ -1,7 +1,7 @@
 // [職責] 封裝所有的 Mutation (Create, Delete 呼叫)
 "use client";
 
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import {
   createWorkspace,
   updateWorkspaceSettings,

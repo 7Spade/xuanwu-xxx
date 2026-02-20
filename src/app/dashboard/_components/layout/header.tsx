@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/app/_components/ui/button";
-import { SidebarTrigger } from "@/app/_components/ui/sidebar";
+import { Button } from "@/shared/ui/button";
+import { SidebarTrigger } from "@/shared/ui/sidebar";
 import { Search, Command } from "lucide-react";
 import { NotificationCenter } from "./notification-center";
 import { GlobalSearch } from "./global-search";

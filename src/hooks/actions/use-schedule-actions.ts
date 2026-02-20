@@ -10,12 +10,12 @@
 
 import { useCallback } from "react";
 import { useApp } from "@/hooks/state/use-app";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/shared/context/auth-context";
 import { 
     assignMember as assignMemberAction,
     unassignMember as unassignMemberAction,
 } from "@/actions/schedule.actions";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { ScheduleItem } from "@/types/domain";
 
 export function useScheduleActions() {

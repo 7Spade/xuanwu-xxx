@@ -1,14 +1,14 @@
 
 import type {Metadata} from 'next';
 import './globals.css';
-import {Toaster} from '@/app/_components/ui/toaster';
+import {Toaster} from '@/shared/ui/toaster';
 import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-import { ThemeProvider } from '@/context/theme-context';
-import { FirebaseClientProvider } from '@/context/firebase-context';
-import { AuthProvider } from '@/context/auth-context';
+import { ThemeProvider } from '@/shared/context/theme-context';
+import { FirebaseClientProvider } from '@/shared/context/firebase-context';
+import { AuthProvider } from '@/shared/context/auth-context';
 import { AppProvider } from '@/context/app-context';
-import { I18nProvider } from '@/context/i18n-context';
+import { I18nProvider } from '@/shared/context/i18n-context';
 
 export const metadata: Metadata = {
   title: 'OrgVerse | Modern Workspace Architecture',

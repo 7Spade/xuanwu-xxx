@@ -15,7 +15,7 @@ import { type ThemeProviderProps } from "next-themes";
  * 
  * @example
  * ```tsx
- * import { useTheme } from '@/context/theme-context';
+ * import { useTheme } from '@/shared/context/theme-context';
  * 
  * function ThemeToggle() {
  *   const { theme, setTheme } = useTheme();

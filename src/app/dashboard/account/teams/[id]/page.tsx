@@ -2,11 +2,11 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent } from "@/app/_components/ui/card";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Button } from "@/shared/ui/button";
 import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react";
 import { useState, useEffect, useMemo, ReactNode } from "react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccountManagement } from "@/hooks/state/use-account-management";
 

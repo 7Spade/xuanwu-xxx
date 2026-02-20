@@ -8,8 +8,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-} from "@/app/_components/ui/sidebar";
-import { Badge } from "@/app/_components/ui/badge";
+} from "@/shared/ui/sidebar";
+import { Badge } from "@/shared/ui/badge";
 import { Terminal } from "lucide-react";
 import { Workspace } from "@/types/domain";
 import { cn } from "@/lib/utils";

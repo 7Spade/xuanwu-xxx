@@ -3,7 +3,7 @@
 
 import { ReactNode } from "react";
 import { UserSettings } from "@/app/dashboard/_components/settings";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 
 interface PageHeaderProps {

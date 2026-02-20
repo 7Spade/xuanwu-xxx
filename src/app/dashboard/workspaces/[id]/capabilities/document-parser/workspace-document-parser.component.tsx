@@ -2,9 +2,9 @@
 
 import { useActionState, useTransition, useRef, useEffect } from 'react';
 import { Loader2, UploadCloud, File } from 'lucide-react';
-import { useToast } from '@/hooks/ui/use-toast';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/_components/ui/card';
-import { Button } from '@/app/_components/ui/button';
+import { useToast } from '@/shared/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
+import { Button } from '@/shared/ui/button';
 import {
   extractDataFromDocument,
   type ActionState,

@@ -1,13 +1,13 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { ShieldCheck, XCircle, CheckCircle, Search, AlertTriangle } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
-import { Badge } from "@/app/_components/ui/badge";
+import { toast } from "@/shared/hooks/use-toast";
+import { Badge } from "@/shared/ui/badge";
 import { WorkspaceTask } from "@/types/domain";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/shared/context/auth-context";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;

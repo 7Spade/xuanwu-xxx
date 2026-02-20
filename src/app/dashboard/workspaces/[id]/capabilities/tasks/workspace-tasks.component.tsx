@@ -2,9 +2,9 @@
 'use client';
 
 import { useWorkspace } from '../../../../../../context/workspace-context';
-import { Button } from '@/app/_components/ui/button';
-import { Input } from '@/app/_components/ui/input';
-import { Textarea } from '@/app/_components/ui/textarea';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Textarea } from '@/shared/ui/textarea';
 import {
   Plus,
   ChevronRight,
@@ -25,8 +25,8 @@ import {
   MapPin,
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
-import { toast } from '@/hooks/ui/use-toast';
-import { Badge } from '@/app/_components/ui/badge';
+import { toast } from '@/shared/hooks/use-toast';
+import { Badge } from '@/shared/ui/badge';
 import { WorkspaceTask, Location } from '@/types/domain';
 import {
   Dialog,
@@ -35,15 +35,15 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/app/_components/ui/dialog';
-import { Label } from '@/app/_components/ui/label';
+} from '@/shared/ui/dialog';
+import { Label } from '@/shared/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/_components/ui/select';
+} from '@/shared/ui/select';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -51,8 +51,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/app/_components/ui/dropdown-menu';
-import { Progress } from '@/app/_components/ui/progress';
+} from '@/shared/ui/dropdown-menu';
+import { Progress } from '@/shared/ui/progress';
 import { cn } from '@/lib/utils';
 import { buildTaskTree } from './workspace-tasks.logic';
 import type { TaskWithChildren } from './workspace-tasks.types';

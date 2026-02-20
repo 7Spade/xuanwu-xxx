@@ -13,22 +13,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
 import { DailyLog, DailyLogComment, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
-import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 import { LikeButton } from './actions/like-button';
 import { CommentButton } from './actions/comment-button';
 import { BookmarkButton } from "./actions/bookmark-button";
 import { ShareButton } from './actions/share-button';
-import { useFirebase } from "@/context/firebase-context";
-import { useAuth } from "@/context/auth-context";
+import { useFirebase } from "@/shared/context/firebase-context";
+import { useAuth } from "@/shared/context/auth-context";
 import { addDailyLogComment } from "@/actions/daily.actions";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { toast } from "@/hooks/ui/use-toast";
-import { Textarea } from "@/app/_components/ui/textarea";
-import { Button } from "@/app/_components/ui/button";
+import { toast } from "@/shared/hooks/use-toast";
+import { Textarea } from "@/shared/ui/textarea";
+import { Button } from "@/shared/ui/button";
 import { CornerUpLeft, Loader2 } from "lucide-react";
 
 interface DailyLogDialogProps {
