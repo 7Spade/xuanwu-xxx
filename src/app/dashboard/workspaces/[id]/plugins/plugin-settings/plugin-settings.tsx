@@ -22,7 +22,8 @@ import {
   Landmark,
   Info,
   Calendar,
-  FileScan
+  FileScan,
+  Loader2,
 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useCallback, useState, useMemo } from "react";
@@ -63,6 +64,8 @@ export function WorkspaceCapabilities() {
   const { capabilitySpecs, accounts } = state;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCaps, setSelectedCaps] = useState<Set<string>>(new Set());
+  const [isMounting, setIsMounting] = useState(false);
+  const [pendingUnmount, setPendingUnmount] = useState<Capability | null>(null);
 
   const ownerType = useMemo(() => 
     accounts[workspace.dimensionId]?.accountType ?? 'user',
@@ -88,6 +91,7 @@ export function WorkspaceCapabilities() {
     const templates = capabilitySpecs.filter(spec => selectedCaps.has(spec.id));
     
     if (templates.length > 0) {
+      setIsMounting(true);
       try {
         await mountCapabilities(templates);
         templates.forEach(template => {
@@ -103,15 +107,18 @@ export function WorkspaceCapabilities() {
           title: "Mounting Failed",
           description: getErrorMessage(error, "You may not have the required permissions."),
         });
+      } finally {
+        setIsMounting(false);
       }
     }
   }, [logAuditEvent, capabilitySpecs, selectedCaps, mountCapabilities]);
 
 
-  const handleRemoveCapability = useCallback(async (cap: Capability) => {
+  const handleConfirmUnmount = useCallback(async () => {
+    if (!pendingUnmount) return;
     try {
-      await unmountCapability(cap);
-      logAuditEvent("Unmounted Capability", cap.name, 'delete');
+      await unmountCapability(pendingUnmount);
+      logAuditEvent("Unmounted Capability", pendingUnmount.name, 'delete');
       toast({ title: "Capability Unmounted" });
     } catch (error: unknown) {
       console.error("Error unmounting capability:", error);
@@ -120,8 +127,10 @@ export function WorkspaceCapabilities() {
         title: "Unmounting Failed",
         description: getErrorMessage(error, "You may not have the required permissions."),
       });
+    } finally {
+      setPendingUnmount(null);
     }
-  }, [logAuditEvent, unmountCapability]);
+  }, [logAuditEvent, unmountCapability, pendingUnmount]);
 
   const toggleCapSelection = (capId: string) => {
     setSelectedCaps(prev => {
@@ -168,15 +177,17 @@ export function WorkspaceCapabilities() {
         <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
           <Box className="w-4 h-4" /> Mounted Atomic Capabilities
         </h3>
-        <button 
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-2 text-[10px] font-bold uppercase tracking-widest"
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-80 transition-opacity"
         >
           <Plus className="w-3.5 h-3.5" /> Mount New Capability
-        </button>
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {(workspace.capabilities || []).map((cap: any) => (
+        {(workspace.capabilities || []).map((cap: Capability) => (
           <Card key={cap.id} className="border-border/60 hover:border-primary/40 transition-all group bg-card/40 backdrop-blur-sm overflow-hidden">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between mb-4">
@@ -196,7 +207,7 @@ export function WorkspaceCapabilities() {
                 variant="ghost" 
                 size="icon" 
                 className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" 
-                onClick={() => handleRemoveCapability(cap)}
+                onClick={() => setPendingUnmount(cap)}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -204,13 +215,22 @@ export function WorkspaceCapabilities() {
           </Card>
         ))}
         {(workspace.capabilities || []).length === 0 && (
-          <div className="col-span-full p-20 text-center border-2 border-dashed rounded-3xl opacity-20">
-            <Box className="w-12 h-12 mx-auto mb-4" />
-            <p className="text-xs font-bold uppercase tracking-widest">No capabilities mounted in this space</p>
+          <div className="col-span-full flex flex-col items-center justify-center gap-4 p-16 border-2 border-dashed rounded-3xl text-center">
+            <div className="p-4 bg-muted/40 rounded-2xl">
+              <Box className="w-10 h-10 text-muted-foreground/50" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-bold">No capabilities mounted yet</p>
+              <p className="text-[11px] text-muted-foreground">Add your first capability to start using this workspace.</p>
+            </div>
+            <Button size="sm" className="gap-2" onClick={() => setIsAddOpen(true)}>
+              <Plus className="w-4 h-4" /> Mount Your First Capability
+            </Button>
           </div>
         )}
       </div>
 
+      {/* Mount Dialog */}
       <Dialog open={isAddOpen} onOpenChange={(open) => { if (!open) setSelectedCaps(new Set()); setIsAddOpen(open); }}>
         <DialogContent className="rounded-2xl max-w-2xl">
           <DialogHeader>
@@ -227,9 +247,15 @@ export function WorkspaceCapabilities() {
               <Label 
                 key={cap.id} 
                 htmlFor={`cap-${cap.id}`}
-                className="flex items-center gap-4 p-4 rounded-2xl border hover:border-primary cursor-pointer transition-colors"
+                className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-colors ${
+                  selectedCaps.has(cap.id) ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+                }`}
               >
-                <Checkbox id={`cap-${cap.id}`} onCheckedChange={() => toggleCapSelection(cap.id)} />
+                <Checkbox
+                  id={`cap-${cap.id}`}
+                  checked={selectedCaps.has(cap.id)}
+                  onCheckedChange={() => toggleCapSelection(cap.id)}
+                />
                 <div className="p-3 bg-primary/10 rounded-xl text-primary">
                   {getSpecIcon(cap.type)}
                 </div>
@@ -241,8 +267,31 @@ export function WorkspaceCapabilities() {
             ))}
           </div>
           <DialogFooter>
-             <Button variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-             <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0}>Mount Selected ({selectedCaps.size})</Button>
+             <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={isMounting}>Cancel</Button>
+             <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
+               {isMounting ? (
+                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mounting...</>
+               ) : (
+                 `Mount Selected (${selectedCaps.size})`
+               )}
+             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unmount Confirmation Dialog */}
+      <Dialog open={!!pendingUnmount} onOpenChange={(open) => !open && setPendingUnmount(null)}>
+        <DialogContent className="rounded-2xl max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Unmount Capability</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to unmount <span className="font-bold text-foreground">{pendingUnmount?.name}</span>?
+              The tab and all associated data will no longer be accessible from this workspace.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingUnmount(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleConfirmUnmount}>Unmount</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
