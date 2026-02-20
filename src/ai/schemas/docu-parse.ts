@@ -1,4 +1,4 @@
-import { z } from 'genkit';
+import { z } from "zod"
 
 /**
  * @fileOverview This file defines the Zod schemas and TypeScript types for the document parsing AI flow.

@@ -2,15 +2,39 @@
 
 ## 1. Responsibility
 
-This directory contains all logic for interacting with Generative AI models and services via Genkit. It encapsulates the "dirty" details of AI model providers (like Google AI) and defines the application's core AI capabilities as "flows".
+This directory contains all logic for interacting with Generative AI models. It uses a **provider abstraction pattern** to ensure single responsibility and easy extensibility to any AI provider (Gemini, OpenAI, Claude, etc.).
 
-It is organized into:
-- **`flows/`**: Self-contained Genkit flows that define specific AI-driven business logic (e.g., `adaptUIColorToOrgContext`). Each flow handles its own prompts, input/output schemas, and interaction with the AI model.
-- **`genkit.ts`**: The central configuration and initialization file for the Genkit `ai` instance.
+## 2. Directory Structure
 
-## 2. Dependency Rules
+- **`providers/`**: Provider implementations. All must conform to the `AIProvider` interface.
+  - `provider.types.ts` — The `AIProvider` interface (the contract every provider must satisfy).
+  - `gemini.provider.ts` — Gemini implementation via Genkit + Google AI (current default).
+  - `openai.provider.ts` — OpenAI stub (ready for future implementation).
+  - `claude.provider.ts` — Claude/Anthropic stub (ready for future implementation).
+- **`index.ts`** — Exports the active `aiProvider`. **Edit this file to switch providers.**
+- **`flows/`** — Provider-agnostic AI business logic. Each flow calls `aiProvider` — never a vendor SDK.
+- **`schemas/`** — Shared Zod schemas for AI input/output validation.
+- **`genkit.ts`** — Internal Genkit client (used only by `gemini.provider.ts`).
 
-This layer must remain independent of the application's UI and state management. It provides server-side functions that can be called from other layers.
+## 3. How to Switch Providers
+
+Edit `src/ai/index.ts`:
+
+```typescript
+// Switch to OpenAI:
+import { openaiProvider } from './providers/openai.provider'
+export const aiProvider = openaiProvider
+```
+
+## 4. How to Add a New Provider
+
+1. Create `src/ai/providers/<name>.provider.ts`
+2. Implement the `AIProvider` interface from `provider.types.ts`
+3. Update `src/ai/index.ts` to use the new provider
+
+## 5. Dependency Rules
+
+This layer must remain independent of the application's UI and state management. It provides server-side functions called from Server Actions.
 
 ### Allowed Imports:
 - `src/types`
@@ -22,12 +46,8 @@ This layer must remain independent of the application's UI and state management.
 - `import ... from '@/components/...'`
 - `import ... from '@/app/...'`
 
-The AI layer knows nothing about React, hooks, or how the data it provides will be displayed.
+## 6. Core Flows
 
-## 3. Who Depends on This Layer?
+- `adaptUIColorToAccountContext` — Determines UI colors based on account identity description.
+- `extractInvoiceItems` — Extracts line items from an invoice or quote document (multimodal).
 
-The `infra` or `app` layers (via Server Actions). UI components should not call AI flows directly; they should go through a dedicated action or API route that provides a clean interface to the backend functionality.
-
-## 4. Core Flows
-
-- `adaptUIColorToOrgContext` - Determines appropriate UI colors based on an **organization's** identity description. This flow is specifically triggered for organizational contexts to create a branded theme.
