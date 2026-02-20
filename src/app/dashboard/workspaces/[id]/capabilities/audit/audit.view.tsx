@@ -1,6 +1,6 @@
 "use client";
 
-import { AccountAuditComponent } from "@/app/dashboard/workspaces/[id]/capabilities/audit/audit.account";
+import { AccountAuditComponent } from "./audit.account";
 
 /**
  * AccountAuditView - Responsibility: Displays the audit trail (Audit Logs) for the entire dimension.

@@ -1,1 +1,1 @@
-export { default } from './audit.view';
+export { default } from '@/app/dashboard/workspaces/[id]/capabilities/audit/audit.view';

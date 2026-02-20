@@ -10,7 +10,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/ui/use-toast";
 import { ScheduleItem } from "@/types/domain";
-import { UnifiedCalendarGrid } from "@/app/dashboard/_components/schedule/unified-calendar-grid";
+import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
 import { ScheduleDataTable } from "./_components/schedule-data-table";
 import { GovernanceSidebar } from "./_components/governance-sidebar";
 import { useGlobalSchedule } from "./_hooks/use-global-schedule";

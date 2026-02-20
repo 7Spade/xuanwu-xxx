@@ -5,8 +5,8 @@ import { Activity } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
-import { AuditTypeIcon } from "../../../../_components/audit/audit-type-icon";
-import { AuditDetailSheet } from "../../../../_components/audit/audit-detail-sheet";
+import { AuditTypeIcon } from "./_components/audit-type-icon";
+import { AuditDetailSheet } from "./_components/audit-detail-sheet";
 import { useWorkspaceAudit } from "./_hooks/use-workspace-audit";
 
 export function WorkspaceAudit() {
