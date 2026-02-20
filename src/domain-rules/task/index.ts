@@ -5,6 +5,19 @@
 
 import type { WorkspaceTask, TaskWithChildren } from "@/domain-types/domain";
 
+/** A task is considered "divisible" (quantity-based) when its quantity exceeds this threshold. */
+const MULTI_QUANTITY_THRESHOLD = 1;
+/** Default quantity for tasks that do not explicitly set one. */
+const DEFAULT_QUANTITY = 1;
+/** Progress percentage representing full completion. */
+const FULL_PROGRESS = 100;
+/** Terminal states that count as completed for atomic (non-divisible) tasks. */
+const COMPLETED_STATES: WorkspaceTask["progressState"][] = [
+  "completed",
+  "verified",
+  "accepted",
+];
+
 /**
  * Builds a recursive task tree from a flat list of WorkspaceTask records.
  * Calculates WBS numbering, descendant subtotal sums, and progress per node.
@@ -43,12 +56,12 @@ export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
     node.descendantSum = sum;
 
     if (node.children.length === 0) {
-      if ((node.quantity ?? 1) > 1) {
+      if ((node.quantity ?? DEFAULT_QUANTITY) > MULTI_QUANTITY_THRESHOLD) {
         const completed = node.completedQuantity || 0;
         const total = node.quantity!;
-        node.progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+        node.progress = total > 0 ? Math.round((completed / total) * FULL_PROGRESS) : 0;
       } else {
-        node.progress = ['completed', 'verified', 'accepted'].includes(node.progressState) ? 100 : 0;
+        node.progress = COMPLETED_STATES.includes(node.progressState) ? FULL_PROGRESS : 0;
       }
     } else {
       const weightedProgressSum = node.children.reduce(
@@ -63,8 +76,8 @@ export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
       if (totalChildSubtotal > 0) {
         node.progress = Math.round(weightedProgressSum / totalChildSubtotal);
       } else {
-        const allChildrenComplete = node.children.every(c => c.progress === 100);
-        node.progress = allChildrenComplete ? 100 : 0;
+        const allChildrenComplete = node.children.every(c => c.progress === FULL_PROGRESS);
+        node.progress = allChildrenComplete ? FULL_PROGRESS : 0;
       }
     }
 

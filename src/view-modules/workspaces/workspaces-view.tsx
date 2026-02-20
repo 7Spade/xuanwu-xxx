@@ -12,6 +12,7 @@ import { WorkspaceGridView } from "./workspace-grid-view";
 import { WorkspaceTableView } from "./workspace-table-view";
 import { Button } from "@/shared/shadcn-ui/button";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/shared/constants/routes";
 
 export function WorkspacesView() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -63,7 +64,7 @@ export function WorkspacesView() {
           <Button
             size="lg"
             className="rounded-full px-8 shadow-lg font-bold uppercase tracking-widest text-xs"
-            onClick={() => router.push('/dashboard/workspaces/new')}
+            onClick={() => router.push(ROUTES.WORKSPACES_NEW)}
           >
             {t("workspaces.createInitialSpace")}
           </Button>

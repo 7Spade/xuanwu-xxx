@@ -12,6 +12,7 @@ import { Button } from "@/shared/shadcn-ui/button";
 import { Input } from "@/shared/shadcn-ui/input";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/shared/constants/routes";
 
 interface PageHeaderProps {
   title: string;
@@ -79,7 +80,7 @@ export function WorkspaceListHeader({
               <ListIcon className="w-4 h-4" />
             </Button>
           </div>
-          <Button className="gap-2 shadow-sm font-bold uppercase tracking-widest text-[11px] h-10 px-4" onClick={() => router.push('/dashboard/workspaces/new')}>
+          <Button className="gap-2 shadow-sm font-bold uppercase tracking-widest text-[11px] h-10 px-4" onClick={() => router.push(ROUTES.WORKSPACES_NEW)}>
             <Plus className="w-4 h-4" /> {t("workspaces.createSpace")}
           </Button>
         </div>
