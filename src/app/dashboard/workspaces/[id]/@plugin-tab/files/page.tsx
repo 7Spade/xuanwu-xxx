@@ -1,5 +1,5 @@
-import { FilesCapabilityView } from "@/view-modules/files/files-view"
+import { WorkspaceFiles } from "../../plugins"
 
 export default function FilesCapabilityPage() {
-  return <FilesCapabilityView />
+  return <WorkspaceFiles />
 }

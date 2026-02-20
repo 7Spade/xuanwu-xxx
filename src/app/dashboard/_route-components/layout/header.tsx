@@ -8,7 +8,6 @@ import { Search, Command } from "lucide-react";
 import { NotificationCenter } from "./notification-center";
 import { GlobalSearch } from "./global-search";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
 import { Account } from '@/domain-types/domain'
 import { useVisibleWorkspaces } from '@/react-hooks/state-hooks/use-visible-workspaces';
 
