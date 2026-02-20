@@ -14,7 +14,7 @@ import { useAuth } from "@/shared/context/auth-context";
 import { 
     assignMember as assignMemberAction,
     unassignMember as unassignMemberAction,
-} from "@/actions/schedule.actions";
+} from "@/actions/schedule";
 import { toast } from "@/shared/hooks/use-toast";
 import { ScheduleItem } from "@/types/domain";
 

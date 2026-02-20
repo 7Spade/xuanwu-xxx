@@ -4,7 +4,7 @@ import { useApp } from '../state/use-app';
 import {
   uploadDailyPhoto as uploadDailyPhotoAction,
   uploadTaskAttachment as uploadTaskAttachmentAction,
-} from '@/actions/storage.actions';
+} from '@/actions/storage';
 
 /**
  * @fileoverview A hook for abstracting file storage operations.

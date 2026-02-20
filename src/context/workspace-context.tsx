@@ -15,7 +15,7 @@ import {
   createTask as createTaskAction,
   updateTask as updateTaskAction,
   deleteTask as deleteTaskAction,
-} from '@/actions/task.actions'
+} from '@/actions/task'
 import {
   authorizeWorkspaceTeam as authorizeWorkspaceTeamAction,
   revokeWorkspaceTeam as revokeWorkspaceTeamAction,
@@ -25,14 +25,14 @@ import {
   unmountCapability as unmountCapabilityAction,
   updateWorkspaceSettings as updateWorkspaceSettingsAction,
   deleteWorkspace as deleteWorkspaceAction,
-} from '@/actions/workspace.actions'
+} from '@/actions/workspace'
 import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
-} from '@/actions/issue.actions'
+} from '@/actions/issue'
 import {
   createScheduleItem as createScheduleItemAction,
-} from '@/actions/schedule.actions'
+} from '@/actions/schedule'
 
 
 interface WorkspaceContextType {

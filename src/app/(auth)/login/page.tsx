@@ -4,13 +4,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/hooks/use-toast"
-import { createUserAccount } from "@/actions/user.actions"
+import { createUserAccount } from "@/actions/user"
 import {
   signIn,
   registerUser,
   signInAnonymously,
   sendPasswordResetEmail,
-} from "@/actions/auth.actions"
+} from "@/actions/auth"
 import { useI18n } from "@/shared/context/i18n-context"
 import { AuthBackground } from "./_components/auth-background"
 import { AuthTabsRoot } from "./_components/auth-tabs-root"

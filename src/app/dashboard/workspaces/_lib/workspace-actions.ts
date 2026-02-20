@@ -6,7 +6,7 @@ import {
   createWorkspace,
   updateWorkspaceSettings,
   deleteWorkspace,
-} from "@/actions/workspace.actions";
+} from "@/actions/workspace";
 import type { Account, WorkspaceLifecycleState } from "@/types/domain";
 
 const getErrorMessage = (error: unknown, fallback: string) =>

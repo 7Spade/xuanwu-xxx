@@ -1,22 +1,31 @@
-# `src/entities/` — Entity Value Objects (Reserved)
+# `src/entities/` — Pure Business Models (No Firebase / No React)
 
-> **Status: Reserved for future use.**  
-> Domain data currently lives in `src/types/domain.ts` as plain TypeScript interfaces.  
-> This directory is reserved for **entity classes with behaviour** if the codebase grows to need them.
-
-## What belongs here (if used)
-
-Rich domain objects that encapsulate both **data and rules** for a single aggregate root:
+Each sub-directory is one domain aggregate. Each `index.ts` exports only pure functions and type guards — no async, no I/O, no React.
 
 ```
 src/entities/
-  workspace.entity.ts   ← Workspace value-object with guard methods
-  account.entity.ts     ← Account entity: isOrganization(), canInvite(), etc.
-  schedule.entity.ts    ← ScheduleItem with status-transition validation
+  account/index.ts    ← isOrganization(), isOwner(), getUserTeamIds(), getMemberRole()
+  workspace/index.ts  ← filterVisibleWorkspaces(), hasWorkspaceAccess()
+  schedule/index.ts   ← canTransitionScheduleStatus(), VALID_STATUS_TRANSITIONS
+  user/index.ts       ← isAnonymousUser()
+  index.ts            ← re-exports all domains
 ```
 
-Each file exports one entity class or factory function.  
-No UI, no Firebase, no React — pure domain logic.
+## Current directory structure
+
+| Module | Responsibility |
+|--------|---------------|
+| `account/` | Account ownership, role checks, team membership queries |
+| `workspace/` | Visibility filtering, access grant resolution |
+| `schedule/` | Status transition validation |
+| `user/` | Auth user type guards |
+
+## What belongs here
+
+- **Pure functions** that encode a single domain rule (no side effects)
+- **Type guards** (`is*`, `has*`, `can*`) derived from domain interfaces
+- **Derived constants** computed from domain enums (e.g. valid state transitions)
+- **Permission predicates** — all permission logic must live here, not in UI or actions
 
 ## What does NOT belong here
 
@@ -27,7 +36,8 @@ No UI, no Firebase, no React — pure domain logic.
 
 ## Naming convention
 
-`{entity-name}.entity.ts` — e.g. `workspace.entity.ts`, `account.entity.ts`
+Sub-directories match the domain name. Each exports via `index.ts`.  
+All exported functions start with a **verb**: `is*`, `has*`, `can*`, `get*`, `filter*`.
 
 ## Allowed imports
 
@@ -44,18 +54,22 @@ import ... from '@/actions/...'  // ❌ no orchestration
 import ... from '@/hooks/...'    // ❌ no React
 import ... from '@/context/...'  // ❌ no React
 import ... from 'react'          // ❌ no React
+import ... from 'next'           // ❌ no Next.js
 ```
 
-## Current guidance
+## Entity migration rules
 
-Do **not** create files here without first confirming that:
-
-1. The logic cannot fit in a plain utility in `src/lib/`
-2. The logic is purely about a single domain aggregate (no I/O)
-3. More than one layer would benefit from sharing the behaviour
-
-If those conditions are not all met, add the logic to `src/actions/` or `src/lib/` instead.
+1. Entity 不得 import `react`、`firebase`、`next`。
+2. Entity 不得包含 `async` 函式。
+3. Entity 不得讀寫資料庫。
+4. Entity 只允許純函式與型別定義。
+5. Entity 不得依賴 `actions`。
+6. Entity 不得依賴 `infra`。
+7. 所有權限判斷必須移入 Entity。
+8. 所有狀態轉換規則必須移入 Entity。
+9. Entity 變更不得影響 UI 層 import 結構。
+10. Entity 不得出現副作用。
 
 ## Who depends on this layer
 
-`src/actions/`, `src/hooks/`, `src/lib/` — anything that needs the domain behaviour.
+`src/actions/`, `src/hooks/`, `src/context/` — any layer that needs domain rules.
