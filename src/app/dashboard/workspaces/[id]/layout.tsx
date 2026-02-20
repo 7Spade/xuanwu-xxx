@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
-import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context";
+import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context"
+import { useWorkspaceEventHandler } from "./_events/workspace-event-handler"
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,8 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * It consumes the context provided by WorkspaceLayout.
  */
 function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
-  const { workspace, updateWorkspaceSettings } = useWorkspace();
+  useWorkspaceEventHandler()
+  const { workspace, updateWorkspaceSettings } = useWorkspace()
   const router = useRouter();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

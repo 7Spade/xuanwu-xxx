@@ -10,7 +10,6 @@ import { useApp } from '@/hooks/state/use-app';
 import { useAccount } from '@/hooks/state/use-account';
 import { useFirebase } from '@/shared/context/firebase-context';
 import { Loader2 } from 'lucide-react';
-import { WorkspaceEventHandler } from '@/app/dashboard/workspaces/[id]/_events/workspace-event-handler';
 import { 
   createTask as createTaskAction,
   updateTask as updateTaskAction,
@@ -142,10 +141,9 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     createScheduleItem,
   };
 
-  return (
+    return (
     <WorkspaceEventContext.Provider value={{ publish: eventBus.publish, subscribe: eventBus.subscribe }}>
       <WorkspaceContext.Provider value={value}>
-        <WorkspaceEventHandler />
         {children}
       </WorkspaceContext.Provider>
     </WorkspaceEventContext.Provider>

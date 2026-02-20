@@ -18,7 +18,13 @@ import { batchImportTasks } from "@/actions/task";
  * This component acts as a central Observer that subscribes to multiple workspace events.
  * It coordinates system-wide reactions without coupling capabilities to each other.
  */
-export function WorkspaceEventHandler() {
+/**
+ * useWorkspaceEventHandler — side-effect hook (no render output).
+ * Call this inside any Client Component that is a descendant of WorkspaceProvider.
+ * Converts from a render-null component to a hook to eliminate the
+ * context → app/ layer violation in workspace-context.tsx.
+ */
+export function useWorkspaceEventHandler() {
   const { eventBus, workspace, logAuditEvent } = useWorkspace();
   const { dispatch } = useApp();
 
@@ -222,7 +228,5 @@ export function WorkspaceEventHandler() {
       unsubTaskCompleted();
       unsubForwardRequested();
     };
-  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
-
-  return null;
+  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent])
 }
