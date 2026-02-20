@@ -2,8 +2,9 @@
  * Repomix Configuration
  *
  * This is the primary configuration file for Repomix.
- * Using a plain export (no `defineConfig` import) so the file can be loaded
- * without requiring `repomix` to be installed as a local package dependency.
+ * Note: repomix.config.ts is excluded from the app's tsconfig.json so that
+ * this file can freely use repomix types when repomix is installed locally,
+ * without breaking the application typecheck when it is not.
  *
  * All ignore patterns and configuration are centralized here.
  * Optimized for Copilot Browser Agent to reduce noise and improve context quality.
