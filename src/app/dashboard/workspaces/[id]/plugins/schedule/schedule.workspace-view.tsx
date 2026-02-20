@@ -4,7 +4,7 @@
 import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import { Button } from "@/shared/shadcn-ui/button";
-import { UnifiedCalendarGrid } from "./_route-components/unified-calendar-grid";
+import { UnifiedCalendarGrid } from "./_plugin-components/unified-calendar-grid";
 import { useWorkspaceSchedule } from "./_plugin-hooks/use-workspace-schedule";
 import { useWorkspace } from "@/react-providers/workspace-provider";
 

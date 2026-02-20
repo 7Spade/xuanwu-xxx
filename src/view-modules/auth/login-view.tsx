@@ -8,8 +8,8 @@ import { toast } from "@/shared/utility-hooks/use-toast"
 import { completeRegistration } from "@/use-cases/auth"
 import { signIn, signInAnonymously } from "@/server-commands/auth"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { AuthBackground } from "@/app/(auth)/login/_components/auth-background"
-import { AuthTabsRoot } from "@/app/(auth)/login/_components/auth-tabs-root"
+import { AuthBackground } from "@/app/(auth-routes)/login/_route-components/auth-background"
+import { AuthTabsRoot } from "@/app/(auth-routes)/login/_route-components/auth-tabs-root"
 
 /**
  * LoginView — The "smart" auth container.

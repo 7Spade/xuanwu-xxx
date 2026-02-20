@@ -5,8 +5,8 @@ import { Activity } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
-import { AuditTypeIcon } from "./_route-components/audit-type-icon";
-import { AuditDetailSheet } from "./_route-components/audit-detail-sheet";
+import { AuditTypeIcon } from "./_plugin-components/audit-type-icon";
+import { AuditDetailSheet } from "./_plugin-components/audit-detail-sheet";
 import { useWorkspaceAudit } from "./_plugin-hooks/use-workspace-audit";
 
 export function WorkspaceAudit() {

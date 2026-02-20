@@ -1,1 +1,1 @@
-export { MembersView } from "./members-view"
+export { MembersView } from "@/view-modules/members/members-view"

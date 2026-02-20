@@ -11,7 +11,7 @@
 
 export { WorkspaceAcceptance } from './acceptance/acceptance-plugin';
 export { WorkspaceAudit } from './audit/audit.workspace-view';
-export { WorkspaceCapabilities } from './plugins/plugin-settings';
+export { WorkspaceCapabilities } from './plugin-settings/plugin-settings';
 export { WorkspaceDaily } from './daily/daily.workspace-view';
 export { WorkspaceFiles } from './files/files-plugin';
 export { WorkspaceFinance } from './finance/finance-plugin';

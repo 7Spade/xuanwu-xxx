@@ -15,10 +15,10 @@ import { useState } from "react";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { AlertCircle, MessageSquare } from "lucide-react";
-import { DailyLogCard } from "./_route-components/daily-log-card";
+import { DailyLogCard } from "./_plugin-components/daily-log-card";
 import { useAggregatedLogs } from "./_plugin-hooks/use-aggregated-logs";
 import { DailyLog } from "@/domain-types/domain";
-import { DailyLogDialog } from "./_route-components/daily-log-dialog";
+import { DailyLogDialog } from "./_plugin-components/daily-log-dialog";
 import { WorkspaceProvider } from "@/react-providers/workspace-provider";
 
 export function AccountDailyComponent() {

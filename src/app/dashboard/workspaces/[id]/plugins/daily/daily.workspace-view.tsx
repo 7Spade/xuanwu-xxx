@@ -3,8 +3,8 @@
 
 import { useRouter } from "next/navigation";
 import { MessageSquare } from "lucide-react";
-import { DailyLogCard } from "./_route-components/daily-log-card";
-import { DailyLogComposer } from "./_route-components/composer";
+import { DailyLogCard } from "./_plugin-components/daily-log-card";
+import { DailyLogComposer } from "./_plugin-components/composer";
 import { useWorkspaceDailyLog } from "./_plugin-hooks/use-workspace-daily";
 import { useWorkspace } from "@/react-providers/workspace-provider";
 

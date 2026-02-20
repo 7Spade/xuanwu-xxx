@@ -1,2 +1,2 @@
-export { PartnersView } from "./partners-view"
-export { PartnerDetailView } from "./partner-detail-view"
+export { PartnersView } from "@/view-modules/partners/partners-view"
+export { PartnerDetailView } from "@/view-modules/partners/partner-detail-view"

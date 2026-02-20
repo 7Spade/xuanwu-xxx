@@ -5,7 +5,7 @@ import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useWorkspace } from "@/react-providers/workspace-provider"
 import { useAccount } from "@/react-hooks/state-hooks/use-account"
-import { GovernanceSidebar } from "../plugins/schedule/_route-components/governance-sidebar"
+import { GovernanceSidebar } from "../plugins/schedule/_plugin-components/governance-sidebar"
 import { approveScheduleItem, rejectScheduleItem } from "@/use-cases/schedule"
 import type { ScheduleItem } from "@/domain-types/domain"
 

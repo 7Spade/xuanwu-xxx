@@ -10,12 +10,12 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { ScheduleItem } from "@/domain-types/domain";
-import { UnifiedCalendarGrid } from "./_route-components/unified-calendar-grid";
-import { ScheduleDataTable } from "./_route-components/schedule-data-table";
-import { GovernanceSidebar } from "./_route-components/governance-sidebar";
+import { UnifiedCalendarGrid } from "./_plugin-components/unified-calendar-grid";
+import { ScheduleDataTable } from "./_plugin-components/schedule-data-table";
+import { GovernanceSidebar } from "./_plugin-components/governance-sidebar";
 import { useGlobalSchedule } from "./_plugin-hooks/use-global-schedule";
-import { decisionHistoryColumns } from "./_route-components/decision-history-columns";
-import { upcomingEventsColumns } from "./_route-components/upcoming-events-columns";
+import { decisionHistoryColumns } from "./_plugin-components/decision-history-columns";
+import { upcomingEventsColumns } from "./_plugin-components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
 import { approveScheduleItem, rejectScheduleItem } from "@/use-cases/schedule";
 import {

@@ -8,7 +8,7 @@ import { Button } from '@/shared/shadcn-ui/button';
 import {
   extractDataFromDocument,
   type ActionState,
-} from './actions';
+} from './document-parser.server-commands';
 import type { WorkItem } from '@/genkit-flows/schemas/docu-parse';
 import { useWorkspace } from '@/react-providers/workspace-provider';
 

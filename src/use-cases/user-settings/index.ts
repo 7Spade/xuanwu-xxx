@@ -1,1 +1,1 @@
-export { UserSettingsView } from "./user-settings-view"
+export { UserSettingsView } from "@/view-modules/user-settings/user-settings-view"
