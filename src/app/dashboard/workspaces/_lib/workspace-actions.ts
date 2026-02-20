@@ -4,9 +4,9 @@
 import { toast } from "@/hooks/ui/use-toast";
 import {
   createWorkspace,
-  updateWorkspaceSettings as updateWorkspaceSettingsFacade,
-  deleteWorkspace as deleteWorkspaceFacade,
-} from "@/infra/firebase/firestore/firestore.facade";
+  updateWorkspaceSettings,
+  deleteWorkspace,
+} from "@/actions/workspace.actions";
 import type { Account, WorkspaceLifecycleState } from "@/types/domain";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -50,7 +50,7 @@ export const handleUpdateWorkspaceSettings = async (
   onSuccess: () => void
 ) => {
   try {
-    await updateWorkspaceSettingsFacade(workspaceId, settings);
+    await updateWorkspaceSettings(workspaceId, settings);
     toast({ title: "Space settings synchronized" });
     onSuccess();
   } catch(error) {
@@ -68,7 +68,7 @@ export const handleDeleteWorkspace = async (
   onSuccess: () => void
 ) => {
   try {
-    await deleteWorkspaceFacade(workspaceId);
+    await deleteWorkspace(workspaceId);
     toast({ title: "Workspace node destroyed" });
     onSuccess();
   } catch(error) {

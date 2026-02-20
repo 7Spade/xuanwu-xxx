@@ -4,8 +4,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/ui/use-toast"
-import { authAdapter } from "@/infra/firebase/auth/auth.adapter"
 import { createUserAccount } from "@/actions/user.actions"
+import {
+  signIn,
+  registerUser,
+  signInAnonymously,
+  sendPasswordResetEmail,
+} from "@/actions/auth.actions"
 import { useI18n } from "@/context/i18n-context"
 import { AuthBackground } from "./_components/auth-background"
 import { AuthTabsRoot } from "./_components/auth-tabs-root"
@@ -30,17 +35,15 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [isResetOpen, setIsResetOpen] = useState(false)
 
-  // Business logic for authentication actions
   const handleAuth = async (type: 'login' | 'register') => {
     setIsLoading(true)
     try {
       if (type === 'login') {
-        await authAdapter.signInWithEmailAndPassword(email, password)
+        await signIn(email, password)
       } else {
         if (!name) throw new Error(t('auth.pleaseSetDisplayName'))
-        const { user: u } = await authAdapter.createUserWithEmailAndPassword(email, password)
-        await authAdapter.updateProfile(u, { displayName: name })
-        await createUserAccount(u.uid, name, email)
+        const uid = await registerUser(email, password, name)
+        await createUserAccount(uid, name, email)
       }
       toast({ title: t('auth.identityResonanceSuccessful') })
       router.push("/dashboard")
@@ -54,7 +57,7 @@ export default function LoginPage() {
   const handleAnonymous = async () => {
     setIsLoading(true)
     try {
-      await authAdapter.signInAnonymously()
+      await signInAnonymously()
       router.push("/dashboard")
     } finally {
       setIsLoading(false)
@@ -64,7 +67,7 @@ export default function LoginPage() {
   const handleSendResetEmail = async () => {
     if (!resetEmail) return
     try {
-      await authAdapter.sendPasswordResetEmail(resetEmail)
+      await sendPasswordResetEmail(resetEmail)
       setIsResetOpen(false)
       toast({ title: t('auth.resetProtocolSent') })
     } catch (e: any) {

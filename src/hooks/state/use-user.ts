@@ -9,7 +9,7 @@ import {
   updateUserProfile as updateUserProfileAction,
   getUserProfile as getUserProfileAction,
 } from '@/actions/user.actions'
-import { uploadProfilePicture } from '@/infra/firebase/storage/storage.facade'
+import { uploadProfilePicture } from '@/actions/storage.actions'
 import type { Account } from '@/types/domain'
 
 /**

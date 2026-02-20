@@ -5,11 +5,11 @@ import { useWorkspace } from "@/context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
 import { toast } from "@/hooks/ui/use-toast";
 import { ToastAction } from "@/app/_components/ui/toast";
-import { collection, doc, writeBatch, serverTimestamp, addDoc } from 'firebase/firestore';
 import type { WorkspaceEventPayloadMap } from "./workspace-events";
 import { WorkspaceTask } from "@/types/domain";
-import { createIssue } from "@/infra/firebase/firestore/firestore.facade";
-import { addDocument } from "@/infra/firebase/firestore/firestore.write.adapter";
+import { createIssue } from "@/actions/issue.actions";
+import { createScheduleItem } from "@/actions/schedule.actions";
+import { batchImportTasks } from "@/actions/task.actions";
 
 /**
  * @fileoverview Global event handler for workspace-level events.
@@ -19,7 +19,7 @@ import { addDocument } from "@/infra/firebase/firestore/firestore.write.adapter"
  * It coordinates system-wide reactions without coupling capabilities to each other.
  */
 export function WorkspaceEventHandler() {
-  const { eventBus, db, workspace, logAuditEvent } = useWorkspace();
+  const { eventBus, workspace, logAuditEvent } = useWorkspace();
   const { dispatch } = useApp();
 
   useEffect(() => {
@@ -59,7 +59,6 @@ export function WorkspaceEventHandler() {
     const unsubQARejected = eventBus.subscribe(
       "workspace:qa:rejected",
       async (payload) => {
-        if (!db) return;
         await createIssue(
           workspace.id,
           `QA Rejected: ${payload.task.name}`,
@@ -77,7 +76,6 @@ export function WorkspaceEventHandler() {
     const unsubAcceptanceFailed = eventBus.subscribe(
       "workspace:acceptance:failed",
       async (payload) => {
-         if (!db) return;
         await createIssue(
           workspace.id,
           `Acceptance Failed: ${payload.task.name}`,
@@ -96,18 +94,13 @@ export function WorkspaceEventHandler() {
       payload: WorkspaceEventPayloadMap["workspace:document-parser:itemsExtracted"]
     ) => {
       const importItems = () => {
-        if (!db) return;
         toast({
           title: "Importing items...",
           description: "Please wait a moment.",
         });
 
-        const batch = writeBatch(db);
-        payload.items.forEach((item) => {
-          const docRef = doc(
-            collection(db, "workspaces", workspace.id, "tasks")
-          );
-          const taskData: Omit<WorkspaceTask, "id"> = {
+        const items: Omit<WorkspaceTask, "id" | "createdAt" | "updatedAt">[] =
+          payload.items.map((item) => ({
             name: item.name,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
@@ -117,14 +110,9 @@ export function WorkspaceEventHandler() {
             type: "Imported",
             priority: "medium",
             progressState: "todo",
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          };
-          batch.set(docRef, taskData);
-        });
+          }));
 
-        batch
-          .commit()
+        batchImportTasks(workspace.id, items)
           .then(() => {
             toast({
               title: "Import Successful",
@@ -180,22 +168,20 @@ export function WorkspaceEventHandler() {
     const unsubTaskCompleted = eventBus.subscribe(
       'workspace:tasks:completed',
       async (payload) => {
-        if (!db || !workspace.dimensionId) return;
+        if (!workspace.dimensionId) return;
         try {
-          const scheduleData = {
+          await createScheduleItem({
             accountId: workspace.dimensionId,
             workspaceId: workspace.id,
             workspaceName: workspace.name,
             title: `Review: ${payload.task.name}`,
-            startDate: serverTimestamp(), 
-            endDate: serverTimestamp(),
-            status: 'PROPOSAL', 
+            startDate: new Date(),
+            endDate: new Date(),
+            status: 'PROPOSAL',
             originType: 'TASK_AUTOMATION',
             originTaskId: payload.task.id,
             assigneeIds: [],
-            createdAt: serverTimestamp(),
-          };
-          await addDocument(`accounts/${workspace.dimensionId}/schedule_items`, scheduleData);
+          });
           
           toast({ 
             title: "Schedule Request Created", 
@@ -236,7 +222,7 @@ export function WorkspaceEventHandler() {
       unsubTaskCompleted();
       unsubForwardRequested();
     };
-  }, [eventBus, dispatch, db, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
+  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 
   return null;
 }

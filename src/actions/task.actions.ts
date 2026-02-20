@@ -33,3 +33,16 @@ export async function deleteTask(
 ): Promise<void> {
   return deleteTaskFacade(workspaceId, taskId)
 }
+
+/**
+ * Imports multiple tasks into a workspace in parallel.
+ * @param workspaceId The ID of the workspace.
+ * @param items Array of task data objects to create (without id/timestamps).
+ * @returns A promise that resolves when all tasks are created.
+ */
+export async function batchImportTasks(
+  workspaceId: string,
+  items: Omit<WorkspaceTask, "id" | "createdAt" | "updatedAt">[]
+): Promise<void> {
+  await Promise.all(items.map((item) => createTaskFacade(workspaceId, item)))
+}
