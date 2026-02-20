@@ -1,33 +1,52 @@
-# Project: AI Layer
+# Genkit Flows Layer (`src/genkit-flows/`)
 
-## 1. Responsibility
+## Role
 
-This directory contains all logic for interacting with Generative AI models and services via Genkit. It encapsulates the "dirty" details of AI model providers (like Google AI) and defines the application's core AI capabilities as "flows".
+Encapsulates all Generative AI logic via Google Genkit. Defines AI flows as typed, composable server-side functions. Knows nothing about React, UI state, or domain invariants.
 
-It is organized into:
-- **`flows/`**: Self-contained Genkit flows that define specific AI-driven business logic (e.g., `adaptUIColorToOrgContext`). Each flow handles its own prompts, input/output schemas, and interaction with the AI model.
-- **`genkit.ts`**: The central configuration and initialization file for the Genkit `ai` instance.
+## Boundary Rules
 
-## 2. Dependency Rules
+- 僅封裝 Genkit flow 定義與 AI orchestration。
+- 不得包含 UI 元件或 React 程式碼（`"use client"` 禁止）。
+- 不得包含 domain 不變條件（邏輯在 `domain-rules`）。
+- 不得依賴 `shared`（無需工具函式）。
+- 所有 prompt 組裝不得耦合 React 狀態。
+- 僅可被 `server-commands` 呼叫。
 
-This layer must remain independent of the application's UI and state management. It provides server-side functions that can be called from other layers.
+## Structure
 
-### Allowed Imports:
-- `src/types`
-- `src/lib`
+```
+genkit-flows/
+  genkit.ts              ← central Genkit ai instance configuration
+  flows/
+    *.flow.ts            ← individual AI flow definitions
+```
 
-### Disallowed Imports:
-- `import ... from '@/react-hooks/...'`
-- `import ... from '@/react-providers/...'`
-- `import ... from '@/components/...'`
-- `import ... from '@/app/...'`
+## Allowed Imports
 
-The AI layer knows nothing about React, hooks, or how the data it provides will be displayed.
+```ts
+import ... from "genkit/*"                // ✅ Genkit SDK
+import type ... from "@/domain-types/..."  // ✅ typed I/O schemas
+import ... from "@/firebase/..."           // ✅ Firebase data (if needed for context)
+```
 
-## 3. Who Depends on This Layer?
+## Forbidden Imports
 
-The `infra` or `app` layers (via Server Actions). UI components should not call AI flows directly; they should go through a dedicated action or API route that provides a clean interface to the backend functionality.
+```ts
+import ... from "react"                    // ❌ no React
+import ... from "@/react-hooks/..."        // ❌ no React hooks
+import ... from "@/react-providers/..."    // ❌ no React context
+import ... from "@/server-commands/..."    // ❌ no upward dependency
+import ... from "@/shared/..."             // ❌ no shared utilities
+import ... from "@/use-cases/..."          // ❌ no upward dependency
+import ... from "@/view-modules/..."       // ❌ no UI
+import ... from "@/app/..."                // ❌ no upward dependency
+```
 
-## 4. Core Flows
+## Side Effects
 
-- `adaptUIColorToOrgContext` - Determines appropriate UI colors based on an **organization's** identity description. This flow is specifically triggered for organizational contexts to create a branded theme.
+AI flows produce LLM calls (Google AI / Vertex AI). May produce Firebase reads for context retrieval.
+
+## Who Depends on This Layer?
+
+`src/server-commands/` only — all AI calls go through server actions.

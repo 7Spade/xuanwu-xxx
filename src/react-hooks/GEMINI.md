@@ -1,55 +1,62 @@
 # React Hooks Layer (`src/react-hooks/`)
 
-## 1. Responsibility
+## Role
 
-Custom React hooks that bridge the UI layer and lower-level infrastructure. Provides clean, reusable access to application state and Firebase-backed operations.
+Custom React hooks that bridge the UI layer and lower-level infrastructure. Provides clean, reusable access to application state and Firebase-backed operations. All hooks are organized by sub-directory purpose.
 
-## 2. Sub-directories and their hooks
+## Boundary Rules
+
+- 僅封裝 React state 與 effect。
+- 可依賴 `server-commands`、`domain-types`、`domain-rules`、`firebase`（僅 real-time listeners）、`react-providers`、`shared`。
+- 不得依賴 `use-cases`（禁止上層依賴）。
+- 不得依賴 `genkit-flows`（AI 呼叫透過 `server-commands`）。
+- 不得依賴 `view-modules`（禁止 UI 元件引用）。
+- 不得包含業務規則不變條件（邏輯在 `domain-rules`）。
+
+## Sub-directories
 
 | Directory | File pattern | What it provides |
 |-----------|-------------|-----------------|
-| `state-hooks/` | `use-*.ts` | Read domain state from `react-providers` (e.g., `use-app.ts`, `use-account.ts`, `use-visible-workspaces.ts`) |
-| `command-hooks/` | `use-*-commands.ts` | Wrap `server-commands` with React concerns: auth guards, toasts, `useCallback` (e.g., `use-schedule-commands.ts`) |
-| `service-hooks/` | `use-*.ts` | Wrap infra services: `use-logger.ts`, `use-storage.ts`, `use-daily-upload.ts` |
+| `state-hooks/` | `use-*.ts` | Read domain state from `react-providers` — read-only, no side effects |
+| `command-hooks/` | `use-*-commands.ts` | Wrap `server-commands` with React concerns: auth guards, toasts, `useCallback` |
+| `service-hooks/` | `use-*.ts` | Wrap infra services: logger, storage, daily upload |
 
-## 3. Input / Output contracts
+## Input / Output Contracts
 
-| Hook pattern | Input (params) | Output | Side effects |
-|-------------|---------------|--------|-------------|
-| `useApp()` | — | `{ activeAccount, setActiveAccount, ... }` | None — reads context |
-| `useAccount()` | — | `{ workspaces, members, ... }` | None — reads context |
-| `use*Commands()` | — | `{ commandFn: (...args) => Promise<void>, isPending }` | Firestore write via `server-commands` |
-| `use*Upload()` | — | `{ upload: (file) => Promise<void>, isUploading }` | Firebase Storage write |
-| `useWorkspaceAudit(workspaceId)` | `string` | `{ logs: AuditLog[], isLoading }` | Firestore real-time listener |
+| Hook pattern | Output | Side effects |
+|-------------|--------|-------------|
+| `useApp()` | `{ activeAccount, setActiveAccount, ... }` | None — reads context |
+| `useAccount()` | `{ workspaces, members, ... }` | None — reads context |
+| `use*Commands()` | `{ commandFn: (...) => Promise<void>, isPending }` | Firestore write via server-commands |
+| `use*Upload()` | `{ upload: (file) => Promise<void>, isUploading }` | Firebase Storage write |
+| `useWorkspaceAudit(id)` | `{ logs: AuditLog[], isLoading }` | Firestore real-time listener |
 
-## 4. Side effects
+## Allowed Imports
 
-- `state-hooks/` — **No side effects**. Read-only context accessors.
-- `command-hooks/` — **Firestore or Auth writes** via `server-commands`. Each call may produce a write side effect.
-- `service-hooks/` — **Firebase Storage writes** (`use-storage`, `use-daily-upload`) or logging side effects (`use-logger`).
+```ts
+import ... from "@/server-commands/..."   // ✅ write operations
+import ... from "@/domain-types/..."      // ✅ domain interfaces
+import ... from "@/domain-rules/..."      // ✅ pure validation
+import ... from "@/firebase/..."          // ✅ onSnapshot real-time listeners ONLY
+import ... from "@/react-providers/..."   // ✅ reading context values
+import ... from "@/shared/..."            // ✅ utilities, constants
+```
 
-## 5. Dependency rules
+## Forbidden Imports
 
-### Allowed
-- `@/domain-types/` — domain interfaces
-- `@/lib/` — pure utilities
-- `@/firebase/` — Firestore listeners and real-time data only
-- `@/server-commands/` — for command-hooks wrapping async write operations
-- `@/react-providers/` — reading context values via `useContext`
-- `@/domain-rules/` — pure validation
+```ts
+import ... from "@/genkit-flows/..."      // ❌ AI flows go through server-commands
+import ... from "@/use-cases/..."         // ❌ no upward dependency
+import ... from "@/view-modules/..."      // ❌ no UI component imports
+import ... from "@/app/..."               // ❌ no upward dependency
+```
 
-### Forbidden
-- `@/app/` — no upward dependency on pages/layouts
-- `@/genkit-flows/` — AI flows belong in server-commands
-- `@/view-modules/` — no UI component imports
-- `@/use-cases/` — use-cases are orchestrated at the app layer, not in hooks
-
-## 6. Who depends on this layer?
-
-`src/react-providers/` (for complex provider logic), `src/view-modules/` (view components), and `src/app/` (pages/layouts).
-
-## 7. Naming conventions
+## Naming Conventions
 
 - File: `use-{what-it-does}.ts` (kebab-case)
 - Export: `use{WhatItDoes}()` (camelCase with `use` prefix)
 - Never export a hook from a file that does not start with `use-`.
+
+## Who Depends on This Layer?
+
+`src/react-providers/` (complex provider logic) and `src/view-modules/` (view components).

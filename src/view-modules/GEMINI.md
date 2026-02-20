@@ -1,54 +1,54 @@
-# Project: View Modules Layer (`src/view-modules/`)
+# View Modules Layer (`src/view-modules/`)
 
-## 1. Responsibility
+## Role
 
-This directory contains **feature-level composable view components** — the building blocks assembled by the `app/` layer into pages and layouts. Each sub-directory owns one domain's visual presentation.
+Feature-level composable UI modules — the building blocks assembled by `app/` into pages. Each sub-directory owns one domain's visual presentation. Contains no routing logic and no business rule implementations.
 
-A **view** is a composite React component (usually a Client Component) that:
-- Reads from context/hooks rather than accepting all data as props.
-- Contains the layout and interaction logic for an entire feature section.
-- Does **not** contain routing logic or Next.js-specific page structure.
+## Boundary Rules
 
-## 2. Directory Map
+- 僅包含 UI 模組（container + presentational components）。
+- 可依賴 `react-hooks`、`react-providers`、`server-commands`、`domain-types`、`domain-rules`、`shared`。
+- 不得依賴 `firebase`、`genkit-flows`（必須透過 react-hooks 或 server-commands）。
+- 不得依賴 `use-cases`（循環依賴：use-cases 已依賴 view-modules 做 re-export）。
+- 不得實作業務規則不變條件（邏輯必須在 `use-cases` 或 `domain-rules`）。
+
+## Directory Map
 
 | Module | Primary exports |
 |--------|----------------|
-| `auth/` | `LoginView` |
-| `account/` | `PermissionMatrixView` |
-| `audit/` | `AuditView` |
-| `dashboard/` | `DashboardView` |
-| `files/` | `FilesView` |
-| `finance/` | `FinanceView` |
+| `auth/` | `LoginView`, `ResetPasswordForm` |
+| `dashboard/` | `DashboardView`, layout (Header, Sidebar), `AccountNewForm` |
+| `user-settings/` | `UserSettingsView` |
+| `workspaces/` | `WorkspacesView`, `WorkspaceNavTabs`, `WorkspaceSettings`, plugins barrel |
 | `members/` | `MembersView` |
 | `partners/` | `PartnersView`, `PartnerDetailView` |
 | `teams/` | `TeamsView`, `TeamDetailView` |
-| `user-settings/` | `UserSettingsView` |
-| `workspace-members/` | `WorkspaceMembersView` |
+| `account/` | `PermissionMatrixView` |
 
-## 3. Dependency Rules
+## Allowed Imports
 
-View modules sit **below** the `app/` layer and **above** hooks, context, and infra.
+```ts
+import ... from "@/react-hooks/..."       // ✅ state, command, service hooks
+import ... from "@/react-providers/..."   // ✅ context consumers
+import ... from "@/server-commands/..."   // ✅ server actions for mutations
+import ... from "@/domain-types/..."      // ✅ type definitions
+import ... from "@/domain-rules/..."      // ✅ pure validation helpers
+import ... from "@/shared/..."            // ✅ shadcn-ui, utility-hooks, constants
+```
 
-### Allowed Imports:
-- `@/shared/shadcn-ui/` — primitive UI components
-- `@/shared/utility-hooks/` — framework-level UI hooks
-- `@/react-hooks/` — domain hooks (state, service, command)
-- `@/react-providers/` — domain context consumers
-- `@/server-commands/` — server actions for mutations
-- `@/domain-types/` — domain type definitions
-- `@/lib/` — pure utilities
+## Forbidden Imports
 
-### Disallowed Imports:
-- `import ... from '@/app/...'` — **never** import from the app layer (one-way dep rule)
-- `import ... from '@/use-cases/...'` — view-modules are imported **by** use-cases, not the reverse
-- `import ... from '@/firebase/...'` — go through hooks or server-commands
+```ts
+import ... from "@/firebase/..."          // ❌ go through react-hooks or server-commands
+import ... from "@/genkit-flows/..."      // ❌ server-side AI; go through server-commands
+import ... from "@/use-cases/..."         // ❌ circular dep (use-cases re-exports view-modules)
+import ... from "@/app/..."               // ❌ no upward dependency
+```
 
-## 4. Who Depends on This Layer?
+## Side Effects
 
-`src/use-cases/` (view-bridge re-exports) and `src/app/` (directly for plugin-tab pages and route-specific components).
+View modules produce side effects only via hooks or server-commands they call. No direct Firebase or network calls.
 
-## 5. Naming Conventions
+## Who Depends on This Layer?
 
-- File names: `{domain}-view.tsx` for the top-level view, optional `{domain}-{subfeature}.tsx` for parts.
-- Component names: `PascalCase` matching the feature (e.g., `TeamsView`, `PartnerDetailView`).
-- Each view component must be a **named export**, not a default export.
+`src/app/` (pages, layouts, plugin-tab slots) and `src/use-cases/` (for view-bridge re-exports only).

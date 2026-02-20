@@ -1,25 +1,42 @@
-# Project: Core Types Layer
+# Domain Types Layer (`src/domain-types/`)
 
-## 1. Responsibility
+## Role
 
-This directory defines all core data structures and TypeScript types for the entire application (e.g., `Organization`, `Workspace`, `User`). It is the ubiquitous language of the system, expressed in code.
+Defines all core TypeScript types, interfaces, enums, and value objects for the entire application. This is the ubiquitous language of the system expressed in code. The foundation — everything else depends on it; it depends on nothing.
 
-## 2. Dependency Rule: ZERO Dependencies
+## Boundary Rules
 
-This layer is the foundation. It MUST NOT import from any other directory within the `src` folder (`lib`, `infra`, `hooks`, `context`, `components`, `app`, `ai`).
+- 僅定義型別、介面、enum、value object。
+- 不得依賴任何其他資料夾（`src/*`）。
+- 不得包含邏輯、副作用或非同步程式碼。
+- `"use client"` 指令在此層是明確禁止的（ESLint 強制）。
 
-### Allowed Imports:
-- None from `src/*`
+## Allowed Imports
 
-### Disallowed Imports:
-- `import ... from '@/lib/...'`
-- `import ... from '@/firebase/...'`
-- `import ... from '@/react-hooks/...'`
-- `import ... from '@/react-providers/...'`
-- `import ... from '@/components/...'`
-- `import ... from '@/genkit-flows/...'`
-- `import ... from '@/app/...'`
+```ts
+// None from src/* — only external type packages are permitted
+import type { Timestamp } from "firebase/firestore"  // ✅ external type-only
+```
 
-## 3. Who Depends on This Layer?
+## Forbidden Imports
 
-**Everyone.** Any other layer can and should import types from this directory.
+```ts
+import ... from "@/firebase/..."          // ❌ no src dependencies
+import ... from "@/domain-rules/..."      // ❌ no src dependencies
+import ... from "@/server-commands/..."   // ❌ no src dependencies
+import ... from "@/react-hooks/..."       // ❌ no src dependencies
+import ... from "@/react-providers/..."   // ❌ no src dependencies
+import ... from "@/shared/..."            // ❌ no src dependencies
+import ... from "@/genkit-flows/..."      // ❌ no src dependencies
+import ... from "@/use-cases/..."         // ❌ no src dependencies
+import ... from "@/view-modules/..."      // ❌ no src dependencies
+import ... from "@/app/..."               // ❌ no src dependencies
+```
+
+## Side Effects
+
+**None.** Type definitions only — no runtime code.
+
+## Who Depends on This Layer?
+
+**Every layer.** `domain-rules`, `firebase`, `genkit-flows`, `server-commands`, `use-cases`, `react-hooks`, `react-providers`, `view-modules`, `app`, `shared`.

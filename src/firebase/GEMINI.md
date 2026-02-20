@@ -1,61 +1,65 @@
-# Project: Infrastructure Layer (`src/firebase/`)
+# Firebase Layer (`src/firebase/`)
 
-## 1. Responsibility
+## Role
 
-This directory is the **sole gateway** to all Firebase services (Firestore, Auth, Storage, Analytics, Messaging). It wraps every Firebase SDK call and exposes a clean, domain-oriented API to the rest of the application.
+**Sole gateway** to all Firebase services (Firestore, Auth, Storage, Analytics, Messaging). Wraps every Firebase SDK call and exposes a clean, domain-oriented API. Organized with a Facade + Repository pattern.
 
-It is organized using a **Facade + Repository** pattern:
+## Boundary Rules
 
-- **`app.client.ts`** — Singleton Firebase app initializer. Must be initialized before any service client.
-- **`firebase.config.ts`** — Firebase project credentials (populated from environment variables).
-- **`auth/`** — Firebase Authentication adapter and client.
-- **`firestore/`** — Firestore database access layer.
-  - `firestore.client.ts` — Firestore SDK instance.
-  - `firestore.facade.ts` — Unified entry point re-exporting all repository functions.
-  - `firestore.read.adapter.ts` / `firestore.write.adapter.ts` — Raw Firestore read/write helpers.
-  - `firestore.converter.ts` — TypeScript-typed Firestore data converters.
-  - `firestore.utils.ts` — Pure Firestore utility functions.
-  - `repositories/` — Domain-aggregate–specific data access modules.
-    - `account.repository.ts` — User profile + organization CRUD.
-    - `workspace.repository.ts` — Workspace lifecycle + sub-collections.
-    - `read.repository.ts` — Read-only query functions (audit, daily, schedule logs).
-- **`storage/`** — Firebase Storage facade, adapters, and client.
-- **`analytics/`** — Firebase Analytics adapter and client.
-- **`messaging/`** — Firebase Cloud Messaging (push notifications).
+- 僅封裝 Firebase SDK 與資料存取細節。
+- 不得依賴 `view-modules`、`react-hooks`、`react-providers`（UI 層不可知）。
+- 不得依賴 `server-commands`、`use-cases`（禁止上層依賴）。
+- 不得包含業務規則（邏輯在 `domain-rules`）。
+- 不得包含 React 程式碼（`"use client"` 禁止）。
+- 僅可被 `server-commands` 或 `react-hooks`（real-time listeners）使用。
 
-## 2. Dependency Rules
-
-This is a **low-level** layer. It must remain independent of React and the UI.
-
-### Allowed Imports:
-- `@/domain-types/` — domain interfaces for typed return values
-- `@/lib/` — pure utility functions
-- `firebase/*` — Firebase SDK packages
-
-### Disallowed Imports:
-- `import ... from 'react'`
-- `import ... from '@/react-hooks/...'`
-- `import ... from '@/react-providers/...'`
-- `import ... from '@/server-commands/...'`
-- `import ... from '@/use-cases/...'`
-- `import ... from '@/view-modules/...'`
-- `import ... from '@/app/...'`
-
-## 3. Who Depends on This Layer?
-
-`src/server-commands/` calls this layer exclusively. Hooks and context providers may call it directly only for **real-time listeners** (onSnapshot). No other layer should call Firebase SDK methods directly.
-
-## 4. Firestore Repository Pattern
-
-Each repository module owns one domain aggregate's data access:
+## Structure
 
 ```
-firestore.facade.ts     ← thin re-export aggregator
-      ↓
-repositories/
-  account.repository.ts    ← Organization, User Profile, Teams, Bookmarks
-  workspace.repository.ts  ← Workspace, Tasks, Issues, Schedule, Grants
-  read.repository.ts       ← Audit logs, Daily logs, Schedule queries
+firebase/
+  app.client.ts              ← singleton Firebase app initializer
+  firebase.config.ts         ← credentials from env vars
+  auth/                      ← Firebase Auth adapter
+  firestore/
+    firestore.client.ts      ← Firestore SDK instance
+    firestore.facade.ts      ← unified re-export aggregator
+    firestore.read.adapter.ts / write.adapter.ts
+    firestore.converter.ts   ← TypeScript-typed data converters
+    firestore.utils.ts       ← pure Firestore utilities
+    repositories/
+      account.repository.ts     ← Organization, Profile, Teams, Bookmarks
+      workspace.repository.ts   ← Workspace, Tasks, Issues, Schedule, Grants
+      read.repository.ts        ← Audit, Daily, Schedule queries
+  storage/                   ← Firebase Storage facade
+  analytics/                 ← Firebase Analytics adapter
+  messaging/                 ← Firebase Cloud Messaging
 ```
 
-**Rule:** Never call Firestore directly in actions, hooks, or components. Always go through the facade or a named repository export.
+## Allowed Imports
+
+```ts
+import ... from "firebase/*"              // ✅ Firebase SDK
+import type ... from "@/domain-types/..."  // ✅ typed return values
+```
+
+## Forbidden Imports
+
+```ts
+import ... from "react"                    // ❌ no React
+import ... from "@/react-hooks/..."        // ❌ no React hooks
+import ... from "@/react-providers/..."    // ❌ no React context
+import ... from "@/server-commands/..."    // ❌ no upward dependency
+import ... from "@/use-cases/..."          // ❌ no upward dependency
+import ... from "@/view-modules/..."       // ❌ no UI
+import ... from "@/genkit-flows/..."       // ❌ no AI layer
+import ... from "@/shared/..."             // ❌ no shared utilities
+import ... from "@/app/..."                // ❌ no upward dependency
+```
+
+## Side Effects
+
+All repository functions may produce Firestore or Auth reads/writes. Callers must assume every `create*` / `update*` / `delete*` call mutates Firebase state.
+
+## Who Depends on This Layer?
+
+`src/server-commands/` (for all mutations and reads) and `src/react-hooks/` (for `onSnapshot` real-time listeners only).
