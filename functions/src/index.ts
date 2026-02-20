@@ -7,13 +7,13 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+import { setGlobalOptions } from 'firebase-functions';
+import { onRequest } from 'firebase-functions/https';
+import * as logger from 'firebase-functions/logger';
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
-
+console.log(onRequest, logger); // 暫時引用，編譯不報錯
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
 // traffic spikes by instead downgrading performance. This limit is a
