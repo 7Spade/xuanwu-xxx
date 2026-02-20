@@ -7,9 +7,9 @@ import { toast } from "@/shared/hooks/use-toast";
 import { ToastAction } from "@/shared/ui/toast";
 import type { WorkspaceEventPayloadMap } from "@/features/workspace/event-bus/workspace-events";
 import { WorkspaceTask } from "@/types/domain";
-import { createIssue } from "@/actions/issue";
-import { createScheduleItem } from "@/actions/schedule";
-import { batchImportTasks } from "@/actions/task";
+import { createIssue } from "@/server-commands/issue";
+import { createScheduleItem } from "@/server-commands/schedule";
+import { batchImportTasks } from "@/server-commands/task";
 
 /**
  * @fileoverview Global event handler for workspace-level events.

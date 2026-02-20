@@ -8,8 +8,8 @@ import { useFirebase } from '@/shared/context/firebase-context'
 import {
   updateUserProfile as updateUserProfileAction,
   getUserProfile as getUserProfileAction,
-} from '@/actions/user'
-import { uploadProfilePicture } from '@/actions/storage'
+} from '@/server-commands/user'
+import { uploadProfilePicture } from '@/server-commands/storage'
 import type { Account } from '@/types/domain'
 
 /**

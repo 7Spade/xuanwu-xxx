@@ -17,7 +17,7 @@
 import { useCallback } from "react";
 import { useApp } from "@/hooks/state/use-app";
 import { useAuth } from "@/shared/context/auth-context";
-import { toggleLike as toggleLikeAction } from "@/actions/daily";
+import { toggleLike as toggleLikeAction } from "@/server-commands/daily";
 import { toast } from "@/shared/hooks/use-toast";
 
 export function useDailyActions() {

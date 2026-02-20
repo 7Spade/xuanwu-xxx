@@ -3,8 +3,8 @@
  * No React. No UI. Callable from hooks, context, or Server Actions.
  */
 
-import { registerUser } from "@/actions/auth"
-import { createUserAccount } from "@/actions/user"
+import { registerUser } from "@/server-commands/auth"
+import { createUserAccount } from "@/server-commands/user"
 
 /**
  * Registers a new user with Firebase Auth and creates their Firestore account

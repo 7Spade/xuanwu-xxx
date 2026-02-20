@@ -14,7 +14,7 @@ import {
   createTask as createTaskAction,
   updateTask as updateTaskAction,
   deleteTask as deleteTaskAction,
-} from '@/actions/task'
+} from '@/server-commands/task'
 import {
   authorizeWorkspaceTeam as authorizeWorkspaceTeamAction,
   revokeWorkspaceTeam as revokeWorkspaceTeamAction,
@@ -24,15 +24,15 @@ import {
   unmountCapability as unmountCapabilityAction,
   updateWorkspaceSettings as updateWorkspaceSettingsAction,
   deleteWorkspace as deleteWorkspaceAction,
-} from '@/actions/workspace'
+} from '@/server-commands/workspace'
 import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
-} from '@/actions/issue'
+} from '@/server-commands/issue'
 import { WorkspaceEventContext } from "@/context/workspace-event-context"
 import {
   createScheduleItem as createScheduleItemAction,
-} from '@/actions/schedule'
+} from '@/server-commands/schedule'
 
 
 interface WorkspaceContextType {

@@ -5,7 +5,7 @@
  */
 
 import { canTransitionScheduleStatus } from "@/entities/schedule"
-import { updateScheduleItemStatus } from "@/actions/schedule"
+import { updateScheduleItemStatus } from "@/server-commands/schedule"
 import type { ScheduleItem } from "@/types/domain"
 
 /**

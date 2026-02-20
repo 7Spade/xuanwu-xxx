@@ -10,7 +10,7 @@ import {
   signIn,
   signInAnonymously,
   sendPasswordResetEmail,
-} from "@/actions/auth"
+} from "@/server-commands/auth"
 import { useI18n } from "@/shared/context/i18n-context"
 import { AuthBackground } from "@/app/(auth)/login/_components/auth-background"
 import { AuthTabsRoot } from "@/app/(auth)/login/_components/auth-tabs-root"

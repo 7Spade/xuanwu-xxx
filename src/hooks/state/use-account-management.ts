@@ -13,7 +13,7 @@ import {
   dismissPartnerMember as dismissPartnerMemberAction,
   updateOrganizationSettings as updateOrganizationSettingsAction,
   deleteOrganization as deleteOrganizationAction,
-} from '@/actions/account';
+} from '@/server-commands/account';
 import type { MemberReference, Account, ThemeConfig } from '@/types/domain';
 
 /**

@@ -24,7 +24,7 @@ import { BookmarkButton } from "./actions/bookmark-button";
 import { ShareButton } from './actions/share-button';
 import { useFirebase } from "@/shared/context/firebase-context";
 import { useAuth } from "@/shared/context/auth-context";
-import { addDailyLogComment } from "@/actions/daily";
+import { addDailyLogComment } from "@/server-commands/daily";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { toast } from "@/shared/hooks/use-toast";
 import { Textarea } from "@/shared/ui/textarea";

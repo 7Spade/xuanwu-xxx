@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/shared/context/auth-context';
 import { useFirebase } from '@/shared/context/firebase-context';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { toggleBookmark as toggleBookmarkAction } from '@/actions/bookmark';
+import { toggleBookmark as toggleBookmarkAction } from '@/server-commands/bookmark';
 import { toast } from '@/shared/hooks/use-toast';
 
 export function useBookmarkActions() {
