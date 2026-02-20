@@ -35,7 +35,7 @@
 
 ### 2. `FirebaseClientProvider`
 - **職責**: 初始化並提供所有 Firebase SDK 的客戶端實例（如 `db`, `auth`, `storage`）。
-- **數據來源**: `@/infra/firebase/*/*.client.ts`。
+- **數據來源**: `@/firebase/*/*.client.ts`。
 - **提供 Hook**: `useFirebase()`。
 
 ### 3. `AuthProvider`

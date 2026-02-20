@@ -31,7 +31,7 @@ service cloud.firestore {
   - **Organization 層級**: 使用者的角色 (`Owner`, `Admin`, `Member`) 儲存在 `/organizations/{orgId}` 的 `members` 陣列中。規則將檢查請求者的 `request.auth.uid` 是否在 `memberIds` 列表中，並根據其角色授予權限。
   - **Workspace 層級**: 工作區的存取權限由 `/workspaces/{workspaceId}` 中的 `grants`（個人授權）和 `teamIds`（團隊授權）共同決定。
 - **資料驗證 (Data Validation)**:
-  - 確保寫入的資料符合 `src/types/domain.ts` 中定義的綱要。例如，檢查欄位類型、長度、範圍等。
+  - 確保寫入的資料符合 `src/domain-types/domain.ts` 中定義的綱要。例如，檢查欄位類型、長度、範圍等。
   - 確保關鍵欄位（如 `ownerId`, `dimensionId`）在創建後不可修改。
 - **所有權驗證 (Ownership Verification)**:
   - 確保只有文件的所有者或具有足夠權限的管理員才能修改或刪除文件。

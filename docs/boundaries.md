@@ -8,37 +8,53 @@
 
 **依賴鏈 (Dependency Chain):**
 
-`app` → `components` → `context` → `hooks` → `infra` → `lib` → `types`
+`app` → `view-modules` → `use-cases` → `react-providers` → `react-hooks` → `server-commands` → `firebase` / `genkit-flows` / `shared` → `domain-rules` → `domain-types`
 
 ---
 
 ## 各層職責與邊界
 
-### 1. `types` - 類型層 (Foundation)
+### 1. `domain-types` - 類型層 (Foundation)
 - **職責**: 定義整個應用程式的 TypeScript 類型和介面，是系統的「通用語言」。
 - **邊界**: **零依賴**。此層不能導入任何其他專案層級的檔案。
 
-### 2. `lib` - 工具層 (Utility)
-- **職責**: 包含純粹、無副作用、與業務無關的通用輔助函式（例如：`cn`, `formatBytes`）。
-- **邊界**: 只能依賴 `types` 層。
+### 2. `domain-rules` - 業務規則層 (Business Logic)
+- **職責**: 包含純粹、無副作用、與框架無關的業務邏輯函式（例如：`filterVisibleWorkspaces`, `buildTaskTree`）。
+- **邊界**: 只能依賴 `domain-types` 層。嚴禁依賴 React 或任何 I/O。
 
-### 3. `infra` - 基礎設施層 (Infrastructure)
+### 3. `shared` - 共享工具層 (Shared Utilities)
+- **職責**: 包含全域共享的工具函式（`cn`, `formatBytes`）、shadcn/ui 元件、常數和 i18n 類型。
+- **邊界**: 只能依賴 `domain-types` 層（`app-providers` 例外，允許導入 `@/firebase`）。
+
+### 4. `firebase` - 基礎設施層 (Infrastructure)
 - **職責**: 封裝所有與外部服務（如 Firebase）的互動。這是唯一允許直接呼叫 SDK 的地方。
-- **邊界**: 只能依賴 `lib` 和 `types` 層。嚴禁了解任何關於 React 或 UI 的概念。
+- **邊界**: 只能依賴 `domain-rules`, `domain-types` 和 `shared` 層。嚴禁了解任何關於 React 或 UI 的概念。
 
-### 4. `hooks` - 邏輯層 (Logic)
-- **職責**: 封裝可重用的業務邏輯或 UI 邏輯。作為 UI 與 `infra` 層之間的橋樑。
-- **邊界**: 可以依賴 `infra`, `lib`, 和 `types` 層。
+### 5. `genkit-flows` - AI 流程層 (AI Flows)
+- **職責**: 封裝所有 Genkit/Gemini AI 流程（僅限伺服器端）。
+- **邊界**: 只能依賴 `domain-types` 層。
 
-### 5. `context` - 狀態層 (State)
+### 6. `server-commands` - 伺服器命令層 (Server Commands)
+- **職責**: `"use server"` 非同步函式，是唯一負責資料修改的入口。
+- **邊界**: 可以依賴 `firebase`, `genkit-flows`, `domain-rules`, `domain-types` 和 `shared` 層。
+
+### 7. `react-hooks` - 邏輯層 (Logic)
+- **職責**: 封裝可重用的業務邏輯或 UI 邏輯。作為 UI 與 `firebase` 層之間的橋樑。
+- **邊界**: 可以依賴 `server-commands`, `firebase`, `domain-rules`, `domain-types` 和 `shared` 層。
+
+### 8. `react-providers` - 狀態層 (State)
 - **職責**: 管理全域或共享的應用程式狀態。
-- **邊界**: 可以依賴 `hooks`, `infra`, `lib`, 和 `types` 層。
+- **邊界**: 可以依賴 `react-hooks`, `server-commands`, `firebase`, `domain-rules`, `domain-types` 和 `shared` 層。
 
-### 6. `components` - 元件層 (UI)
-- **職責**: 包含可重用的「啞」UI 元件 (Dumb Components)，專注於渲染和外觀。
-- **邊界**: 可以依賴 `hooks`, `context`, `lib`, 和 `types` 層。**嚴禁**直接呼叫 `infra` 層。
+### 9. `use-cases` - 用例層 (Use Cases)
+- **職責**: 協調多個 server-commands 和 domain 邏輯來完成一個完整的業務操作。
+- **邊界**: 可以依賴 `react-providers`, `react-hooks`, `server-commands`, `firebase`, `domain-rules`, `domain-types` 和 `shared` 層。
 
-### 7. `app` - 應用層 (Entry)
+### 10. `view-modules` - 元件層 (UI)
+- **職責**: 包含可重用的「智慧」UI 視圖元件，組合 hooks 和 use-cases 進行渲染。
+- **邊界**: 可以依賴 `use-cases`, `react-providers`, `react-hooks`, `domain-types` 和 `shared` 層。**嚴禁**直接呼叫 `firebase` 層。
+
+### 11. `app` - 應用層 (Entry)
 - **職責**: Next.js 的路由入口，負責組合頁面、佈局和元件。
 - **邊界**: 作為最頂層，可以依賴所有下層。**任何其他層都不能依賴 `app` 層**。
 
