@@ -15,11 +15,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/ui/dialog";
-import { WorkspaceSettingsDialog } from "./_components/workspace-settings";
 import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
 import { WorkspaceNavTabs } from "./_components/workspace-nav-tabs";
 import { handleDeleteWorkspace } from "../_lib/workspace-actions";
-import type { WorkspaceLifecycleState, Address } from "@/types/domain";
 
 interface PageHeaderProps {
   title: string;
@@ -47,19 +45,11 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  */
 function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
   useWorkspaceEventHandler()
-  const { workspace, updateWorkspaceSettings } = useWorkspace()
+  const { workspace } = useWorkspace()
   const router = useRouter();
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const onUpdateSettings = async (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState; address?: Address }) => {
-    setLoading(true);
-    await updateWorkspaceSettings(settings);
-    setIsSettingsOpen(false);
-    setLoading(false);
-  };
 
   const onDeleteWorkspace = async () => {
     setLoading(true);
@@ -112,7 +102,7 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { works
             variant="outline"
             size="sm"
             className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => router.push(`/dashboard/workspaces/${workspaceId}/settings`)}
           >
             <Settings className="w-3.5 h-3.5" /> Space Settings
           </Button>
@@ -130,14 +120,6 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { works
       {capability}
       {panel}
       {modal}
-
-      <WorkspaceSettingsDialog
-        workspace={workspace}
-        open={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        onSave={onUpdateSettings}
-        loading={loading}
-      />
 
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="rounded-2xl">

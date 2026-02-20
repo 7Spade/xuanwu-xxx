@@ -1,7 +1,6 @@
 // [職責] 標題、搜尋框與視圖切換 (Grid/List)
 "use client";
 
-import { useState } from "react";
 import {
   Plus,
   Search,
@@ -11,8 +10,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { CreateWorkspaceDialog } from "./create-workspace-dialog";
 import { useI18n } from "@/shared/context/i18n-context";
+import { useRouter } from "next/navigation";
 
 interface PageHeaderProps {
   title: string;
@@ -50,7 +49,7 @@ export function WorkspaceListHeader({
   onSearchQueryChange,
 }: WorkspaceListHeaderProps) {
   const { t } = useI18n();
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <>
@@ -80,7 +79,7 @@ export function WorkspaceListHeader({
               <ListIcon className="w-4 h-4" />
             </Button>
           </div>
-          <Button className="gap-2 shadow-sm font-bold uppercase tracking-widest text-[11px] h-10 px-4" onClick={() => setIsCreateOpen(true)}>
+          <Button className="gap-2 shadow-sm font-bold uppercase tracking-widest text-[11px] h-10 px-4" onClick={() => router.push('/dashboard/workspaces/new')}>
             <Plus className="w-4 h-4" /> {t("workspaces.createSpace")}
           </Button>
         </div>
@@ -103,7 +102,6 @@ export function WorkspaceListHeader({
           <Filter className="w-3.5 h-3.5" /> {t("common.filter")}
         </Button>
       </div>
-      <CreateWorkspaceDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
     </>
   );
 }

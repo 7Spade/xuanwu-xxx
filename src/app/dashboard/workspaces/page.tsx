@@ -11,14 +11,14 @@ import { WorkspaceListHeader } from "./_components/workspace-list-header";
 import { WorkspaceGridView } from "./_components/workspace-grid-view";
 import { WorkspaceTableView } from "./_components/workspace-table-view";
 import { Button } from "@/shared/ui/button";
-import { CreateWorkspaceDialog } from "./_components/create-workspace-dialog";
+import { useRouter } from "next/navigation";
 
 export default function WorkspacesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const { t } = useI18n();
+  const router = useRouter();
 
   const {
     state: { activeAccount },
@@ -63,11 +63,10 @@ export default function WorkspacesPage() {
           <Button
             size="lg"
             className="rounded-full px-8 shadow-lg font-bold uppercase tracking-widest text-xs"
-            onClick={() => setIsCreateOpen(true)}
+            onClick={() => router.push('/dashboard/workspaces/new')}
           >
             {t("workspaces.createInitialSpace")}
           </Button>
-          <CreateWorkspaceDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
         </div>
       )}
     </div>
