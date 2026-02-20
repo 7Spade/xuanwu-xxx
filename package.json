@@ -12,7 +12,7 @@
   },
   "homepage": "https://Ac-Xuanwu.com",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "workspaces": [
     "functions"
   ],
