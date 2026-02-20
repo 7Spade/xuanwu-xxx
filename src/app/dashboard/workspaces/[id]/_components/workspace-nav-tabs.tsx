@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { usePathname } from "next/navigation"
+import { useSelectedLayoutSegment } from "next/navigation"
 import Link from "next/link"
 import { useWorkspace } from "@/context/workspace-context"
 import type { Capability } from "@/types/domain"
@@ -56,10 +56,7 @@ interface WorkspaceNavTabsProps {
 
 export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
   const { workspace } = useWorkspace()
-  const pathname = usePathname()
-
-  // Extract the current capability from pathname
-  const currentCapability = pathname.split("/").pop()
+  const activeCapability = useSelectedLayoutSegment("capability")
 
   const mountedCapabilities = useMemo(() => {
     // Layer 3 — Business: dynamic capabilities mounted per workspace, excluding permanent layers.
@@ -78,7 +75,7 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
     <div className="bg-muted/40 p-1 border border-border/50 rounded-xl w-full flex overflow-x-auto no-scrollbar">
       {mountedCapabilities.map((cap: { id: string; name: string }) => {
         const detail = CAPABILITY_REGISTRY[cap.id as keyof typeof CAPABILITY_REGISTRY]
-        const isActive = currentCapability === cap.id
+        const isActive = activeCapability === cap.id
         
         return detail ? (
           <Link

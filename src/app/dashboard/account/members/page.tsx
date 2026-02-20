@@ -1,5 +1,3 @@
-"use client"
-
 import { MembersView } from "@/features/members"
 
 export default function AccountMembersPage() {

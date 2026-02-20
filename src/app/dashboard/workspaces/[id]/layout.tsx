@@ -44,7 +44,7 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode }) {
+function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
   const { workspace, updateWorkspaceSettings } = useWorkspace();
   const router = useRouter();
 
@@ -126,6 +126,7 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId:
 
       <WorkspaceNavTabs workspaceId={workspaceId} />
       {capability}
+      {panel}
       {modal}
 
       <WorkspaceSettingsDialog
@@ -170,16 +171,18 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId:
 export default function WorkspaceLayout({
   capability,
   modal,
+  panel,
   params,
 }: {
   capability: React.ReactNode;
   modal: React.ReactNode;
+  panel: React.ReactNode;
   params: { id: string };
 }) {
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={capability} modal={modal} />
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={capability} modal={modal} panel={panel} />
     </WorkspaceProvider>
   );
 }

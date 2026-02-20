@@ -1,5 +1,3 @@
-"use client"
-
 import { PartnersView } from "@/features/partners"
 
 /**

@@ -1,5 +1,3 @@
-"use client"
-
 import { WorkspaceIssues } from "../../capabilities"
 
 export default function IssuesCapabilityPage() {

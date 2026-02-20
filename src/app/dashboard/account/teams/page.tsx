@@ -1,5 +1,3 @@
-"use client"
-
 import { TeamsView } from "@/features/teams"
 
 /**

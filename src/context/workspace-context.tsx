@@ -30,6 +30,7 @@ import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
 } from '@/actions/issue'
+import { WorkspaceEventContext } from "@/context/workspace-event-context"
 import {
   createScheduleItem as createScheduleItemAction,
 } from '@/actions/schedule'
@@ -142,10 +143,12 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   };
 
   return (
-    <WorkspaceContext.Provider value={value}>
-      <WorkspaceEventHandler />
-      {children}
-    </WorkspaceContext.Provider>
+    <WorkspaceEventContext.Provider value={{ publish: eventBus.publish, subscribe: eventBus.subscribe }}>
+      <WorkspaceContext.Provider value={value}>
+        <WorkspaceEventHandler />
+        {children}
+      </WorkspaceContext.Provider>
+    </WorkspaceEventContext.Provider>
   );
 }
 
