@@ -28,6 +28,16 @@ import {
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useCallback, useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/shared/shadcn-ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/shadcn-ui/alert-dialog";
 import { Capability } from "@/domain-types/domain";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { Checkbox } from "@/shared/shadcn-ui/checkbox";
@@ -268,33 +278,37 @@ export function WorkspaceCapabilities() {
           </div>
           <DialogFooter>
              <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={isMounting}>Cancel</Button>
-             <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
-               {isMounting ? (
-                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mounting...</>
-               ) : (
-                 `Mount Selected (${selectedCaps.size})`
-               )}
-             </Button>
-          </DialogFooter>
+              <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
+                <span aria-live="polite" aria-busy={isMounting ? "true" : "false"}>
+                  {isMounting ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mounting...</>
+                  ) : (
+                    `Mount Selected (${selectedCaps.size})`
+                  )}
+                </span>
+              </Button>
+           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Unmount Confirmation Dialog */}
-      <Dialog open={!!pendingUnmount} onOpenChange={(open) => !open && setPendingUnmount(null)}>
-        <DialogContent className="rounded-2xl max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Unmount Capability</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={!!pendingUnmount} onOpenChange={(open) => !open && setPendingUnmount(null)}>
+        <AlertDialogContent className="rounded-2xl max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unmount Capability</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to unmount <span className="font-bold text-foreground">{pendingUnmount?.name}</span>?
               The tab and all associated data will no longer be accessible from this workspace.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPendingUnmount(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleConfirmUnmount}>Unmount</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleConfirmUnmount}>
+              Unmount
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

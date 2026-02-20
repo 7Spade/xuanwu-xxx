@@ -1,5 +1,5 @@
 import { WorkspaceCapabilities } from "../../plugins"
 
-export default function CapabilitiesCapabilityPage() {
+export default function CapabilitiesPage() {
   return <WorkspaceCapabilities />
 }
