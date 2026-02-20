@@ -10,6 +10,7 @@ import {
   unassignMemberFromScheduleItem,
   createScheduleItem as createScheduleItemFacade,
   updateScheduleItemStatus as updateScheduleItemStatusFacade,
+  getScheduleItems as getScheduleItemsFacade,
 } from "@/infra/firebase/firestore/firestore.facade"
 import type { ScheduleItem } from "@/types/domain"
 
@@ -64,4 +65,16 @@ export async function updateScheduleItemStatus(
   newStatus: "OFFICIAL" | "REJECTED"
 ): Promise<void> {
   return updateScheduleItemStatusFacade(orgId, itemId, newStatus)
+}
+
+/**
+ * Fetches all schedule items for an account, optionally filtered by workspace.
+ * @param accountId The ID of the organization account.
+ * @param workspaceId Optional workspace ID to filter items.
+ */
+export async function getScheduleItems(
+  accountId: string,
+  workspaceId?: string
+): Promise<ScheduleItem[]> {
+  return getScheduleItemsFacade(accountId, workspaceId)
 }

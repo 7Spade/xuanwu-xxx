@@ -5,7 +5,7 @@ import { useWorkspace } from "@/context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
 import { toast } from "@/shared/hooks/use-toast";
 import { ToastAction } from "@/shared/ui/toast";
-import type { WorkspaceEventPayloadMap } from "./workspace-events";
+import type { WorkspaceEventPayloadMap } from "@/lib/event-bus/workspace-events";
 import { WorkspaceTask } from "@/types/domain";
 import { createIssue } from "@/actions/issue";
 import { createScheduleItem } from "@/actions/schedule";

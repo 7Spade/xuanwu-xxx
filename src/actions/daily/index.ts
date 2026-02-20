@@ -8,7 +8,9 @@
 import {
   toggleDailyLogLike,
   addDailyLogComment as addDailyLogCommentFacade,
+  getDailyLogs as getDailyLogsFacade,
 } from "@/infra/firebase/firestore/firestore.facade"
+import type { DailyLog } from "@/types/domain"
 
 /**
  * Toggles a like on a daily log entry.
@@ -38,4 +40,16 @@ export async function addDailyLogComment(
   content: string
 ): Promise<void> {
   await addDailyLogCommentFacade(orgId, logId, author, content)
+}
+
+/**
+ * Fetches daily log entries for an account.
+ * @param accountId The ID of the organization account.
+ * @param limit Maximum number of logs to return (default: 30).
+ */
+export async function getDailyLogs(
+  accountId: string,
+  limit = 30
+): Promise<DailyLog[]> {
+  return getDailyLogsFacade(accountId, limit)
 }

@@ -1,13 +1,16 @@
 // [職責] Business — 單一 Workspace 日誌撰寫與檢視
 "use client";
 
+import { useRouter } from "next/navigation";
 import { MessageSquare } from "lucide-react";
 import { DailyLogCard } from "./_components/daily-log-card";
 import { DailyLogComposer } from "./_components/composer";
-import { DailyLogDialog } from "./_components/daily-log-dialog";
 import { useWorkspaceDailyLog } from "./_hooks/use-workspace-daily";
+import { useWorkspace } from "@/context/workspace-context";
 
 export function WorkspaceDaily() {
+  const router = useRouter();
+  const { workspace } = useWorkspace();
   const {
     user,
     localLogs,
@@ -16,8 +19,6 @@ export function WorkspaceDaily() {
     photos,
     setPhotos,
     isUploading,
-    selectedLog,
-    setSelectedLog,
     handlePost,
   } = useWorkspaceDailyLog();
 
@@ -38,7 +39,11 @@ export function WorkspaceDaily() {
             key={log.id}
             log={log}
             currentUser={user}
-            onOpen={() => setSelectedLog(log)}
+            onOpen={() =>
+              router.push(
+                `/dashboard/workspaces/${workspace.id}/daily-log/${log.id}`
+              )
+            }
           />
         ))}
         {localLogs.length === 0 && (
@@ -48,13 +53,6 @@ export function WorkspaceDaily() {
           </div>
         )}
       </div>
-
-      <DailyLogDialog
-        log={selectedLog}
-        currentUser={user}
-        isOpen={!!selectedLog}
-        onOpenChange={(open) => { if (!open) setSelectedLog(null); }}
-      />
     </div>
   );
 }

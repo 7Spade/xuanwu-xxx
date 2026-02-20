@@ -7,7 +7,6 @@
  * @responsibility
  * - Derive `localLogs` (filtered + sorted) from AccountContext.
  * - Manage composer state: `content`, `photos`.
- * - Manage dialog state: `selectedLog`.
  * - Handle log post (upload + write) via `useDailyUpload` and `useLogger`.
  */
 "use client";
@@ -35,7 +34,6 @@ export function useWorkspaceDailyLog() {
 
   const [content, setContent] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
-  const [selectedLog, setSelectedLog] = useState<DailyLog | null>(null);
 
   const localLogs = useMemo(() =>
     Object.values(dailyLogs as Record<string, DailyLog>)
@@ -74,8 +72,6 @@ export function useWorkspaceDailyLog() {
     photos,
     setPhotos,
     isUploading,
-    selectedLog,
-    setSelectedLog,
     handlePost,
   };
 }

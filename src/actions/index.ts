@@ -10,11 +10,14 @@
  */
 
 export * from "./account"
+export * from "./audit"
 export * from "./auth"
 export * from "./workspace"
 export * from "./bookmark"
 export * from "./daily"
+export * from "./files"
 export * from "./issue"
+export * from "./members"
 export * from "./schedule"
 export * from "./storage"
 export * from "./task"

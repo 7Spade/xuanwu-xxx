@@ -65,3 +65,18 @@ export const unassignMemberFromScheduleItem = repositories.unassignMemberFromSch
 export const updateScheduleItemStatus = repositories.updateScheduleItemStatus
 export const toggleDailyLogLike = repositories.toggleDailyLogLike
 export const addDailyLogComment = repositories.addDailyLogComment
+
+// ==================================================================
+// == Read-Only Aggregate Exports
+// ==================================================================
+
+// Account reads
+export const getAuditLogs = repositories.getAuditLogs
+export const getDailyLogs = repositories.getDailyLogs
+export const getScheduleItems = repositories.getScheduleItems
+
+// Workspace reads
+export const getWorkspaceTasks = repositories.getWorkspaceTasks
+export const getWorkspaceIssues = repositories.getWorkspaceIssues
+export const getWorkspaceFiles = repositories.getWorkspaceFiles
+export const getWorkspaceGrants = repositories.getWorkspaceGrants

@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { Workspace, AuditLog, WorkspaceTask, WorkspaceRole, Capability, WorkspaceLifecycleState, ScheduleItem, Location } from '@/types/domain';
 import { useLogger } from '@/hooks/infra/use-logger';
-import { WorkspaceEventBus } from '@/app/dashboard/workspaces/[id]/_events/workspace-event-bus';
+import { WorkspaceEventBus } from '@/lib/event-bus/workspace-event-bus';
 import { Firestore } from 'firebase/firestore';
 import { useApp } from '@/hooks/state/use-app';
 import { useAccount } from '@/hooks/state/use-account';

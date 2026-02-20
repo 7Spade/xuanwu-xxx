@@ -9,6 +9,7 @@ import {
   createTask as createTaskFacade,
   updateTask as updateTaskFacade,
   deleteTask as deleteTaskFacade,
+  getWorkspaceTasks as getWorkspaceTasksFacade,
 } from "@/infra/firebase/firestore/firestore.facade"
 import type { WorkspaceTask } from "@/types/domain"
 
@@ -45,4 +46,14 @@ export async function batchImportTasks(
   items: Omit<WorkspaceTask, "id" | "createdAt" | "updatedAt">[]
 ): Promise<void> {
   await Promise.all(items.map((item) => createTaskFacade(workspaceId, item)))
+}
+
+/**
+ * Fetches all tasks for a workspace (one-time read, not real-time).
+ * @param workspaceId The ID of the workspace.
+ */
+export async function getWorkspaceTasks(
+  workspaceId: string
+): Promise<WorkspaceTask[]> {
+  return getWorkspaceTasksFacade(workspaceId)
 }
