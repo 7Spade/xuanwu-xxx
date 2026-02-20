@@ -9,10 +9,10 @@ import { useAuth } from "@/shared/app-providers/auth-provider"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { useApp } from "@/react-hooks/state-hooks/use-app"
 import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces"
-import { StatCards } from "@/app/dashboard/_route-components/overview/stat-cards"
-import { AccountGrid } from "@/app/dashboard/_route-components/overview/account-grid"
-import { WorkspaceList } from "@/app/dashboard/_route-components/overview/workspace-list"
-import { PermissionTree } from "@/app/dashboard/_route-components/overview/permission-tree"
+import { StatCards } from "./stat-cards"
+import { AccountGrid } from "./account-grid"
+import { WorkspaceList } from "./workspace-list"
+import { PermissionTree } from "./permission-tree"
 
 interface PageHeaderProps {
   title: string
