@@ -1,5 +1,5 @@
-import { WorkspaceAudit } from "../../capabilities"
+import { AuditCapabilityView } from "@/features/audit/audit-view"
 
 export default function AuditCapabilityPage() {
-  return <WorkspaceAudit />
+  return <AuditCapabilityView />
 }

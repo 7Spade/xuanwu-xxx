@@ -1,5 +1,5 @@
-import { WorkspaceFinance } from "../../capabilities"
+import { FinanceCapabilityView } from "@/features/finance/finance-view"
 
 export default function FinanceCapabilityPage() {
-  return <WorkspaceFinance />
+  return <FinanceCapabilityView />
 }

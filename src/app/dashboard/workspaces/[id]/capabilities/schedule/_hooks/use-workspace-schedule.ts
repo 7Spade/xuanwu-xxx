@@ -1,7 +1,7 @@
 // [職責] Business — 單一 Workspace 排程提案與狀態邏輯
 /**
  * @fileoverview useWorkspaceSchedule - Hook for workspace-scoped schedule state and actions.
- * @description Encapsulates all data derivation, state management, side effects, and
+ * @description Encapsulates data derivation, state management, side effects, and
  * write actions for the workspace schedule feature. Keeps the view component as a thin renderer.
  *
  * @responsibility
@@ -9,8 +9,6 @@
  * - Derive `orgMembers` from AppContext active account.
  * - Handle `scheduleTaskRequest` cross-capability hint effect.
  * - Manage calendar navigation state: `currentDate`.
- * - Manage proposal dialog state: `isAddDialogOpen`, `dialogInitialDate`.
- * - Handle schedule item creation via WorkspaceContext.
  */
 "use client";
 
@@ -18,19 +16,18 @@ import { useMemo, useState, useEffect } from "react";
 import { useWorkspace } from "@/context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccount } from "@/hooks/state/use-account";
+import { useRouter } from "next/navigation";
 import { toast } from "@/shared/hooks/use-toast";
-import { addMonths, subMonths } from "date-fns";
-import type { ScheduleItem, Location } from "@/types/domain";
+import { addMonths, subMonths, format } from "date-fns";
 
 export function useWorkspaceSchedule() {
-  const { workspace, createScheduleItem } = useWorkspace();
+  const { workspace } = useWorkspace();
   const { state: appState, dispatch: appDispatch } = useApp();
   const { state: accountState } = useAccount();
   const { accounts, activeAccount, scheduleTaskRequest } = appState;
+  const router = useRouter();
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [dialogInitialDate, setDialogInitialDate] = useState(new Date());
 
   // Cross-capability hint: when a task triggers a schedule request, surface a toast.
   useEffect(() => {
@@ -55,38 +52,12 @@ export function useWorkspaceSchedule() {
     [accountState.schedule_items, workspace.id]
   );
 
-  const handleCreateItem = async (data: {
-    title: string;
-    description?: string;
-    startDate?: Date;
-    endDate?: Date;
-    location: Location;
-  }) => {
-    const newItemData = {
-      accountId: workspace.dimensionId,
-      workspaceId: workspace.id,
-      workspaceName: workspace.name,
-      title: data.title.trim(),
-      description: data.description?.trim(),
-      startDate: data.startDate,
-      endDate: data.endDate,
-      location: data.location,
-      status: "PROPOSAL",
-      originType: "MANUAL",
-      assigneeIds: [],
-    };
-    await createScheduleItem(newItemData as Omit<ScheduleItem, "id" | "createdAt" | "updatedAt">);
-    toast({ title: "Schedule Proposal Sent", description: "Your request has been sent for organization approval." });
-    setIsAddDialogOpen(false);
-  };
-
   const handleMonthChange = (direction: "prev" | "next") => {
     setCurrentDate(current => direction === "prev" ? subMonths(current, 1) : addMonths(current, 1));
   };
 
   const handleOpenAddDialog = (date: Date) => {
-    setDialogInitialDate(date);
-    setIsAddDialogOpen(true);
+    router.push(`schedule-proposal?date=${format(date, "yyyy-MM-dd")}`);
   };
 
   return {
@@ -94,10 +65,7 @@ export function useWorkspaceSchedule() {
     orgMembers,
     currentDate,
     handleMonthChange,
-    isAddDialogOpen,
-    setIsAddDialogOpen,
-    dialogInitialDate,
     handleOpenAddDialog,
-    handleCreateItem,
   };
 }
+

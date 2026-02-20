@@ -2,7 +2,6 @@
 "use client";
 
 import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
-import { ProposalDialog } from "./_components/proposal-dialog";
 import { useWorkspaceSchedule } from "./_hooks/use-workspace-schedule";
 
 export function WorkspaceSchedule() {
@@ -11,11 +10,7 @@ export function WorkspaceSchedule() {
     orgMembers,
     currentDate,
     handleMonthChange,
-    isAddDialogOpen,
-    setIsAddDialogOpen,
-    dialogInitialDate,
     handleOpenAddDialog,
-    handleCreateItem,
   } = useWorkspaceSchedule();
 
   return (
@@ -27,12 +22,6 @@ export function WorkspaceSchedule() {
         currentDate={currentDate}
         onMonthChange={handleMonthChange}
         onAddClick={handleOpenAddDialog}
-      />
-      <ProposalDialog
-        isOpen={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onSubmit={handleCreateItem}
-        initialDate={dialogInitialDate}
       />
     </div>
   );
