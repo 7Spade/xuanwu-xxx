@@ -8,7 +8,7 @@ import { Ghost, Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/context/i18n-context";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { LanguageSwitcher } from "@/app/_components/language-switcher";
+import { LanguageSwitcher } from "@/shared/ui/language-switcher";
 
 interface AuthTabsRootProps {
   isLoading: boolean;

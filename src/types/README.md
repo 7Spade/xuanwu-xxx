@@ -2,11 +2,18 @@
 
 TypeScript domain types and interfaces for the entire application.
 
+## Current files
+
+| File | Description |
+|------|-------------|
+| `domain.ts` | All domain entities: `Account`, `Workspace`, `ScheduleItem`, `DailyLog`, etc. |
+
+> **i18n types** (`i18n.ts`, `i18n.schema.ts`) have been moved to `src/shared/types/`.
+
 ## What belongs here
 
-- Domain entities: `Account`, `Workspace`, `ScheduleItem`, `DailyLog`, etc. — all in `domain.ts`
-- Shared discriminated unions and enums
-- i18n schema types
+- Domain entities and value objects used by infra, actions, hooks, and app
+- Shared discriminated unions and enums that belong to the domain model
 
 ## What does NOT belong here
 

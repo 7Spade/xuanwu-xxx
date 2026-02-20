@@ -1,29 +1,38 @@
 # `src/lib/` — Utility Layer
 
-Pure, stateless helper functions with no side effects.
+> **Status:** Global utilities have been moved to `src/shared/utils/`.
+> This directory now holds only documentation and any future lib-level utilities
+> that are not universally shared (e.g. server-only helpers that don't belong in shared/).
+
+## Current files
+
+| File | Status |
+|------|--------|
+| _(empty — utilities migrated)_ | — |
 
 ## What belongs here
 
-- Generic formatting helpers (`formatBytes`, `formatDate`, etc.)
-- `cn()` — Tailwind class merging utility
-- Type guards and narrowing helpers
-- Other framework-agnostic utilities used across layers
+- Server-only utility helpers that are **not** needed by client components
+- Framework-agnostic helpers that are **specific to the backend/infra layer**
 
 ## What does NOT belong here
 
+- `cn()` and Tailwind utilities → `src/shared/utils/utils.ts`
+- Formatting helpers (`formatBytes`, etc.) → `src/shared/utils/format-bytes.ts`
+- i18n utilities → `src/shared/utils/i18n.ts`
 - Firebase SDK calls → `src/infra/`
 - Business logic → `src/actions/`
-- React-specific helpers → `src/hooks/ui/`
-- App constants → `src/config/`
+- React-specific helpers → `src/shared/hooks/`
 
 ## Naming convention
 
-`{utility-name}.ts` — e.g. `utils.ts`, `format.ts`, `date.ts`
+`{utility-name}.ts` — e.g. `server-utils.ts`, `date.ts`
 
 ## Allowed imports
 
 ```ts
-import ... from '@/types/...'  // ✅ (for type-only imports)
+import ... from '@/types/...'        // ✅ (for type-only imports)
+import ... from '@/shared/types/...' // ✅
 ```
 
 ## Forbidden imports
@@ -36,7 +45,3 @@ import ... from '@/actions/...'  // ❌
 import ... from '@/app/...'      // ❌
 import ... from '@/ai/...'       // ❌
 ```
-
-## Who depends on this layer
-
-Everyone — `infra`, `actions`, `hooks`, `context`, `app`.

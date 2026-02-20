@@ -53,7 +53,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import { Progress } from '@/shared/ui/progress';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/utils/utils';
 import { buildTaskTree } from './workspace-tasks.logic';
 import type { TaskWithChildren } from './workspace-tasks.types';
 import { useStorage } from '@/hooks/infra/use-storage';

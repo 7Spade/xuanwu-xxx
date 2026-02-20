@@ -41,9 +41,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { useAuth } from "@/shared/context/auth-context";
-import { formatBytes } from "@/lib/format";
+import { formatBytes } from "@/shared/utils/format-bytes";
 import type { WorkspaceFile, WorkspaceFileVersion } from "@/types/domain";
 import {
   Table,

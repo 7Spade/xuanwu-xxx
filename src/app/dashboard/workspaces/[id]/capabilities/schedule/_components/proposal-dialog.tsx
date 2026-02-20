@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { Calendar } from "@/shared/ui/calendar";
 import { CalendarIcon, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { toast } from "@/shared/hooks/use-toast";
 import { Location } from "@/types/domain";
 

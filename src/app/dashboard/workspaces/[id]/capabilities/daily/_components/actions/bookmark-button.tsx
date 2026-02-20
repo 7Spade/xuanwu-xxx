@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useBookmarkActions } from '@/hooks/actions/use-bookmark-actions';
 import { Button } from "@/shared/ui/button";
 import { Bookmark, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface BookmarkButtonProps {
   logId: string;

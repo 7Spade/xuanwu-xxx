@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/shared/ui/badge";
 import { Terminal } from "lucide-react";
 import { Workspace } from "@/types/domain";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface NavWorkspacesProps {
   workspaces: Workspace[];

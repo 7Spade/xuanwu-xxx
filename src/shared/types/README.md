@@ -1,59 +1,40 @@
-# Shared Types
+# `src/shared/types/` — Global Shared Types
 
-This directory is reserved for UI-layer shared type definitions.
+Types that are globally shared across client layers (UI, hooks, contexts).
 
-## Note on Domain Types
+## Current files
 
-Domain types remain in `src/types/` because they are used by:
-- Infrastructure layer (`src/infrastructure/`)
-- Server Actions (`src/actions/`)
-- Business logic layers
+| File | Description |
+|------|-------------|
+| `i18n.schema.ts` | `TranslationMessages` interface — all UI string keys |
+| `i18n.ts` | `Locale`, `I18nConfig` types |
 
-Moving them would require updating hundreds of imports across critical layers.
+## What belongs here
 
-## Purpose
-
-Use this directory for:
-- UI component prop type definitions
-- Form schema types (Zod schemas, validation types)
+- i18n types (`Locale`, `TranslationMessages`)
+- UI component prop type definitions shared across `shared/ui/`
+- Form schema types (Zod schemas, validation types) used client-side
 - Display-specific type transformations
-- Client-side state type definitions
-- UI event handler types
-- Component composition types
 
-## Example
+## What does NOT belong here
 
-```typescript
-// src/shared/types/forms.ts
-import { z } from "zod"
+- Domain entity types → `src/types/domain.ts` (used by infra/actions too)
+- Infrastructure types → `src/infra/`
+- Action param types → co-locate with actions in `src/actions/{domain}/`
 
-export const loginFormSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-})
+## Dependency rule
 
-export type LoginFormValues = z.infer<typeof loginFormSchema>
-
-// src/shared/types/display.ts
-export interface DisplayUser {
-  id: string
-  name: string
-  avatar?: string
-  isOnline: boolean
-}
-
-// Transform from domain User to DisplayUser
-export function toDisplayUser(user: User): DisplayUser {
-  return {
-    id: user.id,
-    name: user.profile.displayName || user.email,
-    avatar: user.profile.avatarUrl,
-    isOnline: user.status === "online",
-  }
-}
+```ts
+import ... from '@/shared/types/...'  // ✅ allowed by any layer
+import ... from '@/types/...'         // ✅ also still valid for domain types
 ```
 
-## Guideline
+## Forbidden imports
 
-- **Domain types**: Keep in `@/types` (infrastructure, actions, business logic)
-- **UI types**: Add to `@/shared/types` (component props, forms, display transformations)
+```ts
+import ... from '@/infra/...'    // ❌
+import ... from '@/hooks/...'    // ❌
+import ... from '@/context/...'  // ❌
+import ... from '@/actions/...'  // ❌
+import ... from '@/app/...'      // ❌
+```

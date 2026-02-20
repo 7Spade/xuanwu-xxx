@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { format, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, addMonths, subMonths } from "date-fns";
 import { Plus, Check, X, Layers, ChevronLeft, ChevronRight } from "lucide-react";
 

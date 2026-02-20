@@ -1,9 +1,9 @@
 
 import type {Metadata} from 'next';
-import './globals.css';
+import '../styles/globals.css';
 import {Toaster} from '@/shared/ui/toaster';
 import { Inter } from 'next/font/google';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/utils/utils';
 import { ThemeProvider } from '@/shared/context/theme-context';
 import { FirebaseClientProvider } from '@/shared/context/firebase-context';
 import { AuthProvider } from '@/shared/context/auth-context';
