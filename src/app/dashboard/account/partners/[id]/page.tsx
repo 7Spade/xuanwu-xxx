@@ -1,4 +1,4 @@
-import { PartnerDetailView } from "@/use-cases/partners"
+import { PartnerDetailView } from "@/view-modules/partners/partner-detail-view"
 
 /**
  * PartnerTeamDetailPage - Manages recruitment and identity governance within a specific partner team.

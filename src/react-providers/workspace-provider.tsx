@@ -29,7 +29,7 @@ import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
 } from '@/server-commands/issue'
-import { WorkspaceEventContext } from "@/react-providers/workspace-event-provider"
+import { WorkspaceEventContext } from "@/react-providers/workspace-event-context"
 import {
   createScheduleItem as createScheduleItemAction,
 } from '@/server-commands/schedule'

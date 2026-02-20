@@ -13,26 +13,7 @@ import { Input } from "@/shared/shadcn-ui/input";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
-
-interface PageHeaderProps {
-  title: string;
-  description?: string;
-  children?: React.ReactNode;
-}
-
-function PageHeader({ title, description, children }: PageHeaderProps) {
-    return (
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div className="space-y-1">
-          <h1 className="text-4xl font-bold tracking-tight font-headline">{title}</h1>
-          {description && <p className="text-muted-foreground">{description}</p>}
-        </div>
-        <div className="flex items-center gap-2">
-          {children}
-        </div>
-      </div>
-    );
-}
+import { PageHeader } from "@/shared/shadcn-ui/page-header";
 
 interface WorkspaceListHeaderProps {
   activeAccountName: string;
