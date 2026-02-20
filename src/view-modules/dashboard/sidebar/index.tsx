@@ -28,6 +28,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarRail,
   SidebarSeparator,
 } from "@/shared/shadcn-ui/sidebar";
 
@@ -77,7 +78,7 @@ export function DashboardSidebar() {
   return (
     <Sidebar className="border-r border-border/50">
       {/* Sidebar Header: Contains the logo and the account switcher dropdown */}
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-2">
         <AccountSwitcher
           user={currentUser}
           accounts={accounts}
@@ -115,7 +116,7 @@ export function DashboardSidebar() {
       </SidebarContent>
 
       {/* Sidebar Footer: Contains user profile info, settings, and logout */}
-      <SidebarFooter className="p-4 bg-muted/5">
+      <SidebarFooter className="p-2">
         <NavUser
           user={currentUser}
           accounts={accounts}
@@ -124,6 +125,8 @@ export function DashboardSidebar() {
           t={t}
         />
       </SidebarFooter>
+
+      <SidebarRail />
     </Sidebar>
   );
 }

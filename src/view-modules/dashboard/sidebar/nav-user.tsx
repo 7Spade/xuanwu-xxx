@@ -11,9 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/shadcn-ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/shadcn-ui/avatar"
-import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/shared/shadcn-ui/sidebar"
-import { UserCircle, LogOut, ChevronUp } from "lucide-react"
-import { Account } from "@/domain-types/domain"
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/shared/shadcn-ui/sidebar"
+import { UserCircle, LogOut, ChevronsUpDown } from "lucide-react"
+import type { Account } from "@/domain-types/domain"
 import { useMemo } from "react"
 import { ROUTES } from "@/shared/constants/routes"
 
@@ -28,6 +28,7 @@ interface NavUserProps {
 const getAccountInitial = (name?: string) => name?.[0] ?? ""
 
 export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserProps) {
+  const { isMobile } = useSidebar()
   const router = useRouter()
 
   const handleLogout = () => {
@@ -52,23 +53,29 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="w-full hover:bg-primary/5">
-                <div className="flex items-center gap-3 w-full">
-                  <Avatar className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
-                    {user?.photoURL ? <AvatarImage src={user.photoURL} alt={user?.name} /> : null}
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold">{getAccountInitial(user?.name)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col overflow-hidden text-left flex-1">
-                    <span className="text-xs font-bold truncate">{user?.name}</span>
-                    <span className="text-[9px] text-muted-foreground truncate uppercase">
-                      {activeAccount?.accountType === 'organization' ? currentUserRoleInOrg : user?.email}
-                    </span>
-                  </div>
-                  <ChevronUp className="ml-auto w-4 h-4 text-muted-foreground opacity-50" />
-                </div>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Avatar className="h-8 w-8 rounded-lg">
+                {user?.photoURL ? <AvatarImage src={user.photoURL} alt={user?.name} /> : null}
+                <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">{getAccountInitial(user?.name)}</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{user?.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {activeAccount?.accountType === 'organization' ? currentUserRoleInOrg : user?.email}
+                </span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="w-[220px]">
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            side={isMobile ? "bottom" : "top"}
+            align="end"
+            sideOffset={4}
+          >
             <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest opacity-60">
               {t('navigation.account')}
             </DropdownMenuLabel>
