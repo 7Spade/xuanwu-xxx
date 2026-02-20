@@ -177,7 +177,7 @@ export default function WorkspaceLayout({
   capability: React.ReactNode;
   modal: React.ReactNode;
   panel: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const resolvedParams = use(params);
   return (
