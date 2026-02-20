@@ -1,88 +1,84 @@
-# Project: Action Layer (`src/actions/`)
+# Server Commands Layer (`src/server-commands/`)
 
 ## Responsibility
 
-Server boundary — orchestrates infra calls.  
+Server boundary — orchestrates Firebase calls.  
 No business rules. No React. No UI.  
-Pure async functions with explicit parameters.
+Pure `async` functions with explicit parameters.
 
-## Directory map
+## File naming convention
 
-| Module | What it provides |
-|--------|-----------------|
-| `account/` | Organization CRUD, teams, members |
-| `auth/` | signIn, registerUser, signOut, resetPassword |
-| `workspace/` | Workspace lifecycle, grants, capabilities |
-| `bookmark/` | Bookmark add/remove toggle |
-| `daily/` | Daily log likes and comments |
-| `issue/` | Issue CRUD and comments |
-| `schedule/` | Schedule item CRUD, member assignment |
-| `storage/` | File uploads (photo, attachment, avatar) |
-| `task/` | Task CRUD, batch import |
-| `user/` | User account creation and profile management |
-| `index.ts` | re-exports all domains |
+Each module uses an **explicit named file** for the commands, with `index.ts` as a thin re-export barrel:
+
+| Module | Logic file | What it provides |
+|--------|-----------|-----------------|
+| `account/` | `account.commands.ts` | Organization CRUD, teams, members |
+| `auth/` | `auth.commands.ts` | `signIn`, `registerUser`, `signOut`, `sendPasswordResetEmail` |
+| `workspace/` | `workspace.commands.ts` | Workspace lifecycle, grants, capabilities |
+| `bookmark/` | `bookmark.commands.ts` | Bookmark add/remove toggle |
+| `daily/` | `daily.commands.ts` | Daily log likes and comments |
+| `document-parser/` | `document-parser.commands.ts` | AI document parsing Server Action |
+| `files/` | `files.commands.ts` | File manifest retrieval |
+| `issue/` | `issue.commands.ts` | Issue CRUD and comments |
+| `members/` | `members.commands.ts` | Workspace member retrieval |
+| `schedule/` | `schedule.commands.ts` | Schedule item CRUD, member assignment |
+| `storage/` | `storage.commands.ts` | File uploads (photo, attachment, avatar) |
+| `task/` | `task.commands.ts` | Task CRUD, batch import |
+| `user/` | `user.commands.ts` | User account creation and profile management |
+| `index.ts` | re-exports all modules | — |
+
+## Input / Output contracts
+
+Every command function signature follows: `(explicitParam1, explicitParam2, ...) => Promise<string | void | DomainType>`
+
+- Return value **must** be JSON-serializable: `string`, `number`, `void`, plain object, or array.
+- **Never** return Firebase `DocumentReference`, `Timestamp`, or other non-serializable objects.
+- **Never** accept React state (`useState`, `useRef`) as parameters.
+
+## Side effects
+
+**All commands may mutate Firebase Firestore or Firebase Auth.** Callers must assume every call produces a write side effect unless the function is prefixed with `get`, `fetch`, or `read`.
+
+- `create*` / `update*` / `delete*` — Firestore write
+- `register*` / `signIn*` / `signOut*` — Firebase Auth mutation
+- `upload*` — Firebase Storage write
+- `get*` / `fetch*` — Firestore read only (no mutation)
 
 ## Dependency rules
 
 ### Allowed
-- `@/firebase/` — call facade or repositories
-- `@/domain-rules/` — use pure domain rules for input validation
+- `@/firebase/` — call facade or repositories (never Firestore SDK directly)
+- `@/domain-rules/` — pure validation before calling infra
 - `@/domain-types/` — domain types
 - `@/lib/` — pure utilities
+- `@/genkit-flows/` — AI server actions only
 
 ### Forbidden
 - `react` — no React hooks or context
 - `@/react-hooks/` — no hook calls
 - `@/react-providers/` — no context reads
-- `@/shared/ui/` — no UI components
+- `@/shared/shadcn-ui/` — no UI components
+- `@/view-modules/` — no view components
 - `@/app/` — no app layer
+- `@/use-cases/` — no upward dependency
 
 ## Coding constraints
 
-1. **呼叫 service 或 repository** — actions must call infra; never touch Firestore directly.
-2. **不得包含商業規則** — business rules (permission checks, state validation) belong in `@/domain-rules/`.
-3. **不得實作權限邏輯** — all `isOwner` / `hasAccess` checks must be in `@/domain-rules/`.
-4. **不得依賴 React hook** — actions must be callable outside React (Server Actions, scripts, tests).
-5. **不得 import UI** — zero dependency on any component or visual layer.
-6. **不得返回非序列化物件** — return value must be JSON-serializable (string, number, void, plain object/array).
-7. **只負責驗證輸入與調用流程** — validate inputs, resolve entities, call infra, return result.
-8. **`"use server"` (目標)** — actions are the unique server boundary; mark with `"use server"` once Firebase Admin SDK migration is complete.
-
-## Action migration rules
-
-1. Action 必須標註 `"use server"`（Firebase Admin SDK 後啟用）。
-2. Action 不得包含商業規則。
-3. Action 不得直接操作 Firestore。
-4. Action 只能呼叫 service 或 repository。
-5. Action 不得 import UI。
-6. Action 不得依賴 React hook。
-7. Action 必須作為唯一 server 邊界。
-8. Action 不得返回非序列化物件。
-9. Action 不得實作權限邏輯。
-10. Action 只負責驗證輸入與調用流程。
-
-## Migration order
-
-1. Entity extracted first.
-2. Business rules moved to entity.
-3. Action simplified to: validate → call infra → return.
-4. Callers (hooks / context) updated last.
-5. Never refactor multiple domains simultaneously.
-6. Verify zero circular imports after each migration.
-7. Do not create temporary helper shims.
-8. Do not keep old paths as transition layers.
+1. **Call `@/firebase/` facade or repositories** — never touch Firestore SDK directly.
+2. **No business rules** — permission checks and state validation belong in `@/domain-rules/`.
+3. **No permission logic** — all `isOwner` / `hasAccess` checks must live in `@/domain-rules/`.
+4. **No React dependencies** — callable outside React (Server Actions, scripts, tests).
+5. **No UI imports** — zero dependency on any component or visual layer.
+6. **Return serializable values** — `string`, `number`, `void`, plain object/array.
 
 ## Dependency direction (absolute)
 
 ```
-app / context / hooks
-       ↓
-  src/actions/   ← pure async, no React, explicit params
-       ↓
-infra/facade → repositories
+app → react-hooks/react-providers → use-cases → server-commands
+                                                       ↓
+                                              @/firebase/ (repositories)
 ```
 
-- **actions → UI** ❌ forbidden
-- **actions → hooks** ❌ forbidden
-- **features → app** ❌ forbidden
-- **infra → features** ❌ forbidden
+- **server-commands → UI** ❌ forbidden
+- **server-commands → react-hooks** ❌ forbidden
+- **server-commands → use-cases** ❌ forbidden
