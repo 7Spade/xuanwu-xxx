@@ -8,7 +8,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { ScheduleItem } from "@/types/domain";
 import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
 import { ScheduleDataTable } from "./_components/schedule-data-table";
@@ -17,7 +17,7 @@ import { useGlobalSchedule } from "./_hooks/use-global-schedule";
 import { decisionHistoryColumns } from "./_components/decision-history-columns";
 import { upcomingEventsColumns } from "./_components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
-import { updateScheduleItemStatus } from "@/infra/firebase/firestore/firestore.facade";
+import { approveScheduleItem, rejectScheduleItem } from "@/features/schedule";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { Button } from "@/app/_components/ui/button";
+} from "@/shared/ui/dropdown-menu";
+import { Button } from "@/shared/ui/button";
 import { UserPlus, Calendar, ListChecks, History } from "lucide-react";
 import { useScheduleActions } from "@/hooks/actions/use-schedule-actions";
 
@@ -39,7 +39,11 @@ export function AccountScheduleComponent() {
 
   const handleAction = useCallback(async (item: ScheduleItem, newStatus: 'OFFICIAL' | 'REJECTED') => {
     try {
-      await updateScheduleItemStatus(item.accountId, item.id, newStatus);
+      if (newStatus === 'OFFICIAL') {
+        await approveScheduleItem(item)
+      } else {
+        await rejectScheduleItem(item)
+      }
       const successTitle = newStatus === 'OFFICIAL' ? "Proposal Approved" : "Proposal Rejected";
       toast({ title: successTitle, description: `"${item.title}" has been updated.` });
     } catch (e: any) {

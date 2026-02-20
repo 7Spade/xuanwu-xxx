@@ -1,12 +1,12 @@
 // [職責] 封裝所有的 Mutation (Create, Delete 呼叫)
 "use client";
 
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import {
   createWorkspace,
-  updateWorkspaceSettings as updateWorkspaceSettingsFacade,
-  deleteWorkspace as deleteWorkspaceFacade,
-} from "@/infra/firebase/firestore/firestore.facade";
+  updateWorkspaceSettings,
+  deleteWorkspace,
+} from "@/actions/workspace";
 import type { Account, WorkspaceLifecycleState } from "@/types/domain";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -50,7 +50,7 @@ export const handleUpdateWorkspaceSettings = async (
   onSuccess: () => void
 ) => {
   try {
-    await updateWorkspaceSettingsFacade(workspaceId, settings);
+    await updateWorkspaceSettings(workspaceId, settings);
     toast({ title: "Space settings synchronized" });
     onSuccess();
   } catch(error) {
@@ -68,7 +68,7 @@ export const handleDeleteWorkspace = async (
   onSuccess: () => void
 ) => {
   try {
-    await deleteWorkspaceFacade(workspaceId);
+    await deleteWorkspace(workspaceId);
     toast({ title: "Workspace node destroyed" });
     onSuccess();
   } catch(error) {

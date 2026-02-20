@@ -9,12 +9,12 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/app/_components/ui/card";
-import { Badge } from "@/app/_components/ui/badge";
-import { Button } from "@/app/_components/ui/button";
+} from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { MoreVertical, Eye, EyeOff, Shield } from "lucide-react";
 import type { Workspace } from "@/types/domain";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface WorkspaceCardProps {
   workspace: Workspace;

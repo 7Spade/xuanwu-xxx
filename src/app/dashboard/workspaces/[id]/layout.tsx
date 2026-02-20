@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context";
@@ -13,9 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/app/_components/ui/dialog";
+} from "@/shared/ui/dialog";
 import { WorkspaceSettingsDialog } from "./_components/workspace-settings";
 import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
+import { WorkspaceNavTabs } from "./_components/workspace-nav-tabs";
 import { handleDeleteWorkspace } from "../_lib/workspace-actions";
 import type { WorkspaceLifecycleState, Address } from "@/types/domain";
 
@@ -43,7 +44,7 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
+function WorkspaceLayoutInner({ workspaceId, capability, modal }: { workspaceId: string; capability: React.ReactNode; modal: React.ReactNode }) {
   const { workspace, updateWorkspaceSettings } = useWorkspace();
   const router = useRouter();
 
@@ -123,7 +124,9 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
       )}
 
-      {children}
+      <WorkspaceNavTabs workspaceId={workspaceId} />
+      {capability}
+      {modal}
 
       <WorkspaceSettingsDialog
         workspace={workspace}
@@ -165,16 +168,18 @@ function WorkspaceLayoutInner({ children }: { children: React.ReactNode }) {
  * Its sole responsibility is to provide the WorkspaceContext.
  */
 export default function WorkspaceLayout({
-  children,
+  capability,
+  modal,
   params,
 }: {
-  children: React.ReactNode;
+  capability: React.ReactNode;
+  modal: React.ReactNode;
   params: { id: string };
 }) {
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner>{children}</WorkspaceLayoutInner>
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={capability} modal={modal} />
     </WorkspaceProvider>
   );
 }

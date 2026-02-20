@@ -13,13 +13,13 @@
 // ============================================================================
 import { useEffect, useMemo, useState, ReactNode } from "react";
 import { User as UserIcon } from "lucide-react";
-import { Badge } from "@/app/_components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 
 // ============================================================================
 // Internal Dependencies - Contexts & Hooks
 // ============================================================================
-import { useAuth } from "@/context/auth-context";
-import { useI18n } from "@/context/i18n-context";
+import { useAuth } from "@/shared/context/auth-context";
+import { useI18n } from "@/shared/context/i18n-context";
 import { useApp } from "@/hooks/state/use-app";
 import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";
 

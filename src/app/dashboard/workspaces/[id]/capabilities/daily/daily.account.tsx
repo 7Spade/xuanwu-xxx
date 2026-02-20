@@ -13,7 +13,7 @@
 
 import { useState } from "react";
 import { useApp } from "@/hooks/state/use-app";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/shared/context/auth-context";
 import { AlertCircle, MessageSquare } from "lucide-react";
 import { DailyLogCard } from "./_components/daily-log-card";
 import { useAggregatedLogs } from "./_hooks/use-aggregated-logs";

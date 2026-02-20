@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Card, CardContent } from "@/app/_components/ui/card";
+import { Card, CardContent } from "@/shared/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/app/_components/ui/carousel";
+} from "@/shared/ui/carousel";
 
 interface ImageCarouselProps {
     images: string[];

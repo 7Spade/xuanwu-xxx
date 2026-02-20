@@ -6,7 +6,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/app/_components/ui/collapsible";
+} from "@/shared/ui/collapsible";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -14,7 +14,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarMenuButton,
-} from "@/app/_components/ui/sidebar";
+} from "@/shared/ui/sidebar";
 import {
   LayoutDashboard,
   Layers,
@@ -28,7 +28,7 @@ import {
   MessageSquare,
   History
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface NavMainProps {
   pathname: string;

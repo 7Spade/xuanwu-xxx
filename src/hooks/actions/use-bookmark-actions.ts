@@ -7,14 +7,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { useFirebase } from '@/context/firebase-context';
+import { useAuth } from '@/shared/context/auth-context';
+import { useFirebase } from '@/shared/context/firebase-context';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { 
-    addBookmark as addBookmarkRepo,
-    removeBookmark as removeBookmarkRepo
-} from '@/infra/firebase/firestore/firestore.facade';
-import { toast } from '@/hooks/ui/use-toast';
+import { toggleBookmark as toggleBookmarkAction } from '@/actions/bookmark';
+import { toast } from '@/shared/hooks/use-toast';
 
 export function useBookmarkActions() {
     const { state: authState } = useAuth();
@@ -48,11 +45,7 @@ export function useBookmarkActions() {
     const toggleBookmark = useCallback(async (logId: string, shouldBookmark: boolean) => {
         if (!user) return;
         try {
-            if (shouldBookmark) {
-                await addBookmarkRepo(user.id, logId);
-            } else {
-                await removeBookmarkRepo(user.id, logId);
-            }
+            await toggleBookmarkAction(user.id, logId, shouldBookmark);
         } catch (error) {
             console.error("Failed to toggle bookmark:", error);
             toast({ variant: 'destructive', title: 'Failed to update bookmark' });

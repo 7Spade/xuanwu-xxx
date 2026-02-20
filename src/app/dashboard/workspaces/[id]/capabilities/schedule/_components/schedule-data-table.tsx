@@ -22,15 +22,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/app/_components/ui/table"
+} from "@/shared/ui/table"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu"
-import { Button } from "@/app/_components/ui/button"
-import { Input } from "@/app/_components/ui/input"
+} from "@/shared/ui/dropdown-menu"
+import { Button } from "@/shared/ui/button"
+import { Input } from "@/shared/ui/input"
 import { ChevronDown } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {

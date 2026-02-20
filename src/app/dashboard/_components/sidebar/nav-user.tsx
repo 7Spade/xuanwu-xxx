@@ -10,9 +10,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar"
-import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/app/_components/ui/sidebar"
+} from "@/shared/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar"
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/shared/ui/sidebar"
 import { UserCircle, LogOut, ChevronUp } from "lucide-react"
 import { Account } from "@/types/domain"
 import { useMemo } from "react"

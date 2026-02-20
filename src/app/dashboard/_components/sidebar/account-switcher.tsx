@@ -2,8 +2,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Button } from "@/app/_components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/_components/ui/avatar"
+import { Button } from "@/shared/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +11,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu"
+} from "@/shared/ui/dropdown-menu"
 import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import { Account } from "@/types/domain"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/utils/utils"
 import Link from "next/link"
 import { AccountCreateDialog } from "./account-create-dialog"
 

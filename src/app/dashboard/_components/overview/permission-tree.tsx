@@ -1,8 +1,8 @@
 
 "use client";
 
-import { Badge } from "@/app/_components/ui/badge";
-import { Card, CardContent } from "@/app/_components/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Card, CardContent } from "@/shared/ui/card";
 import { Shield } from "lucide-react";
 import { OrganizationRole } from "@/types/domain";
 

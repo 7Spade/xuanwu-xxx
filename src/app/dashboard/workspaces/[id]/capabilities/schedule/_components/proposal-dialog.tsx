@@ -10,17 +10,17 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/app/_components/ui/dialog";
-import { Button } from "@/app/_components/ui/button";
-import { Label } from "@/app/_components/ui/label";
-import { Input } from "@/app/_components/ui/input";
-import { Textarea } from "@/app/_components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/app/_components/ui/popover";
-import { Calendar } from "@/app/_components/ui/calendar";
+} from "@/shared/ui/dialog";
+import { Button } from "@/shared/ui/button";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { Calendar } from "@/shared/ui/calendar";
 import { CalendarIcon, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/ui/use-toast";
+import { cn } from "@/shared/utils/utils";
+import { toast } from "@/shared/hooks/use-toast";
 import { Location } from "@/types/domain";
 
 interface ProposalDialogProps {

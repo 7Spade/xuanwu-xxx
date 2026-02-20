@@ -10,12 +10,12 @@
 
 import { useCallback } from "react";
 import { useApp } from "@/hooks/state/use-app";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/shared/context/auth-context";
 import { 
-    assignMemberToScheduleItem,
-    unassignMemberFromScheduleItem,
-} from "@/infra/firebase/firestore/firestore.facade";
-import { toast } from "@/hooks/ui/use-toast";
+    assignMember as assignMemberAction,
+    unassignMember as unassignMemberAction,
+} from "@/actions/schedule";
+import { toast } from "@/shared/hooks/use-toast";
 import { ScheduleItem } from "@/types/domain";
 
 export function useScheduleActions() {
@@ -35,7 +35,7 @@ export function useScheduleActions() {
     }
 
     try {
-      await assignMemberToScheduleItem(item.accountId, item.id, memberId);
+      await assignMemberAction(item.accountId, item.id, memberId);
       toast({ title: "Member Assigned", description: "The schedule item has been updated." });
     } catch (error) {
       console.error("Failed to assign member:", error);
@@ -59,7 +59,7 @@ export function useScheduleActions() {
     }
 
     try {
-      await unassignMemberFromScheduleItem(item.accountId, item.id, memberId);
+      await unassignMemberAction(item.accountId, item.id, memberId);
       toast({ title: "Member Unassigned" });
     } catch (error) {
       console.error("Failed to unassign member:", error);

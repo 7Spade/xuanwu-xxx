@@ -9,12 +9,12 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/app/_components/ui/dialog"
-import { Button } from "@/app/_components/ui/button"
-import { Label } from "@/app/_components/ui/label"
-import { Input } from "@/app/_components/ui/input"
+} from "@/shared/ui/dialog"
+import { Button } from "@/shared/ui/button"
+import { Label } from "@/shared/ui/label"
+import { Input } from "@/shared/ui/input"
 import { Loader2 } from "lucide-react"
-import { toast } from "@/hooks/ui/use-toast"
+import { toast } from "@/shared/hooks/use-toast"
 import { Account } from "@/types/domain"
 
 interface AccountCreateDialogProps {

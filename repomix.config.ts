@@ -1,16 +1,15 @@
-import { defineConfig } from 'repomix';
-
 /**
- * Repomix Configuration (TypeScript)
+ * Repomix Configuration
  *
  * This is the primary configuration file for Repomix.
- * - repomix.config.json (DEPRECATED - removed)
- * - .repomixignore (DEPRECATED - removed)
+ * Note: repomix.config.ts is excluded from the app's tsconfig.json so that
+ * this file can freely use repomix types when repomix is installed locally,
+ * without breaking the application typecheck when it is not.
  *
- * All ignore patterns and configuration are now centralized here.
+ * All ignore patterns and configuration are centralized here.
  * Optimized for Copilot Browser Agent to reduce noise and improve context quality.
  */
-export default defineConfig({
+export default {
   $schema: 'https://repomix.com/schemas/latest/schema.json',
 
   input: {
@@ -174,10 +173,6 @@ export default defineConfig({
       'stylelint.config.mjs',
       'firebase.json',
 
-      // ==================== Deprecated Repomix Files ====================
-      'repomix.config.json', // Deprecated in favor of this TS file
-      '.repomixignore', // Deprecated - patterns moved here
-
       // ==================== Scripts & Tooling ====================
       'scripts/', // Build/deploy scripts (not core code)
 
@@ -209,4 +204,5 @@ export default defineConfig({
   tokenCount: {
     encoding: 'o200k_base', // OpenAI's encoding for GPT-4 and newer
   },
-});
+}
+

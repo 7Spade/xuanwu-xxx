@@ -4,8 +4,8 @@
 import { useMemo } from "react";
 import { useAccount } from "@/hooks/state/use-account";
 import { useApp } from "@/hooks/state/use-app";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/_components/ui/card";
-import { Progress } from "@/app/_components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Progress } from "@/shared/ui/progress";
 import { ShieldCheck, Activity, Layers, Zap } from "lucide-react";
 
 export function StatCards() {

@@ -2,9 +2,9 @@
 "use client";
 
 import { format } from "date-fns";
-import { Badge } from "@/app/_components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { AuditLog } from "@/types/domain";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 import { AuditTypeIcon } from "./audit-type-icon";
 import { AuditEventItemContainer } from "./audit-timeline";
 

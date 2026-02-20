@@ -29,13 +29,13 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarSeparator,
-} from "@/app/_components/ui/sidebar";
+} from "@/shared/ui/sidebar";
 
 // ============================================================================
 // Contexts & Hooks
 // ============================================================================
-import { useAuth } from "@/context/auth-context";
-import { useI18n } from "@/context/i18n-context";
+import { useAuth } from "@/shared/context/auth-context";
+import { useI18n } from "@/shared/context/i18n-context";
 import { useApp } from "@/hooks/state/use-app";
 import { useUser } from "@/hooks/state/use-user";
 import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";

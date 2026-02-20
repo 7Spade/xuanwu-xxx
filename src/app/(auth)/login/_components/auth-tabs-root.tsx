@@ -1,14 +1,14 @@
 
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/app/_components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
-import { Button } from "@/app/_components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/shared/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Button } from "@/shared/ui/button";
 import { Ghost, Loader2 } from "lucide-react";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { LanguageSwitcher } from "@/app/_components/language-switcher";
+import { LanguageSwitcher } from "@/shared/ui/language-switcher";
 
 interface AuthTabsRootProps {
   isLoading: boolean;

@@ -8,15 +8,15 @@
 
 import { useWorkspace } from "@/context/workspace-context";
 import { DailyLog } from "@/types/domain";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
+} from "@/shared/ui/dropdown-menu";
 import { Share2 } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 
 interface ShareButtonProps {
   log: DailyLog;

@@ -2,8 +2,8 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/app/_components/ui/button";
-import { Badge } from "@/app/_components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 import { 
   FileText, 
   UploadCloud, 
@@ -22,8 +22,8 @@ import {
   Download,
   Loader2
 } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
-import { useFirebase } from "@/context/firebase-context";
+import { toast } from "@/shared/hooks/use-toast";
+import { useFirebase } from "@/shared/context/firebase-context";
 import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useMemo, useState, useRef } from "react";
@@ -33,17 +33,17 @@ import {
   SheetDescription, 
   SheetHeader, 
   SheetTitle 
-} from "@/app/_components/ui/sheet";
-import { ScrollArea } from "@/app/_components/ui/scroll-area";
+} from "@/shared/ui/sheet";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/app/_components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/auth-context";
-import { formatBytes } from "@/lib/format";
+} from "@/shared/ui/dropdown-menu";
+import { cn } from "@/shared/utils/utils";
+import { useAuth } from "@/shared/context/auth-context";
+import { formatBytes } from "@/shared/utils/format-bytes";
 import type { WorkspaceFile, WorkspaceFileVersion } from "@/types/domain";
 import {
   Table,
@@ -52,7 +52,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/app/_components/ui/table";
+} from "@/shared/ui/table";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>

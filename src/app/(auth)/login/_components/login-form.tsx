@@ -1,11 +1,11 @@
 
 "use client";
 
-import { Button } from "@/app/_components/ui/button";
-import { Label } from "@/app/_components/ui/label";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/app/_components/ui/input-group";
+import { Button } from "@/shared/ui/button";
+import { Label } from "@/shared/ui/label";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/shared/ui/input-group";
 import { Mail, Lock, Loader2 } from "lucide-react";
-import { useI18n } from "@/context/i18n-context";
+import { useI18n } from "@/shared/context/i18n-context";
 
 interface LoginFormProps {
   email: string;

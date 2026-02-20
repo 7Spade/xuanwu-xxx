@@ -1,11 +1,11 @@
 
 "use client";
 
-import { toast } from "@/hooks/ui/use-toast";
+import { toast } from "@/shared/hooks/use-toast";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/auth-context";
-import { useI18n } from "@/context/i18n-context";
+import { useAuth } from "@/shared/context/auth-context";
+import { useI18n } from "@/shared/context/i18n-context";
 import { useUser } from "@/hooks/state/use-user";
 import { ExpertiseBadge } from "@/types/domain";
 

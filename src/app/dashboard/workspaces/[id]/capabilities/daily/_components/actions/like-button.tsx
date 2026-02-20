@@ -9,9 +9,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDailyActions } from '@/hooks/actions/use-daily-actions';
 import { DailyLog, Account } from "@/types/domain";
-import { Button } from "@/app/_components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { Heart } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
 
 interface LikeButtonProps {
   log: DailyLog;

@@ -1,10 +1,10 @@
 
 import { useCallback } from 'react';
 import { useApp } from '../state/use-app';
-import { 
-  uploadDailyPhoto as uploadDailyPhotoFacade,
-  uploadTaskAttachment as uploadTaskAttachmentFacade
-} from '@/infra/firebase/storage/storage.facade';
+import {
+  uploadDailyPhoto as uploadDailyPhotoAction,
+  uploadTaskAttachment as uploadTaskAttachmentAction,
+} from '@/actions/storage';
 
 /**
  * @fileoverview A hook for abstracting file storage operations.
@@ -25,8 +25,8 @@ export function useStorage(workspaceId: string) {
     if (!activeAccount || activeAccount.accountType !== 'organization') {
       throw new Error("Photo uploads are only supported in an organization context.");
     }
-    // Delegates the actual upload logic to the infrastructure facade.
-    return uploadDailyPhotoFacade(activeAccount.id, workspaceId, file);
+    // Delegates the actual upload logic to the actions layer.
+    return uploadDailyPhotoAction(activeAccount.id, workspaceId, file);
   }, [activeAccount, workspaceId]);
 
   /**
@@ -38,7 +38,7 @@ export function useStorage(workspaceId: string) {
     if (!workspaceId) {
       throw new Error("A workspace context is required to upload task attachments.");
     }
-    return uploadTaskAttachmentFacade(workspaceId, file);
+    return uploadTaskAttachmentAction(workspaceId, file);
   }, [workspaceId]);
 
   return { uploadDailyPhoto, uploadTaskAttachment };

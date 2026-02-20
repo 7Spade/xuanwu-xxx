@@ -2,15 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { MemberReference, ScheduleItem } from "@/types/domain"
-import { Avatar, AvatarFallback } from "@/app/_components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/app/_components/ui/tooltip"
+} from "@/shared/ui/tooltip"
 import { format } from "date-fns"
-import { Button } from "@/app/_components/ui/button"
+import { Button } from "@/shared/ui/button"
 import { ArrowUpDown } from "lucide-react"
 
 export type UpcomingEventItem = Pick<ScheduleItem, 'id' | 'title' | 'workspaceName' | 'startDate' | 'endDate' | 'assigneeIds'> & { members: MemberReference[] }
