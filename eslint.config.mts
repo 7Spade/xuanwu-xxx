@@ -53,12 +53,48 @@ export default tseslint.config(
   importRecommended,
   importTypescript,
 
+  // ── TypeScript quality rules ─────────────────────────────────────────────
+  // Enforce `import type` for type-only imports so runtime bundles stay lean
+  // and cross-layer type imports never create accidental runtime coupling.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      ],
+    },
+  },
+
   // ── One-way layer dependency rules ───────────────────────────────────────
   // Each config block covers one src/ layer and forbids imports from layers
   // that sit above it in the dependency hierarchy, preventing circular deps.
   // Architecture: domain-types → domain-rules/firebase/genkit-flows/shared
   //   → server-commands → react-hooks/react-providers → use-cases
   //   → view-modules → app
+
+  // ── "use client" protection ──────────────────────────────────────────────
+  // The five layers below are always server-side or framework-agnostic.
+  // A "use client" directive in any of them is a hard architectural mistake.
+  {
+    files: [
+      "src/domain-types/**/*.{ts,tsx}",
+      "src/domain-rules/**/*.{ts,tsx}",
+      "src/firebase/**/*.{ts,tsx}",
+      "src/genkit-flows/**/*.{ts,tsx}",
+      "src/server-commands/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ExpressionStatement > Literal[value='use client']",
+          message:
+            "This layer must never contain a 'use client' directive — it is server-side or framework-agnostic.",
+        },
+      ],
+    },
+  },
 
   // domain-types: foundation — zero internal dependencies
   {
@@ -154,7 +190,10 @@ export default tseslint.config(
     },
   },
 
-  // server-commands: server boundary — no React, no UI, no higher layers
+  // server-commands: server boundary — no React, no UI, no higher layers.
+  // CAN use: @/firebase, @/genkit-flows, @/domain-rules, @/domain-types,
+  //          @/shared/utils, @/shared/constants, @/shared/i18n-types.
+  // MUST NOT use React UI parts of shared or any higher layer.
   {
     files: ["src/server-commands/**/*.{ts,tsx}"],
     rules: {
@@ -165,10 +204,11 @@ export default tseslint.config(
             { group: ["react", "react/**", "react-dom", "react-dom/**"], message: "server-commands must not depend on React" },
             { group: ["@/react-hooks", "@/react-hooks/**"], message: "server-commands must not import from react-hooks" },
             { group: ["@/react-providers", "@/react-providers/**"], message: "server-commands must not import from react-providers" },
-            { group: ["@/shared", "@/shared/**"], message: "server-commands must not import from shared" },
+            { group: ["@/shared/shadcn-ui", "@/shared/shadcn-ui/**"], message: "server-commands must not import shadcn UI components" },
+            { group: ["@/shared/app-providers", "@/shared/app-providers/**"], message: "server-commands must not import React context providers" },
+            { group: ["@/shared/utility-hooks", "@/shared/utility-hooks/**"], message: "server-commands must not import React hooks from shared" },
             { group: ["@/use-cases", "@/use-cases/**"], message: "server-commands must not import from use-cases" },
             { group: ["@/view-modules", "@/view-modules/**"], message: "server-commands must not import from view-modules" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "server-commands must not import from genkit-flows" },
             { group: ["@/app", "@/app/**"], message: "server-commands must not import from app layer" },
           ],
         },
