@@ -1,5 +1,5 @@
-import { AuditCapabilityView } from "@/view-modules/audit/audit-view"
+import { WorkspaceAudit } from "../../plugins"
 
 export default function AuditCapabilityPage() {
-  return <AuditCapabilityView />
+  return <WorkspaceAudit />
 }
