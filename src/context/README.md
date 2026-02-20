@@ -47,7 +47,7 @@ import ... from '@/shared/context/...' // ✅ (FirebaseProvider, AuthProvider)
 ## Forbidden imports
 
 ```ts
-import ... from '@/ai/...'   // ❌
+import ... from '@/genkit-flows/...'   // ❌
 import ... from '@/app/...'  // ❌
 ```
 

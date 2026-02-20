@@ -16,7 +16,7 @@ Hooks act as a bridge between the UI and the lower-level layers.
 
 ### Disallowed Imports:
 - `import ... from '@/components/...'`
-- `import ... from '@/ai/...'`
+- `import ... from '@/genkit-flows/...'`
 - `import ... from '@/app/...'`
 
 A hook MUST NOT import a specific UI component. Its job is to provide logic *to* a component, not to depend on one.

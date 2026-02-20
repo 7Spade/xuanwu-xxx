@@ -20,7 +20,7 @@ This layer must remain independent of the application's UI and state management.
 - `import ... from '@/hooks/...'`
 - `import ... from '@/context/...'`
 - `import ... from '@/components/...'`
-- `import ... from '@/ai/...'`
+- `import ... from '@/genkit-flows/...'`
 - `import ... from '@/app/...'`
 
 The infrastructure layer knows nothing about React, hooks, or how the data it provides will be displayed.

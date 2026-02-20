@@ -49,7 +49,7 @@ import ... from '@/context/...'    // ❌
 import ... from '@/server-commands/...'    // ❌
 import ... from '@/components/...' // ❌
 import ... from '@/app/...'        // ❌
-import ... from '@/ai/...'         // ❌
+import ... from '@/genkit-flows/...'         // ❌
 ```
 
 ## Who depends on this layer

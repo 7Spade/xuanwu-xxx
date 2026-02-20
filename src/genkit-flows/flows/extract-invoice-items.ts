@@ -3,12 +3,12 @@
  * @fileOverview Extracts line items from an invoice or quote document.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/genkit-flows/genkit';
 import { z } from 'genkit';
 import {
   ExtractInvoiceItemsInputSchema,
   ExtractInvoiceItemsOutputSchema,
-} from '@/ai/schemas/docu-parse';
+} from '@/genkit-flows/schemas/docu-parse';
 
 export async function extractInvoiceItems(
   input: z.infer<typeof ExtractInvoiceItemsInputSchema>

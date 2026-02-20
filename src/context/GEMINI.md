@@ -23,7 +23,7 @@ This directory manages React context and application state. It acts as the prima
 
 ### Disallowed Imports:
 - `import ... from '@/components/...'`
-- `import ... from '@/ai/...'`
+- `import ... from '@/genkit-flows/...'`
 - `import ... from '@/app/...'`
 
 ## 3. Who Depends on This Layer?

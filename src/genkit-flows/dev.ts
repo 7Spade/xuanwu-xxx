@@ -2,5 +2,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/adapt-ui-color-to-account-context.ts';
-import '@/ai/flows/extract-invoice-items.ts';
+import '@/genkit-flows/flows/adapt-ui-color-to-account-context.ts';
+import '@/genkit-flows/flows/extract-invoice-items.ts';

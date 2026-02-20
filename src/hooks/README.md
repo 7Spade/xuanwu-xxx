@@ -44,7 +44,7 @@ import ... from '@/context/...'  // ✅
 
 ```ts
 import ... from '@/app/...'        // ❌
-import ... from '@/ai/...'         // ❌
+import ... from '@/genkit-flows/...'         // ❌
 ```
 
 ## Who depends on this layer

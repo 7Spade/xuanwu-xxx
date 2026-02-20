@@ -17,7 +17,7 @@ This layer is the foundation. It MUST NOT import from any other directory within
 - `import ... from '@/hooks/...'`
 - `import ... from '@/context/...'`
 - `import ... from '@/components/...'`
-- `import ... from '@/ai/...'`
+- `import ... from '@/genkit-flows/...'`
 - `import ... from '@/app/...'`
 
 ## 3. Who Depends on This Layer?

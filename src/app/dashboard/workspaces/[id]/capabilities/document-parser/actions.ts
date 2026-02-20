@@ -1,8 +1,8 @@
 'use server';
 
-import { extractInvoiceItems } from '@/ai/flows/extract-invoice-items';
+import { extractInvoiceItems } from '@/genkit-flows/flows/extract-invoice-items';
 import { z } from 'zod';
-import type { WorkItem } from '@/ai/schemas/docu-parse';
+import type { WorkItem } from '@/genkit-flows/schemas/docu-parse';
 
 const actionInputSchema = z.object({
   documentDataUri: z.string().startsWith('data:'),
