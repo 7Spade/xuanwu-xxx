@@ -5,7 +5,10 @@
  * or future Server Actions without any React dependencies.
  */
 
-import { toggleDailyLogLike } from "@/infra/firebase/firestore/firestore.facade"
+import {
+  toggleDailyLogLike,
+  addDailyLogComment as addDailyLogCommentFacade,
+} from "@/infra/firebase/firestore/firestore.facade"
 
 /**
  * Toggles a like on a daily log entry.
@@ -19,4 +22,20 @@ export async function toggleLike(
   userId: string
 ): Promise<void> {
   await toggleDailyLogLike(accountId, logId, userId)
+}
+
+/**
+ * Adds a comment to a daily log entry.
+ * @param orgId The ID of the organization that owns the log.
+ * @param logId The ID of the daily log entry.
+ * @param author The author information for the comment.
+ * @param content The text content of the comment.
+ */
+export async function addDailyLogComment(
+  orgId: string,
+  logId: string,
+  author: { uid: string; name: string; avatarUrl?: string },
+  content: string
+): Promise<void> {
+  await addDailyLogCommentFacade(orgId, logId, author, content)
 }

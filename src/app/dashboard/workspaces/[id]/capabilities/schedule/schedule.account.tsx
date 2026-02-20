@@ -17,7 +17,7 @@ import { useGlobalSchedule } from "./_hooks/use-global-schedule";
 import { decisionHistoryColumns } from "./_components/decision-history-columns";
 import { upcomingEventsColumns } from "./_components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
-import { updateScheduleItemStatus } from "@/infra/firebase/firestore/firestore.facade";
+import { updateScheduleItemStatus } from "@/actions/schedule.actions";
 import {
   DropdownMenu,
   DropdownMenuContent,

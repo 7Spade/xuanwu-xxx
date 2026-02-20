@@ -12,21 +12,27 @@ import { useFirebase } from '@/context/firebase-context';
 import { Loader2 } from 'lucide-react';
 import { WorkspaceEventHandler } from '@/app/dashboard/workspaces/[id]/_events/workspace-event-handler';
 import { 
-  createTask as createTaskFacade,
-  updateTask as updateTaskFacade,
-  deleteTask as deleteTaskFacade,
-  authorizeWorkspaceTeam as authorizeWorkspaceTeamFacade,
-  revokeWorkspaceTeam as revokeWorkspaceTeamFacade,
-  grantIndividualWorkspaceAccess as grantIndividualWorkspaceAccessFacade,
-  revokeIndividualWorkspaceAccess as revokeIndividualWorkspaceAccessFacade,
-  mountCapabilities as mountCapabilitiesFacade,
-  unmountCapability as unmountCapabilityFacade,
-  updateWorkspaceSettings as updateWorkspaceSettingsFacade,
-  deleteWorkspace as deleteWorkspaceFacade,
-  createIssue as createIssueFacade,
-  addCommentToIssue as addCommentToIssueFacade,
-  createScheduleItem as createScheduleItemFacade,
-} from '@/infra/firebase/firestore/firestore.facade';
+  createTask as createTaskAction,
+  updateTask as updateTaskAction,
+  deleteTask as deleteTaskAction,
+} from '@/actions/task.actions'
+import {
+  authorizeWorkspaceTeam as authorizeWorkspaceTeamAction,
+  revokeWorkspaceTeam as revokeWorkspaceTeamAction,
+  grantIndividualWorkspaceAccess as grantIndividualWorkspaceAccessAction,
+  revokeIndividualWorkspaceAccess as revokeIndividualWorkspaceAccessAction,
+  mountCapabilities as mountCapabilitiesAction,
+  unmountCapability as unmountCapabilityAction,
+  updateWorkspaceSettings as updateWorkspaceSettingsAction,
+  deleteWorkspace as deleteWorkspaceAction,
+} from '@/actions/workspace.actions'
+import {
+  createIssue as createIssueAction,
+  addCommentToIssue as addCommentToIssueAction,
+} from '@/actions/issue.actions'
+import {
+  createScheduleItem as createScheduleItemAction,
+} from '@/actions/schedule.actions'
 
 
 interface WorkspaceContextType {
@@ -79,25 +85,25 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     logAudit(action, detail, type);
   }, [logAudit]);
 
-  const createTask = useCallback(async (task: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>) => createTaskFacade(workspaceId, task), [workspaceId]);
-  const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => updateTaskFacade(workspaceId, taskId, updates), [workspaceId]);
-  const deleteTask = useCallback(async (taskId: string) => deleteTaskFacade(workspaceId, taskId), [workspaceId]);
+  const createTask = useCallback(async (task: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>) => createTaskAction(workspaceId, task), [workspaceId]);
+  const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => updateTaskAction(workspaceId, taskId, updates), [workspaceId]);
+  const deleteTask = useCallback(async (taskId: string) => deleteTaskAction(workspaceId, taskId), [workspaceId]);
   
-  const authorizeWorkspaceTeam = useCallback(async (teamId: string) => authorizeWorkspaceTeamFacade(workspaceId, teamId), [workspaceId]);
-  const revokeWorkspaceTeam = useCallback(async (teamId: string) => revokeWorkspaceTeamFacade(workspaceId, teamId), [workspaceId]);
-  const grantIndividualWorkspaceAccess = useCallback(async (userId: string, role: WorkspaceRole, protocol?: string) => grantIndividualWorkspaceAccessFacade(workspaceId, userId, role, protocol), [workspaceId]);
-  const revokeIndividualWorkspaceAccess = useCallback(async (grantId: string) => revokeIndividualWorkspaceAccessFacade(workspaceId, grantId), [workspaceId]);
+  const authorizeWorkspaceTeam = useCallback(async (teamId: string) => authorizeWorkspaceTeamAction(workspaceId, teamId), [workspaceId]);
+  const revokeWorkspaceTeam = useCallback(async (teamId: string) => revokeWorkspaceTeamAction(workspaceId, teamId), [workspaceId]);
+  const grantIndividualWorkspaceAccess = useCallback(async (userId: string, role: WorkspaceRole, protocol?: string) => grantIndividualWorkspaceAccessAction(workspaceId, userId, role, protocol), [workspaceId]);
+  const revokeIndividualWorkspaceAccess = useCallback(async (grantId: string) => revokeIndividualWorkspaceAccessAction(workspaceId, grantId), [workspaceId]);
   
-  const mountCapabilities = useCallback(async (capabilities: Capability[]) => mountCapabilitiesFacade(workspaceId, capabilities), [workspaceId]);
-  const unmountCapability = useCallback(async (capability: Capability) => unmountCapabilityFacade(workspaceId, capability), [workspaceId]);
+  const mountCapabilities = useCallback(async (capabilities: Capability[]) => mountCapabilitiesAction(workspaceId, capabilities), [workspaceId]);
+  const unmountCapability = useCallback(async (capability: Capability) => unmountCapabilityAction(workspaceId, capability), [workspaceId]);
   
-  const updateWorkspaceSettings = useCallback(async (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState }) => updateWorkspaceSettingsFacade(workspaceId, settings), [workspaceId]);
-  const deleteWorkspace = useCallback(async () => deleteWorkspaceFacade(workspaceId), [workspaceId]);
+  const updateWorkspaceSettings = useCallback(async (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState }) => updateWorkspaceSettingsAction(workspaceId, settings), [workspaceId]);
+  const deleteWorkspace = useCallback(async () => deleteWorkspaceAction(workspaceId), [workspaceId]);
 
-  const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => createIssueFacade(workspaceId, title, type, priority), [workspaceId]);
-  const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueFacade(workspaceId, issueId, author, content), [workspaceId]);
+  const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => createIssueAction(workspaceId, title, type, priority), [workspaceId]);
+  const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
 
-  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemFacade(itemData), []);
+  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
 
 
   if (!workspace || !db) {

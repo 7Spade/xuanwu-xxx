@@ -6,9 +6,9 @@ import { onSnapshot, doc } from 'firebase/firestore'
 import { useAuth } from '@/context/auth-context'
 import { useFirebase } from '@/context/firebase-context'
 import {
-  updateUserProfile,
-  getUserProfile,
-} from '@/infra/firebase/firestore/firestore.facade'
+  updateUserProfile as updateUserProfileAction,
+  getUserProfile as getUserProfileAction,
+} from '@/actions/user.actions'
 import { uploadProfilePicture } from '@/infra/firebase/storage/storage.facade'
 import type { Account } from '@/types/domain'
 
@@ -38,7 +38,7 @@ export function useUser() {
         setProfile({ id: doc.id, ...doc.data() } as Account)
       } else {
         // If profile doesn't exist, create a default one.
-        getUserProfile(user.id).then(setProfile)
+        getUserProfileAction(user.id).then(setProfile)
       }
       setLoading(false)
     })
@@ -50,7 +50,7 @@ export function useUser() {
   const updateProfile = useCallback(
     async (data: Partial<Omit<Account, 'id'>>) => {
       if (!user) throw new Error('User not authenticated.')
-      await updateUserProfile(user.id, data)
+      await updateUserProfileAction(user.id, data)
     },
     [user]
   )

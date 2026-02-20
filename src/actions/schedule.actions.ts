@@ -8,7 +8,10 @@
 import {
   assignMemberToScheduleItem,
   unassignMemberFromScheduleItem,
+  createScheduleItem as createScheduleItemFacade,
+  updateScheduleItemStatus as updateScheduleItemStatusFacade,
 } from "@/infra/firebase/firestore/firestore.facade"
+import type { ScheduleItem } from "@/types/domain"
 
 /**
  * Assigns a member to a schedule item.
@@ -36,4 +39,29 @@ export async function unassignMember(
   memberId: string
 ): Promise<void> {
   await unassignMemberFromScheduleItem(accountId, itemId, memberId)
+}
+
+/**
+ * Creates a new schedule item in the account's schedule sub-collection.
+ * @param itemData The data for the new schedule item (without id, createdAt, updatedAt).
+ * @returns The ID of the newly created schedule item.
+ */
+export async function createScheduleItem(
+  itemData: Omit<ScheduleItem, "id" | "createdAt" | "updatedAt">
+): Promise<string> {
+  return createScheduleItemFacade(itemData)
+}
+
+/**
+ * Updates the approval status of a schedule item.
+ * @param orgId The ID of the organization that owns the schedule item.
+ * @param itemId The ID of the schedule item.
+ * @param newStatus The new status to set ('OFFICIAL' or 'REJECTED').
+ */
+export async function updateScheduleItemStatus(
+  orgId: string,
+  itemId: string,
+  newStatus: "OFFICIAL" | "REJECTED"
+): Promise<void> {
+  return updateScheduleItemStatusFacade(orgId, itemId, newStatus)
 }
