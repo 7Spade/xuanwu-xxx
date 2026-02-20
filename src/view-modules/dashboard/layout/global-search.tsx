@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -13,6 +12,7 @@ import { Badge } from "@/shared/shadcn-ui/badge";
 import { Globe, Layers, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Account, Workspace, MemberReference } from "@/domain-types/domain";
+import { ROUTES } from "@/shared/constants/routes";
 
 interface GlobalSearchProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export function GlobalSearch({
         </CommandGroup>
         <CommandGroup heading="Spaces">
           {workspaces.map((ws) => (
-            <CommandItem key={ws.id} onSelect={() => handleSelect(() => router.push(`/dashboard/workspaces/${ws.id}`))}>
+            <CommandItem key={ws.id} onSelect={() => handleSelect(() => router.push(`${ROUTES.WORKSPACES}/${ws.id}`))}>
               <Layers className="mr-2 h-4 w-4 text-primary" />
               <span>{ws.name}</span>
               <span className="text-[9px] text-muted-foreground font-mono ml-auto">{ws.id.toUpperCase()}</span>
@@ -65,7 +65,7 @@ export function GlobalSearch({
         </CommandGroup>
         <CommandGroup heading="People">
           {members.map((member) => (
-            <CommandItem key={member.id} onSelect={() => handleSelect(() => router.push('/dashboard/account/members'))}>
+            <CommandItem key={member.id} onSelect={() => handleSelect(() => router.push(ROUTES.ACCOUNT_MEMBERS))}>
               <User className="mr-2 h-4 w-4 text-primary" />
               <span>{member.name}</span>
               <span className="text-[9px] text-muted-foreground ml-auto">{member.email}</span>

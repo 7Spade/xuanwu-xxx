@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -17,6 +16,7 @@ import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import { Account } from "@/domain-types/domain"
 import { cn } from "@/shared/utils/utils"
 import Link from "next/link"
+import { ROUTES } from "@/shared/constants/routes"
 
 interface AccountSwitcherProps {
   user: Account | null
@@ -84,7 +84,7 @@ export function AccountSwitcher({
 
   return (
     <>
-      <Link href="/dashboard" className="flex items-center mb-4 px-1 hover:opacity-80 transition-opacity">
+      <Link href={ROUTES.DASHBOARD} className="flex items-center mb-4 px-1 hover:opacity-80 transition-opacity">
         <div className="text-3xl select-none">🐢</div>
       </Link>
       
@@ -120,7 +120,7 @@ export function AccountSwitcher({
             className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
             onSelect={() => {
               setIsDropdownOpen(false)
-              router.push("/dashboard/account/new")
+              router.push(ROUTES.ACCOUNT_NEW)
             }}
           >
             <Plus className="w-4 h-4" /> {t('sidebar.createNewDimension')}

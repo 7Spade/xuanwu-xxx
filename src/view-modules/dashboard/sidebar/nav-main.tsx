@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -29,6 +28,7 @@ import {
   History
 } from "lucide-react";
 import { cn } from "@/shared/utils/utils";
+import { ROUTES } from "@/shared/constants/routes";
 
 interface NavMainProps {
   pathname: string;
@@ -44,8 +44,8 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive("/dashboard")}>
-          <Link href="/dashboard">
+        <SidebarMenuButton asChild isActive={isActive(ROUTES.DASHBOARD)}>
+          <Link href={ROUTES.DASHBOARD}>
             <LayoutDashboard />
             <span className="font-semibold">{t("navigation.dashboard")}</span>
           </Link>
@@ -53,8 +53,8 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
       </SidebarMenuItem>
 
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isPartiallyActive("/dashboard/workspaces")}>
-          <Link href="/dashboard/workspaces">
+        <SidebarMenuButton asChild isActive={isPartiallyActive(ROUTES.WORKSPACES)}>
+          <Link href={ROUTES.WORKSPACES}>
             <Layers />
             <span className="font-semibold">{t("navigation.workspaces")}</span>
           </Link>
@@ -74,14 +74,14 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
             <CollapsibleContent>
               <SidebarMenuSub>
                 {[
-                  { path: "/dashboard/account/members", icon: Users, label: t('navigation.members') },
-                  { path: "/dashboard/account/teams", icon: Users, label: t('navigation.internalTeams') },
-                  { path: "/dashboard/account/partners", icon: Globe, label: t('navigation.partnerTeams') },
-                  { path: "/dashboard/account/settings", icon: Settings, label: t('navigation.settings') },
-                  { path: "/dashboard/account/matrix", icon: Grid3X3, label: t('navigation.permissions') },
-                  { path: "/dashboard/account/schedule", icon: Calendar, label: t('navigation.schedule') },
-                  { path: "/dashboard/account/daily", icon: MessageSquare, label: t('navigation.daily') },
-                  { path: "/dashboard/account/audit", icon: History, label: t('navigation.audit') },
+                  { path: ROUTES.ACCOUNT_MEMBERS, icon: Users, label: t('navigation.members') },
+                  { path: ROUTES.ACCOUNT_TEAMS, icon: Users, label: t('navigation.internalTeams') },
+                  { path: ROUTES.ACCOUNT_PARTNERS, icon: Globe, label: t('navigation.partnerTeams') },
+                  { path: ROUTES.ACCOUNT_SETTINGS, icon: Settings, label: t('navigation.settings') },
+                  { path: ROUTES.ACCOUNT_MATRIX, icon: Grid3X3, label: t('navigation.permissions') },
+                  { path: ROUTES.ACCOUNT_SCHEDULE, icon: Calendar, label: t('navigation.schedule') },
+                  { path: ROUTES.ACCOUNT_DAILY, icon: MessageSquare, label: t('navigation.daily') },
+                  { path: ROUTES.ACCOUNT_AUDIT, icon: History, label: t('navigation.audit') },
                 ].map((item) => (
                   <SidebarMenuSubItem key={item.path}>
                     <SidebarMenuSubButton asChild isActive={isPartiallyActive(item.path)}>

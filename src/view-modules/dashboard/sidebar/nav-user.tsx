@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -16,6 +15,7 @@ import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/shared/shadcn
 import { UserCircle, LogOut, ChevronUp } from "lucide-react"
 import { Account } from "@/domain-types/domain"
 import { useMemo } from "react"
+import { ROUTES } from "@/shared/constants/routes"
 
 interface NavUserProps {
   user: Account | null
@@ -32,7 +32,7 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
 
   const handleLogout = () => {
     logout()
-    router.push("/login")
+    router.push(ROUTES.LOGIN)
   }
 
   const activeOrg = useMemo(() =>
@@ -74,7 +74,7 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/dashboard/account/settings" className="cursor-pointer flex items-center gap-2 py-2">
+              <Link href={ROUTES.ACCOUNT_SETTINGS} className="cursor-pointer flex items-center gap-2 py-2">
                 <UserCircle className="w-4 h-4 text-muted-foreground" />
                 <span className="text-xs font-medium">{t('sidebar.userSettings')}</span>
               </Link>
