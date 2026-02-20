@@ -5,7 +5,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
-import { useState, ReactNode, use } from "react";
+import { useState, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/react-providers/workspace-provider"
 import { useWorkspaceEventHandler } from "./_event-handlers/workspace-event-handler"
 import {
@@ -15,29 +15,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
-import { WorkspaceStatusBar } from "./_route-components/workspace-status-bar";
-import { WorkspaceNavTabs } from "./_route-components/workspace-nav-tabs";
-import { handleDeleteWorkspace } from "../_route-utils/workspace-actions";
-
-interface PageHeaderProps {
-  title: string;
-  description?: string;
-  children?: React.ReactNode;
-}
-
-function PageHeader({ title, description, children }: PageHeaderProps) {
-  return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div className="space-y-1">
-        <h1 className="text-4xl font-bold tracking-tight font-headline">
-          {title}
-        </h1>
-        {description && <p className="text-muted-foreground">{description}</p>}
-      </div>
-      <div className="flex items-center gap-2">{children}</div>
-    </div>
-  );
-}
+import { WorkspaceStatusBar } from "@/view-modules/workspaces/workspace-status-bar";
+import { WorkspaceNavTabs } from "@/view-modules/workspaces/workspace-nav-tabs";
+import { handleDeleteWorkspace } from "@/use-cases/workspace/workspace-actions";
+import { PageHeader } from "@/shared/shadcn-ui/page-header";
 
 /**
  * WorkspaceLayoutInner - The actual UI layout component.

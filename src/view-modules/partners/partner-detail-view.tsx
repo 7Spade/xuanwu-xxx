@@ -13,7 +13,7 @@ import {
   ShieldCheck,
   SendHorizontal
 } from "lucide-react"
-import { useState, useEffect, useMemo, ReactNode } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import type { PartnerInvite, MemberReference } from "@/domain-types/domain"
 import { 
@@ -31,28 +31,7 @@ import { useApp } from "@/react-hooks/state-hooks/use-app"
 import { useAccount } from "@/react-hooks/state-hooks/use-account"
 import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management"
 import type { Team } from "@/domain-types/domain"
-
-interface PageHeaderProps {
-  title: string
-  description?: string
-  children?: ReactNode
-  badge?: ReactNode
-}
-
-function PageHeader({ title, description, children, badge }: PageHeaderProps) {
-  return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div className="space-y-1">
-        {badge && <div className="mb-2">{badge}</div>}
-        <h1 className="text-4xl font-bold tracking-tight font-headline">{title}</h1>
-        {description && <p className="text-muted-foreground">{description}</p>}
-      </div>
-      <div className="flex items-center gap-2">
-        {children}
-      </div>
-    </div>
-  )
-}
+import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 /**
  * PartnerDetailView - Manages recruitment and identity governance within a specific partner team.

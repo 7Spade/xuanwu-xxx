@@ -20,9 +20,9 @@ import { Loader2 } from "lucide-react";
 // Internal Dependencies - Components & Layout
 // ============================================================================
 import { SidebarProvider, SidebarInset } from "@/shared/shadcn-ui/sidebar";
-import { DashboardSidebar } from "@/app/dashboard/_route-components/sidebar";
-import { Header } from "@/app/dashboard/_route-components/layout/header";
-import { ThemeAdapter } from "@/app/dashboard/_route-components/layout/theme-adapter";
+import { DashboardSidebar } from "@/view-modules/dashboard/sidebar";
+import { Header } from "@/view-modules/dashboard/layout/header";
+import { ThemeAdapter } from "@/view-modules/dashboard/layout/theme-adapter";
 
 // ============================================================================
 // Internal Dependencies - Contexts & Providers

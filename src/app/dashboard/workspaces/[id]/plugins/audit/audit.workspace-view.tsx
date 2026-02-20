@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/car
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import { AuditTypeIcon } from "./_plugin-components/audit-type-icon";
 import { AuditDetailSheet } from "./_plugin-components/audit-detail-sheet";
-import { useWorkspaceAudit } from "./_plugin-hooks/use-workspace-audit";
+import { useWorkspaceAudit } from "@/react-hooks/state-hooks/use-workspace-audit";
 
 export function WorkspaceAudit() {
   const { localAuditLogs, selectedLog, setSelectedLog, clearSelection } = useWorkspaceAudit();

@@ -2,7 +2,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { CreateWorkspaceDialog } from "../../_route-components/create-workspace-dialog"
+import { CreateWorkspaceDialog } from "@/view-modules/workspaces/create-workspace-dialog"
 
 export default function NewWorkspaceModalPage() {
   const router = useRouter()

@@ -2,37 +2,19 @@
 // Extracted from app/dashboard/page.tsx to follow the features/ view pattern.
 "use client"
 
-import { useEffect, useMemo, useState, ReactNode } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { User as UserIcon } from "lucide-react"
 import { Badge } from "@/shared/shadcn-ui/badge"
 import { useAuth } from "@/shared/app-providers/auth-provider"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { useApp } from "@/react-hooks/state-hooks/use-app"
 import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces"
-import { StatCards } from "@/app/dashboard/_route-components/overview/stat-cards"
-import { AccountGrid } from "@/app/dashboard/_route-components/overview/account-grid"
-import { WorkspaceList } from "@/app/dashboard/_route-components/overview/workspace-list"
-import { PermissionTree } from "@/app/dashboard/_route-components/overview/permission-tree"
+import { StatCards } from "./stat-cards"
+import { AccountGrid } from "./account-grid"
+import { WorkspaceList } from "./workspace-list"
+import { PermissionTree } from "./permission-tree"
+import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
-interface PageHeaderProps {
-  title: string
-  description?: string
-  children?: ReactNode
-  badge?: ReactNode
-}
-
-function PageHeader({ title, description, children, badge }: PageHeaderProps) {
-  return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div className="space-y-1">
-        {badge && <div className="mb-2">{badge}</div>}
-        <h1 className="text-4xl font-bold tracking-tight font-headline">{title}</h1>
-        {description && <p className="text-muted-foreground">{description}</p>}
-      </div>
-      <div className="flex items-center gap-2">{children}</div>
-    </div>
-  )
-}
 
 /**
  * DashboardView — The "smart" dashboard overview container.

@@ -54,8 +54,8 @@ import {
 } from '@/shared/shadcn-ui/dropdown-menu';
 import { Progress } from '@/shared/shadcn-ui/progress';
 import { cn } from '@/shared/utils/utils';
-import { buildTaskTree } from './tasks-plugin.logic';
-import type { TaskWithChildren } from './tasks-plugin.types';
+import { buildTaskTree } from '@/domain-rules/task';
+import type { TaskWithChildren } from '@/domain-types/domain';
 import { useStorage } from '@/react-hooks/service-hooks/use-storage';
 import Image from "next/image";
 

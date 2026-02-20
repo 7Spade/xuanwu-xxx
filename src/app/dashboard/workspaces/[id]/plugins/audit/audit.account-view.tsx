@@ -5,7 +5,7 @@ import { AlertCircle, Terminal } from "lucide-react";
 import { AuditTimeline } from "./_plugin-components/audit-timeline";
 import { AuditEventItem } from "./_plugin-components/audit-event-item";
 import { AuditDetailSheet } from "./_plugin-components/audit-detail-sheet";
-import { useAccountAudit } from "./_plugin-hooks/use-account-audit";
+import { useAccountAudit } from "@/react-hooks/state-hooks/use-account-audit";
 
 export function AccountAuditComponent() {
   const { logs, isOrgContext, selectedLog, setSelectedLog, clearSelection } = useAccountAudit();
