@@ -1,9 +1,8 @@
 /**
  * @fileoverview Account Repository.
  *
- * This file contains all Firestore write operations related to the 'accounts'
- * collection and its associated data. It encapsulates the direct interactions
- * with the Firebase SDK for creating and managing accounts (both user and organization types), teams, and members.
+ * Firestore write operations for the `accounts` collection — organization and
+ * user account management, teams, and member roster operations.
  */
 
 import {
@@ -13,12 +12,6 @@ import {
   doc,
   getDoc,
   deleteDoc,
-  runTransaction,
-  increment,
-  collection,
-  writeBatch,
-  updateDoc,
-  setDoc,
 } from 'firebase/firestore'
 import { db } from '../firestore.client'
 import { updateDocument, addDocument, setDocument } from '../firestore.write.adapter'
@@ -27,10 +20,7 @@ import type {
   MemberReference,
   Team,
   ThemeConfig,
-  ScheduleItem,
-  DailyLog,
-  DailyLogComment,
-} from '@/domain-types/domain'
+} from '@/domain-types/account'
 
 /**
  * Creates a user account in the accounts collection.
@@ -138,166 +128,4 @@ export const updateOrganizationSettings = async (orgId: string, settings: { name
 export const deleteOrganization = async (orgId: string): Promise<void> => {
     // In a real app, this should trigger a Cloud Function to delete all subcollections and associated data.
     return deleteDoc(doc(db, 'accounts', orgId))
-}
-
-export const createScheduleItem = async (
-  itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<string> => {
-  const dataWithTimestamp = {
-    ...itemData,
-    assigneeIds: itemData.assigneeIds || [],
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  }
-  const docRef = await addDocument(
-    `accounts/${itemData.accountId}/schedule_items`,
-    dataWithTimestamp
-  )
-  return docRef.id
-}
-
-export const updateScheduleItemStatus = async (
-  orgId: string,
-  itemId: string,
-  newStatus: 'OFFICIAL' | 'REJECTED'
-): Promise<void> => {
-  const itemRef = doc(db, `accounts/${orgId}/schedule_items`, itemId)
-  return updateDoc(itemRef, { status: newStatus, updatedAt: serverTimestamp() })
-}
-
-
-export const assignMemberToScheduleItem = async (
-  accountId: string,
-  itemId: string,
-  memberId: string
-): Promise<void> => {
-  return updateDocument(`accounts/${accountId}/schedule_items/${itemId}`, { assigneeIds: arrayUnion(memberId) })
-}
-
-export const unassignMemberFromScheduleItem = async (
-  accountId: string,
-  itemId: string,
-  memberId: string
-): Promise<void> => {
-  return updateDocument(`accounts/${accountId}/schedule_items/${itemId}`, { assigneeIds: arrayRemove(memberId) })
-}
-
-export const toggleDailyLogLike = async (orgId: string, logId: string, userId: string): Promise<void> => {
-  const logRef = doc(db, `accounts/${orgId}/dailyLogs`, logId)
-
-  await runTransaction(db, async (transaction) => {
-    const logDoc = await transaction.get(logRef)
-    if (!logDoc.exists()) {
-      throw "Document does not exist!"
-    }
-
-    const logData = logDoc.data() as DailyLog
-    const likes = logData.likes || []
-    let newLikes
-    let newLikeCount
-
-    if (likes.includes(userId)) {
-      newLikes = arrayRemove(userId)
-      newLikeCount = increment(-1)
-    } else {
-      newLikes = arrayUnion(userId)
-      newLikeCount = increment(1)
-    }
-
-    transaction.update(logRef, {
-      likes: newLikes,
-      likeCount: newLikeCount,
-    })
-  })
-}
-
-export const addDailyLogComment = async (
-    orgId: string, 
-    logId: string, 
-    author: { uid: string; name: string; avatarUrl?: string }, 
-    content: string
-): Promise<void> => {
-    const logRef = doc(db, `accounts/${orgId}/dailyLogs`, logId)
-    const commentRef = doc(collection(db, `accounts/${orgId}/dailyLogs/${logId}/comments`))
-
-    const newComment: Omit<DailyLogComment, 'id' | 'createdAt'> & { createdAt: any } = {
-        author,
-        content,
-        createdAt: serverTimestamp(),
-    }
-
-    const batch = writeBatch(db)
-    batch.set(commentRef, newComment)
-    batch.update(logRef, { commentCount: increment(1) })
-
-    await batch.commit()
-}
-
-// =================================================================
-// == User Profile Functions (merged from user.repository.ts)
-// =================================================================
-
-/**
- * Fetches a user's profile from Firestore.
- * @param userId The ID of the user whose profile is to be fetched.
- * @returns A promise that resolves to the Account object or null if not found.
- */
-export const getUserProfile = async (
-  userId: string
-): Promise<Account | null> => {
-  const docRef = doc(db, 'accounts', userId)
-  const docSnap = await getDoc(docRef)
-
-  if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() } as Account
-  } else {
-    // Optionally create a default profile if it doesn't exist
-    const defaultProfile: Omit<Account, 'id'> = {
-      name: '',
-      accountType: 'user',
-      bio: '',
-      photoURL: '',
-      achievements: [],
-      expertiseBadges: [],
-    }
-    await setDocument(`accounts/${userId}`, defaultProfile)
-    return { id: userId, ...defaultProfile }
-  }
-}
-
-/**
- * Updates a user's profile in Firestore.
- * @param userId The ID of the user whose profile is to be updated.
- * @param data A partial Account object with the fields to update.
- */
-export const updateUserProfile = async (
-  userId: string,
-  data: Partial<Account>
-): Promise<void> => {
-  // We use set with merge:true to handle both creation and update gracefully.
-  const docRef = doc(db, 'accounts', userId)
-  return setDoc(docRef, data, { merge: true })
-}
-
-
-/**
- * Adds a log to a user's bookmarks.
- * @param userId The ID of the user.
- * @param logId The ID of the daily log to bookmark.
- */
-export const addBookmark = async (userId: string, logId: string): Promise<void> => {
-    // We create an empty document where the ID is the logId for easy lookup.
-    const bookmarkRef = doc(db, `accounts/${userId}/bookmarks`, logId)
-    await setDoc(bookmarkRef, {})
-}
-
-
-/**
- * Removes a log from a user's bookmarks.
- * @param userId The ID of the user.
- * @param logId The ID of the daily log to unbookmark.
- */
-export const removeBookmark = async (userId: string, logId: string): Promise<void> => {
-    const bookmarkRef = doc(db, `accounts/${userId}/bookmarks`, logId)
-    await deleteDoc(bookmarkRef)
 }
