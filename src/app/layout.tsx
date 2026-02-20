@@ -1,7 +1,7 @@
 
 import type {Metadata} from 'next';
 import '../styles/globals.css';
-import {Toaster} from '@/shared/ui/toaster';
+import {Toaster} from '@/shared/shadcn-ui/toaster';
 import { Inter } from 'next/font/google';
 import { cn } from '@/shared/utils/utils';
 import { ThemeProvider } from '@/shared/context/theme-context';

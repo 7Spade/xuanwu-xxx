@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
-import { Button } from "@/shared/ui/button";
+} from "@/shared/shadcn-ui/dropdown-menu";
+import { Button } from "@/shared/shadcn-ui/button";
 import { UserPlus, Calendar, ListChecks, History } from "lucide-react";
 import { useScheduleActions } from "@/hooks/actions/use-schedule-actions";
 

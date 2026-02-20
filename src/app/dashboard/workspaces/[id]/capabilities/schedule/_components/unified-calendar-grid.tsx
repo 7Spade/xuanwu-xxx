@@ -3,15 +3,15 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { MemberReference, ScheduleItem } from "@/types/domain";
-import { Button } from "@/shared/ui/button";
-import { ScrollArea } from "@/shared/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Button } from "@/shared/shadcn-ui/button";
+import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/shared/ui/tooltip";
+} from "@/shared/shadcn-ui/tooltip";
 import { cn } from "@/shared/utils/utils";
 import { format, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, addMonths, subMonths } from "date-fns";
 import { Plus, Check, X, Layers, ChevronLeft, ChevronRight } from "lucide-react";

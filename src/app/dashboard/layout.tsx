@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 // ============================================================================
 // Internal Dependencies - Components & Layout
 // ============================================================================
-import { SidebarProvider, SidebarInset } from "@/shared/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/shared/shadcn-ui/sidebar";
 import { DashboardSidebar } from "@/app/dashboard/_components/sidebar";
 import { Header } from "@/app/dashboard/_components/layout/header";
 import { ThemeAdapter } from "@/app/dashboard/_components/layout/theme-adapter";
@@ -36,13 +36,14 @@ import { AccountProvider } from "@/context/account-context";
 
 type DashboardLayoutProps = {
   children: ReactNode;
+  modal?: ReactNode;
 };
 
 // ============================================================================
 // Component: DashboardLayoutClient
 // Responsibility: Renders the authenticated layout shell.
 // ============================================================================
-function DashboardLayoutClient({ children }: DashboardLayoutProps) {
+function DashboardLayoutClient({ children, modal }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <DashboardSidebar />
@@ -54,6 +55,7 @@ function DashboardLayoutClient({ children }: DashboardLayoutProps) {
             </main>
         </ThemeAdapter>
       </SidebarInset>
+      {modal}
     </SidebarProvider>
   );
 }
@@ -62,7 +64,7 @@ function DashboardLayoutClient({ children }: DashboardLayoutProps) {
 // Component: DashboardLayout (Default Export)
 // Responsibility: Auth guard and provider setup for the entire dashboard.
 // ============================================================================
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, modal }: DashboardLayoutProps) {
   const { state } = useAuth();
   const { user, authInitialized } = state;
   const router = useRouter();
@@ -86,7 +88,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <AccountProvider>
-      <DashboardLayoutClient>{children}</DashboardLayoutClient>
+      <DashboardLayoutClient modal={modal}>{children}</DashboardLayoutClient>
     </AccountProvider>
   );
 }

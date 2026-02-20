@@ -50,7 +50,7 @@ import ... from '@/lib/...'    // ✅ pure utilities
 
 ```ts
 import ... from '@/infra/...'    // ❌ no Firebase
-import ... from '@/actions/...'  // ❌ no orchestration
+import ... from '@/server-commands/...'  // ❌ no orchestration
 import ... from '@/hooks/...'    // ❌ no React
 import ... from '@/context/...'  // ❌ no React
 import ... from 'react'          // ❌ no React

@@ -3,7 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
 import { useWorkspaceSchedule } from "./_hooks/use-workspace-schedule";
 import { useWorkspace } from "@/context/workspace-context";

@@ -3,7 +3,7 @@
 
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/shadcn-ui/sheet"
 import { useWorkspace } from "@/context/workspace-context"
 import { useAccount } from "@/hooks/state/use-account"
 import { GovernanceSidebar } from "../../capabilities/schedule/_components/governance-sidebar"

@@ -1,9 +1,9 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card"
-import { Badge } from "@/shared/ui/badge"
-import { Button } from "@/shared/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/shadcn-ui/card"
+import { Badge } from "@/shared/shadcn-ui/badge"
+import { Button } from "@/shared/shadcn-ui/button"
 import { 
   ArrowLeft, 
   MailPlus, 
@@ -23,10 +23,10 @@ import {
   DialogTitle, 
   DialogDescription, 
   DialogFooter 
-} from "@/shared/ui/dialog"
-import { Input } from "@/shared/ui/input"
-import { Label } from "@/shared/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs"
+} from "@/shared/shadcn-ui/dialog"
+import { Input } from "@/shared/shadcn-ui/input"
+import { Label } from "@/shared/shadcn-ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
 import { useApp } from "@/hooks/state/use-app"
 import { useAccount } from "@/hooks/state/use-account"
 import { useAccountManagement } from "@/hooks/state/use-account-management"

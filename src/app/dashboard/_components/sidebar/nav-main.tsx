@@ -6,7 +6,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/shared/ui/collapsible";
+} from "@/shared/shadcn-ui/collapsible";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -14,7 +14,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarMenuButton,
-} from "@/shared/ui/sidebar";
+} from "@/shared/shadcn-ui/sidebar";
 import {
   LayoutDashboard,
   Layers,

@@ -29,7 +29,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarSeparator,
-} from "@/shared/ui/sidebar";
+} from "@/shared/shadcn-ui/sidebar";
 
 // ============================================================================
 // Contexts & Hooks

@@ -3,10 +3,10 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { ScheduleItem } from "@/types/domain"
-import { Badge } from "@/shared/ui/badge"
+import { Badge } from "@/shared/shadcn-ui/badge"
 import { CheckCircle, XCircle, ArrowUpDown } from "lucide-react"
 import { format } from "date-fns"
-import { Button } from "@/shared/ui/button"
+import { Button } from "@/shared/shadcn-ui/button"
 
 export type DecisionHistoryItem = Pick<ScheduleItem, 'id' | 'title' | 'workspaceName' | 'status' | 'updatedAt'>
 

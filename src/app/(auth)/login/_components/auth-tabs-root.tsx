@@ -1,14 +1,14 @@
 
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/shared/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/shared/shadcn-ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs";
+import { Button } from "@/shared/shadcn-ui/button";
 import { Ghost, Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/context/i18n-context";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { LanguageSwitcher } from "@/shared/ui/language-switcher";
+import { LanguageSwitcher } from "@/shared/shadcn-ui/language-switcher";
 
 interface AuthTabsRootProps {
   isLoading: boolean;

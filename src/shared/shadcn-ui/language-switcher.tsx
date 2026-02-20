@@ -2,13 +2,13 @@
 
 import { useI18n } from "@/shared/context/i18n-context"
 import { Locale } from "@/shared/types/i18n"
-import { Button } from "@/shared/ui/button"
+import { Button } from "@/shared/shadcn-ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu"
+} from "@/shared/shadcn-ui/dropdown-menu"
 import { Globe } from "lucide-react"
 
 const LOCALE_NAMES: Record<Locale, string> = {

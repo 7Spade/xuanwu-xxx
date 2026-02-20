@@ -26,7 +26,7 @@ Pure async functions with explicit parameters.
 
 ### Allowed
 - `@/infra/` — call facade or repositories
-- `@/entities/` — use pure domain rules for input validation
+- `@/domain-rules/` — use pure domain rules for input validation
 - `@/types/` — domain types
 - `@/lib/` — pure utilities
 
@@ -40,8 +40,8 @@ Pure async functions with explicit parameters.
 ## Coding constraints
 
 1. **呼叫 service 或 repository** — actions must call infra; never touch Firestore directly.
-2. **不得包含商業規則** — business rules (permission checks, state validation) belong in `@/entities/`.
-3. **不得實作權限邏輯** — all `isOwner` / `hasAccess` checks must be in `@/entities/`.
+2. **不得包含商業規則** — business rules (permission checks, state validation) belong in `@/domain-rules/`.
+3. **不得實作權限邏輯** — all `isOwner` / `hasAccess` checks must be in `@/domain-rules/`.
 4. **不得依賴 React hook** — actions must be callable outside React (Server Actions, scripts, tests).
 5. **不得 import UI** — zero dependency on any component or visual layer.
 6. **不得返回非序列化物件** — return value must be JSON-serializable (string, number, void, plain object/array).

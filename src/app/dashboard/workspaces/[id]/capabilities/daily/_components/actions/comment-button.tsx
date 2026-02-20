@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { MessageCircle } from "lucide-react";
 
 interface CommentButtonProps {

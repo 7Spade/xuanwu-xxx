@@ -40,7 +40,7 @@ import ... from '@/types/...'          // ✅
 import ... from '@/lib/...'            // ✅
 import ... from '@/infra/...'          // ✅ (for real-time listeners)
 import ... from '@/hooks/...'          // ✅
-import ... from '@/actions/...'        // ✅
+import ... from '@/server-commands/...'        // ✅
 import ... from '@/shared/context/...' // ✅ (FirebaseProvider, AuthProvider)
 ```
 

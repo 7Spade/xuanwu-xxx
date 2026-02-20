@@ -9,10 +9,10 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/shared/ui/dialog"
-import { Button } from "@/shared/ui/button"
-import { Label } from "@/shared/ui/label"
-import { Input } from "@/shared/ui/input"
+} from "@/shared/shadcn-ui/dialog"
+import { Button } from "@/shared/shadcn-ui/button"
+import { Label } from "@/shared/shadcn-ui/label"
+import { Input } from "@/shared/shadcn-ui/input"
 import { Loader2 } from "lucide-react"
 import { toast } from "@/shared/hooks/use-toast"
 import { Account } from "@/types/domain"

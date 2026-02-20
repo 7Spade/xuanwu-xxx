@@ -12,10 +12,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/shared/ui/card";
+import { Card } from "@/shared/shadcn-ui/card";
 import { DailyLog, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
 
 // Import the new single-responsibility action components
 import { LikeButton } from "./actions/like-button";

@@ -35,6 +35,6 @@ import ... from '@/types/...'         // ✅ also still valid for domain types
 import ... from '@/infra/...'    // ❌
 import ... from '@/hooks/...'    // ❌
 import ... from '@/context/...'  // ❌
-import ... from '@/actions/...'  // ❌
+import ... from '@/server-commands/...'  // ❌
 import ... from '@/app/...'      // ❌
 ```

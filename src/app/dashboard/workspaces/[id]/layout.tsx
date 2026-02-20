@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, ReactNode, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/context/workspace-context"
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/shared/ui/dialog";
+} from "@/shared/shadcn-ui/dialog";
 import { WorkspaceStatusBar } from "./_components/workspace-status-bar";
 import { WorkspaceNavTabs } from "./_components/workspace-nav-tabs";
 import { handleDeleteWorkspace } from "../_lib/workspace-actions";

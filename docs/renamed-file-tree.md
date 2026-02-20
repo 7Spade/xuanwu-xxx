@@ -525,13 +525,13 @@ src/
 | 現行 alias | 建議 alias |
 |-----------|-----------|
 | `@/types/` | `@/domain-types/` |
-| `@/entities/` | `@/domain-rules/` |
+| `@/domain-rules/` | `@/domain-rules/` |
 | `@/infra/` | `@/firebase/` |
-| `@/actions/` | `@/server-commands/` |
+| `@/server-commands/` | `@/server-commands/` |
 | `@/hooks/` | `@/react-hooks/` |
 | `@/context/` | `@/react-providers/` |
 | `@/features/` | `@/use-cases/` 或 `@/view-modules/`（視導入對象） |
-| `@/shared/ui/` | `@/shared/shadcn-ui/` |
+| `@/shared/shadcn-ui/` | `@/shared/shadcn-ui/` |
 | `@/ai/` | `@/genkit-flows/` |
 
 ---

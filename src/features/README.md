@@ -42,9 +42,9 @@ All exported functions start with a **verb**: `create*`, `complete*`, `approve*`
 ## Allowed imports
 
 ```ts
-import ... from '@/entities/...'  // ✅ domain rules and validation
+import ... from '@/domain-rules/...'  // ✅ domain rules and validation
 import ... from '@/infra/...'     // ✅ data access via facade
-import ... from '@/actions/...'   // ✅ compose existing actions
+import ... from '@/server-commands/...'   // ✅ compose existing actions
 import ... from '@/types/...'     // ✅ domain types
 import ... from '@/lib/...'       // ✅ pure utilities
 ```

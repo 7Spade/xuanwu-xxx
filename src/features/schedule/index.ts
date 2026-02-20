@@ -4,7 +4,7 @@
  * No React. No UI.
  */
 
-import { canTransitionScheduleStatus } from "@/entities/schedule"
+import { canTransitionScheduleStatus } from "@/domain-rules/schedule"
 import { updateScheduleItemStatus } from "@/server-commands/schedule"
 import type { ScheduleItem } from "@/types/domain"
 

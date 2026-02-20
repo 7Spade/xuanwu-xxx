@@ -1,12 +1,12 @@
 /**
- * @fileoverview src/actions/index.ts — Re-exports all action modules.
+ * @fileoverview src/server-commands/index.ts — Re-exports all server-command modules.
  *
  * Import from the domain sub-directory for clarity:
- *   import { createWorkspace } from '@/actions/workspace'
- *   import { signIn } from '@/actions/auth'
+ *   import { createWorkspace } from '@/server-commands/workspace'
+ *   import { signIn } from '@/server-commands/auth'
  *
  * Or import everything from here:
- *   import { createWorkspace, signIn } from '@/actions'
+ *   import { createWorkspace, signIn } from '@/server-commands'
  */
 
 export * from "./account"

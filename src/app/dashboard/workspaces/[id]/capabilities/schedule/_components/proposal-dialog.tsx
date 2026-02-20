@@ -10,13 +10,13 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/shared/ui/dialog";
-import { Button } from "@/shared/ui/button";
-import { Label } from "@/shared/ui/label";
-import { Input } from "@/shared/ui/input";
-import { Textarea } from "@/shared/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { Calendar } from "@/shared/ui/calendar";
+} from "@/shared/shadcn-ui/dialog";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Label } from "@/shared/shadcn-ui/label";
+import { Input } from "@/shared/shadcn-ui/input";
+import { Textarea } from "@/shared/shadcn-ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/shadcn-ui/popover";
+import { Calendar } from "@/shared/shadcn-ui/calendar";
 import { CalendarIcon, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/shared/utils/utils";

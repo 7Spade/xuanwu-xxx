@@ -1,6 +1,6 @@
 "use client"
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/shadcn-ui/table"
 import { ShieldCheck, ShieldAlert, Users, AlertCircle } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { useApp } from "@/hooks/state/use-app"

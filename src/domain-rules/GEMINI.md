@@ -24,7 +24,7 @@ Each sub-directory is one domain aggregate; each `index.ts` contains only pure f
 ### Forbidden
 - `react`, `firebase`, `next` — no framework dependencies
 - `@/infra/` — no data access
-- `@/actions/` — no orchestration
+- `@/server-commands/` — no orchestration
 - `@/hooks/` — no React
 - `@/context/` — no React
 

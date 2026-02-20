@@ -8,8 +8,8 @@ import {
   LayoutGrid,
   List as ListIcon,
 } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Input } from "@/shared/shadcn-ui/input";
 import { useI18n } from "@/shared/context/i18n-context";
 import { useRouter } from "next/navigation";
 

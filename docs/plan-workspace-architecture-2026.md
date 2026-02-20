@@ -170,7 +170,7 @@ When navigating to `/workspace/[id]/daily-log/abc`:
 **Pattern for partial RSC (e.g., daily):**
 ```tsx
 // @capability/daily/page.tsx — Server Component
-import { getDailyLogs } from '@/actions/daily'
+import { getDailyLogs } from '@/server-commands/daily'
 import { DailyFeed } from '@/features/daily/ui/daily-feed'     // RSC
 import { DailyComposerIsland } from '@/features/daily/ui/composer-island' // 'use client'
 

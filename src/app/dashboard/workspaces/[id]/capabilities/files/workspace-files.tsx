@@ -2,8 +2,8 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/shared/ui/button";
-import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { 
   FileText, 
   UploadCloud, 
@@ -33,14 +33,14 @@ import {
   SheetDescription, 
   SheetHeader, 
   SheetTitle 
-} from "@/shared/ui/sheet";
-import { ScrollArea } from "@/shared/ui/scroll-area";
+} from "@/shared/shadcn-ui/sheet";
+import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
+} from "@/shared/shadcn-ui/dropdown-menu";
 import { cn } from "@/shared/utils/utils";
 import { useAuth } from "@/shared/context/auth-context";
 import { formatBytes } from "@/shared/utils/format-bytes";
@@ -52,7 +52,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/ui/table";
+} from "@/shared/shadcn-ui/table";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>

@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState, ReactNode } from "react"
 import { User as UserIcon } from "lucide-react"
-import { Badge } from "@/shared/ui/badge"
+import { Badge } from "@/shared/shadcn-ui/badge"
 import { useAuth } from "@/shared/context/auth-context"
 import { useI18n } from "@/shared/context/i18n-context"
 import { useApp } from "@/hooks/state/use-app"

@@ -12,10 +12,10 @@
  */
 "use client";
 
-import { Textarea } from "@/shared/ui/textarea";
-import { Button } from "@/shared/ui/button";
-import { Card } from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/shadcn-ui/textarea";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Card } from "@/shared/shadcn-ui/card";
+import { Input } from "@/shared/shadcn-ui/input";
 import { ImagePlusIcon, Send, Loader2, X } from "lucide-react";
 import Image from "next/image";
 

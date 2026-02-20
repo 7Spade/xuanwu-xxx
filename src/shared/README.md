@@ -7,7 +7,7 @@ Everything in this directory is used across multiple unrelated features and laye
 
 | Directory | Contents | Import alias |
 |-----------|---------|-------------|
-| `ui/` | shadcn/ui primitive components (Button, Dialog, Card, …) | `@/shared/ui/` |
+| `shadcn-ui/` | shadcn/ui primitive components (Button, Dialog, Card, …) | `@/shared/shadcn-ui/` |
 | `hooks/` | `use-mobile.tsx`, `use-toast.ts` — framework-level UI hooks | `@/shared/hooks/` |
 | `context/` | `theme-context`, `i18n-context`, `auth-context`, `firebase-context` — global providers | `@/shared/context/` |
 | `utils/` | *(reserved)* additional shared pure helpers beyond `src/lib/` | `@/shared/utils/` |
@@ -15,15 +15,15 @@ Everything in this directory is used across multiple unrelated features and laye
 | `constants/` | *(reserved)* shared domain-independent constants (route names, limits) | `@/shared/constants/` |
 | `types/` | *(reserved)* UI-layer shared type definitions (form schemas, display props) | `@/shared/types/` |
 
-## `ui/` — shadcn/ui components
+## `shadcn-ui/` — shadcn/ui components
 
 All shadcn primitive components live here. Install / update with:
 
 ```bash
-npx shadcn@latest add <component>   # components.json points to @/shared/ui
+npx shadcn@latest add <component>   # components.json points to @/shared/shadcn-ui
 ```
 
-✅ Import: `import { Button } from "@/shared/ui/button"`  
+✅ Import: `import { Button } from "@/shared/shadcn-ui/button"`  
 ❌ Never import ui primitives from `@/app/_components/ui/` — that path no longer exists.
 
 ## `hooks/` — global UI hooks
@@ -50,7 +50,7 @@ Domain contexts (`app-context`, `account-context`, `workspace-context`) remain i
 
 ## What does NOT belong here
 
-- Domain business logic → `src/actions/`
+- Domain business logic → `src/server-commands/`
 - Domain-specific hooks → `src/hooks/`
 - Domain-specific contexts → `src/context/`
 - Firebase SDK calls → `src/infra/`

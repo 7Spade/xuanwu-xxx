@@ -36,9 +36,9 @@ The corresponding `app/` page becomes a 3-line RSC wrapper.
 ## Dependency rules
 
 ### Allowed
-- `@/entities/` — use pure domain rules (validation, permission checks)
+- `@/domain-rules/` — use pure domain rules (validation, permission checks)
 - `@/infra/` — call facade or repositories for data access
-- `@/actions/` — compose existing action functions
+- `@/server-commands/` — compose existing action functions
 - `@/types/` — domain interfaces
 - `@/lib/` — pure utilities
 - `react` — **only** in `*-view.tsx` and `*-loader.tsx` files
@@ -60,14 +60,14 @@ The corresponding `app/` page becomes a 3-line RSC wrapper.
 
 ### Orchestration functions
 1. **Multi-step only** — if a function only calls one infra function, it belongs in `actions/`.
-2. **No business rules inline** — validation and permission checks belong in `@/entities/`.
+2. **No business rules inline** — validation and permission checks belong in `@/domain-rules/`.
 3. **Async everywhere** — all exports are async functions.
 4. **Explicit parameters** — no global state reads; every dependency is a parameter.
 5. **Verb-prefixed exports** — all exported functions start with a verb: `create*`, `complete*`, `approve*`, `setup*`.
 
 ### View components
 1. **`"use client"` required** — view files must be Client Components.
-2. **No direct infra calls** — use `@/actions/` or `@/hooks/` for data mutations.
+2. **No direct infra calls** — use `@/server-commands/` or `@/hooks/` for data mutations.
 3. **Props for initial data** — accept `initialData` props for RSC hydration.
 4. **Exported named function** — export as named (not default) function.
 

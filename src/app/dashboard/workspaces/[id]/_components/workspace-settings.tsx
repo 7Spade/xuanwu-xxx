@@ -9,18 +9,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/shared/ui/dialog";
-import { Button } from "@/shared/ui/button";
-import { Label } from "@/shared/ui/label";
-import { Input } from "@/shared/ui/input";
-import { Switch } from "@/shared/ui/switch";
+} from "@/shared/shadcn-ui/dialog";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Label } from "@/shared/shadcn-ui/label";
+import { Input } from "@/shared/shadcn-ui/input";
+import { Switch } from "@/shared/shadcn-ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/select";
+} from "@/shared/shadcn-ui/select";
 import type { Workspace, WorkspaceLifecycleState, Address } from "@/types/domain";
 
 interface WorkspaceSettingsDialogProps {

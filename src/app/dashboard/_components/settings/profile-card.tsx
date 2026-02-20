@@ -1,13 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/ui/card";
-import { Label } from "@/shared/ui/label";
-import { Input } from "@/shared/ui/input";
-import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/shadcn-ui/card";
+import { Label } from "@/shared/shadcn-ui/label";
+import { Input } from "@/shared/shadcn-ui/input";
+import { Button } from "@/shared/shadcn-ui/button";
 import { User, Loader2, Upload } from "lucide-react";
-import { Textarea } from "@/shared/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
-import { Checkbox } from "@/shared/ui/checkbox";
+import { Textarea } from "@/shared/shadcn-ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/shadcn-ui/avatar";
+import { Checkbox } from "@/shared/shadcn-ui/checkbox";
 import { ExpertiseBadge, Account } from "@/types/domain"
 import React from "react"
 

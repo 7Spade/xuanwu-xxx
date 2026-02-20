@@ -36,7 +36,7 @@ Never export a hook from a file that does not start with `use-`.
 import ... from '@/types/...'    // ✅
 import ... from '@/lib/...'      // ✅
 import ... from '@/infra/...'    // ✅
-import ... from '@/actions/...'  // ✅
+import ... from '@/server-commands/...'  // ✅
 import ... from '@/context/...'  // ✅
 ```
 

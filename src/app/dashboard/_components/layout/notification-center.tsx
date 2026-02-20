@@ -1,9 +1,9 @@
 
 "use client";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { Button } from "@/shared/ui/button";
-import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/shadcn-ui/popover";
+import { Button } from "@/shared/shadcn-ui/button";
+import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import { Bell, Trash2, Check } from "lucide-react";
 import { Notification } from "@/types/domain";
 

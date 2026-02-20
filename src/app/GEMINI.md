@@ -69,7 +69,7 @@ Root of the Next.js App Router. Contains **only** routes, layouts, parallel-rout
 ```ts
 import ... from "@/features/..."   // ✅ view components, orchestration
 import ... from "@/lib/..."         // ✅ pure utilities, event-bus
-import ... from "@/actions/..."     // ✅ server actions (mutations + reads)
+import ... from "@/server-commands/..."     // ✅ server actions (mutations + reads)
 import ... from "@/hooks/..."       // ✅ client-side hooks
 import ... from "@/context/..."     // ✅ React context providers
 import ... from "@/shared/ui/..."   // ✅ shadcn components

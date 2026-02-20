@@ -6,19 +6,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/hooks/use-toast"
 import { completeRegistration } from "@/features/auth"
-import {
-  signIn,
-  signInAnonymously,
-  sendPasswordResetEmail,
-} from "@/server-commands/auth"
+import { signIn, signInAnonymously } from "@/server-commands/auth"
 import { useI18n } from "@/shared/context/i18n-context"
 import { AuthBackground } from "@/app/(auth)/login/_components/auth-background"
 import { AuthTabsRoot } from "@/app/(auth)/login/_components/auth-tabs-root"
-import { ResetPasswordDialog } from "@/app/(auth)/login/_components/reset-password-dialog"
 
 /**
  * LoginView — The "smart" auth container.
  * Manages all auth state and delegates rendering to _components/.
+ * Reset password is handled by @modal/(.)reset-password intercepting route.
  * app/(auth)/login/page.tsx is now a thin RSC wrapper that renders this.
  */
 export function LoginView() {
@@ -29,8 +25,6 @@ export function LoginView() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
-  const [resetEmail, setResetEmail] = useState("")
-  const [isResetOpen, setIsResetOpen] = useState(false)
 
   const handleAuth = async (type: "login" | "register") => {
     setIsLoading(true)
@@ -61,18 +55,6 @@ export function LoginView() {
     }
   }
 
-  const handleSendResetEmail = async () => {
-    if (!resetEmail) return
-    try {
-      await sendPasswordResetEmail(resetEmail)
-      setIsResetOpen(false)
-      toast({ title: t("auth.resetProtocolSent") })
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "An unknown error occurred."
-      toast({ variant: "destructive", title: t("auth.resetFailed"), description: message })
-    }
-  }
-
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background px-4 overflow-hidden">
       <AuthBackground />
@@ -86,17 +68,9 @@ export function LoginView() {
         setName={setName}
         handleAuth={handleAuth}
         handleAnonymous={handleAnonymous}
-        openResetDialog={() => {
-          setResetEmail(email)
-          setIsResetOpen(true)
-        }}
-      />
-      <ResetPasswordDialog
-        isOpen={isResetOpen}
-        onOpenChange={setIsResetOpen}
-        email={resetEmail}
-        setEmail={setResetEmail}
-        handleSendResetEmail={handleSendResetEmail}
+        openResetDialog={() =>
+          router.push(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`)
+        }
       />
     </div>
   )

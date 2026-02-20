@@ -13,11 +13,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/shadcn-ui/dialog";
 import { DailyLog, DailyLogComment, Account } from "@/types/domain";
 import { ImageCarousel } from "./image-carousel";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
-import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
+import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import { LikeButton } from './actions/like-button';
 import { CommentButton } from './actions/comment-button';
 import { BookmarkButton } from "./actions/bookmark-button";
@@ -27,8 +27,8 @@ import { useAuth } from "@/shared/context/auth-context";
 import { addDailyLogComment } from "@/server-commands/daily";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { toast } from "@/shared/hooks/use-toast";
-import { Textarea } from "@/shared/ui/textarea";
-import { Button } from "@/shared/ui/button";
+import { Textarea } from "@/shared/shadcn-ui/textarea";
+import { Button } from "@/shared/shadcn-ui/button";
 import { CornerUpLeft, Loader2 } from "lucide-react";
 
 interface DailyLogDialogProps {

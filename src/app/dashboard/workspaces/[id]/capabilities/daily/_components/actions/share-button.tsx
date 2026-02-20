@@ -8,13 +8,13 @@
 
 import { useWorkspace } from "@/context/workspace-context";
 import { DailyLog } from "@/types/domain";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
+} from "@/shared/shadcn-ui/dropdown-menu";
 import { Share2 } from "lucide-react";
 import { toast } from "@/shared/hooks/use-toast";
 

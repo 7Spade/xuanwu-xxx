@@ -2,9 +2,9 @@
 'use client';
 
 import { useWorkspace } from '../../../../../../context/workspace-context';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Textarea } from '@/shared/ui/textarea';
+import { Button } from '@/shared/shadcn-ui/button';
+import { Input } from '@/shared/shadcn-ui/input';
+import { Textarea } from '@/shared/shadcn-ui/textarea';
 import {
   Plus,
   ChevronRight,
@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from '@/shared/hooks/use-toast';
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/shadcn-ui/badge';
 import { WorkspaceTask, Location } from '@/types/domain';
 import {
   Dialog,
@@ -35,15 +35,15 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/shared/ui/dialog';
-import { Label } from '@/shared/ui/label';
+} from '@/shared/shadcn-ui/dialog';
+import { Label } from '@/shared/shadcn-ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/select';
+} from '@/shared/shadcn-ui/select';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -51,8 +51,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
-import { Progress } from '@/shared/ui/progress';
+} from '@/shared/shadcn-ui/dropdown-menu';
+import { Progress } from '@/shared/shadcn-ui/progress';
 import { cn } from '@/shared/utils/utils';
 import { buildTaskTree } from './workspace-tasks.logic';
 import type { TaskWithChildren } from './workspace-tasks.types';

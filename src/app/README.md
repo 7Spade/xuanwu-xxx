@@ -81,7 +81,7 @@ Every async data fetch must be wrapped in `<Suspense>` or be an async Server Com
 ```ts
 // ✅ Correct
 import { AuditView } from "@/features/audit/audit-view"
-import { getAuditLogs } from "@/actions/audit"
+import { getAuditLogs } from "@/server-commands/audit"
 
 // ❌ Never import infra directly from a route page
 import { firestoreFacade } from "@/infra/firebase/firestore/firestore.facade"
@@ -93,7 +93,7 @@ No cross-route-group global side effects.
 
 ```ts
 // ✅ Correct
-import { createWorkspace } from "@/actions/workspace"
+import { createWorkspace } from "@/server-commands/workspace"
 
 // ❌ Never call Firebase SDK directly from a route component
 import { db } from "@/infra/firebase/firestore/db"
@@ -158,7 +158,7 @@ src/app/
 ```ts
 import ... from "@/features/..."   // ✅ view components, orchestration
 import ... from "@/lib/..."         // ✅ pure utilities, event-bus
-import ... from "@/actions/..."     // ✅ server actions (mutations + reads)
+import ... from "@/server-commands/..."     // ✅ server actions (mutations + reads)
 import ... from "@/hooks/..."       // ✅ client-side hooks
 import ... from "@/context/..."     // ✅ React context providers
 import ... from "@/shared/ui/..."   // ✅ shadcn components

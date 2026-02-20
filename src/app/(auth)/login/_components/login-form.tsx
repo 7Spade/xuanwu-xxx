@@ -1,9 +1,9 @@
 
 "use client";
 
-import { Button } from "@/shared/ui/button";
-import { Label } from "@/shared/ui/label";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/shared/ui/input-group";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Label } from "@/shared/shadcn-ui/label";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/shared/shadcn-ui/input-group";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/context/i18n-context";
 

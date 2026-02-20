@@ -1,21 +1,21 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/shared/ui/button";
-import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { AlertCircle, Plus, ArrowRight, ShieldAlert, DollarSign, PenTool, MessageSquare, CornerUpLeft } from "lucide-react";
 import { toast } from "@/shared/hooks/use-toast";
 import { useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/ui/dialog";
-import { Label } from "@/shared/ui/label";
-import { Input } from "@/shared/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/shadcn-ui/dialog";
+import { Label } from "@/shared/shadcn-ui/label";
+import { Input } from "@/shared/shadcn-ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/shadcn-ui/select";
 import { useAuth } from "@/shared/context/auth-context";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/shared/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/shared/shadcn-ui/sheet";
 import { WorkspaceIssue } from "@/types/domain";
 import { format } from "date-fns";
-import { ScrollArea } from "@/shared/ui/scroll-area";
-import { Textarea } from "@/shared/ui/textarea";
+import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
+import { Textarea } from "@/shared/shadcn-ui/textarea";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;

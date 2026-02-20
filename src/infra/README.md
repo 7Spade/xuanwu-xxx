@@ -46,7 +46,7 @@ import ... from '@/lib/...'    // ✅
 ```ts
 import ... from '@/hooks/...'      // ❌
 import ... from '@/context/...'    // ❌
-import ... from '@/actions/...'    // ❌
+import ... from '@/server-commands/...'    // ❌
 import ... from '@/components/...' // ❌
 import ... from '@/app/...'        // ❌
 import ... from '@/ai/...'         // ❌

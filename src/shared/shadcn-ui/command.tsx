@@ -6,7 +6,7 @@ import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
 
 import { cn } from "@/shared/utils/utils"
-import { Dialog, DialogContent } from "@/shared/ui/dialog"
+import { Dialog, DialogContent } from "@/shared/shadcn-ui/dialog"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,

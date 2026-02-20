@@ -10,7 +10,7 @@ import { useWorkspaceFilters } from "./_lib/use-workspace-filters";
 import { WorkspaceListHeader } from "./_components/workspace-list-header";
 import { WorkspaceGridView } from "./_components/workspace-grid-view";
 import { WorkspaceTableView } from "./_components/workspace-table-view";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { useRouter } from "next/navigation";
 
 export default function WorkspacesPage() {

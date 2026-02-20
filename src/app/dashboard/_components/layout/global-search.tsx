@@ -8,8 +8,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/shared/ui/command";
-import { Badge } from "@/shared/ui/badge";
+} from "@/shared/shadcn-ui/command";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { Globe, Layers, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Account, Workspace, MemberReference } from "@/types/domain";

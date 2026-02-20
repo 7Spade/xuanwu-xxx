@@ -40,7 +40,7 @@ src/actions/
 
 ```ts
 import ... from '@/infra/...'      // ✅ call the facade
-import ... from '@/entities/...'   // ✅ use pure domain rules for input validation
+import ... from '@/domain-rules/...'   // ✅ use pure domain rules for input validation
 import ... from '@/types/...'      // ✅ domain types
 import ... from '@/lib/...'        // ✅ pure utilities
 ```

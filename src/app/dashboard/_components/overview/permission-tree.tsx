@@ -1,8 +1,8 @@
 
 "use client";
 
-import { Badge } from "@/shared/ui/badge";
-import { Card, CardContent } from "@/shared/ui/card";
+import { Badge } from "@/shared/shadcn-ui/badge";
+import { Card, CardContent } from "@/shared/shadcn-ui/card";
 import { Shield } from "lucide-react";
 import { OrganizationRole } from "@/types/domain";
 

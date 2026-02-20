@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { useApp } from './use-app'
 import { useAuth } from '@/shared/context/auth-context'
 import { useAccount } from './use-account'
-import { filterVisibleWorkspaces } from '@/entities/workspace'
+import { filterVisibleWorkspaces } from '@/domain-rules/workspace'
 
 /**
  * A hook that centralizes the logic for determining which workspaces are visible to the current user

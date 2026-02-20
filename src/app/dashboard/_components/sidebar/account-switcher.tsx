@@ -2,8 +2,9 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Button } from "@/shared/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar"
+import { useRouter } from "next/navigation"
+import { Button } from "@/shared/shadcn-ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/shadcn-ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +12,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu"
+} from "@/shared/shadcn-ui/dropdown-menu"
 import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import { Account } from "@/types/domain"
 import { cn } from "@/shared/utils/utils"
 import Link from "next/link"
-import { AccountCreateDialog } from "./account-create-dialog"
 
 interface AccountSwitcherProps {
   user: Account | null
@@ -68,10 +68,10 @@ export function AccountSwitcher({
   accounts,
   activeAccount,
   dispatch,
-  createOrganization,
+  createOrganization: _createOrganization,
   t,
 }: AccountSwitcherProps) {
-  const [isCreateOrgOpen, setIsCreateOrgOpen] = useState(false)
+  const router = useRouter()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const availableAccounts = useMemo(() => {
@@ -119,23 +119,14 @@ export function AccountSwitcher({
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
             onSelect={() => {
-              setIsDropdownOpen(false);
-              setTimeout(() => setIsCreateOrgOpen(true), 150);
+              setIsDropdownOpen(false)
+              router.push("/dashboard/account/new")
             }}
           >
             <Plus className="w-4 h-4" /> {t('sidebar.createNewDimension')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <AccountCreateDialog
-        open={isCreateOrgOpen}
-        onOpenChange={setIsCreateOrgOpen}
-        createOrganization={createOrganization}
-        dispatch={dispatch}
-        accounts={accounts}
-        t={t}
-      />
     </>
   )
 }

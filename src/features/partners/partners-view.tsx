@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/ui/card"
-import { Badge } from "@/shared/ui/badge"
-import { Button } from "@/shared/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/shadcn-ui/card"
+import { Badge } from "@/shared/shadcn-ui/badge"
+import { Button } from "@/shared/shadcn-ui/button"
 import { Handshake, Plus, FolderTree, ArrowRight, Globe, AlertCircle } from "lucide-react"
 import { useState, useEffect, useMemo, ReactNode } from "react"
 import { 
@@ -12,9 +12,9 @@ import {
   DialogTitle, 
   DialogFooter,
   DialogDescription
-} from "@/shared/ui/dialog"
-import { Label } from "@/shared/ui/label"
-import { Input } from "@/shared/ui/input"
+} from "@/shared/shadcn-ui/dialog"
+import { Label } from "@/shared/shadcn-ui/label"
+import { Input } from "@/shared/shadcn-ui/input"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/hooks/use-toast"
 import { useApp } from "@/hooks/state/use-app"

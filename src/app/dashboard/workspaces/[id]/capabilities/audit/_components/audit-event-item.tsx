@@ -2,7 +2,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { Badge } from "@/shared/ui/badge";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { AuditLog } from "@/types/domain";
 import { cn } from "@/shared/utils/utils";
 import { AuditTypeIcon } from "./audit-type-icon";

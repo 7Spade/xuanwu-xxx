@@ -8,8 +8,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-} from "@/shared/ui/sidebar";
-import { Badge } from "@/shared/ui/badge";
+} from "@/shared/shadcn-ui/sidebar";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { Terminal } from "lucide-react";
 import { Workspace } from "@/types/domain";
 import { cn } from "@/shared/utils/utils";

@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Card, CardContent } from "@/shared/ui/card";
+import { Card, CardContent } from "@/shared/shadcn-ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/shared/ui/carousel";
+} from "@/shared/shadcn-ui/carousel";
 
 interface ImageCarouselProps {
     images: string[];

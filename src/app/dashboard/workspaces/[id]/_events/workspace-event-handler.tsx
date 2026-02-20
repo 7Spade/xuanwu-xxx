@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useWorkspace } from "@/context/workspace-context";
 import { useApp } from "@/hooks/state/use-app";
 import { toast } from "@/shared/hooks/use-toast";
-import { ToastAction } from "@/shared/ui/toast";
+import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceEventPayloadMap } from "@/features/workspace/event-bus/workspace-events";
 import { WorkspaceTask } from "@/types/domain";
 import { createIssue } from "@/server-commands/issue";

@@ -9,9 +9,9 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/shared/ui/card";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
+} from "@/shared/shadcn-ui/card";
+import { Badge } from "@/shared/shadcn-ui/badge";
+import { Button } from "@/shared/shadcn-ui/button";
 import { MoreVertical, Eye, EyeOff, Shield } from "lucide-react";
 import type { Workspace } from "@/types/domain";
 import { useI18n } from "@/shared/context/i18n-context";

@@ -3,8 +3,8 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
-import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/shadcn-ui/button";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { Eye, EyeOff, Shield, Trash2, ArrowUpRight, Terminal } from "lucide-react";
 import { Workspace } from "@/types/domain";
 

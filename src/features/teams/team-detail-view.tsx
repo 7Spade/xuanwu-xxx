@@ -1,8 +1,8 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent } from "@/shared/ui/card"
-import { Button } from "@/shared/ui/button"
+import { Card, CardContent } from "@/shared/shadcn-ui/card"
+import { Button } from "@/shared/shadcn-ui/button"
 import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react"
 import { useState, useEffect, useMemo, ReactNode } from "react"
 import { toast } from "@/shared/hooks/use-toast"

@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card"
-import { Badge } from "@/shared/ui/badge"
-import { Button } from "@/shared/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/shadcn-ui/card"
+import { Badge } from "@/shared/shadcn-ui/badge"
+import { Button } from "@/shared/shadcn-ui/button"
 import { UserPlus, Trash2, Mail, AlertCircle } from "lucide-react"
 import { toast } from "@/shared/hooks/use-toast"
 import { useState, useEffect, useMemo, ReactNode } from "react"

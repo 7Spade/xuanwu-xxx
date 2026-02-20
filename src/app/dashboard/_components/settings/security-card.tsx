@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
+import { Button } from "@/shared/shadcn-ui/button";
 import { AlertTriangle } from "lucide-react";
 
 interface SecurityCardProps {

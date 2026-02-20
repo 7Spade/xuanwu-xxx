@@ -4,7 +4,7 @@
  */
 
 import type { Workspace, Account } from "@/types/domain"
-import { isOrganization, isOwner, getUserTeamIds } from "@/entities/account"
+import { isOrganization, isOwner, getUserTeamIds } from "@/domain-rules/account"
 
 // ---------------------------------------------------------------------------
 // Access predicates

@@ -1,10 +1,10 @@
 "use client";
 
 import { useWorkspace } from "../../../../../../context/workspace-context";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/shadcn-ui/button";
 import { ShieldCheck, XCircle, CheckCircle, Search, AlertTriangle } from "lucide-react";
 import { toast } from "@/shared/hooks/use-toast";
-import { Badge } from "@/shared/ui/badge";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { WorkspaceTask } from "@/types/domain";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/shared/context/auth-context";

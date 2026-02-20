@@ -41,7 +41,7 @@ import ... from '@/shared/types/...'  // ✅
 import ... from '@/infra/...'    // ❌
 import ... from '@/hooks/...'    // ❌
 import ... from '@/context/...'  // ❌
-import ... from '@/actions/...'  // ❌
+import ... from '@/server-commands/...'  // ❌
 import ... from '@/app/...'      // ❌
 import ... from 'react'          // ❌
 ```
