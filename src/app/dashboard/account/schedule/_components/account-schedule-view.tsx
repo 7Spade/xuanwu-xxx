@@ -2,7 +2,7 @@
 
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { AlertCircle } from "lucide-react";
-import { AccountScheduleComponent } from "./account-schedule-component";
+import { AccountScheduleComponent } from "@/view-modules/workspaces/plugins";
 
 export default function AccountScheduleView() {
   const { state } = useApp();

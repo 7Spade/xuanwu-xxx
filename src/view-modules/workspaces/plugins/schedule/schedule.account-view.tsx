@@ -1,4 +1,4 @@
-// [職責] Projection — Account 層跨 Workspace 排程治理視圖 (全維度、可審批)
+// @/view-modules/workspaces/plugins/schedule/schedule.account-view.tsx
 /**
  * @fileoverview AccountScheduleComponent - The "Governor" view for the account-wide schedule.
  * @description Aggregated view of all proposed and official schedule items across all workspaces.
@@ -10,14 +10,13 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import type { ScheduleItem } from "@/domain-types/domain";
-import { UnifiedCalendarGrid } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/unified-calendar-grid";
-import { ScheduleDataTable } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/schedule-data-table";
-import { GovernanceSidebar } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/governance-sidebar";
+import { UnifiedCalendarGrid } from "./_plugin-components/unified-calendar-grid";
+import { ScheduleDataTable } from "./_plugin-components/schedule-data-table";
+import { GovernanceSidebar } from "./_plugin-components/governance-sidebar";
 import { useGlobalSchedule } from "@/react-hooks/state-hooks/use-global-schedule";
-import { decisionHistoryColumns } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/decision-history-columns";
-import { upcomingEventsColumns } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/upcoming-events-columns";
+import { decisionHistoryColumns } from "./_plugin-components/decision-history-columns";
+import { upcomingEventsColumns } from "./_plugin-components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
-import { approveScheduleItem, rejectScheduleItem } from "@/use-cases/schedule";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,25 +34,25 @@ export function AccountScheduleComponent() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const { allItems, pendingProposals, decisionHistory, upcomingEvents, presentEvents, orgMembers } = useGlobalSchedule();
-  const { assignMember, unassignMember } = useScheduleActions();
+  const { assignMember, unassignMember, approveItem, rejectItem } = useScheduleActions();
 
   const handleAction = useCallback(async (item: ScheduleItem, newStatus: 'OFFICIAL' | 'REJECTED') => {
     try {
       if (newStatus === 'OFFICIAL') {
-        await approveScheduleItem(item)
+        await approveItem(item);
       } else {
-        await rejectScheduleItem(item)
+        await rejectItem(item);
       }
       const successTitle = newStatus === 'OFFICIAL' ? "Proposal Approved" : "Proposal Rejected";
       toast({ title: successTitle, description: `"${item.title}" has been updated.` });
     } catch (e: unknown) {
       toast({ variant: "destructive", title: "Action Failed", description: e instanceof Error ? e.message : "An unknown error occurred." });
     }
-  }, []);
+  }, [approveItem, rejectItem]);
 
   const approveProposal = (item: ScheduleItem) => handleAction(item, 'OFFICIAL');
   const rejectProposal = (item: ScheduleItem) => handleAction(item, 'REJECTED');
-  
+
   const onItemClick = (item: ScheduleItem) => {
     router.push(`/dashboard/workspaces/${item.workspaceId}?capability=schedule`);
   };
@@ -61,7 +60,7 @@ export function AccountScheduleComponent() {
   const handleMonthChange = (direction: 'prev' | 'next') => {
     setCurrentDate(current => direction === 'prev' ? subMonths(current, 1) : addMonths(current, 1));
   };
-  
+
   const renderItemActions = useCallback((item: ScheduleItem) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -76,7 +75,7 @@ export function AccountScheduleComponent() {
               <DropdownMenuCheckboxItem
                 key={member.id}
                 checked={item.assigneeIds.includes(member.id)}
-                onSelect={(e) => e.preventDefault()} // Prevents menu from closing
+                onSelect={(e) => e.preventDefault()}
                 onCheckedChange={() => {
                     if (item.assigneeIds.includes(member.id)) {
                         unassignMember(item, member.id);
@@ -111,10 +110,10 @@ export function AccountScheduleComponent() {
           </div>
         </div>
         <div className="md:flex-[1] min-w-[300px] border-t md:border-t-0 md:border-l flex flex-col">
-           <GovernanceSidebar 
-            proposals={pendingProposals} 
-            onApprove={approveProposal} 
-            onReject={rejectProposal} 
+           <GovernanceSidebar
+            proposals={pendingProposals}
+            onApprove={approveProposal}
+            onReject={rejectProposal}
           />
         </div>
       </div>

@@ -5,24 +5,26 @@ import { useWorkspace } from "@/react-providers/workspace-provider";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
-import type { WorkspaceEventPayloadMap } from "@/use-cases/workspace/event-bus/workspace-events";
-import { WorkspaceTask } from "@/domain-types/domain";
+import type { WorkspaceTask } from "@/domain-types/domain";
 import { createIssue } from "@/server-commands/issue";
 import { createScheduleItem } from "@/server-commands/schedule";
 import { batchImportTasks } from "@/server-commands/task";
 
-/**
- * @fileoverview Global event handler for workspace-level events.
- *
- * ARCHITECTURAL ROLE: Cross-Capability Orchestration
- * This component acts as a central Observer that subscribes to multiple workspace events.
- * It coordinates system-wide reactions without coupling capabilities to each other.
- */
+type DocParserPayload = {
+  sourceDocument: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    discount?: number;
+    subtotal: number;
+  }>;
+};
+
 /**
  * useWorkspaceEventHandler — side-effect hook (no render output).
- * Call this inside any Client Component that is a descendant of WorkspaceProvider.
- * Converts from a render-null component to a hook to eliminate the
- * context → app/ layer violation in workspace-context.tsx.
+ * Call inside any Client Component that is a descendant of WorkspaceProvider.
+ * Subscribes to workspace-level events and orchestrates cross-capability reactions.
  */
 export function useWorkspaceEventHandler() {
   const { eventBus, workspace, logAuditEvent } = useWorkspace();
@@ -96,9 +98,7 @@ export function useWorkspaceEventHandler() {
       }
     );
 
-    const handleImport = (
-      payload: WorkspaceEventPayloadMap["workspace:document-parser:itemsExtracted"]
-    ) => {
+    const handleImport = (payload: DocParserPayload) => {
       const importItems = () => {
         toast({
           title: "Importing items...",
@@ -157,22 +157,22 @@ export function useWorkspaceEventHandler() {
       "workspace:document-parser:itemsExtracted",
       handleImport
     );
-    
+
     const unsubScheduleRequest = eventBus.subscribe(
-        'workspace:tasks:scheduleRequested',
-        (payload) => {
-            dispatch({
-                type: 'REQUEST_SCHEDULE_TASK',
-                payload: {
-                    taskName: payload.taskName,
-                    workspaceId: workspace.id,
-                }
-            });
-        }
+      "workspace:tasks:scheduleRequested",
+      (payload) => {
+        dispatch({
+          type: "REQUEST_SCHEDULE_TASK",
+          payload: {
+            taskName: payload.taskName,
+            workspaceId: workspace.id,
+          },
+        });
+      }
     );
-    
+
     const unsubTaskCompleted = eventBus.subscribe(
-      'workspace:tasks:completed',
+      "workspace:tasks:completed",
       async (payload) => {
         if (!workspace.dimensionId) return;
         try {
@@ -183,40 +183,44 @@ export function useWorkspaceEventHandler() {
             title: `Review: ${payload.task.name}`,
             startDate: new Date(),
             endDate: new Date(),
-            status: 'PROPOSAL',
-            originType: 'TASK_AUTOMATION',
+            status: "PROPOSAL",
+            originType: "TASK_AUTOMATION",
             originTaskId: payload.task.id,
             assigneeIds: [],
           });
-          
-          toast({ 
-            title: "Schedule Request Created", 
-            description: `A proposal for "${payload.task.name}" has been sent to the organization for approval.`
+
+          toast({
+            title: "Schedule Request Created",
+            description: `A proposal for "${payload.task.name}" has been sent to the organization for approval.`,
           });
-          logAuditEvent("Auto-Generated Schedule Proposal", `From task: ${payload.task.name}`, "create");
+          logAuditEvent(
+            "Auto-Generated Schedule Proposal",
+            `From task: ${payload.task.name}`,
+            "create"
+          );
         } catch (error) {
-           console.error("Failed to create schedule proposal:", error);
-           toast({
-             variant: "destructive",
-             title: "Proposal Creation Failed",
-             description: error instanceof Error ? error.message : "An unknown error occurred.",
-           });
+          console.error("Failed to create schedule proposal:", error);
+          toast({
+            variant: "destructive",
+            title: "Proposal Creation Failed",
+            description:
+              error instanceof Error
+                ? error.message
+                : "An unknown error occurred.",
+          });
         }
       }
     );
 
     const unsubForwardRequested = eventBus.subscribe(
-      'daily:log:forwardRequested',
+      "daily:log:forwardRequested",
       (payload) => {
-        // For now, just show a toast to confirm the event was caught.
-        // In a real implementation, this would trigger a dialog or another action.
         toast({
           title: "Forward Action Triggered",
           description: `Received request to forward log to the '${payload.targetCapability}' capability.`,
         });
       }
     );
-
 
     return () => {
       unsubQAApproved();
@@ -228,5 +232,5 @@ export function useWorkspaceEventHandler() {
       unsubTaskCompleted();
       unsubForwardRequested();
     };
-  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent])
+  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 }

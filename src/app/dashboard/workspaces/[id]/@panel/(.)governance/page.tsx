@@ -7,13 +7,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/shadcn-ui
 import { useWorkspace } from "@/react-providers/workspace-provider"
 import { useAccount } from "@/react-hooks/state-hooks/use-account"
 import { GovernanceSidebar } from "@/view-modules/workspaces/plugins/schedule/_plugin-components/governance-sidebar"
-import { approveScheduleItem, rejectScheduleItem } from "@/use-cases/schedule"
+import { useScheduleActions } from "@/react-hooks/command-hooks/use-schedule-commands"
 import type { ScheduleItem } from "@/domain-types/domain"
 
 export default function GovernancePanelPage() {
   const router = useRouter()
   const { workspace } = useWorkspace()
   const { state: accountState } = useAccount()
+  const { approveItem, rejectItem } = useScheduleActions()
 
   const proposals = useMemo(() =>
     Object.values(accountState.schedule_items).filter(
@@ -21,14 +22,6 @@ export default function GovernancePanelPage() {
     ),
     [accountState.schedule_items, workspace.id]
   )
-
-  const handleApprove = async (item: ScheduleItem) => {
-    await approveScheduleItem(item)
-  }
-
-  const handleReject = async (item: ScheduleItem) => {
-    await rejectScheduleItem(item)
-  }
 
   return (
     <Sheet open onOpenChange={(open) => !open && router.back()}>
@@ -38,8 +31,8 @@ export default function GovernancePanelPage() {
         </SheetHeader>
         <GovernanceSidebar
           proposals={proposals}
-          onApprove={handleApprove}
-          onReject={handleReject}
+          onApprove={approveItem}
+          onReject={rejectItem}
         />
       </SheetContent>
     </Sheet>

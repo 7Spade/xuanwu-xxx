@@ -7,7 +7,7 @@ import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/react-providers/workspace-provider"
-import { useWorkspaceEventHandler } from "./_event-handlers/workspace-event-handler"
+import { useWorkspaceEventHandler } from "@/react-hooks/command-hooks/use-workspace-event-handler"
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import {
 } from "@/shared/shadcn-ui/dialog";
 import { WorkspaceStatusBar } from "@/view-modules/workspaces/workspace-status-bar";
 import { WorkspaceNavTabs } from "@/view-modules/workspaces/workspace-nav-tabs";
-import { handleDeleteWorkspace } from "@/use-cases/workspace/workspace-actions";
+import { useWorkspaceCommands } from "@/react-hooks/command-hooks/use-workspace-commands";
 import { PageHeader } from "@/shared/shadcn-ui/page-header";
 
 /**
@@ -28,6 +28,7 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
   useWorkspaceEventHandler()
   const { workspace } = useWorkspace()
   const router = useRouter();
+  const { handleDeleteWorkspace } = useWorkspaceCommands();
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
