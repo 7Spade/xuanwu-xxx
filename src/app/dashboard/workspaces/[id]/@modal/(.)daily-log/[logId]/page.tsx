@@ -13,7 +13,7 @@ interface PageProps {
 }
 
 export default function DailyLogModalPage({ params }: PageProps) {
-  const { id: _workspaceId, logId } = use(params)
+  const { logId } = use(params)
   const router = useRouter()
   const { state: accountState } = useAccount()
   const { state: authState } = useAuth()
