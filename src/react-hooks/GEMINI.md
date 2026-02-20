@@ -1,26 +1,55 @@
-# Project: Reusable Logic Layer (Hooks)
+# React Hooks Layer (`src/react-hooks/`)
 
 ## 1. Responsibility
 
-This directory contains custom React Hooks that encapsulate reusable UI logic or provide clean, reusable access to application state and infrastructure. For example, `useApp()` provides access to the `AppContext`, and `useLogger()` provides a clean interface for logging.
+Custom React hooks that bridge the UI layer and lower-level infrastructure. Provides clean, reusable access to application state and Firebase-backed operations.
 
-## 2. Dependency Rules
+## 2. Sub-directories and their hooks
 
-Hooks act as a bridge between the UI and the lower-level layers.
+| Directory | File pattern | What it provides |
+|-----------|-------------|-----------------|
+| `state-hooks/` | `use-*.ts` | Read domain state from `react-providers` (e.g., `use-app.ts`, `use-account.ts`, `use-visible-workspaces.ts`) |
+| `command-hooks/` | `use-*-commands.ts` | Wrap `server-commands` with React concerns: auth guards, toasts, `useCallback` (e.g., `use-schedule-commands.ts`) |
+| `service-hooks/` | `use-*.ts` | Wrap infra services: `use-logger.ts`, `use-storage.ts`, `use-daily-upload.ts` |
 
-### Allowed Imports:
-- `src/types`
-- `src/lib`
-- `src/infra`
-- `src/context`
+## 3. Input / Output contracts
 
-### Disallowed Imports:
-- `import ... from '@/components/...'`
-- `import ... from '@/genkit-flows/...'`
-- `import ... from '@/app/...'`
+| Hook pattern | Input (params) | Output | Side effects |
+|-------------|---------------|--------|-------------|
+| `useApp()` | — | `{ activeAccount, setActiveAccount, ... }` | None — reads context |
+| `useAccount()` | — | `{ workspaces, members, ... }` | None — reads context |
+| `use*Commands()` | — | `{ commandFn: (...args) => Promise<void>, isPending }` | Firestore write via `server-commands` |
+| `use*Upload()` | — | `{ upload: (file) => Promise<void>, isUploading }` | Firebase Storage write |
+| `useWorkspaceAudit(workspaceId)` | `string` | `{ logs: AuditLog[], isLoading }` | Firestore real-time listener |
 
-A hook MUST NOT import a specific UI component. Its job is to provide logic *to* a component, not to depend on one.
+## 4. Side effects
 
-## 3. Who Depends on This Layer?
+- `state-hooks/` — **No side effects**. Read-only context accessors.
+- `command-hooks/` — **Firestore or Auth writes** via `server-commands`. Each call may produce a write side effect.
+- `service-hooks/` — **Firebase Storage writes** (`use-storage`, `use-daily-upload`) or logging side effects (`use-logger`).
 
-The `context`, `components`, and `app` layers.
+## 5. Dependency rules
+
+### Allowed
+- `@/domain-types/` — domain interfaces
+- `@/lib/` — pure utilities
+- `@/firebase/` — Firestore listeners and real-time data only
+- `@/server-commands/` — for command-hooks wrapping async write operations
+- `@/react-providers/` — reading context values via `useContext`
+- `@/domain-rules/` — pure validation
+
+### Forbidden
+- `@/app/` — no upward dependency on pages/layouts
+- `@/genkit-flows/` — AI flows belong in server-commands
+- `@/view-modules/` — no UI component imports
+- `@/use-cases/` — use-cases are orchestrated at the app layer, not in hooks
+
+## 6. Who depends on this layer?
+
+`src/react-providers/` (for complex provider logic), `src/view-modules/` (view components), and `src/app/` (pages/layouts).
+
+## 7. Naming conventions
+
+- File: `use-{what-it-does}.ts` (kebab-case)
+- Export: `use{WhatItDoes}()` (camelCase with `use` prefix)
+- Never export a hook from a file that does not start with `use-`.

@@ -1,63 +1,71 @@
-# Project: Entity Layer (`src/entities/`)
+# Domain Rules Layer (`src/domain-rules/`)
 
 ## Responsibility
 
 Pure domain logic — no I/O, no async, no frameworks.  
-Each sub-directory is one domain aggregate; each `index.ts` contains only pure functions and type guards.
+Each sub-directory is one domain aggregate.
 
-## Directory map
+## File naming convention
 
-| Module | What it provides |
-|--------|-----------------|
-| `account/` | `isOrganization`, `isOwner`, `getUserTeamIds`, `getMemberRole` |
-| `workspace/` | `filterVisibleWorkspaces`, `hasWorkspaceAccess` |
-| `schedule/` | `canTransitionScheduleStatus`, `VALID_STATUS_TRANSITIONS` |
-| `user/` | `isAnonymousUser` |
-| `index.ts` | re-exports all of the above |
+Each module uses an **explicit named file** for the logic, with `index.ts` as a thin re-export barrel:
+
+| Module | Logic file | What it provides |
+|--------|-----------|-----------------|
+| `account/` | `account.rules.ts` | `isOrganization`, `isOwner`, `getUserTeamIds`, `getMemberRole` |
+| `workspace/` | `workspace.rules.ts` | `filterVisibleWorkspaces`, `hasWorkspaceAccess`, `isWorkspaceVisibleToUser` |
+| `schedule/` | `schedule.rules.ts` | `canTransitionScheduleStatus`, `VALID_STATUS_TRANSITIONS` |
+| `task/` | `task.rules.ts` | `buildTaskTree` |
+| `user/` | `user.rules.ts` | `isAnonymousUser` |
+| `index.ts` | re-exports all sub-modules | — |
+
+## Input / Output contracts
+
+| Function | Input | Output | Throws? |
+|----------|-------|--------|---------|
+| `isOrganization(account)` | `Account` | `boolean` | No |
+| `isOwner(account, userId)` | `Account`, `string` | `boolean` | No |
+| `getUserTeamIds(account, userId)` | `Account`, `string` | `Set<string>` | No |
+| `filterVisibleWorkspaces(workspaces, userId, activeAccount, allAccounts)` | arrays/records of domain types | `Workspace[]` | No |
+| `canTransitionScheduleStatus(from, to)` | two `ScheduleStatus` | `boolean` | No |
+| `buildTaskTree(tasks)` | `WorkspaceTask[]` | `TaskWithChildren[]` | No |
+
+## Side effects
+
+**None.** Every function is pure: same input → same output, zero I/O, zero mutation.
 
 ## Dependency rules
 
 ### Allowed
 - `@/domain-types/` — domain interfaces as shapes
-- `@/lib/` — pure utilities
 
 ### Forbidden
 - `react`, `firebase`, `next` — no framework dependencies
 - `@/firebase/` — no data access
 - `@/server-commands/` — no orchestration
-- `@/react-hooks/` — no React
-- `@/react-providers/` — no React
+- `@/react-hooks/`, `@/react-providers/` — no React
+- `@/view-modules/`, `@/app/` — no UI
 
 ## Coding constraints
 
-1. **No `async` functions** — entities never perform I/O.
-2. **No side effects** — every function is pure (same input → same output).
-3. **Verb-prefixed exports** — all exported functions start with `is`, `has`, `can`, `get`, or `filter`.
+1. **No `async` functions** — rules never perform I/O.
+2. **No side effects** — every function is pure.
+3. **Verb-prefixed exports** — all functions start with `is`, `has`, `can`, `get`, `filter`, or `build`.
 4. **Single aggregate per module** — each sub-directory encapsulates one domain object.
-5. **All permission logic here** — do not place `isOwner` or `hasAccess` checks in hooks or UI.
-6. **All state-transition rules here** — do not check status validity anywhere else.
-
-## Migration order (when moving code here)
-
-1. 先抽 Entity — extract pure logic first.
-2. 再移動商業規則 — move business rules.
-3. 再改寫 Service / Action — simplify the action layer.
-4. 最後改寫 UI — UI adjusts last.
-5. 每次只移動一個 domain — never refactor multiple domains simultaneously.
-6. 每次遷移後必須確保 import 無跨層循環.
+5. **All permission logic here** — never place `isOwner` or `hasAccess` checks in hooks or UI.
+6. **All state-transition rules here** — never check status validity elsewhere.
 
 ## Dependency direction (absolute)
 
 ```
-app → actions → entities
-                   ↓
-                 (types / lib only)
+app → use-cases → server-commands → domain-rules
+                                         ↓
+                                    (domain-types only)
 ```
 
-- **entities → actions** ❌ forbidden
-- **entities → infra** ❌ forbidden
-- **entities → react/firebase/next** ❌ forbidden
+- **domain-rules → server-commands** ❌ forbidden
+- **domain-rules → firebase** ❌ forbidden
+- **domain-rules → react/firebase/next** ❌ forbidden
 
 ## Ideal end state
 
-> Entity 變厚 (rich domain rules) · Action 變薄 (thin boundary) · UI 無規則 (zero business logic)
+> Rules 變厚 (rich domain logic) · server-commands 變薄 (thin boundary) · UI 無規則 (zero business logic)
