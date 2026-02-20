@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useWorkspace } from "../../../../../../context/workspace-context";
+import { useWorkspace } from '@/react-providers/workspace-provider';
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
 import { 

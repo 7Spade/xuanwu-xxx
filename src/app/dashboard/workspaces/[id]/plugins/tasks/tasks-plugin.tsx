@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useWorkspace } from '../../../../../../context/workspace-context';
+import { useWorkspace } from '@/react-providers/workspace-provider';
 import { Button } from '@/shared/shadcn-ui/button';
 import { Input } from '@/shared/shadcn-ui/input';
 import { Textarea } from '@/shared/shadcn-ui/textarea';

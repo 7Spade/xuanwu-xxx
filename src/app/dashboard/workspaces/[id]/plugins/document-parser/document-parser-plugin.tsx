@@ -10,7 +10,7 @@ import {
   type ActionState,
 } from './actions';
 import type { WorkItem } from '@/genkit-flows/schemas/docu-parse';
-import { useWorkspace } from '../../../../../../context/workspace-context';
+import { useWorkspace } from '@/react-providers/workspace-provider';
 
 const initialState: ActionState = {
   data: undefined,

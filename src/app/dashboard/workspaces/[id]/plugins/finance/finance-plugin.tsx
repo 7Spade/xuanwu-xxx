@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useWorkspace } from "../../../../../../context/workspace-context";
+import { useWorkspace } from '@/react-providers/workspace-provider';
 import { Button } from "@/shared/shadcn-ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
 import { Wallet, Landmark, TrendingUp, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";

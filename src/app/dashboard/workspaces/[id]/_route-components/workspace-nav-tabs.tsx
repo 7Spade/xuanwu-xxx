@@ -56,7 +56,7 @@ interface WorkspaceNavTabsProps {
 
 export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
   const { workspace } = useWorkspace()
-  const activeCapability = useSelectedLayoutSegment("capability")
+  const activeCapability = useSelectedLayoutSegment("plugin-tab")
 
   const mountedCapabilities = useMemo(() => {
     // Layer 3 — Business: dynamic capabilities mounted per workspace, excluding permanent layers.

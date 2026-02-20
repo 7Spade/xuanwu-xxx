@@ -1,6 +1,6 @@
 "use client";
 
-import { useWorkspace } from "../../../../../../context/workspace-context";
+import { useWorkspace } from '@/react-providers/workspace-provider';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/shadcn-ui/card";
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";

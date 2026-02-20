@@ -1,6 +1,6 @@
 "use client";
 
-import { useWorkspace } from "../../../../../../context/workspace-context";
+import { useWorkspace } from '@/react-providers/workspace-provider';
 import { Button } from "@/shared/shadcn-ui/button";
 import { Trophy, CheckCircle2, Search, XCircle, AlertTriangle } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
