@@ -31,6 +31,17 @@ import { Capability } from "@/domain-types/domain";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { Checkbox } from "@/shared/shadcn-ui/checkbox";
 import { Label } from "@/shared/shadcn-ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/shadcn-ui/alert-dialog";
+import { Spinner } from "@/shared/shadcn-ui/spinner";
 
 // Capabilities available for personal (user-owned) workspaces.
 const PERSONAL_CAPABILITY_IDS = new Set([
@@ -63,6 +74,8 @@ export function WorkspaceCapabilities() {
   const { capabilitySpecs, accounts } = state;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCaps, setSelectedCaps] = useState<Set<string>>(new Set());
+  const [isMounting, setIsMounting] = useState(false);
+  const [capToUnmount, setCapToUnmount] = useState<Capability | null>(null);
 
   const ownerType = useMemo(() => 
     accounts[workspace.dimensionId]?.accountType ?? 'user',
@@ -89,6 +102,7 @@ export function WorkspaceCapabilities() {
     
     if (templates.length > 0) {
       try {
+        setIsMounting(true);
         await mountCapabilities(templates);
         templates.forEach(template => {
             logAuditEvent("Mounted Capability", template.name, 'create'); 
@@ -103,6 +117,8 @@ export function WorkspaceCapabilities() {
           title: "Mounting Failed",
           description: getErrorMessage(error, "You may not have the required permissions."),
         });
+      } finally {
+        setIsMounting(false);
       }
     }
   }, [logAuditEvent, capabilitySpecs, selectedCaps, mountCapabilities]);
@@ -168,12 +184,9 @@ export function WorkspaceCapabilities() {
         <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
           <Box className="w-4 h-4" /> Mounted Atomic Capabilities
         </h3>
-        <button 
-          onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-80 transition-opacity"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setIsAddOpen(true)} className="gap-2 text-[10px] font-bold uppercase tracking-widest">
           <Plus className="w-3.5 h-3.5" /> Mount New Capability
-        </button>
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {(workspace.capabilities || []).map((cap: any) => (
@@ -192,21 +205,24 @@ export function WorkspaceCapabilities() {
             </CardHeader>
             <CardFooter className="border-t border-border/10 flex justify-between items-center py-4 bg-muted/5">
               <span className="text-[9px] font-mono text-muted-foreground opacity-60">SPEC_ID: {cap.id.toUpperCase()}</span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" 
-                onClick={() => handleRemoveCapability(cap)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" 
+                  onClick={() => setCapToUnmount(cap)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
             </CardFooter>
           </Card>
         ))}
         {(workspace.capabilities || []).length === 0 && (
-          <div className="col-span-full p-20 text-center border-2 border-dashed rounded-3xl opacity-20">
-            <Box className="w-12 h-12 mx-auto mb-4" />
-            <p className="text-xs font-bold uppercase tracking-widest">No capabilities mounted in this space</p>
+          <div className="col-span-full p-10 text-center border-2 border-dashed rounded-3xl bg-muted/20">
+            <Box className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-xs font-bold uppercase tracking-widest mb-4">No capabilities mounted in this space</p>
+            <Button size="sm" onClick={() => setIsAddOpen(true)} className="gap-2 text-[10px] font-bold uppercase tracking-widest">
+              <Plus className="w-3.5 h-3.5" /> Mount New Capability
+            </Button>
           </div>
         )}
       </div>
@@ -229,7 +245,7 @@ export function WorkspaceCapabilities() {
                 htmlFor={`cap-${cap.id}`}
                 className="flex items-center gap-4 p-4 rounded-2xl border hover:border-primary cursor-pointer transition-colors"
               >
-                <Checkbox id={`cap-${cap.id}`} onCheckedChange={() => toggleCapSelection(cap.id)} />
+                <Checkbox id={`cap-${cap.id}`} checked={selectedCaps.has(cap.id)} onCheckedChange={() => toggleCapSelection(cap.id)} />
                 <div className="p-3 bg-primary/10 rounded-xl text-primary">
                   {getSpecIcon(cap.type)}
                 </div>
@@ -240,12 +256,40 @@ export function WorkspaceCapabilities() {
               </Label>
             ))}
           </div>
-          <DialogFooter>
-             <Button variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-             <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0}>Mount Selected ({selectedCaps.size})</Button>
-          </DialogFooter>
+           <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
+                {isMounting && <Spinner className="mr-1" />}
+                Mount Selected ({selectedCaps.size})
+              </Button>
+           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!capToUnmount} onOpenChange={(open) => !open && setCapToUnmount(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unmount capability?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove <span className="font-semibold">{capToUnmount?.name}</span> from this workspace.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCapToUnmount(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (capToUnmount) {
+                  void handleRemoveCapability(capToUnmount);
+                }
+                setCapToUnmount(null);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Unmount
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
