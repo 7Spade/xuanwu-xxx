@@ -4,10 +4,9 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/hooks/use-toast"
-import { createUserAccount } from "@/actions/user"
+import { completeRegistration } from "@/features/auth"
 import {
   signIn,
-  registerUser,
   signInAnonymously,
   sendPasswordResetEmail,
 } from "@/actions/auth"
@@ -42,8 +41,7 @@ export default function LoginPage() {
         await signIn(email, password)
       } else {
         if (!name) throw new Error(t('auth.pleaseSetDisplayName'))
-        const uid = await registerUser(email, password, name)
-        await createUserAccount(uid, name, email)
+        await completeRegistration(email, password, name)
       }
       toast({ title: t('auth.identityResonanceSuccessful') })
       router.push("/dashboard")

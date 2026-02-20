@@ -17,7 +17,7 @@ import { useGlobalSchedule } from "./_hooks/use-global-schedule";
 import { decisionHistoryColumns } from "./_components/decision-history-columns";
 import { upcomingEventsColumns } from "./_components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
-import { updateScheduleItemStatus } from "@/actions/schedule";
+import { approveScheduleItem, rejectScheduleItem } from "@/features/schedule";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +39,11 @@ export function AccountScheduleComponent() {
 
   const handleAction = useCallback(async (item: ScheduleItem, newStatus: 'OFFICIAL' | 'REJECTED') => {
     try {
-      await updateScheduleItemStatus(item.accountId, item.id, newStatus);
+      if (newStatus === 'OFFICIAL') {
+        await approveScheduleItem(item)
+      } else {
+        await rejectScheduleItem(item)
+      }
       const successTitle = newStatus === 'OFFICIAL' ? "Proposal Approved" : "Proposal Rejected";
       toast({ title: successTitle, description: `"${item.title}" has been updated.` });
     } catch (e: any) {
