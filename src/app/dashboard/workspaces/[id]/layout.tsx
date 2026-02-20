@@ -17,7 +17,7 @@ import {
 } from "@/shared/shadcn-ui/dialog";
 import { WorkspaceStatusBar } from "./_route-components/workspace-status-bar";
 import { WorkspaceNavTabs } from "./_route-components/workspace-nav-tabs";
-import { handleDeleteWorkspace } from "../_route-utils/workspace-actions";
+import { handleDeleteWorkspace } from "@/use-cases/workspace/workspace-actions";
 
 interface PageHeaderProps {
   title: string;

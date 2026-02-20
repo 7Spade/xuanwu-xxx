@@ -13,7 +13,7 @@ import {
 import { Button } from "@/shared/shadcn-ui/button";
 import { Input } from "@/shared/shadcn-ui/input";
 import { Label } from "@/shared/shadcn-ui/label";
-import { handleCreateWorkspace } from "../_route-utils/workspace-actions";
+import { handleCreateWorkspace } from "@/use-cases/workspace/workspace-actions";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 

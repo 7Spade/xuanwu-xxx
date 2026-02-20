@@ -6,7 +6,7 @@ import { Terminal } from "lucide-react";
 import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
-import { useWorkspaceFilters } from "./_route-utils/use-workspace-filters";
+import { useWorkspaceFilters } from "@/react-hooks/state-hooks/use-workspace-filters";
 import { WorkspaceListHeader } from "./_route-components/workspace-list-header";
 import { WorkspaceGridView } from "./_route-components/workspace-grid-view";
 import { WorkspaceTableView } from "./_route-components/workspace-table-view";

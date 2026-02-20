@@ -1,6 +1,14 @@
-import type { WorkspaceTask } from "@/domain-types/domain";
-import type { TaskWithChildren } from "./tasks-plugin.types";
+/**
+ * @fileoverview domain-rules/task — Pure task domain rules.
+ * No async, no I/O, no React, no Firebase.
+ */
 
+import type { WorkspaceTask, TaskWithChildren } from "@/domain-types/domain";
+
+/**
+ * Builds a recursive task tree from a flat list of WorkspaceTask records.
+ * Calculates WBS numbering, descendant subtotal sums, and progress per node.
+ */
 export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
   if (!tasks || tasks.length === 0) return [];
   const map: Record<string, TaskWithChildren> = {};
@@ -17,7 +25,7 @@ export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
   ) => {
     if (path.has(node.id)) {
       console.error("Circular dependency detected in tasks:", node.id);
-      return 0; // Stop recursion
+      return 0;
     }
     const newPath = new Set(path);
     newPath.add(node.id);
@@ -34,20 +42,15 @@ export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
     });
     node.descendantSum = sum;
 
-    // New progress calculation logic
     if (node.children.length === 0) {
-      // Leaf node: progress is based on quantity or binary state
       if ((node.quantity ?? 1) > 1) {
-        // Divisible task
         const completed = node.completedQuantity || 0;
         const total = node.quantity!;
         node.progress = total > 0 ? Math.round((completed / total) * 100) : 0;
       } else {
-        // Atomic task
         node.progress = ['completed', 'verified', 'accepted'].includes(node.progressState) ? 100 : 0;
       }
     } else {
-      // Parent node: progress is a weighted average of children's progress
       const weightedProgressSum = node.children.reduce(
         (acc, child) => acc + (child.progress || 0) * (child.subtotal || 0),
         0
@@ -60,12 +63,11 @@ export const buildTaskTree = (tasks: WorkspaceTask[]): TaskWithChildren[] => {
       if (totalChildSubtotal > 0) {
         node.progress = Math.round(weightedProgressSum / totalChildSubtotal);
       } else {
-        // If children have no value, progress is 100 only if all are complete.
         const allChildrenComplete = node.children.every(c => c.progress === 100);
         node.progress = allChildrenComplete ? 100 : 0;
       }
     }
-    
+
     return sum;
   };
 
