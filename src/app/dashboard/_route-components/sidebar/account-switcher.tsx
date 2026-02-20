@@ -16,7 +16,6 @@ import {
 import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import { Account } from "@/domain-types/domain"
 import { cn } from "@/shared/utils/utils"
-import Link from "next/link"
 
 interface AccountSwitcherProps {
   user: Account | null
@@ -83,50 +82,44 @@ export function AccountSwitcher({
   const accountLabel = activeAccount?.name ?? t('sidebar.selectAccount')
 
   return (
-    <>
-      <Link href="/dashboard" className="flex items-center mb-4 px-1 hover:opacity-80 transition-opacity">
-        <div className="text-3xl select-none">🐢</div>
-      </Link>
-      
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full justify-between shadow-sm border-border/60 hover:bg-accent/10 rounded-xl h-11">
-            <div className="flex items-center gap-3 truncate">
-              {activeAccount ? (
-                <Avatar className="w-6 h-6">
-                  {activeAccount.accountType === 'user' && user?.photoURL ? (
-                    <AvatarImage src={user.photoURL} alt={activeAccount.name} />
-                  ) : null}
-                  <AvatarFallback className={cn("font-bold text-xs shadow-inner", activeAccount.accountType === "user" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
-                    {getAccountInitial(activeAccount.name)}
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <Globe className="w-4 h-4" />
-              )}
-              <span className="truncate font-semibold text-sm">{accountLabel}</span>
-            </div>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[240px]" align="start">
-          <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-black px-2 py-1.5">
-            {t('sidebar.switchAccountContext')}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} activeAccount={activeAccount} dispatch={dispatch} />)}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
-            onSelect={() => {
-              setIsDropdownOpen(false)
-              router.push("/dashboard/account/new")
-            }}
-          >
-            <Plus className="w-4 h-4" /> {t('sidebar.createNewDimension')}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="w-full justify-between shadow-sm border-border/60 hover:bg-accent/10 rounded-xl h-11">
+          <div className="flex items-center gap-3 truncate">
+            {activeAccount ? (
+              <Avatar className="w-6 h-6">
+                {activeAccount.accountType === 'user' && user?.photoURL ? (
+                  <AvatarImage src={user.photoURL} alt={activeAccount.name} />
+                ) : null}
+                <AvatarFallback className={cn("font-bold text-xs shadow-inner", activeAccount.accountType === "user" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary")}>
+                  {getAccountInitial(activeAccount.name)}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <Globe className="w-4 h-4" />
+            )}
+            <span className="truncate font-semibold text-sm">{accountLabel}</span>
+          </div>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[240px]" align="start" side="top">
+        <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-black px-2 py-1.5">
+          {t('sidebar.switchAccountContext')}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {availableAccounts.map((account) => <AccountSwitcherItem key={account.id} account={account} activeAccount={activeAccount} dispatch={dispatch} />)}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
+          onSelect={() => {
+            setIsDropdownOpen(false)
+            router.push("/dashboard/account/new")
+          }}
+        >
+          <Plus className="w-4 h-4" /> {t('sidebar.createNewDimension')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

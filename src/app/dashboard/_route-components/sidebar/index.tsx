@@ -16,6 +16,7 @@
 // Next.js & React Imports
 // ============================================================================
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 // ============================================================================
 // UI Components
@@ -75,17 +76,12 @@ export function DashboardSidebar() {
   // Render - Assembling the Sidebar
   // ========================================
   return (
-    <Sidebar className="border-r border-border/50">
-      {/* Sidebar Header: Contains the logo and the account switcher dropdown */}
+    <Sidebar className="border-r border-border/50 z-40">
+      {/* Sidebar Header: Contains only the logo */}
       <SidebarHeader className="p-4">
-        <AccountSwitcher
-          user={currentUser}
-          accounts={accounts}
-          activeAccount={activeAccount}
-          dispatch={dispatch}
-          createOrganization={createOrganization}
-          t={t}
-        />
+        <Link href="/dashboard" aria-label="Go to dashboard home" className="flex items-center px-1 hover:opacity-80 transition-opacity">
+          <div className="text-3xl select-none">🐢</div>
+        </Link>
       </SidebarHeader>
 
       {/* Sidebar Content: Contains the main navigation and workspace quick links */}
@@ -114,8 +110,17 @@ export function DashboardSidebar() {
         />
       </SidebarContent>
 
-      {/* Sidebar Footer: Contains user profile info, settings, and logout */}
+      {/* Sidebar Footer: Contains account switcher and user profile */}
       <SidebarFooter className="p-4 bg-muted/5">
+        <AccountSwitcher
+          user={currentUser}
+          accounts={accounts}
+          activeAccount={activeAccount}
+          dispatch={dispatch}
+          createOrganization={createOrganization}
+          t={t}
+        />
+        <SidebarSeparator className="mx-0 opacity-30" />
         <NavUser
           user={currentUser}
           accounts={accounts}
