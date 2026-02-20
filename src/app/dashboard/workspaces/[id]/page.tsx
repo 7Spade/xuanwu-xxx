@@ -1,13 +1,20 @@
-// [職責] 詳情頁入口：僅負責渲染核心內容。
-"use client";
+// [職責] 詳情頁入口：重定向到默認能力。
+"use client"
 
-import { WorkspaceTabs } from "./_components/workspace-tabs";
+import { useEffect } from "react"
+import { useRouter, useParams } from "next/navigation"
 
 /**
  * WorkspaceDetailPage - The entry point for a specific workspace.
- * Its SOLE RESPONSIBILITY is to render the core content (WorkspaceTabs).
- * The WorkspaceProvider is now handled by the parent layout.
+ * Its SOLE RESPONSIBILITY is to redirect to the default capability (capabilities).
  */
 export default function WorkspaceDetailPage() {
-  return <WorkspaceTabs />;
+  const { id } = useParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace(`/dashboard/workspaces/${id}/capabilities`)
+  }, [id, router])
+
+  return null
 }
