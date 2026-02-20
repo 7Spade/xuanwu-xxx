@@ -17,7 +17,7 @@
 import { useCallback } from "react";
 import { useApp } from "@/hooks/state/use-app";
 import { useAuth } from "@/context/auth-context";
-import { toggleDailyLogLike } from "@/infra/firebase/firestore/firestore.facade";
+import { toggleLike as toggleLikeAction } from "@/actions/daily.actions";
 import { toast } from "@/hooks/ui/use-toast";
 
 export function useDailyActions() {
@@ -40,7 +40,7 @@ export function useDailyActions() {
       try {
         // Here we could implement an optimistic update to the local state
         // for a more responsive UI, before waiting for the backend call.
-        await toggleDailyLogLike(activeAccount.id, logId, user.id);
+        await toggleLikeAction(activeAccount.id, logId, user.id);
       } catch (error) {
         console.error("Failed to toggle like:", error);
         toast({
