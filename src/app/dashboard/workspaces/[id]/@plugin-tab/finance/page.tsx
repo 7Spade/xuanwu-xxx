@@ -1,4 +1,4 @@
-import { WorkspaceFinance } from "../../plugins"
+import { WorkspaceFinance } from "@/view-modules/workspaces/plugins"
 
 export default function FinanceCapabilityPage() {
   return <WorkspaceFinance />

@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/workspaces/[id]/plugins/audit/audit.view';
+export { default } from '@/view-modules/workspaces/plugins/audit/audit.view';

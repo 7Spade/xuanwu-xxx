@@ -1,4 +1,4 @@
-import { WorkspaceFiles } from "../../plugins"
+import { WorkspaceFiles } from "@/view-modules/workspaces/plugins"
 
 export default function FilesCapabilityPage() {
   return <WorkspaceFiles />
