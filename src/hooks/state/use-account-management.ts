@@ -17,13 +17,11 @@ import {
 import type { MemberReference, Account, ThemeConfig } from '@/types/domain';
 
 /**
- * @fileoverview A hook for managing organization-level actions.
- * This hook acts as an intermediary between the UI components and the
- * infrastructure layer (facades), ensuring that components do not
-* directly call infrastructure logic. It centralizes all organization-related
- * write operations.
+ * @fileoverview A hook for managing account-level (organization) write operations.
+ * This hook acts as an intermediary between UI components and the infrastructure
+ * layer (facades), ensuring components do not directly call infrastructure logic.
  */
-export function useOrganization() {
+export function useAccountManagement() {
   const { state: appState } = useApp();
   const { activeAccount } = appState;
   const { state: authState } = useAuth();

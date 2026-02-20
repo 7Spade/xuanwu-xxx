@@ -8,7 +8,7 @@ import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react";
 import { useState, useEffect, useMemo, ReactNode } from "react";
 import { toast } from "@/hooks/ui/use-toast";
 import { useApp } from "@/hooks/state/use-app";
-import { useOrganization } from "@/hooks/state/use-organization";
+import { useAccountManagement } from "@/hooks/state/use-account-management";
 
 interface PageHeaderProps {
   title: string;
@@ -41,7 +41,7 @@ export default function AccountTeamDetailPage() {
   
   const { state } = useApp();
   const { accounts, activeAccount } = state;
-  const { updateTeamMembers } = useOrganization();
+  const { updateTeamMembers } = useAccountManagement();
   const activeOrgId = activeAccount?.id;
   const [mounted, setMounted] = useState(false);
   

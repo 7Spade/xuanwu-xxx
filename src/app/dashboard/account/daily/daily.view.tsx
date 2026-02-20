@@ -1,10 +1,9 @@
 "use client";
 
-import { OrganizationDailyComponent } from "@/app/dashboard/workspaces/[id]/capabilities/daily/organization-daily.component";
+import { AccountDailyComponent } from "@/app/dashboard/workspaces/[id]/capabilities/daily/daily.account";
 
 /**
  * AccountDailyView - Responsibility: The dynamic wall for the entire dimension.
- * Composes the OrganizationDailyComponent to separate concerns.
  */
 export default function AccountDailyView() {
   return (
@@ -15,7 +14,7 @@ export default function AccountDailyView() {
           <p className="text-muted-foreground">Aggregated activity from all personnel across all spaces.</p>
         </div>
       </div>
-      <OrganizationDailyComponent />
+      <AccountDailyComponent />
     </div>
   );
 }

@@ -39,7 +39,7 @@ import { useI18n } from "@/context/i18n-context";
 import { useApp } from "@/hooks/state/use-app";
 import { useUser } from "@/hooks/state/use-user";
 import { useVisibleWorkspaces } from "@/hooks/state/use-visible-workspaces";
-import { useOrganization } from "@/hooks/state/use-organization";
+import { useAccountManagement } from "@/hooks/state/use-account-management";
 
 // ============================================================================
 // Sidebar Sub-components
@@ -66,7 +66,7 @@ export function DashboardSidebar() {
   const { state: appState, dispatch } = useApp()
   const { accounts, activeAccount } = appState
   const visibleWorkspaces = useVisibleWorkspaces()
-  const { createOrganization } = useOrganization()
+  const { createOrganization } = useAccountManagement()
 
   // Merge Firestore profile with auth user: profile has photoURL etc., user is always available
   const currentUser = profile ?? user

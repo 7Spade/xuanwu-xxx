@@ -1,6 +1,6 @@
 "use client";
 
-import { OrganizationAuditComponent } from "@/app/dashboard/workspaces/[id]/capabilities/audit/organization-audit.component";
+import { AccountAuditComponent } from "@/app/dashboard/workspaces/[id]/capabilities/audit/audit.account";
 
 /**
  * AccountAuditView - Responsibility: Displays the audit trail (Audit Logs) for the entire dimension.
@@ -14,7 +14,7 @@ export default function AccountAuditView() {
           <p className="text-muted-foreground">Architectural event log for the entire dimension.</p>
         </div>
       </div>
-      <OrganizationAuditComponent />
+      <AccountAuditComponent />
     </div>
   );
 }

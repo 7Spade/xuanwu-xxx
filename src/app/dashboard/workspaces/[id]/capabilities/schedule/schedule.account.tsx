@@ -1,10 +1,15 @@
-
+// [職責] Projection — Account 層跨 Workspace 排程治理視圖 (全維度、可審批)
+/**
+ * @fileoverview AccountScheduleComponent - The "Governor" view for the account-wide schedule.
+ * @description Aggregated view of all proposed and official schedule items across all workspaces.
+ * Uses the `useScheduleActions` hook to handle all write operations (approve/reject/assign).
+ */
 "use client";
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/ui/use-toast";
-import { MemberReference, ScheduleItem } from "@/types/domain";
+import { ScheduleItem } from "@/types/domain";
 import { UnifiedCalendarGrid } from "@/app/dashboard/_components/schedule/unified-calendar-grid";
 import { ScheduleDataTable } from "./_components/schedule-data-table";
 import { GovernanceSidebar } from "./_components/governance-sidebar";
@@ -25,12 +30,6 @@ import { Button } from "@/app/_components/ui/button";
 import { UserPlus, Calendar, ListChecks, History } from "lucide-react";
 import { useScheduleActions } from "@/hooks/actions/use-schedule-actions";
 
-
-/**
- * @fileoverview AccountScheduleComponent - The "Governor" view for the organization's schedule.
- * @description REFACTORED: Now uses the `useScheduleActions` hook to handle all write operations.
- * The member assignment UI has been simplified to use a DropdownMenu, removing the local Popover component.
- */
 export function AccountScheduleComponent() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());

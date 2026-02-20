@@ -9,7 +9,7 @@ import { toast } from "@/hooks/ui/use-toast";
 import { useState, useEffect, useMemo, ReactNode } from "react";
 import { MemberReference } from "@/types/domain";
 import { useApp } from "@/hooks/state/use-app";
-import { useOrganization } from "@/hooks/state/use-organization";
+import { useAccountManagement } from "@/hooks/state/use-account-management";
 import { useI18n } from "@/context/i18n-context";
 
 interface PageHeaderProps {
@@ -39,7 +39,7 @@ export default function AccountMembersPage() {
   const { t } = useI18n();
   const { state } = useApp();
   const { accounts, activeAccount } = state;
-  const { recruitMember, dismissMember } = useOrganization();
+  const { recruitMember, dismissMember } = useAccountManagement();
 
   useEffect(() => {
     setMounted(true);

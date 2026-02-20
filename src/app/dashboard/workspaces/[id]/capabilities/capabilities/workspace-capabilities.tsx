@@ -32,13 +32,22 @@ import { useApp } from "@/hooks/state/use-app";
 import { Checkbox } from "@/app/_components/ui/checkbox";
 import { Label } from "@/app/_components/ui/label";
 
+// Capabilities available for personal (user-owned) workspaces.
 const PERSONAL_CAPABILITY_IDS = new Set([
   'tasks',
   'files',
   'daily',
   'issues',
   'schedule',
-  'docu-import',
+  'document-parser',
+]);
+
+// Capabilities that belong to permanent layers (Core, Governance, Projection) and
+// must never appear in the mountable-capability picker.
+const NON_MOUNTABLE_CAPABILITY_IDS = new Set([
+  'capabilities', // Core
+  'members',      // Governance
+  'audit',        // Projection
 ]);
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -70,8 +79,8 @@ export function WorkspaceCapabilities() {
     if (ownerType === 'user') {
       specs = specs.filter(spec => PERSONAL_CAPABILITY_IDS.has(spec.id));
     }
-    // "Capabilities" capability should not be mountable
-    return specs.filter(spec => spec.id !== 'capabilities' && !mountedCapIds.includes(spec.id));
+    // Exclude capabilities from permanent layers (Core, Governance, Projection) — these are not mountable.
+    return specs.filter(spec => !NON_MOUNTABLE_CAPABILITY_IDS.has(spec.id) && !mountedCapIds.includes(spec.id));
   }, [capabilitySpecs, ownerType, mountedCapIds]);
 
 

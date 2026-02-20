@@ -16,7 +16,7 @@ import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import { Account } from "@/types/domain"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { OrgCreateDialog } from "./org-create-dialog"
+import { AccountCreateDialog } from "./account-create-dialog"
 
 interface AccountSwitcherProps {
   user: Account | null
@@ -128,7 +128,7 @@ export function AccountSwitcher({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <OrgCreateDialog
+      <AccountCreateDialog
         open={isCreateOrgOpen}
         onOpenChange={setIsCreateOrgOpen}
         createOrganization={createOrganization}

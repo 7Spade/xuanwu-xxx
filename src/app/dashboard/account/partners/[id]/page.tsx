@@ -30,7 +30,7 @@ import { Label } from "@/app/_components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/_components/ui/tabs";
 import { useApp } from "@/hooks/state/use-app";
 import { useAccount } from "@/hooks/state/use-account";
-import { useOrganization } from "@/hooks/state/use-organization";
+import { useAccountManagement } from "@/hooks/state/use-account-management";
 
 interface PageHeaderProps {
   title: string;
@@ -66,7 +66,7 @@ export default function PartnerTeamDetailPage() {
   const { state: accountState } = useAccount();
   const { accounts, activeAccount } = appState;
   const { invites } = accountState;
-  const { sendPartnerInvite, dismissPartnerMember } = useOrganization();
+  const { sendPartnerInvite, dismissPartnerMember } = useAccountManagement();
   
   const [mounted, setMounted] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);

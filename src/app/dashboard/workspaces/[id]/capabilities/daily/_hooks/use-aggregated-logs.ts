@@ -9,7 +9,7 @@
  * @responsibility
  * - Access `dailyLogs` from `useAccount` context.
  * - Memoize the transformation of the logs from a record to a sorted array.
- * - Provide a stable, sorted array of logs for the `OrganizationDailyComponent`.
+ * - Provide a stable, sorted array of logs for the `AccountDailyComponent`.
  */
 "use client";
 
