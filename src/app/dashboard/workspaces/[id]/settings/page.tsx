@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { WorkspaceSettingsDialog } from "../_route-components/workspace-settings"
+import { WorkspaceSettingsDialog } from "@/view-modules/workspaces/workspace-settings"
 import { useWorkspace } from "@/react-providers/workspace-provider"
 import type { WorkspaceLifecycleState, Address } from "@/domain-types/domain"
 

@@ -280,3 +280,14 @@ export interface PartnerInvite {
   invitedAt: any; // Event Timestamp
   protocol: string;
 }
+
+// ---------------------------------------------------------------------------
+// Derived / computed task types (used by buildTaskTree in domain-rules/task)
+// ---------------------------------------------------------------------------
+
+export type TaskWithChildren = WorkspaceTask & {
+  children: TaskWithChildren[];
+  descendantSum: number;
+  wbsNo: string;
+  progress: number;
+}

@@ -16,7 +16,7 @@ import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { AlertCircle, MessageSquare } from "lucide-react";
 import { DailyLogCard } from "./_plugin-components/daily-log-card";
-import { useAggregatedLogs } from "./_plugin-hooks/use-aggregated-logs";
+import { useAggregatedLogs } from "@/react-hooks/state-hooks/use-aggregated-logs";
 import { DailyLog } from "@/domain-types/domain";
 import { DailyLogDialog } from "./_plugin-components/daily-log-dialog";
 import { WorkspaceProvider } from "@/react-providers/workspace-provider";

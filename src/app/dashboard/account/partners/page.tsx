@@ -1,4 +1,4 @@
-import { PartnersView } from "@/use-cases/partners"
+import { PartnersView } from "@/view-modules/partners/partners-view"
 
 /**
  * PartnersPage - Manages logical groupings of EXTERNAL partners (Partner Teams).

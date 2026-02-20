@@ -44,6 +44,8 @@ export function WorkspaceMembers() {
 
   const [grantTarget, setGrantTarget] = useState<MemberReference | null>(null);
   const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('Contributor');
+  const [loadingTeamId, setLoadingTeamId] = useState<string | null>(null);
+  const [loadingGrantId, setLoadingGrantId] = useState<string | null>(null);
 
   const activeOrg = useMemo(() => 
     activeOrgId ? accounts[activeOrgId] : null,
@@ -51,6 +53,8 @@ export function WorkspaceMembers() {
   );
 
   const handleToggleTeam = async (team: Team, isAuthorized: boolean) => {
+    if (loadingTeamId) return;
+    setLoadingTeamId(team.id);
     try {
       if (isAuthorized) {
         await revokeWorkspaceTeam(team.id);
@@ -68,12 +72,14 @@ export function WorkspaceMembers() {
         title: "Permission Update Failed",
         description: getErrorMessage(error, "You may not have the required permissions."),
       });
+    } finally {
+      setLoadingTeamId(null);
     }
   };
 
   const handleConfirmGrant = async () => {
-    if (!grantTarget) return;
-
+    if (!grantTarget || loadingGrantId) return;
+    setLoadingGrantId('new');
     try {
       await grantIndividualWorkspaceAccess(grantTarget.id, selectedRole, workspace.protocol);
       logAuditEvent("Authorized Individual", `${grantTarget.name} as ${selectedRole}`, 'create');
@@ -86,13 +92,17 @@ export function WorkspaceMembers() {
         title: "Grant Failed",
         description: getErrorMessage(error, "You may not have the required permissions."),
       });
+    } finally {
+      setLoadingGrantId(null);
     }
   };
 
   const handleRevokeGrant = async (grantId: string) => {
+    if (loadingGrantId) return;
+    setLoadingGrantId(grantId);
     try {
       const grant = (workspace.grants || []).find(g => g.grantId === grantId);
-      const member = activeOrg?.members.find(m => m.id === grant?.userId);
+      const member = (activeOrg?.members || []).find(m => m.id === grant?.userId);
       
       await revokeIndividualWorkspaceAccess(grantId);
       
@@ -105,6 +115,8 @@ export function WorkspaceMembers() {
         title: "Revoke Failed",
         description: getErrorMessage(error, "You may not have the required permissions."),
       });
+    } finally {
+      setLoadingGrantId(null);
     }
   };
 
@@ -135,8 +147,9 @@ export function WorkspaceMembers() {
             size="sm" 
             className="h-7 text-[9px] font-bold uppercase tracking-widest"
             onClick={() => handleToggleTeam(team, isAuthorized)}
+            disabled={!!loadingTeamId}
           >
-            {isAuthorized ? "Revoke" : "Authorize"}
+            {loadingTeamId === team.id ? "..." : isAuthorized ? "Revoke" : "Authorize"}
           </Button>
         </CardHeader>
         {isAuthorized && (
@@ -226,14 +239,14 @@ export function WorkspaceMembers() {
                   {!hasInheritedAccess && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                         <Button variant="ghost" size="icon" className="h-8 w-8">
+                         <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!!loadingGrantId}>
                            <MoreVertical className="w-4 h-4" />
                          </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         {directGrant ? (
-                          <DropdownMenuItem onClick={() => handleRevokeGrant(directGrant.grantId)} className="text-destructive cursor-pointer">
-                             <Trash2 className="mr-2 h-4 w-4" /> Revoke Access
+                          <DropdownMenuItem onClick={() => handleRevokeGrant(directGrant.grantId)} className="text-destructive cursor-pointer" disabled={loadingGrantId === directGrant.grantId}>
+                             <Trash2 className="mr-2 h-4 w-4" /> {loadingGrantId === directGrant.grantId ? 'Revoking...' : 'Revoke Access'}
                           </DropdownMenuItem>
                         ) : (
                           <DropdownMenuItem onClick={() => setGrantTarget(member)} className="cursor-pointer">
@@ -281,8 +294,10 @@ export function WorkspaceMembers() {
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setGrantTarget(null)}>Cancel</Button>
-            <Button onClick={handleConfirmGrant}>Confirm Grant</Button>
+            <Button variant="ghost" onClick={() => setGrantTarget(null)} disabled={loadingGrantId === 'new'}>Cancel</Button>
+            <Button onClick={handleConfirmGrant} disabled={loadingGrantId === 'new'}>
+              {loadingGrantId === 'new' ? 'Granting...' : 'Confirm Grant'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

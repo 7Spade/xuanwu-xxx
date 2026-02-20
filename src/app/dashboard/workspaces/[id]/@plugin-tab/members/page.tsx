@@ -1,5 +1,5 @@
-import { WorkspaceMembersCapabilityView } from "@/view-modules/workspace-members/workspace-members-view"
+import { WorkspaceMembers } from "../../plugins"
 
 export default function MembersCapabilityPage() {
-  return <WorkspaceMembersCapabilityView />
+  return <WorkspaceMembers />
 }

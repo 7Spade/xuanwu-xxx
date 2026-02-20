@@ -4,33 +4,12 @@ import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent } from "@/shared/shadcn-ui/card"
 import { Button } from "@/shared/shadcn-ui/button"
 import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react"
-import { useState, useEffect, useMemo, ReactNode } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/react-hooks/state-hooks/use-app"
 import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management"
 import type { MemberReference, Team } from "@/domain-types/domain"
-
-interface PageHeaderProps {
-  title: string
-  description?: string
-  children?: ReactNode
-  badge?: ReactNode
-}
-
-function PageHeader({ title, description, children, badge }: PageHeaderProps) {
-  return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div className="space-y-1">
-        {badge && <div className="mb-2">{badge}</div>}
-        <h1 className="text-4xl font-bold tracking-tight font-headline">{title}</h1>
-        {description && <p className="text-muted-foreground">{description}</p>}
-      </div>
-      <div className="flex items-center gap-2">
-        {children}
-      </div>
-    </div>
-  )
-}
+import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 /**
  * TeamDetailView - 職責：管理特定團隊內的成員 (Team Member 清單)

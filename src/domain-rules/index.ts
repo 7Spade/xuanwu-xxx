@@ -9,4 +9,5 @@
 export * from "./account"
 export * from "./workspace"
 export * from "./schedule"
+export * from "./task"
 export * from "./user"
