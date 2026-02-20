@@ -108,7 +108,7 @@ export function WorkspaceCapabilities() {
   }, [logAuditEvent, capabilitySpecs, selectedCaps, mountCapabilities]);
 
 
-  const handleRemoveCapability = useCallback(async (cap: any) => {
+  const handleRemoveCapability = useCallback(async (cap: Capability) => {
     try {
       await unmountCapability(cap);
       logAuditEvent("Unmounted Capability", cap.name, 'delete');
@@ -211,7 +211,7 @@ export function WorkspaceCapabilities() {
         )}
       </div>
 
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+      <Dialog open={isAddOpen} onOpenChange={(open) => { if (!open) setSelectedCaps(new Set()); setIsAddOpen(open); }}>
         <DialogContent className="rounded-2xl max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">Mount Atomic Capability</DialogTitle>

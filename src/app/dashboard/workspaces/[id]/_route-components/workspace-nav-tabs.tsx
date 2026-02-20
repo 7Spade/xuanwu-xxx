@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { useSelectedLayoutSegment } from "next/navigation"
 import Link from "next/link"
 import { useWorkspace } from "@/react-providers/workspace-provider"
+import { useApp } from "@/react-hooks/state-hooks/use-app"
 import type { Capability } from "@/domain-types/domain"
 
 // =================================================================
@@ -56,7 +57,21 @@ interface WorkspaceNavTabsProps {
 
 export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
   const { workspace } = useWorkspace()
+  const { state } = useApp()
+  const { activeAccount } = state
   const activeCapability = useSelectedLayoutSegment("plugin-tab")
+
+  // Show governance tabs (Members) only for org-owned workspaces.
+  // We avoid hiding them unless we can definitively confirm a personal workspace
+  // (i.e., dimensionId matches the active user's own account ID).
+  const showGovernanceTabs = useMemo(
+    () =>
+      !(
+        activeAccount?.accountType === "user" &&
+        workspace.dimensionId === activeAccount.id
+      ),
+    [workspace.dimensionId, activeAccount]
+  )
 
   const mountedCapabilities = useMemo(() => {
     // Layer 3 — Business: dynamic capabilities mounted per workspace, excluding permanent layers.
@@ -67,9 +82,12 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
         name: capability.name,
       }))
 
+    // Layer 2 — Governance: only relevant for org-owned workspaces.
+    const governanceCapabilities = showGovernanceTabs ? GOVERNANCE_CAPABILITIES : []
+
     // Tab order: Core → Governance → Business → Projection
-    return [CORE_CAPABILITY, ...GOVERNANCE_CAPABILITIES, ...businessCapabilities, ...PROJECTION_CAPABILITIES]
-  }, [workspace.capabilities])
+    return [CORE_CAPABILITY, ...governanceCapabilities, ...businessCapabilities, ...PROJECTION_CAPABILITIES]
+  }, [workspace.capabilities, showGovernanceTabs])
 
   return (
     <div className="bg-muted/40 p-1 border border-border/50 rounded-xl w-full flex overflow-x-auto no-scrollbar">

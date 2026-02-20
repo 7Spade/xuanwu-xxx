@@ -11,7 +11,7 @@ import {
   arrayUnion,
   arrayRemove,
   doc,
-  getDoc,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from '../firestore.client';
 import {
@@ -86,6 +86,7 @@ export const revokeWorkspaceTeam = async (
 
 /**
  * Grants an individual member a specific role in a workspace.
+ * Uses a transaction to atomically guard against duplicate active grants.
  * @param workspaceId The ID of the workspace.
  * @param userId The ID of the user to grant access to.
  * @param role The role to grant.
@@ -97,20 +98,35 @@ export const grantIndividualWorkspaceAccess = async (
   role: WorkspaceRole,
   protocol?: string
 ): Promise<void> => {
-  const newGrant: WorkspaceGrant = {
-    grantId: `grant-${Math.random().toString(36).substring(2, 11)}`,
-    userId: userId,
-    role: role,
-    protocol: protocol || 'Standard Bridge',
-    status: 'active',
-    grantedAt: serverTimestamp(),
-  };
-  const updates = { grants: arrayUnion(newGrant) };
-  return updateDocument(`workspaces/${workspaceId}`, updates);
+  const wsRef = doc(db, 'workspaces', workspaceId);
+  return runTransaction(db, async (transaction) => {
+    const wsSnap = await transaction.get(wsRef);
+    if (!wsSnap.exists()) throw new Error('Workspace not found');
+
+    const data = wsSnap.data() as Workspace;
+    const grants = data.grants || [];
+    const hasActiveGrant = grants.some(
+      (g) => g.userId === userId && g.status === 'active'
+    );
+    if (hasActiveGrant) {
+      throw new Error('User already has an active grant for this workspace.');
+    }
+
+    const newGrant: WorkspaceGrant = {
+      grantId: crypto.randomUUID(),
+      userId,
+      role,
+      protocol: protocol || 'Standard Bridge',
+      status: 'active',
+      grantedAt: serverTimestamp(),
+    };
+    transaction.update(wsRef, { grants: arrayUnion(newGrant) });
+  });
 };
 
 /**
  * Revokes an individual's direct access grant from a workspace.
+ * Uses a transaction to atomically read-modify-write the grants array.
  * @param workspaceId The ID of the workspace.
  * @param grantId The ID of the grant to revoke.
  */
@@ -119,21 +135,19 @@ export const revokeIndividualWorkspaceAccess = async (
   grantId: string
 ): Promise<void> => {
   const wsRef = doc(db, 'workspaces', workspaceId);
-  const wsSnap = await getDoc(wsRef);
+  return runTransaction(db, async (transaction) => {
+    const wsSnap = await transaction.get(wsRef);
+    if (!wsSnap.exists()) throw new Error('Workspace not found');
 
-  if (!wsSnap.exists()) {
-    throw new Error('Workspace not found');
-  }
-
-  const workspace = wsSnap.data() as Workspace;
-  const grants = workspace.grants || [];
-  const updatedGrants = grants.map((g) =>
-    g.grantId === grantId
-      ? { ...g, status: 'revoked', revokedAt: serverTimestamp() }
-      : g
-  );
-
-  return updateDocument(`workspaces/${workspaceId}`, { grants: updatedGrants });
+    const data = wsSnap.data() as Workspace;
+    const grants = data.grants || [];
+    const updatedGrants = grants.map((g) =>
+      g.grantId === grantId
+        ? { ...g, status: 'revoked' as const, revokedAt: serverTimestamp() }
+        : g
+    );
+    transaction.update(wsRef, { grants: updatedGrants });
+  });
 };
 
 /**
@@ -247,6 +261,7 @@ export const mountCapabilities = async (
 
 /**
  * Unmounts (removes) a capability from a workspace.
+ * Uses a transaction with filter-by-id to avoid fragile deep-equality matching.
  * @param workspaceId The ID of the workspace.
  * @param capability The capability object to unmount.
  */
@@ -254,8 +269,15 @@ export const unmountCapability = async (
   workspaceId: string,
   capability: Capability
 ): Promise<void> => {
-  const updates = { capabilities: arrayRemove(capability) };
-  return updateDocument(`workspaces/${workspaceId}`, updates);
+  const wsRef = doc(db, 'workspaces', workspaceId);
+  return runTransaction(db, async (transaction) => {
+    const wsSnap = await transaction.get(wsRef);
+    if (!wsSnap.exists()) throw new Error('Workspace not found');
+
+    const data = wsSnap.data() as Workspace;
+    const updated = (data.capabilities || []).filter((c) => c.id !== capability.id);
+    transaction.update(wsRef, { capabilities: updated });
+  });
 };
 
 /**
