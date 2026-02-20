@@ -153,12 +153,12 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
  * Its sole responsibility is to provide the WorkspaceContext.
  */
 export default function WorkspaceLayout({
-  pluginTab,
+  "plugin-tab": pluginTab,
   modal,
   panel,
   params,
 }: {
-  pluginTab: React.ReactNode;
+  "plugin-tab": React.ReactNode;
   modal: React.ReactNode;
   panel: React.ReactNode;
   params: Promise<{ id: string }>;
