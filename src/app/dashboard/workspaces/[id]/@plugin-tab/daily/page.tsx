@@ -1,4 +1,4 @@
-import { WorkspaceDaily } from "../../capabilities"
+import { WorkspaceDaily } from "../../plugins"
 
 export default function DailyCapabilityPage() {
   return <WorkspaceDaily />

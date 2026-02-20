@@ -43,7 +43,7 @@ function PageHeader({ title, description, children }: PageHeaderProps) {
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { workspaceId: string; pluginTab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
+function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { workspaceId: string; pluginTab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
   useWorkspaceEventHandler()
   const { workspace } = useWorkspace()
   const router = useRouter();
@@ -153,7 +153,7 @@ function WorkspaceLayoutInner({ workspaceId, capability, modal, panel }: { works
  * Its sole responsibility is to provide the WorkspaceContext.
  */
 export default function WorkspaceLayout({
-  capability,
+  pluginTab,
   modal,
   panel,
   params,
@@ -166,7 +166,7 @@ export default function WorkspaceLayout({
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner workspaceId={resolvedParams.id} capability={pluginTab} modal={modal} panel={panel} />
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} pluginTab={pluginTab} modal={modal} panel={panel} />
     </WorkspaceProvider>
   );
 }

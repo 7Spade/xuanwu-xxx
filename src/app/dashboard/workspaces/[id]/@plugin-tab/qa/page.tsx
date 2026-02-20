@@ -1,4 +1,4 @@
-import { WorkspaceQA } from "../../capabilities"
+import { WorkspaceQA } from "../../plugins"
 
 export default function QACapabilityPage() {
   return <WorkspaceQA />
