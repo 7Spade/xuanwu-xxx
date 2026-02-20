@@ -1,9 +1,16 @@
 import js from "@eslint/js";
-import nextPlugin from "@next/eslint-plugin-next";
+// flatConfig is a named export — default export only has { rules, configs }
+import { flatConfig as nextFlatConfig } from "@next/eslint-plugin-next";
 import importPlugin from "eslint-plugin-import";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactPlugin from "eslint-plugin-react";
 import * as reactHooks from "eslint-plugin-react-hooks";
+// eslint-plugin-tailwindcss ships without TypeScript declarations; use require().
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tailwindPlugin = require("eslint-plugin-tailwindcss") as {
+  configs: { "flat/recommended": import("typescript-eslint").ConfigWithExtends[] };
+  rules: Record<string, import("eslint").Rule.RuleModule>;
+};
 import tseslint from "typescript-eslint";
 
 const importRecommended = importPlugin.flatConfigs.recommended;
@@ -34,8 +41,9 @@ export default tseslint.config(
 
   ...tseslint.configs.recommended,
 
-  // Next.js core-web-vitals rules (flat config)
-  nextPlugin.flatConfig.coreWebVitals,
+  // Next.js core-web-vitals rules — flatConfig is a named export, not a
+  // property on the default export. Cast bridges the string-keyed rules type.
+  nextFlatConfig.coreWebVitals as unknown as import("typescript-eslint").ConfigWithExtends,
 
   // React recommended + JSX-runtime (React 17+ / React 19 new JSX transform;
   // no need to import React in every file for JSX).
@@ -59,12 +67,18 @@ export default tseslint.config(
         },
         node: true,
       },
+      // Tell eslint-plugin-react to auto-detect the installed React version
+      react: { version: "detect" },
     },
   },
   importRecommended,
   importTypescript,
 
-  // ── TypeScript quality rules ─────────────────────────────────────────────
+  // Tailwind CSS — flat/recommended registers the plugin + sets sane defaults
+  // (classnames-order: warn, no-custom-classname: warn, no-contradicting-classname: error)
+  ...tailwindPlugin.configs["flat/recommended"],
+
+  // ── TypeScript & React quality rules ─────────────────────────────────────
   // Enforce `import type` for type-only imports so runtime bundles stay lean
   // and cross-layer type imports never create accidental runtime coupling.
   {
@@ -74,6 +88,45 @@ export default tseslint.config(
         "error",
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
+      // Ban accidental `any` — surfaces hidden type holes
+      "@typescript-eslint/no-explicit-any": "error",
+      // Dead code: unused variables are always errors
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      // React list-rendering correctness
+      "react/jsx-key": "error",
+      "react/no-array-index-key": "warn",
+      // JSX hygiene
+      "react/jsx-no-useless-fragment": "error",
+      "react/self-closing-comp": "error",
+      // React Hooks correctness
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      // Prefer absolute @/* imports; forbid ../../ parent-relative imports
+      "import/no-relative-parent-imports": "warn",
+      // Override flat/recommended severities where we want stricter control
+      "tailwindcss/no-custom-classname": "warn",
+      "tailwindcss/classnames-order": "warn",
+      "tailwindcss/no-contradicting-classname": "error",
+    },
+  },
+
+  // ── TypeScript type-aware rules ───────────────────────────────────────────
+  // These rules require full TypeScript type information (parserServices).
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
+    rules: {
+      // Catches async callbacks passed where synchronous callbacks are expected
+      "@typescript-eslint/no-misused-promises": "error",
+      // Warns when non-boolean values are used in boolean contexts
+      "@typescript-eslint/strict-boolean-expressions": "warn",
     },
   },
 
