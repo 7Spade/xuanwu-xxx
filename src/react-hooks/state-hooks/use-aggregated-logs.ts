@@ -1,4 +1,3 @@
-// @/app/dashboard/workspaces/[id]/plugins/daily/_plugin-hooks/use-aggregated-logs.ts
 /**
  * @fileoverview useAggregatedLogs - Hook for fetching and memoizing daily logs.
  * @description This hook is responsible for retrieving all daily logs for the

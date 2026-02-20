@@ -1,4 +1,3 @@
-// @/app/dashboard/workspaces/[id]/plugins/schedule/_plugin-hooks/use-global-schedule.ts
 "use client";
 
 import { useMemo } from "react";

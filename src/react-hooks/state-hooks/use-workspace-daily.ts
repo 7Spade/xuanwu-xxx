@@ -17,7 +17,7 @@ import { useAccount } from "@/react-hooks/state-hooks/use-account";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useLogger } from "@/react-hooks/service-hooks/use-logger";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { useDailyUpload } from "./use-daily-upload";
+import { useDailyUpload } from "../service-hooks/use-daily-upload";
 import { DailyLog } from "@/domain-types/domain";
 
 const getErrorMessage = (error: unknown, fallback: string) =>

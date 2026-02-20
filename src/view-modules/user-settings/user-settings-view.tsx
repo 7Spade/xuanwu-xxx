@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import { UserSettings } from "@/app/dashboard/_route-components/settings"
+import { UserSettings } from "./user-settings"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 
 

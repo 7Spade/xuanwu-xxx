@@ -1,4 +1,3 @@
-// @/app/dashboard/workspaces/[id]/plugins/daily/_plugin-hooks/use-daily-upload.ts
 /**
  * @fileoverview useDailyUpload - A hook for handling daily log image uploads.
  * @description This hook abstracts the logic for compressing, uploading, and
