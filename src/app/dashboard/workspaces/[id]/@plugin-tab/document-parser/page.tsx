@@ -1,4 +1,4 @@
-import { WorkspaceDocumentParser } from "@/view-modules/workspaces/plugins"
+import { WorkspaceDocumentParser } from "@/features/document-parser"
 
 export default function DocumentParserCapabilityPage() {
   return <WorkspaceDocumentParser />

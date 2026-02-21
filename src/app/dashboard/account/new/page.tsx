@@ -3,7 +3,7 @@
 
 import { useRouter } from "next/navigation"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { AccountNewForm } from "@/view-modules/dashboard/account-new-form"
+import { AccountNewForm } from "@/features/account"
 
 export default function AccountNewPage() {
   const router = useRouter()

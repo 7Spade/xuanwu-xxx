@@ -1,4 +1,4 @@
-import { WorkspaceTasks } from "@/view-modules/workspaces/plugins"
+import { WorkspaceTasks } from "@/features/tasks"
 
 export default function TasksCapabilityPage() {
   return <WorkspaceTasks />

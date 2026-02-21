@@ -1,4 +1,4 @@
-import { WorkspaceAcceptance } from "@/view-modules/workspaces/plugins"
+import { WorkspaceAcceptance } from "@/features/acceptance"
 
 export default function AcceptanceCapabilityPage() {
   return <WorkspaceAcceptance />

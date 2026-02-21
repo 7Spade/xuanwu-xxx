@@ -1,7 +1,5 @@
-
-import { PermissionMatrixView } from "@/view-modules/account/permission-matrix-view"
+import { PermissionMatrixView } from "@/features/account"
 
 export default function PermissionMatrixPage() {
   return <PermissionMatrixView />
 }
-

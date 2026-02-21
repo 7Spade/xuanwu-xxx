@@ -3,11 +3,11 @@
 
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { useWorkspace } from "@/react-providers/workspace-provider"
-import { useAccount } from "@/react-hooks/state-hooks/use-account"
-import { GovernanceSidebar } from "@/view-modules/schedule"
-import { useScheduleActions } from "@/react-hooks/command-hooks/use-schedule-commands"
-import type { ScheduleItem } from "@/domain-types/domain"
+import { useWorkspace } from "@/features/workspace"
+import { useAccount } from "@/features/account"
+import { GovernanceSidebar } from "@/features/schedule"
+import { useScheduleActions } from "@/features/schedule"
+import type { ScheduleItem } from "@/shared/types"
 
 export default function GovernancePage() {
   const router = useRouter()

@@ -25,13 +25,13 @@ import { Loader2 } from "lucide-react";
 // Internal Dependencies - Layout Primitives
 // ============================================================================
 import { SidebarProvider, SidebarInset } from "@/shared/shadcn-ui/sidebar";
-import { ThemeAdapter } from "@/view-modules/dashboard/layout/theme-adapter";
+import { ThemeAdapter } from "@/features/workspace";
 
 // ============================================================================
 // Internal Dependencies - Contexts & Providers
 // ============================================================================
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { AccountProvider } from "@/react-providers/account-provider";
+import { AccountProvider } from "@/features/account";
 
 // ============================================================================
 // Type Definitions

@@ -1,4 +1,4 @@
-import { Header } from "@/view-modules/dashboard/layout/header";
+import { Header } from "@/features/workspace";
 
 export default function HeaderSlot() {
   return <Header />;

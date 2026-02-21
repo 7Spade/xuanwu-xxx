@@ -1,4 +1,4 @@
-import { DashboardView } from "@/view-modules/dashboard/dashboard-view"
+import { DashboardView } from "@/features/workspace"
 
 export default function DashboardPage() {
   return <DashboardView />

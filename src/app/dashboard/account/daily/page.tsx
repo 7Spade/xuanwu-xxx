@@ -1,1 +1,1 @@
-export { default } from '@/view-modules/workspaces/plugins/daily/daily.view';
+export { default } from '@/features/daily';

@@ -4,7 +4,7 @@
 import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { ResetPasswordForm } from "@/view-modules/auth/reset-password-form"
+import { ResetPasswordForm } from "@/features/auth"
 
 function ResetPasswordContent() {
   const router = useRouter()

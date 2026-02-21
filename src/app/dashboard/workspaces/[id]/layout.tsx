@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, use } from "react";
-import { WorkspaceProvider, useWorkspace } from "@/react-providers/workspace-provider"
-import { useWorkspaceEventHandler } from "@/react-hooks/command-hooks/use-workspace-event-handler"
+import { WorkspaceProvider, useWorkspace } from "@/features/workspace"
+import { useWorkspaceEventHandler } from "@/features/workspace"
 import {
   Dialog,
   DialogContent,
@@ -15,9 +15,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
-import { WorkspaceStatusBar } from "@/view-modules/workspaces/workspace-status-bar";
-import { WorkspaceNavTabs } from "@/view-modules/workspaces/workspace-nav-tabs";
-import { useWorkspaceCommands } from "@/react-hooks/command-hooks/use-workspace-commands";
+import { WorkspaceStatusBar } from "@/features/workspace";
+import { WorkspaceNavTabs } from "@/features/workspace";
+import { useWorkspaceCommands } from "@/features/workspace";
 import { PageHeader } from "@/shared/shadcn-ui/page-header";
 
 /**

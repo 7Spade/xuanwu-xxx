@@ -1,4 +1,4 @@
-import { MembersView } from "@/view-modules/members/members-view"
+import { MembersView } from "@/features/members"
 
 export default function AccountMembersPage() {
   return <MembersView />

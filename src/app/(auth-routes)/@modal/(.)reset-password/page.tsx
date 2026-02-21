@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/shared/shadcn-ui/dialog"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { ResetPasswordForm } from "@/view-modules/auth/reset-password-form"
+import { ResetPasswordForm } from "@/features/auth"
 
 function ResetPasswordModalContent() {
   const router = useRouter()

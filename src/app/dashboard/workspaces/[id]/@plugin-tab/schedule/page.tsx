@@ -1,4 +1,4 @@
-import { WorkspaceSchedule } from "@/view-modules/workspaces/plugins"
+import { WorkspaceSchedule } from "@/features/schedule"
 
 export default function ScheduleCapabilityPage() {
   return <WorkspaceSchedule />

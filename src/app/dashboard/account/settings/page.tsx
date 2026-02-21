@@ -1,4 +1,4 @@
-import { UserSettingsView } from "@/view-modules/user-settings/user-settings-view"
+import { UserSettingsView } from "@/features/user-settings"
 
 export default function AccountSettingsPage() {
   return <UserSettingsView />

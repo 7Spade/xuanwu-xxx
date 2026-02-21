@@ -1,4 +1,4 @@
-import { DashboardSidebar } from "@/view-modules/dashboard/sidebar";
+import { DashboardSidebar } from "@/features/workspace";
 
 export default function SidebarSlot() {
   return <DashboardSidebar />;
