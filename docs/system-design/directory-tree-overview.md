@@ -146,38 +146,40 @@ src/
         │   └── default.tsx
         ├── @modal/               ← Parallel Route slot — 全域覆蓋層（預設 null）
         │   └── default.tsx
-        ├── page.tsx              ← 根頁 / → 重定向至 /login 或 /dashboard
+        ├── page.tsx              ← 根頁 / → 重定向至 /login
         │
-        └── (dashboard)/          ← 路由群組：認證後業務路由（繼承 shell 佈局）
-            └── dashboard/        ← 認證後業務路由（/dashboard/**）
-                ├── layout.tsx        ← Auth Guard + AccountProvider + SidebarInset + @header + @modal
-                ├── page.tsx          ← 重定向至 /workspaces
-                ├── @header/default.tsx   ← Header（SidebarTrigger + Breadcrumb）
-                ├── @modal/
-            │   ├── (.)account/new/page.tsx ← 新建帳號 Dialog
-            │   └── default.tsx
+        └── (account)/            ← 路由群組：AccountProvider 共用上下文
+            ├── layout.tsx        ← AccountProvider（(dashboard) + (workspaces) 共用）
             │
-            ├── account/
-            │   ├── audit/page.tsx
-            │   ├── daily/page.tsx
-            │   ├── matrix/page.tsx
-            │   ├── members/page.tsx
-            │   ├── new/page.tsx
-            │   ├── partners/page.tsx + [id]/page.tsx
-            │   ├── schedule/page.tsx
-            │   ├── settings/page.tsx
-            │   └── teams/page.tsx + [id]/page.tsx
+            ├── (dashboard)/      ← 路由群組：組織管理業務路由（繼承 shell + account 佈局）
+            │   └── dashboard/    ← /dashboard/**
+            │       ├── layout.tsx    ← Auth Guard + SidebarInset + @header + @modal
+            │       ├── page.tsx      ← /dashboard 首頁
+            │       ├── @header/default.tsx   ← Header（SidebarTrigger + Breadcrumb）
+            │       ├── @modal/
+            │       │   ├── (.)account/new/page.tsx ← 新建帳號 Dialog
+            │       │   └── default.tsx
+            │       └── account/
+            │           ├── audit/page.tsx
+            │           ├── daily/page.tsx
+            │           ├── matrix/page.tsx
+            │           ├── members/page.tsx
+            │           ├── new/page.tsx
+            │           ├── partners/page.tsx + [id]/page.tsx
+            │           ├── schedule/page.tsx
+            │           ├── settings/page.tsx
+            │           └── teams/page.tsx + [id]/page.tsx
             │
-            └── workspaces/
-                ├── layout.tsx
-                ├── page.tsx
-                ├── new/page.tsx
-                ├── @modal/
-                │   ├── (.)new/page.tsx  ← 新建工作區 Dialog
-                │   └── default.tsx
-                └── [id]/
-                    └── (workspace)/     ← 路由群組：單一工作區上下文
-                        ├── layout.tsx   ← WorkspaceProvider
+            └── (workspaces)/     ← 路由群組：工作區模組（列表 + 詳情，URL: /workspaces/**）
+                └── workspaces/
+                    ├── layout.tsx    ← 工作區模組共用佈局（可選）
+                    ├── page.tsx      ← /workspaces（工作區列表）
+                    ├── new/page.tsx  ← /workspaces/new（新建）
+                    ├── @modal/
+                    │   ├── (.)new/page.tsx  ← 新建工作區 Dialog
+                    │   └── default.tsx
+                    └── [id]/         ← /workspaces/[id]（特定工作區）
+                        ├── layout.tsx    ← WorkspaceProvider
                         ├── page.tsx
                         ├── settings/page.tsx
                         ├── governance/page.tsx

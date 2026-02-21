@@ -70,34 +70,38 @@ src/
 │       ├── @sidebar/default.tsx      ← import { DashboardSidebar } from "@/features/workspace-core"
 │       ├── @modal/default.tsx        ← 全域覆蓋層（預設 null）
 │       ├── page.tsx                  ← 根入口（redirect）
-│       └── (dashboard)/              ← 路由群組：認證後業務路由（繼承 shell 佈局）
-│           └── dashboard/            ← 認證後業務路由
-│               ├── layout.tsx            ← Auth Guard + AccountProvider + SidebarInset + @header + @modal
-│               ├── page.tsx              ← import { DashboardView } from "@/features/workspace-core"
-│           ├── account/
-│           │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/workspace-governance.schedule"
-│           │   ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-business.members"
-│           │   ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-business.teams"
-│           │   ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-business.partners"
-│           │   ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
-│           │   └── ...
-│           └── workspaces/
-│               ├── [id]/
-│               │   └── (workspace)/      ← 路由群組：單一工作區上下文（WorkspaceProvider）
-│               │       ├── layout.tsx    ← import { WorkspaceLayout } from "@/features/workspace-core"
-│               │       ├── @plugin-tab/
-│               │       │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
-│               │       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
-│               │       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
-│               │       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
-│               │       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-business.members"
-│               │       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
-│               │       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
-│               │       │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
-│               │       │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/workspace-business.qa"
-│               │       │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/workspace-business.acceptance"
-│               │       │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/workspace-business.document-parser"
-│               │       └── ...
+│       └── (account)/                ← 路由群組：AccountProvider 共用上下文
+│           ├── layout.tsx            ← AccountProvider（(dashboard) + (workspaces) 共用）
+│           ├── (dashboard)/          ← 路由群組：組織管理業務路由
+│           │   └── dashboard/        ← /dashboard/**
+│           │       ├── layout.tsx    ← Auth Guard + SidebarInset + @header + @modal
+│           │       ├── page.tsx      ← import { DashboardView } from "@/features/workspace-core"
+│           │       └── account/
+│           │           ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/workspace-governance.schedule"
+│           │           ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-business.members"
+│           │           ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-business.teams"
+│           │           ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-business.partners"
+│           │           ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
+│           │           └── ...
+│           └── (workspaces)/         ← 路由群組：工作區模組（列表 + 詳情）
+│               └── workspaces/       ← /workspaces/**
+│                   ├── layout.tsx
+│                   ├── page.tsx      ← import { WorkspacesView } from "@/features/workspace-core"
+│                   └── [id]/         ← /workspaces/[id]（WorkspaceProvider）
+│                       ├── layout.tsx← import { WorkspaceLayout } from "@/features/workspace-core"
+│                       ├── @plugin-tab/
+│                       │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
+│                       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
+│                       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
+│                       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
+│                       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-business.members"
+│                       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
+│                       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
+│                       │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
+│                       │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/workspace-business.qa"
+│                       │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/workspace-business.acceptance"
+│                       │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/workspace-business.document-parser"
+│                       └── ...
 │               └── ...
 │
 ├── features/                         ← 20 個垂直功能切片

@@ -27,7 +27,7 @@
 app/  →  features/{name}/index.ts  →  shared/*
 ```
 
-- **`src/app/`**: **路由組裝層 (Entry Layer)**。含 4 個路由群組：`(shell)/`（視覺容器）、`(dashboard)/`（帳號/組織層，巢狀於 shell）、`(workspace)/`（單一工作區層，巢狀於 [id]）、`(public)/`（未登入）。只引用 `features/*/index.ts` 和 `shared/*`。
+- **`src/app/`**: **路由組裝層 (Entry Layer)**。含 5 個路由群組：`(shell)/`（視覺容器）、`(account)/`（AccountProvider 共用上下文）、`(dashboard)/`（組織管理，巢狀於 account）、`(workspaces)/`（工作區列表 + 詳情，巢狀於 account）、`(public)/`（未登入）。只引用 `features/*/index.ts` 和 `shared/*`。
 - **`src/features/`**: **17 個垂直功能切片**。每個切片擁有其業務領域的所有程式碼（`_actions.ts`、`_hooks/`、`_components/`、`index.ts`）。
 - **`src/shared/`**: **跨切片共用基礎設施**。5 個模組：
   - `types/` — 全域類型定義（無邏輯）
