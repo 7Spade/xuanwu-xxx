@@ -23,7 +23,7 @@ proficiency-graded skills.
 
 ## 2. Core Vocabulary
 
-Three domain types (see `src/domain-types/skill/skill.types.ts`):
+Three domain types (see `src/shared/types/skill.types.ts`):
 
 | Type | Role | Stored on |
 |------|------|-----------|
@@ -71,7 +71,7 @@ so the darkest badges signal the rarest talent.
 
 ## 4. Domain Rules
 
-Pure functions live in `src/domain-rules/skill/skill.rules.ts`:
+Pure functions live in `src/shared/lib/skill.rules.ts`:
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -173,7 +173,7 @@ All identifiers are designed for semantic clarity:
 
 Future Genkit flow entry point (not yet implemented):
 ```typescript
-// genkit-flows/schedule/auto-assign.flow.ts
+// shared/ai/flows/auto-assign.flow.ts
 // input: ScheduleItem with requiredSkills
 // output: suggested assigneeIds ranked by tier score
 ```
@@ -184,8 +184,8 @@ Future Genkit flow entry point (not yet implemented):
 
 | Component | Location (proposed) | Shadcn primitives |
 |-----------|---------------------|-------------------|
-| `SkillBadge` | `src/shared/shadcn-ui/skill-badge.tsx` (or view-modules) | `Badge` + CSS var |
-| `SkillTagPicker` | `view-modules/schedule/_components/` | `Command` + `Badge` |
+| `SkillBadge` | `src/shared/ui/shadcn-ui/skill-badge.tsx` (or features/{name}/_components) | `Badge` + CSS var |
+| `SkillTagPicker` | `features/schedule/_components/` | `Command` + `Badge` |
 | `SkillGrantEditor` | account settings / member editor | `Command` + `Badge` + `Slider` |
 | `SkillRequirementForm` | `WorkspaceSchedule` proposal dialog | `Command` + `Input` |
 
@@ -384,7 +384,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 #### 區域 A：全域技能標籤庫管理
 
 ```
-位置：view-modules/account/settings/
+位置：features/user-settings/_components/
 路由：已有 app/dashboard/account/settings/page.tsx
 ```
 
@@ -405,7 +405,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 #### 區域 B：個人技能授予（成員資料卡內嵌）
 
 ```
-位置：view-modules/members/members-view.tsx 的成員卡片
+位置：features/members/_components/members-view.tsx 的成員卡片
 路由：已有 app/dashboard/account/members/
 ```
 
@@ -418,17 +418,17 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | `SkillGrantEditor` | Command 選擇 tag + 直接選擇 SkillTier（下拉） |
 | XP 顯示 | 只讀，顯示目前 xp 值和進度條 |
 
-**架構位置**：`view-modules/members/` （已存在）
+**架構位置**：`features/members/_components/` （已存在）
 
 ---
 
 #### 區域 C：團隊 / 夥伴技能授予（Detail View 內嵌）
 
 ```
-位置 (內部團隊)：view-modules/teams/team-detail-view.tsx
+位置 (內部團隊)：features/teams/_components/team-detail-view.tsx
 路由：已有 app/dashboard/account/teams/[id]/page.tsx
 
-位置 (外部夥伴)：view-modules/partners/partner-detail-view.tsx
+位置 (外部夥伴)：features/partners/_components/partner-detail-view.tsx
 路由：已有 app/dashboard/account/partners/[id]/page.tsx
 ```
 
@@ -440,14 +440,14 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | `SkillGrantEditor` (Team) | 同區域 B，但授予對象是 `Team.skillGrants` |
 | XP 進度 | 顯示團隊在每個技能的 XP 和等級 |
 
-**架構位置**：`view-modules/teams/` + `view-modules/partners/` （均已存在）
+**架構位置**：`features/teams/_components/` + `features/partners/_components/` （均已存在）
 
 ---
 
 #### 區域 D：排班提案中的技能需求表單
 
 ```
-位置：view-modules/schedule/_components/proposal-dialog.tsx（已存在）
+位置：features/schedule/_components/proposal-dialog.tsx（已存在）
 路由：app/dashboard/workspaces/[id]/@modal/(.)schedule-proposal/（已存在）
 ```
 
@@ -459,7 +459,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | 新增需求列 | Command 選擇 SkillTag + 下拉選 minimumTier + 數字 Input 填 quantity |
 | 需求摘要 | 所有已添加需求以 Chip 形式顯示，可刪除 |
 
-**架構位置**：`view-modules/schedule/_components/`（已存在），
+**架構位置**：`features/schedule/_components/`（已存在），
 只需在 `proposal-dialog.tsx` 末尾增加此區塊。
 
 ---
@@ -467,7 +467,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 #### 區域 E：帳戶排班審批面板中的智慧指派面板
 
 ```
-位置：view-modules/schedule/_components/governance-sidebar.tsx（已存在）
+位置：features/schedule/_components/governance-sidebar.tsx（已存在）
 路由：app/dashboard/account/schedule/（已存在）
 ```
 
@@ -480,7 +480,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | 技能符合度指標 | 每位候選人旁顯示「符合 N/M 個需求」 |
 | 指派操作 | 選取並保存到 `scheduleItem.assigneeIds` |
 
-**架構位置**：`view-modules/schedule/_components/`（已存在），
+**架構位置**：`features/schedule/_components/`（已存在），
 擴展現有 `governance-sidebar.tsx` 的提案卡片。
 
 ---
@@ -756,7 +756,7 @@ accounts/{orgId}
 
 ### 11-F. 修訂後的 SkillGrant 型別
 
-目前的型別（`src/domain-types/skill/skill.types.ts`）：
+目前的型別（`src/shared/types/skill.types.ts`）：
 ```typescript
 export interface SkillGrant {
   tagId: string;   ← org-local，跨 org 會成為孤兒引用
@@ -907,7 +907,7 @@ interface SkillRequirement {
 
 ### 12-E. `grantSatisfiesRequirement` 更新
 
-`domain-rules/skill/skill.rules.ts` 中的匹配函數改為：
+`shared/lib/skill.rules.ts` 中的匹配函數改為：
 
 ```typescript
 // 以 tagSlug 為主要匹配鍵，tagId 為向下相容備選
@@ -1152,7 +1152,7 @@ sidebar footer 的用戶 dropdown 也有一個「User Settings」連結（UserCi
 ```
 新增：
   src/app/dashboard/account/profile/page.tsx
-  src/view-modules/user-profile/              ← 新 view-module
+  src/features/user-settings/_components/              ← 新 view-module
     user-profile-view.tsx                     ← 頁面組合（smart container）
     profile-hero-card.tsx                     ← Avatar + name + bio
     skill-grants-section.tsx                  ← 技能徽章列表
@@ -1160,9 +1160,9 @@ sidebar footer 的用戶 dropdown 也有一個「User Settings」連結（UserCi
 
 修改：
   src/shared/constants/routes.ts              ← 加入 ACCOUNT_PROFILE
-  src/view-modules/dashboard/sidebar/nav-user.tsx  ← 分拆兩個入口
-  src/view-modules/dashboard/sidebar/nav-main.tsx  ← 個人 Profile 入口（永遠可見，不限 org）
-  src/view-modules/user-settings/profile-card.tsx  ← 移除 ExpertiseBadges checkbox
+  src/features/workspace/_shell/nav-user.tsx  ← 分拆兩個入口
+  src/features/workspace/_shell/nav-main.tsx  ← 個人 Profile 入口（永遠可見，不限 org）
+  src/features/user-settings/_components/profile-card.tsx  ← 移除 ExpertiseBadges checkbox
 ```
 
 ---
@@ -1222,8 +1222,8 @@ Sidebar nav（NavMain）：
 | 文件 | 變更 |
 |------|------|
 | `src/shared/constants/skills.ts` | **新增** — 31 個工程施工技能定義 |
-| `src/domain-types/skill/skill.types.ts` | `SkillTag` 移除 `id` 和 `createdAt: any`，變成純值類型 |
-| `src/domain-types/account/account.types.ts` | `Account` 移除 `skillTags?: SkillTag[]`（組織不再擁有技能庫） |
+| `src/shared/types/skill.types.ts` | `SkillTag` 移除 `id` 和 `createdAt: any`，變成純值類型 |
+| `src/shared/types/account/account.types.ts` | `Account` 移除 `skillTags?: SkillTag[]`（組織不再擁有技能庫） |
 
 ---
 

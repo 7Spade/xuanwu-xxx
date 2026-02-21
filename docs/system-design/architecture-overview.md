@@ -13,262 +13,174 @@
 
 ---
 
-## 一、分層架構（One-Way Dependency Architecture）
+## 一、垂直切片架構（Vertical Slice Architecture — VSA）
 
-本專案採用**單向依賴流**，每一層只能依賴其下方的層級，絕不允許向上依賴。
+> **目標：AI 開發零認知 — 實作任何功能只需讀一個資料夾。**
 
 ```
-┌──────────────────────────────────────────────────┐
-│                    app/                          │  ← 路由組裝、頁面組合
-├──────────────────────────────────────────────────┤
-│                view-modules/                     │  ← 功能 UI 模組
-├──────────────────────────────────────────────────┤
-│   react-hooks/          react-providers/         │  ← React 狀態與 Context
-├──────────────────────────────────────────────────┤
-│                  use-cases/                      │  ← 應用層編排（≥2個指令）
-├──────────────────────────────────────────────────┤
-│               server-commands/                   │  ← Firebase 寫入/讀取封裝
-├───────────────────────┬──────────────────────────┤
-│     domain-rules/     │     genkit-flows/        │  ← 純業務規則 / AI 流程
-├───────────────────────┴──────────────────────────┤
-│                   firebase/                      │  ← Firebase SDK 唯一閘道
-├──────────────────────────────────────────────────┤
-│     domain-types/          shared/               │  ← 型別定義 / 跨層工具
-└──────────────────────────────────────────────────┘
+src/
+├── app/          ← Next.js 路由層（純組裝，零業務邏輯）
+├── features/     ← 17 個垂直功能切片（每個業務領域一個）
+└── shared/       ← 5 個跨切片共用基礎設施模組
 ```
 
-### 各層職責摘要
+### 依賴流（單向）
 
-| 層級 | 路徑 | 職責 | 是否含 React |
-|------|------|------|-------------|
-| **app** | `src/app/` | Next.js App Router 路由組裝，純 UI 組合層 | ✅ |
-| **view-modules** | `src/view-modules/` | 功能 UI 模組，可組合的 React 元件 | ✅ |
-| **react-hooks** | `src/react-hooks/` | 狀態 hooks、指令 hooks、服務 hooks | ✅ |
-| **react-providers** | `src/react-providers/` | React Context 全域狀態容器（Firestore 實時監聽） | ✅ |
-| **use-cases** | `src/use-cases/` | 應用層編排：≥ 2 個 server-command 的組合工作流 | ❌ |
-| **server-commands** | `src/server-commands/` | Firebase 操作的型別化封裝（Next.js Server Actions） | ❌ |
-| **domain-rules** | `src/domain-rules/` | 純業務規則與不變條件（invariants），無 I/O | ❌ |
-| **genkit-flows** | `src/genkit-flows/` | Google Genkit AI 流程定義 | ❌ |
-| **firebase** | `src/firebase/` | Firebase SDK 唯一閘道（Facade + Repository Pattern） | ❌ |
-| **domain-types** | `src/domain-types/` | 全域 TypeScript 型別定義，無任何邏輯 | ❌ |
-| **shared** | `src/shared/` | 跨層工具函式、Shadcn UI primitives、常數 | 部分 |
+```
+app/  →  features/{name}/index.ts  →  shared/*
+```
+
+- `app/` 僅 import `features/*/index.ts`（公開 API）和 `shared/*`
+- `features/*` import `shared/*`，以及其他切片的 `index.ts`（禁止 import 私有 `_` 路徑）
+- `shared/*` 零功能依賴
+
+### 切片公開 API 規則
+
+```ts
+// ✅ 允許：透過 index.ts
+import { AccountScheduleSection } from "@/features/schedule";
+
+// ❌ 禁止：直接引用切片私有路徑
+import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-schedule";
+```
 
 ---
 
-## 二、依賴矩陣
+## 二、shared/ 五個模組
 
-下表以 ✅ 表示允許依賴，❌ 表示 ESLint 強制禁止：
-
-| 來源層 \ 目標層 | domain-types | domain-rules | firebase | genkit-flows | server-commands | use-cases | react-hooks | react-providers | view-modules | app | shared |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **app** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | — | ✅ |
-| **view-modules** | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | — | ❌ | ✅ |
-| **react-hooks** | ✅ | ✅ | ✅¹ | ❌ | ✅ | ❌ | — | ✅ | ❌ | ❌ | ✅ |
-| **react-providers** | ✅ | ❌ | ✅¹ | ❌ | ❌ | ❌ | ✅ | — | ❌ | ❌ | ✅ |
-| **use-cases** | ✅ | ✅ | ❌ | ❌ | ✅ | — | ❌ | ❌ | ✅² | ❌ | ✅ |
-| **server-commands** | ✅ | ✅ | ✅ | ✅ | — | ❌ | ❌ | ❌ | ❌ | ❌ | ✅³ |
-| **domain-rules** | ✅ | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **genkit-flows** | ✅ | ❌ | ✅ | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **firebase** | ✅ | ❌ | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **domain-types** | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **shared** | ✅ | ❌ | ❌⁴ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
-
-> ¹ 僅限 `onSnapshot` 實時監聽，不得執行寫入。  
-> ² 僅限 view-bridge re-export，不得包含 React 狀態邏輯。  
-> ³ 僅限 `shared/utils`、`shared/constants`、`shared/i18n-types`，不得使用 `shared/shadcn-ui` 或 `shared/utility-hooks`。  
-> ⁴ 例外：`shared/app-providers/` 可依賴 `firebase` 用於基礎設施接線（FirebaseProvider）。
+| 模組 | 路徑 | 職責 |
+|------|------|------|
+| `types` | `shared/types/` | 全域 TypeScript 領域類型 |
+| `lib` | `shared/lib/` | 純工具函式 + 領域規則（無 I/O） |
+| `infra` | `shared/infra/` | Firebase SDK 唯一閘道（Auth、Firestore、Storage） |
+| `ai` | `shared/ai/` | Genkit AI 流程定義 |
+| `ui` | `shared/ui/` | Shadcn/UI primitives、app-providers、常數、i18n |
 
 ---
 
-## 三、ESLint 強制執行
+## 三、app/ 路由群組
 
-所有層間依賴規則均由 `eslint.config.mts` 的 `no-restricted-imports` 規則在 CI 層面強制執行。  
-此外，以下規則在整個 `src/` 範圍內生效：
+```
+src/app/
+├── (dashboard)/   ← 認證後路由（/dashboard/**）
+├── (public)/      ← 公開路由（/login、/reset-password）
+├── (shell)/       ← 根入口（/ → redirect）
+└── layout.tsx     ← 根 layout（providers，必須在根層）
+```
 
-- `@typescript-eslint/no-explicit-any` → error
-- `@typescript-eslint/consistent-type-imports` → error（全域）
-- `eslint-plugin-import/no-relative-parent-imports` → warn
-- `"use client"` 指令在 `domain-types`、`domain-rules`、`firebase`、`genkit-flows`、`server-commands` 中被 `no-restricted-syntax` 明確禁止
+路由群組（`(name)`）對 URL 透明，不影響路徑結構。
 
 ---
 
 ## 四、四種規範資料流
 
-詳細時序圖請參閱 [`src/shared/FLOWS.md`](./src/shared/FLOWS.md)。
+### Flow A：UI 動作 → Firebase 寫入
 
-### Flow A：UI 動作 → Firebase 寫入（標準指令流）
-
-適用於**單一 domain** 的使用者觸發寫入操作。
+單一 domain 的使用者寫入操作：
 
 ```
 UI Component
-  → command-hook (useCallback + auth guard + toast)
-    → server-commands/{domain}.commands.ts
-      → firebase/firestore/repositories/{domain}.repository.ts
+  → features/{name}/_hooks/use-{domain}-commands.ts (useCallback + auth guard + toast)
+    → features/{name}/_actions.ts ("use server" action)
+      → shared/infra/firestore/repositories/{domain}.repository.ts
 ```
 
-**使用時機：** 操作僅涉及 1 個 domain（如書籤、按讚、任務狀態更新）。
+### Flow B：跨切片協調（事件匯流排）
 
----
-
-### Flow B：跨插件協調（事件匯流排流）
-
-適用於 Plugin A 完成後需要**通知 Plugin B** 的場景，不直接耦合。
+Plugin A 完成後需通知 Plugin B：
 
 ```
-Plugin A view
-  → publish("workspace:tasks:completed", payload)
-    → WorkspaceEventBus
-      → _event-handlers/workspace-event-handler.tsx
-        → server-commands/{target-domain}.commands.ts
+Plugin A → publish("workspace:tasks:completed", payload)
+  → WorkspaceEventBus
+    → features/workspace/_components/workspace-event-handler.tsx
+      → features/{target}/_actions.ts
 ```
 
-**事件定義位置：** `src/use-cases/workspace/event-bus/workspace-events.ts`  
-**訂閱者位置：** `src/app/dashboard/workspaces/[id]/_event-handlers/workspace-event-handler.tsx`
+### Flow C：多步驟編排
 
----
-
-### Flow C：多步驟編排（Use-Cases 流）
-
-適用於單一動作需要 **≥ 2 個 Firebase 寫入**且必須原子性成功的場景。
+單一動作需 ≥2 次 Firebase 寫入：
 
 ```
-UI Component (view-modules or app)
-  → use-cases/{domain}/{domain}.use-cases.ts
-    → server-commands/A.commands.ts → firebase
-    → server-commands/B.commands.ts → firebase
+UI → features/workspace/_use-cases.ts
+  → features/workspace/_actions.ts  (write A)
+  → features/workspace/_actions.ts  (write B)
 ```
 
-**使用時機：** `createWorkspaceWithCapabilities`（1 次建立 + 1 次掛載能力）。
+### Flow D：實時狀態（Provider / Listener）
 
----
-
-### Flow D：實時狀態（Provider / Listener 流）
-
-適用於需要**即時同步**的資料，由多個元件共享。
+多元件共享即時資料：
 
 ```
 Firestore onSnapshot
-  → react-providers/{domain}-provider.tsx (setState)
-    → react-hooks/state-hooks/use-{domain}.ts (useContext)
-      → view-modules component (renders)
-```
-
-**Provider 層級（由外至內）：**
-```
-FirebaseProvider → AuthProvider → AppProvider → AccountProvider → WorkspaceProvider
+  → features/workspace/_components/workspace-provider.tsx (setState)
+    → features/workspace/index.ts → useWorkspace()
+      → UI component (重新渲染)
 ```
 
 ---
 
-## 五、Firebase 整合架構
+## 五、Firebase 整合
 
-### Firestore Facade + Repository Pattern
-
-`firebase/firestore/` 採用 **Facade + Repository** 雙層封裝：
+### Firestore Facade + Repository
 
 ```
-server-commands/
-  → firestore.facade.ts        ← 統一出口，彙整所有 repository 的 re-export
-    → repositories/
-        account.repository.ts  ← 組織、成員、團隊
-        user.repository.ts     ← 使用者個人資料、書籤
-        workspace.repository.ts← 工作區、任務、議題、檔案
-        schedule.repository.ts ← 排程項目 CRUD
-        daily.repository.ts    ← 每日日誌寫入與讀取
-        audit.repository.ts    ← 稽核日誌讀取
+features/{name}/_actions.ts
+  → shared/infra/firestore/repositories/{domain}.repository.ts
+    → shared/infra/firestore/firestore.write.adapter.ts / firestore.read.adapter.ts
+      → Firestore (Google Cloud)
 ```
 
-`firestore.read.adapter.ts` 與 `firestore.write.adapter.ts` 提供底層泛型 CRUD 操作，由各 Repository 組合使用。
-
-### Firestore 資料模型（Collections）
+### Firestore 資料模型
 
 ```
 accounts/{accountId}
-  ├── [fields: name, accountType, members, teams, ...]
-  └── invites/{inviteId}
-
-accounts/{accountId}/schedules/{itemId}
-  └── [fields: title, status, startDate, endDate, assigneeIds, ...]
+  └── schedules/{itemId}
 
 workspaces/{workspaceId}
-  ├── [fields: name, dimensionId, capabilities, grants, ...]
   ├── tasks/{taskId}
   ├── issues/{issueId}
   └── auditLogs/{logId}
 
 users/{userId}
-  ├── [fields: name, email, photoURL, ...]
   └── bookmarks/{bookmarkId}
 
 dailyLogs/{logId}
-  ├── [fields: accountId, workspaceId, content, likes, ...]
   └── comments/{commentId}
 ```
 
 ---
 
-## 六、Next.js App Router 平行路由架構
+## 六、Next.js App Router 平行路由
 
-本專案大量使用 Next.js App Router 的 **Parallel Routes**（`@slot`）與 **Intercepting Routes**（`(.)`）。
-
-### Dashboard 頂層 Parallel Routes
+### Dashboard 頂層
 
 ```
-app/dashboard/layout.tsx
+app/(dashboard)/dashboard/layout.tsx
   ├── @sidebar/default.tsx   → DashboardSidebar
-  ├── @header/default.tsx    → Header (SidebarTrigger + Breadcrumb)
+  ├── @header/default.tsx    → Header
   └── @modal/                → Dialog overlays
 ```
 
-### Workspace 詳情頁 Parallel Routes
+### Workspace 詳情頁
 
 ```
-app/dashboard/workspaces/[id]/layout.tsx
-  ├── @plugin-tab/           → 工作區功能插件（schedule, tasks, daily, ...)
-  ├── @modal/                → 模態框攔截
-  │     ├── (.)schedule-proposal  → 排程提案 Dialog
-  │     ├── (.)settings           → 工作區設定 Dialog
-  │     └── (.)daily-log/[logId]  → 日誌詳情 Dialog
-  └── @panel/                → 右側面板攔截
-        └── (.)governance         → 治理審核側面板
+app/(dashboard)/dashboard/workspaces/[id]/layout.tsx
+  ├── @plugin-tab/     → 工作區功能插件
+  ├── @modal/          → 攔截路由 Dialog
+  └── @panel/          → 右側面板攔截
 ```
-
-**攔截路由原則：**
-- 攔截路由提供 Modal/Sheet 體驗（URL 改變但不換頁）
-- 規範路由（canonical route）同時存在，支援直接 URL 存取
-- 共享邏輯萃取至 `_components/` 中的共用元件
 
 ---
 
-## 七、AI 整合（Genkit）
-
-```
-view-modules (UI)
-  → server-commands/document-parser/document-parser.commands.ts
-    → genkit-flows/flows/*.flow.ts
-      → Google Gemini API
-```
-
-- Genkit AI 流程僅由 `server-commands` 呼叫
-- 每個 flow 定義在 `genkit-flows/flows/*.flow.ts`
-- 中央 Genkit 實例配置於 `genkit-flows/genkit.ts`
-
----
-
-## 八、技術棧
+## 七、技術棧
 
 | 分類 | 技術 |
 |------|------|
-| 框架 | Next.js 15 (App Router) + React 19 |
+| 框架 | Next.js 16 (App Router) + React 19 |
 | 語言 | TypeScript 5（strict mode） |
-| 後端即服務 | Firebase 11（Firestore、Auth、Storage、Analytics、Messaging） |
-| AI | Google Genkit 1.x + Gemini |
+| 後端即服務 | Firebase 11（Firestore、Auth、Storage） |
+| AI | Google Genkit + Gemini |
 | UI 元件庫 | Shadcn/UI（Radix UI primitives） |
-| 樣式 | Tailwind CSS 3 |
-| 表單 | React Hook Form + Zod |
-| 資料表格 | TanStack Table v8 |
-| 狀態管理 | React Context（custom providers）+ Zustand（局部） |
-| 建構工具 | Turbopack（`next dev --turbopack`） |
-| Lint | ESLint 9（flat config）+ 7 plugins |
+| 樣式 | Tailwind CSS |
+| Lint | ESLint 9（flat config） |
 | 埠號 | `9002`（開發環境） |

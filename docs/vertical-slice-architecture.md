@@ -61,38 +61,40 @@ src/features/schedule/
 src/
 ├── app/                              ← Next.js App Router（路由組裝）
 │   ├── layout.tsx
-│   ├── page.tsx
-│   ├── (auth-routes)/
+│   ├── (shell)/
+│   │   └── page.tsx                  ← 根入口（redirect）
+│   ├── (public)/
 │   │   ├── login/page.tsx            ← import { LoginView } from "@/features/auth"
 │   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/auth"
 │   │   └── layout.tsx
-│   └── dashboard/
-│       ├── layout.tsx                ← import { DashboardShell } from "@/features/workspace"
-│       ├── page.tsx                  ← import { DashboardView } from "@/features/workspace"
-│       ├── account/
-│       │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/schedule"
-│       │   ├── members/page.tsx      ← import { MembersView } from "@/features/members"
-│       │   ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/teams"
-│       │   ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/partners"
-│       │   ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
-│       │   └── ...
-│       └── workspaces/
-│           ├── [id]/
-│           │   ├── layout.tsx        ← import { WorkspaceLayout } from "@/features/workspace"
-│           │   ├── @plugin-tab/
-│           │   │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/schedule"
-│           │   │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/daily"
-│           │   │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/tasks"
-│           │   │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/audit"
-│           │   │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/members"
-│           │   │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/files"
-│           │   │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/issues"
-│           │   │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/finance"
-│           │   │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/qa"
-│           │   │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/acceptance"
-│           │   │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/document-parser"
+│   └── (dashboard)/
+│       └── dashboard/
+│           ├── layout.tsx                ← import { DashboardShell } from "@/features/workspace"
+│           ├── page.tsx                  ← import { DashboardView } from "@/features/workspace"
+│           ├── account/
+│           │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/schedule"
+│           │   ├── members/page.tsx      ← import { MembersView } from "@/features/members"
+│           │   ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/teams"
+│           │   ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/partners"
+│           │   ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
 │           │   └── ...
-│           └── ...
+│           └── workspaces/
+│               ├── [id]/
+│               │   ├── layout.tsx        ← import { WorkspaceLayout } from "@/features/workspace"
+│               │   ├── @plugin-tab/
+│               │   │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/schedule"
+│               │   │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/daily"
+│               │   │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/tasks"
+│               │   │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/audit"
+│               │   │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/members"
+│               │   │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/files"
+│               │   │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/issues"
+│               │   │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/finance"
+│               │   │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/qa"
+│               │   │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/acceptance"
+│               │   │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/document-parser"
+│               │   └── ...
+│               └── ...
 │
 ├── features/                         ← 17 個垂直功能切片
 │   │
@@ -304,7 +306,7 @@ src/
 │
 └── shared/                           ← 跨切片共用基礎設施（5 個模組）
     │
-    ├── types/                        ← [模組 1] 全域領域類型（原 domain-types/）
+    ├── types/                        ← [模組 1] 全域領域類型
     │   ├── GEMINI.md
     │   ├── account.types.ts
     │   ├── workspace.types.ts
@@ -315,7 +317,7 @@ src/
     │   ├── skill.types.ts
     │   └── index.ts
     │
-    ├── lib/                          ← [模組 2] 純工具 + 領域規則（原 domain-rules/ + shared/utils/）
+    ├── lib/                          ← [模組 2] 純工具 + 領域規則
     │   ├── GEMINI.md
     │   ├── account.rules.ts
     │   ├── schedule.rules.ts
@@ -326,7 +328,7 @@ src/
     │   ├── i18n.ts
     │   └── utils.ts
     │
-    ├── infra/                        ← [模組 3] Firebase 基礎設施（原 firebase/）
+    ├── infra/                        ← [模組 3] Firebase 基礎設施
     │   ├── GEMINI.md
     │   ├── auth/
     │   ├── firestore/
@@ -335,12 +337,12 @@ src/
     │   ├── storage/
     │   └── ...
     │
-    ├── ai/                           ← [模組 4] Genkit AI 流程（原 genkit-flows/）
+    ├── ai/                           ← [模組 4] Genkit AI 流程
     │   ├── GEMINI.md
     │   ├── flows/
     │   └── schemas/
     │
-    └── ui/                           ← [模組 5] UI 原語（原 shared/）
+    └── ui/                           ← [模組 5] UI 原語
         ├── GEMINI.md
         ├── shadcn-ui/                ← shadcn 元件庫
         ├── app-providers/            ← Firebase/Auth/i18n/Theme providers
@@ -431,33 +433,7 @@ import { GovernanceSidebar } from "@/features/schedule/_components/governance-si
 
 ---
 
-## 7. 遷移路徑（增量遷移）
-
-現有程式碼**不需要一次性遷移**。可按以下順序逐步進行：
-
-### 第一階段：建立 `features/` 骨架
-- 為每個功能切片建立目錄 + `GEMINI.md`
-- 此為目前已完成的部分 ✅
-
-### 第二階段：遷移 `shared/`（基礎設施重組）
-1. `domain-types/` → `shared/types/`
-2. `domain-rules/` → `shared/lib/`
-3. `firebase/` → `shared/infra/`
-4. `genkit-flows/` → `shared/ai/`
-5. `shared/` (現有) → `shared/ui/`
-- 更新 `tsconfig.json` 路徑別名（`@/shared/types`、`@/shared/infra` 等）
-- 更新 ESLint 引用規則
-
-### 第三階段：逐切片遷移（推薦順序）
-1. `auth` — 最獨立，依賴最少
-2. `user-settings` — 僅依賴 user 資料
-3. `account` — 組織管理
-4. `workspace` — 工作區外殼
-5. `schedule` — 複雜度最高，最後遷移
-
----
-
-## 8. ESLint 邊界規則（目標狀態）
+## 7. ESLint 邊界規則
 
 ```ts
 // eslint.config.mts — VSA 邊界規則
@@ -473,7 +449,7 @@ import { GovernanceSidebar } from "@/features/schedule/_components/governance-si
 
 ---
 
-## 9. 新增切片流程
+## 8. 新增切片流程
 
 當需要新增一個功能時，AI 的完整指引：
 

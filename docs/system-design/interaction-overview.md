@@ -26,7 +26,7 @@ src/app/dashboard/layout.tsx   ← 含 auth guard（若未登入 → /login）
               └── WorkspaceProvider  ← 掛載於 workspaces/[id]/layout.tsx；監聽單一 workspace 的 tasks, issues, files
 ```
 
-**互動關係：** 每一個 Provider 在 `useEffect` 中呼叫 `firebase/firestore` 的 `onSnapshot`，並在 `setState` 變更時通知所有消費者（透過 `useContext`）。
+**互動關係：** 每一個 Provider 在 `useEffect` 中呼叫 `shared/infra/firestore` 的 `onSnapshot`，並在 `setState` 變更時通知所有消費者（透過 `useContext`）。
 
 ---
 
@@ -36,15 +36,14 @@ src/app/dashboard/layout.tsx   ← 含 auth guard（若未登入 → /login）
 ┌──────────────────────────────────────────────────────────┐
 │  app/  (純路由組裝，無業務邏輯)                            │
 │    ↓ renders                                             │
-│  view-modules/  (功能 UI)                                │
+│  features/{name}/_components/  (功能 UI)                 │
 │    ↓ calls                    ↓ reads context via        │
-│  react-hooks/command-hooks/   react-hooks/state-hooks/   │
-│    ↓ await                      ↓ useContext             │
-│  use-cases/  (多步驟編排)     react-providers/            │
+│  features/{name}/_hooks/      features/{name}/_hooks/    │
+│  (command hooks)              (state hooks, useContext)  │
 │    ↓ await                      ↑ onSnapshot             │
-│  server-commands/             firebase/firestore/        │
-│    ↓ calls                                               │
-│  firebase/firestore/repositories/                        │
+│  features/{name}/_actions.ts  features/{name}/_queries.ts│
+│    ↓ calls                    (provider)                 │
+│  shared/infra/firestore/repositories/                    │
 │    ↓ read/write                                          │
 │  Firestore (Google Cloud)                                │
 └──────────────────────────────────────────────────────────┘
@@ -61,8 +60,8 @@ src/app/dashboard/layout.tsx   ← 含 auth guard（若未登入 → /login）
 | `app/**/page.tsx` | 大多為 Client Component（`"use client"`） | 需要 useContext（Auth guard、Provider 資料） |
 | `app/**/layout.tsx` | Client Component | 需要 useRouter、useState（auth guard + 導航邏輯） |
 | `app/**/loading.tsx` | Server Component | 純 Skeleton UI，無互動 |
-| `view-modules/**` | Client Component | 所有元件均依賴 Context 或 Hook |
-| `server-commands/**` | Server-safe（無 React） | Next.js Server Action 相容 |
+| `features/{name}/_components/**` | Client Component | 所有元件均依賴 Context 或 Hook |
+| `features/{name}/_actions.ts → **` | Server-safe（無 React） | Next.js Server Action 相容 |
 
 ### 3.2 Page → View Module 互動
 
@@ -70,7 +69,7 @@ src/app/dashboard/layout.tsx   ← 含 auth guard（若未登入 → /login）
 
 ```
 app/dashboard/account/schedule/page.tsx
-  → import { AccountScheduleSection } from '@/view-modules/schedule'
+  → import { AccountScheduleSection } from '@/features/{name}/_components/schedule'
   → return <AccountScheduleSection />
 ```
 
@@ -78,7 +77,7 @@ app/dashboard/account/schedule/page.tsx
 ```
 AccountScheduleSection
   ├── useGlobalSchedule()          ← 讀取 AppContext / AccountContext
-  ├── useScheduleCommands()        ← 呼叫 server-commands/schedule
+  ├── useScheduleCommands()        ← 呼叫 features/{name}/_actions.ts → schedule
   └── <UnifiedCalendarGrid />      ← 純展示子元件
       <GovernanceSidebar />        ← 呼叫 useScheduleCommands().approve/reject
 ```
@@ -130,14 +129,14 @@ Command Hook 是 UI 與 Firebase 寫入之間的標準橋樑：
 useScheduleCommands()
   ├── approveScheduleItem(item)
   │     ├── 驗證 activeAccount guard
-  │     ├── await server-commands/schedule/approveScheduleItem(item)
+  │     ├── await features/schedule/_actions.ts → approveScheduleItem(item)
   │     └── toast.success("Schedule approved")
   ├── rejectScheduleItem(item, reason)
   │     ├── 驗證 activeAccount guard
-  │     ├── await server-commands/schedule/rejectScheduleItem(item, reason)
+  │     ├── await features/schedule/_actions.ts → rejectScheduleItem(item, reason)
   │     └── toast.success("Schedule rejected")
   └── assignScheduleItem(itemId, assigneeIds)
-        └── await server-commands/schedule/assignScheduleMembers(...)
+        └── await features/schedule/_actions.ts → assignScheduleMembers(...)
 ```
 
 **互動規則：**
@@ -165,8 +164,8 @@ tasks-plugin.tsx
 app/dashboard/workspaces/[id]/_event-handlers/workspace-event-handler.tsx
   → useEffect(() => {
       subscribe("workspace:tasks:completed", async ({ task }) => {
-        await createScheduleItem(...)   // server-commands/schedule
-        await createQAItem(...)         // server-commands/qa
+        await createScheduleItem(...)   // features/{name}/_actions.ts → schedule
+        await createQAItem(...)         // features/{name}/_actions.ts → qa
       })
     }, [])
 ```
@@ -175,20 +174,20 @@ app/dashboard/workspaces/[id]/_event-handlers/workspace-event-handler.tsx
 
 ```
 Tasks Plugin   ──── workspace:tasks:completed ────►  EventHandler
-                                                        ├── server-commands/schedule
-                                                        └── server-commands/qa
+                                                        ├── features/{name}/_actions.ts → schedule
+                                                        └── features/{name}/_actions.ts → qa
 
 QA Plugin      ──── workspace:qa:approved ──────────►  EventHandler
-                                                        └── server-commands/acceptance
+                                                        └── features/{name}/_actions.ts → acceptance
 
 QA Plugin      ──── workspace:qa:rejected ──────────►  EventHandler
-                                                        └── server-commands/issue (create issue)
+                                                        └── features/{name}/_actions.ts → issue (create issue)
 
 Acceptance     ──── workspace:acceptance:passed ────►  EventHandler
-                                                        └── server-commands/finance
+                                                        └── features/{name}/_actions.ts → finance
 
 Acceptance     ──── workspace:acceptance:failed ────►  EventHandler
-                                                        └── server-commands/issue
+                                                        └── features/{name}/_actions.ts → issue
 
 Tasks Plugin   ──── workspace:tasks:scheduleRequested►  AppContext (scheduleTaskRequest state)
                                                         └── UI prompt to user
@@ -197,7 +196,7 @@ Document Parser ─── workspace:document-parser:itemsExtracted ► EventHand
                                                         └── confirmation dialog → bulk task import
 
 Daily Plugin   ──── daily:log:forwardRequested ─────►  EventHandler
-                                                        └── server-commands/task or /issue
+                                                        └── features/tasks/_actions.ts →  or /issue
 ```
 
 ---
@@ -223,8 +222,8 @@ Firestore 文件變更
 ```
 使用者提交登入表單
   → LoginForm.handleSubmit()
-    → use-cases/auth/completeRegistration() 或 server-commands/auth/signIn()
-      → firebase/auth/auth.adapter.signIn()
+    → features/auth/_use-cases.ts: completeRegistration() 或 features/auth/_actions.ts → signIn()
+      → shared/infra/auth/auth.adapter.signIn()
         → Firebase Auth（Google Cloud）
           → onAuthStateChanged 觸發
             → AuthProvider.setState({ user })
@@ -235,8 +234,8 @@ Firestore 文件變更
 **登出流程：**
 ```
 NavUser.handleSignOut()
-  → server-commands/auth/signOut()
-    → firebase/auth/auth.adapter.signOut()
+  → features/auth/_actions.ts → signOut()
+    → shared/infra/auth/auth.adapter.signOut()
       → onAuthStateChanged({ user: null })
         → AuthProvider.setState({ user: null })
           → DashboardLayout → router.push('/login')

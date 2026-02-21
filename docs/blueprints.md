@@ -32,7 +32,7 @@
 
 ## 5. UI 元件庫規格 (UI Component Specifications)
 
-- **文件**: `src/shared/shadcn-ui/`
+- **文件**: `src/shared/ui/shadcn-ui/`
 - **內容**: `shadcn/ui` 的所有可用 UI 元件。開發時應優先使用這些已存在的元件，避免重複造輪子。詳細的組件列表和使用方法可參考其官方文件。
 
 ## 6. 系統限制與配額 (System Limits)
