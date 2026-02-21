@@ -7,6 +7,7 @@ import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
 import { Eye, EyeOff, Shield, Trash2, ArrowUpRight, Terminal } from "lucide-react";
 import { Workspace } from "@/shared/types";
+import { ROUTES } from "@/shared/constants/routes";
 
 interface WorkspaceListItemProps {
   workspace: Workspace;
@@ -74,7 +75,7 @@ export function WorkspaceList({ workspaces }: { workspaces: Workspace[] }) {
         <Button 
           variant="ghost" 
           size="sm"
-          onClick={() => router.push('/dashboard/workspaces')}
+          onClick={() => router.push(ROUTES.WORKSPACES)}
           className="text-xs text-primary font-bold uppercase tracking-widest hover:bg-primary/5"
         >
           View All <ArrowUpRight className="ml-1 w-3 h-3" />
@@ -89,7 +90,7 @@ export function WorkspaceList({ workspaces }: { workspaces: Workspace[] }) {
             <p className="text-sm text-muted-foreground">No workspace nodes have been created yet.</p>
             <Button 
               variant="link"
-              onClick={() => router.push('/dashboard/workspaces')}
+              onClick={() => router.push(ROUTES.WORKSPACES)}
               className="mt-2 text-xs font-bold text-primary uppercase tracking-widest"
             >
               + Create First Node

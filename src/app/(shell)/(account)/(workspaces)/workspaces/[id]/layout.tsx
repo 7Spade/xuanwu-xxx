@@ -8,6 +8,7 @@ import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react"
 import { useState, use } from "react";
 import { WorkspaceProvider, useWorkspace } from "@/features/workspace-core"
 import { useWorkspaceEventHandler } from "@/features/workspace-core"
+import { ROUTES } from "@/shared/constants/routes";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,7 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
     setLoading(true);
     await handleDeleteWorkspace(workspace.id, () => {
       setIsDeleteOpen(false);
-      router.push("/dashboard/workspaces");
+      router.push(ROUTES.WORKSPACES);
     });
     setLoading(false);
   };
