@@ -1,1 +1,1 @@
-export * from "./user.rules"
+export * from "./user.rules" // isAnonymousUser

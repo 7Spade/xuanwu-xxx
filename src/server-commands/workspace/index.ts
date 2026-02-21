@@ -1,1 +1,1 @@
-export * from "./workspace.commands"
+export * from "./workspace.commands" // createWorkspace, authorizeWorkspaceTeam, revokeWorkspaceTeam, grantIndividualWorkspaceAccess, revokeIndividualWorkspaceAccess, mountCapabilities, unmountCapability, updateWorkspaceSettings, deleteWorkspace
