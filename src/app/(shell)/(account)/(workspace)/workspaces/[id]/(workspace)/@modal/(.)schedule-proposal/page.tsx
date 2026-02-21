@@ -1,5 +1,5 @@
 // Intercepting route: renders ProposalDialog in the @modal slot when navigating
-// to /dashboard/workspaces/[id]/schedule-proposal from within the workspace layout.
+// to /workspaces/[id]/schedule-proposal from within the workspace layout.
 "use client"
 
 import { ScheduleProposalContent } from "@/features/workspace-governance.schedule"

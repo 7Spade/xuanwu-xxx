@@ -3,7 +3,8 @@
  * Dashboard Layout
  *
  * Responsibility: Business layout for authenticated dashboard pages.
- * Auth guard and SidebarProvider live in the parent (shell)/layout.tsx.
+ * Auth guard and SidebarProvider live in (shell)/layout.tsx.
+ * AccountProvider lives in the parent (account)/layout.tsx.
  *
  * Parallel route structure:
  *   @header  →  Header (SidebarTrigger + Breadcrumb, inside SidebarInset)
@@ -16,7 +17,6 @@ import type { ReactNode } from "react";
 
 import { SidebarInset } from "@/shared/shadcn-ui/sidebar";
 import { ThemeAdapter } from "@/features/workspace-core";
-import { AccountProvider } from "@/features/account";
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -28,16 +28,14 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children, header, modal }: DashboardLayoutProps) {
   return (
-    <AccountProvider>
-      <SidebarInset>
-        {header}
-        <ThemeAdapter>
-          <main className="flex-1 p-6 overflow-y-auto">
-            {children}
-          </main>
-        </ThemeAdapter>
-      </SidebarInset>
+    <SidebarInset>
+      {header}
+      <ThemeAdapter>
+        <main className="flex-1 p-6 overflow-y-auto">
+          {children}
+        </main>
+      </ThemeAdapter>
       {modal}
-    </AccountProvider>
+    </SidebarInset>
   );
 }

@@ -140,7 +140,7 @@ export function UnifiedCalendarGrid({
                                     className="flex items-center gap-1.5 p-1.5 border-b cursor-pointer hover:bg-muted/50 rounded-t-md transition-colors"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        router.push(`/dashboard/workspaces/${item.workspaceId}?capability=schedule`);
+                                        router.push(`/workspaces/${item.workspaceId}?capability=schedule`);
                                     }}
                                 >
                                     <Layers className="w-3 h-3 text-muted-foreground" />

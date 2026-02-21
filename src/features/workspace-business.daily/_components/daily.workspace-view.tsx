@@ -41,7 +41,7 @@ export function WorkspaceDaily() {
             currentUser={user}
             onOpen={() =>
               router.push(
-                `/dashboard/workspaces/${workspace.id}/daily-log/${log.id}`
+                `/workspaces/${workspace.id}/daily-log/${log.id}`
               )
             }
           />

@@ -12,5 +12,5 @@ export default async function WorkspaceDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  redirect(`/dashboard/workspaces/${id}/capabilities`)
+  redirect(`/workspaces/${id}/capabilities`)
 }

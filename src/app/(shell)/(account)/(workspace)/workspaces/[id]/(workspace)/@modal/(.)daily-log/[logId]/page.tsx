@@ -1,5 +1,5 @@
 // Intercepting route: renders DailyLogDialog in the @modal slot when navigating
-// to /dashboard/workspaces/[id]/daily-log/[logId] from within the workspace layout.
+// to /workspaces/[id]/daily-log/[logId] from within the workspace layout.
 "use client"
 
 import { use } from "react"

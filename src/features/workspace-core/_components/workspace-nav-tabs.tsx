@@ -98,7 +98,7 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
         return detail ? (
           <Link
             key={cap.id}
-            href={`/dashboard/workspaces/${workspaceId}/${cap.id}`}
+            href={`/workspaces/${workspaceId}/${cap.id}`}
             className={`text-[9px] font-bold uppercase tracking-widest px-4 rounded-lg whitespace-nowrap inline-flex items-center justify-center h-9 transition-colors ${
               isActive
                 ? "bg-background text-foreground shadow-sm"

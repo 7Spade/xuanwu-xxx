@@ -26,7 +26,7 @@ export function WorkspaceSchedule() {
           variant="outline"
           size="sm"
           className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
-          onClick={() => router.push(`/dashboard/workspaces/${workspace.id}/governance`)}
+          onClick={() => router.push(`/workspaces/${workspace.id}/governance`)}
         >
           <Shield className="w-3.5 h-3.5" /> Governance Panel
         </Button>

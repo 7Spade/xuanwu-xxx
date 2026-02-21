@@ -84,7 +84,7 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
             variant="outline"
             size="sm"
             className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
-            onClick={() => router.push(`/dashboard/workspaces/${workspaceId}/settings`)}
+            onClick={() => router.push(`/workspaces/${workspaceId}/settings`)}
           >
             <Settings className="w-3.5 h-3.5" /> Space Settings
           </Button>

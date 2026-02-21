@@ -36,9 +36,9 @@ export function NavWorkspaces({ workspaces, pathname, t }: NavWorkspacesProps) {
             <SidebarMenuItem key={workspace.id}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === `/dashboard/workspaces/${workspace.id}`}
+                isActive={pathname === `/workspaces/${workspace.id}`}
               >
-                <Link href={`/dashboard/workspaces/${workspace.id}`}>
+                <Link href={`/workspaces/${workspace.id}`}>
                   <Terminal className="w-3 h-3 text-primary/60" />
                   <span className="truncate text-xs font-medium">{workspace.name}</span>
                 </Link>

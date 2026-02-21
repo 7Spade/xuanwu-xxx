@@ -34,7 +34,7 @@ export default function DailyLogPage({ params }: PageProps) {
         variant="ghost"
         size="sm"
         className="gap-2 font-bold uppercase text-[10px] tracking-widest"
-        onClick={() => router.push(`/dashboard/workspaces/${workspaceId}/daily`)}
+        onClick={() => router.push(`/workspaces/${workspaceId}/daily`)}
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Back to Daily
       </Button>
@@ -44,7 +44,7 @@ export default function DailyLogPage({ params }: PageProps) {
         isOpen={true}
         onOpenChange={(open) => {
           if (!open)
-            router.push(`/dashboard/workspaces/${workspaceId}/daily`)
+            router.push(`/workspaces/${workspaceId}/daily`)
         }}
       />
     </div>

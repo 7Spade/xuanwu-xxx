@@ -22,7 +22,7 @@ function WorkspaceListItem({ workspace, onDelete }: WorkspaceListItemProps) {
   return (
     <div 
       className="flex items-center justify-between p-4 bg-card border border-border/60 rounded-xl hover:bg-muted/30 transition-colors group cursor-pointer"
-      onClick={() => router.push(`/dashboard/workspaces/${workspace.id}`)}
+      onClick={() => router.push(`/workspaces/${workspace.id}`)}
     >
       <div className="flex items-center gap-4">
         <div className="p-2 bg-primary/5 rounded-lg text-primary">

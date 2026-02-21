@@ -25,7 +25,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
   const { t } = useI18n();
 
   const handleClick = () => {
-    router.push(`/dashboard/workspaces/${workspace.id}`);
+    router.push(`/workspaces/${workspace.id}`);
   };
 
   return (

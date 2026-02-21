@@ -57,7 +57,7 @@ export function AccountScheduleSection() {
   const rejectProposal = (item: ScheduleItem) => handleAction(item, 'REJECTED');
 
   const onItemClick = (item: ScheduleItem) => {
-    router.push(`/dashboard/workspaces/${item.workspaceId}?capability=schedule`);
+    router.push(`/workspaces/${item.workspaceId}?capability=schedule`);
   };
 
   const handleMonthChange = (direction: 'prev' | 'next') => {
