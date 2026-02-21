@@ -130,23 +130,25 @@ export default tseslint.config(
     },
   },
 
-  // ── One-way layer dependency rules ───────────────────────────────────────
-  // Each config block covers one src/ layer and forbids imports from layers
-  // that sit above it in the dependency hierarchy, preventing circular deps.
-  // Architecture: domain-types → domain-rules/firebase/genkit-flows/shared
-  //   → server-commands → react-hooks/react-providers → use-cases
-  //   → view-modules → app
+  // ── VSA one-way dependency rules ─────────────────────────────────────────
+  // Architecture (Vertical Slice Architecture):
+  //
+  //   app/  →  features/{name}/index.ts  →  shared/*
+  //
+  // Three invariants:
+  //   1. shared/* has zero feature and zero app dependencies
+  //   2. features/* imports shared/* freely; cross-slice imports go through index.ts only
+  //   3. app/* imports features through public index.ts APIs; never feature internals
 
   // ── "use client" protection ──────────────────────────────────────────────
-  // The five layers below are always server-side or framework-agnostic.
-  // A "use client" directive in any of them is a hard architectural mistake.
+  // shared/types, shared/lib, shared/infra, shared/ai are always server-side
+  // or framework-agnostic. A "use client" directive in them is an arch mistake.
   {
     files: [
-      "src/domain-types/**/*.{ts,tsx}",
-      "src/domain-rules/**/*.{ts,tsx}",
-      "src/firebase/**/*.{ts,tsx}",
-      "src/genkit-flows/**/*.{ts,tsx}",
-      "src/server-commands/**/*.{ts,tsx}",
+      "src/shared/types/**/*.{ts,tsx}",
+      "src/shared/lib/**/*.{ts,tsx}",
+      "src/shared/infra/**/*.{ts,tsx}",
+      "src/shared/ai/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-syntax": [
@@ -154,224 +156,72 @@ export default tseslint.config(
         {
           selector: "ExpressionStatement > Literal[value='use client']",
           message:
-            "This layer must never contain a 'use client' directive — it is server-side or framework-agnostic.",
+            "This shared module must never contain a 'use client' directive — it is server-side or framework-agnostic.",
         },
       ],
     },
   },
 
-  // domain-types: foundation — zero internal dependencies
-  {
-    files: ["src/domain-types/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["@/firebase", "@/firebase/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/domain-rules", "@/domain-rules/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/server-commands", "@/server-commands/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/shared", "@/shared/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "domain-types must not import from any other src layer" },
-            { group: ["@/app", "@/app/**"], message: "domain-types must not import from any other src layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // domain-rules: pure logic — no I/O, no async, no frameworks
-  {
-    files: ["src/domain-rules/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["react", "react/**", "react-dom", "react-dom/**"], message: "domain-rules must not depend on React" },
-            { group: ["next", "next/**"], message: "domain-rules must not depend on Next.js" },
-            { group: ["firebase", "firebase/**"], message: "domain-rules must not depend on Firebase SDK" },
-            { group: ["@/firebase", "@/firebase/**"], message: "domain-rules must not import from firebase layer" },
-            { group: ["@/server-commands", "@/server-commands/**"], message: "domain-rules must not import from server-commands" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "domain-rules must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "domain-rules must not import from react-providers" },
-            { group: ["@/shared", "@/shared/**"], message: "domain-rules must not import from shared" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "domain-rules must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "domain-rules must not import from view-modules" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "domain-rules must not import from genkit-flows" },
-            { group: ["@/app", "@/app/**"], message: "domain-rules must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // firebase: sole Firebase gateway — no React, no higher layers
-  {
-    files: ["src/firebase/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["react", "react/**", "react-dom", "react-dom/**"], message: "firebase layer must not depend on React" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "firebase layer must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "firebase layer must not import from react-providers" },
-            { group: ["@/server-commands", "@/server-commands/**"], message: "firebase layer must not import from server-commands" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "firebase layer must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "firebase layer must not import from view-modules" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "firebase layer must not import from genkit-flows" },
-            { group: ["@/shared", "@/shared/**"], message: "firebase layer must not import from shared" },
-            { group: ["@/app", "@/app/**"], message: "firebase layer must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // genkit-flows: AI layer — server-side only, no React/UI
-  {
-    files: ["src/genkit-flows/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "genkit-flows must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "genkit-flows must not import from react-providers" },
-            { group: ["@/server-commands", "@/server-commands/**"], message: "genkit-flows must not import from server-commands" },
-            { group: ["@/shared", "@/shared/**"], message: "genkit-flows must not import from shared" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "genkit-flows must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "genkit-flows must not import from view-modules" },
-            { group: ["@/app", "@/app/**"], message: "genkit-flows must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // server-commands: server boundary — no React, no UI, no higher layers.
-  // CAN use: @/firebase, @/genkit-flows, @/domain-rules, @/domain-types,
-  //          @/shared/utils, @/shared/constants, @/shared/i18n-types.
-  // MUST NOT use React UI parts of shared or any higher layer.
-  {
-    files: ["src/server-commands/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["react", "react/**", "react-dom", "react-dom/**"], message: "server-commands must not depend on React" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "server-commands must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "server-commands must not import from react-providers" },
-            { group: ["@/shared/shadcn-ui", "@/shared/shadcn-ui/**"], message: "server-commands must not import shadcn UI components" },
-            { group: ["@/shared/app-providers", "@/shared/app-providers/**"], message: "server-commands must not import React context providers" },
-            { group: ["@/shared/utility-hooks", "@/shared/utility-hooks/**"], message: "server-commands must not import React hooks from shared" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "server-commands must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "server-commands must not import from view-modules" },
-            { group: ["@/app", "@/app/**"], message: "server-commands must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // shared: cross-cutting utilities — no domain services or higher layers
-  // Exception: shared/app-providers may import from @/firebase (infrastructure wiring)
+  // shared/*: cross-cutting infrastructure — no feature dependencies, no app
   {
     files: ["src/shared/**/*.{ts,tsx}"],
-    ignores: ["src/shared/app-providers/**"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["@/firebase", "@/firebase/**"], message: "shared utilities must not import from firebase layer" },
-            { group: ["@/domain-rules", "@/domain-rules/**"], message: "shared utilities must not import from domain-rules" },
-            { group: ["@/server-commands", "@/server-commands/**"], message: "shared utilities must not import from server-commands" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "shared utilities must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "shared utilities must not import from react-providers" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "shared utilities must not import from genkit-flows" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "shared utilities must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "shared utilities must not import from view-modules" },
-            { group: ["@/app", "@/app/**"], message: "shared utilities must not import from app layer" },
+            {
+              group: ["@/features", "@/features/**"],
+              message: "shared/* must not import from features/ — zero feature dependencies in shared",
+            },
+            {
+              group: ["@/app", "@/app/**"],
+              message: "shared/* must not import from app/ — one-way dependency rule",
+            },
           ],
         },
       ],
     },
   },
 
-  // react-hooks: logic bridge — no app layer, no genkit-flows (per README)
+  // features/*: vertical slices — no app imports; cross-slice only via index.ts
   {
-    files: ["src/react-hooks/**/*.{ts,tsx}"],
+    files: ["src/features/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "react-hooks must not import from genkit-flows" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "react-hooks must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "react-hooks must not import from view-modules" },
-            { group: ["@/app", "@/app/**"], message: "react-hooks must not import from app layer" },
+            {
+              group: ["@/app", "@/app/**"],
+              message: "features/* must not import from app/ — one-way dependency rule",
+            },
+            {
+              // Forbid cross-feature access to slice-private (_-prefixed) files.
+              // Within-slice code uses relative paths, so @/features/own-slice/_x won't appear here.
+              group: ["@/features/**/_*"],
+              message:
+                "Cross-feature imports must go through index.ts — do not import private (_-prefixed) files from another slice",
+            },
           ],
         },
       ],
     },
   },
 
-  // react-providers: state management — no app layer, no genkit-flows (per README)
+  // app/*: routing only — no feature internals; must use public index.ts API
   {
-    files: ["src/react-providers/**/*.{ts,tsx}"],
+    files: ["src/app/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "react-providers must not import from genkit-flows" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "react-providers must not import from use-cases" },
-            { group: ["@/view-modules", "@/view-modules/**"], message: "react-providers must not import from view-modules" },
-            { group: ["@/app", "@/app/**"], message: "react-providers must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // use-cases: orchestration + view bridges — no firebase direct, no React context
-  {
-    files: ["src/use-cases/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["@/firebase", "@/firebase/**"], message: "use-cases must not import firebase directly; go through server-commands" },
-            { group: ["@/react-hooks", "@/react-hooks/**"], message: "use-cases must not import from react-hooks" },
-            { group: ["@/react-providers", "@/react-providers/**"], message: "use-cases must not import from react-providers" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "use-cases must not import from genkit-flows" },
-            { group: ["@/app", "@/app/**"], message: "use-cases must not import from app layer" },
-          ],
-        },
-      ],
-    },
-  },
-
-  // view-modules: feature views — no app layer, no use-cases (reverse dep), no firebase direct
-  {
-    files: ["src/view-modules/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            { group: ["@/firebase", "@/firebase/**"], message: "view-modules must not import firebase directly; use react-hooks or server-commands" },
-            { group: ["@/use-cases", "@/use-cases/**"], message: "view-modules must not import from use-cases (circular dep: use-cases depends on view-modules)" },
-            { group: ["@/genkit-flows", "@/genkit-flows/**"], message: "view-modules must not import from genkit-flows" },
-            { group: ["@/app", "@/app/**"], message: "view-modules must not import from app layer (one-way dep rule)" },
+            {
+              group: ["@/features/**/_*"],
+              message:
+                "app/ must not import feature internals directly — use features/{name}/index.ts (public API only)",
+            },
           ],
         },
       ],

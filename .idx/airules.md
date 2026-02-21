@@ -105,24 +105,22 @@ Remember, the XML structure you generate is the only mechanism for applying chan
 - Adapter：`.adapter.ts`
 
 ### Next.js App Router 結構邊界
-- `app/`：僅存放路由、Layout、Server Components
+- `app/`：僅存放路由、Layout、Server Components（含 route groups: `(shell)`, `(account)`, `(dashboard)`, `(workspaces)`, `(public)`）
 - `app/**/_components/`：僅該路由可用的區域組件
-- `infra/firebase/`：Firebase 唯一操作層
+- `shared/infra/`：Firebase 唯一操作層
   - `adapters/`
   - `repositories/`
-- `context/`：全域狀態（Auth / Theme / App）
-- `hooks/`
-  - `infra/`
-  - `state/`
+- `shared/ui/`：shadcn-ui、app-providers、i18n、constants
+- `features/{name}/`：垂直功能切片（20 個）
 
 
 ## 3. UI 組件優先準則 (UI Library Whitelist)
 
 ### 使用規則
 - 構建 UI 時禁止直接使用原生 HTML 標籤（除非必要）
-- 必須優先使用：`@/app/_components/ui/...`
+- 必須優先使用：`@/shared/ui/...`
 - 若已有現成組件，禁止重寫
-- 引用路徑必須使用別名 `@/app/_components/ui/...`
+- 引用路徑必須使用別名 `@/shared/ui/...`
 
 ### Whitelist
 

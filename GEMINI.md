@@ -26,7 +26,7 @@ src/
 | Directory | Role | Count |
 |-----------|------|-------|
 | `app/` | Next.js App Router — routing & layout composition only | 1 |
-| `features/` | Self-contained business domain slices | 17 |
+| `features/` | Self-contained business domain slices | 20 |
 | `shared/` | Cross-cutting infrastructure (types, lib, infra, ai, ui) | 5 |
 
 ### Dependency Flow
@@ -41,37 +41,39 @@ app/  ->  features/{name}/index.ts  ->  shared/*
 
 ### Feature Slice Index
 
-Each slice lives at `src/features/{name}/` and owns everything for its domain:
+Each slice lives at `src/features/{name}/` and owns everything for its domain.
+Workspace slices use dot-namespace: `workspace-core.*` for infrastructure, `workspace-business.*` for plugins, `workspace-governance.*` for governance.
 
 | Slice | Domain |
 |-------|--------|
 | `features/auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
-| `features/workspace` | Workspace CRUD, settings, shell |
-| `features/members` | Member management |
-| `features/teams` | Team management |
-| `features/partners` | Partner management |
-| `features/schedule` | Schedule, proposals, governance |
-| `features/daily` | Daily logs, comments, bookmarks |
-| `features/tasks` | Task tree, CRUD |
-| `features/audit` | Audit trail, event timeline |
-| `features/files` | File upload, management |
-| `features/issues` | Issue tracking |
-| `features/finance` | Finance plugin |
-| `features/qa` | QA plugin |
-| `features/document-parser` | AI document parsing |
-| `features/acceptance` | Acceptance plugin |
-| `features/user-settings` | User profile, preferences |
+| `features/user-settings` | User profile, preferences, security |
+| `features/workspace-core` | Workspace CRUD, shell, provider, list |
+| `features/workspace-core.event-bus` | Intra-workspace event bus |
+| `features/workspace-business.members` | Member management (workspace-level) |
+| `features/workspace-business.teams` | Team management |
+| `features/workspace-business.partners` | Partner management |
+| `features/workspace-business.daily` | Daily logs, comments, bookmarks |
+| `features/workspace-business.tasks` | Task tree, CRUD |
+| `features/workspace-business.audit` | Audit trail, event timeline |
+| `features/workspace-business.files` | File upload, management |
+| `features/workspace-business.issues` | Issue tracking |
+| `features/workspace-business.finance` | Finance plugin |
+| `features/workspace-business.qa` | QA plugin |
+| `features/workspace-business.document-parser` | AI document parsing |
+| `features/workspace-business.acceptance` | Acceptance plugin |
+| `features/workspace-governance.schedule` | Schedule, proposals, governance |
 
 ### Shared Module Index
 
-| Module | Maps From | Contents |
-|--------|-----------|----------|
-| `shared/types` | `domain-types/` | All TypeScript domain types |
-| `shared/lib` | `domain-rules/` + `shared/utils/` | Pure utilities + domain rules |
-| `shared/infra` | `firebase/` | Firebase adapters + repositories |
-| `shared/ai` | `genkit-flows/` | Genkit AI flows |
-| `shared/ui` | `shared/` | shadcn-ui, providers, i18n, constants |
+| Module | Contents |
+|--------|----------|
+| `shared/types` | All TypeScript domain types |
+| `shared/lib` | Pure utilities + domain rules |
+| `shared/infra` | Firebase adapters + repositories |
+| `shared/ai` | Genkit AI flows |
+| `shared/ui` | shadcn-ui, app-providers, i18n, constants |
 
 > **Full design doc**: `docs/vertical-slice-architecture.md`
 
