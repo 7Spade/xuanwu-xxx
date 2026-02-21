@@ -1,3 +1,5 @@
+import type { SkillTag, SkillGrant } from '../skill/skill.types'
+
 export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
 
@@ -10,6 +12,8 @@ export interface Account {
   bio?: string
   achievements?: string[]
   expertiseBadges?: ExpertiseBadge[]
+  /** Global skill-tag library for this organisation. */
+  skillTags?: SkillTag[]
   // org-specific
   description?: string
   ownerId?: string
@@ -29,6 +33,8 @@ export interface MemberReference {
   presence: 'active' | 'away' | 'offline';
   isExternal?: boolean;
   expiryDate?: any; // FirestoreTimestamp
+  /** Skills held by this individual, with proficiency tier. */
+  skillGrants?: SkillGrant[];
 }
 
 export interface Team {
@@ -37,6 +43,8 @@ export interface Team {
   description: string;
   type: 'internal' | 'external';
   memberIds: string[];
+  /** Skills held by this team as a whole, with proficiency tier. */
+  skillGrants?: SkillGrant[];
 }
 
 export interface ThemeConfig {
@@ -45,6 +53,7 @@ export interface ThemeConfig {
   accent: string;
 }
 
+/** @deprecated Use SkillTag from domain-types/skill for new code. */
 export interface ExpertiseBadge {
   id: string;
   name: string;

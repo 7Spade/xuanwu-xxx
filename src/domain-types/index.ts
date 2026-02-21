@@ -1,6 +1,7 @@
 export * from './account'
 export * from './workspace'
 export * from './schedule'
+export * from './skill'
 export * from './task'
 export * from './daily'
 export * from './audit'
