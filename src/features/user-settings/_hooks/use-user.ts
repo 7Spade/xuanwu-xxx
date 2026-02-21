@@ -9,7 +9,7 @@ import {
   updateUserProfile as updateUserProfileAction,
   getUserProfile as getUserProfileAction,
 } from '@/features/user-settings/_actions'
-import { uploadProfilePicture } from '@/server-commands/storage'
+import { uploadProfilePicture } from '@/features/files/_storage-actions'
 import type { Account } from '@/shared/types'
 
 /**

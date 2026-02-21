@@ -3,7 +3,7 @@
 
 import { useMemo } from "react";
 import { useAccount } from "@/features/account";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
 import { Progress } from "@/shared/shadcn-ui/progress";
 import { ShieldCheck, Activity, Layers, Zap } from "lucide-react";

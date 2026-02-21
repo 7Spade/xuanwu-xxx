@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/shadcn-ui/dropdown-menu";
 import { Button } from "@/shared/shadcn-ui/button";
-import { useScheduleActions } from "@/react-hooks/command-hooks/use-schedule-commands";
+import { useScheduleActions } from "../_hooks/use-schedule-commands";
 import { useApp } from "@/features/workspace";
 
 export function AccountScheduleSection() {

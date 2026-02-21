@@ -3,7 +3,7 @@
 
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
 import { serverTimestamp } from "firebase/firestore";
-import { addDocument } from "@/firebase/firestore/firestore.write.adapter";
+import { addDocument } from "@/shared/infra/firestore/firestore.write.adapter";
 import { useCallback } from "react";
 import type { AuditLog, Account } from "@/shared/types";
 import { useApp } from "@/features/workspace";

@@ -3,7 +3,7 @@
  * No React. No UI. Callable from hooks, context, or Server Actions.
  */
 
-import { createOrganization, createTeam } from "@/server-commands/account"
+import { createOrganization, createTeam } from "@/features/account/_actions"
 import type { Account } from "@/shared/types"
 
 /**

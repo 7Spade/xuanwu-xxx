@@ -4,7 +4,7 @@ import { useApp } from '@/features/workspace';
 import {
   uploadDailyPhoto as uploadDailyPhotoAction,
   uploadTaskAttachment as uploadTaskAttachmentAction,
-} from '@/server-commands/storage';
+} from '../_storage-actions';
 
 /**
  * @fileoverview A hook for abstracting file storage operations.

@@ -1,5 +1,5 @@
 // [職責] 事件名稱與 Payload 的 TypeScript 類型定義 (Contract)
-import type { WorkspaceTask, DailyLog } from "@/domain-types/domain"
+import type { WorkspaceTask, DailyLog } from "@/shared/types"
 
 // =================================================================
 // == Payload Interfaces

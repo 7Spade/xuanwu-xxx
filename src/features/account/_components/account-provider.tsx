@@ -5,7 +5,7 @@ import React, { createContext, useReducer, useEffect, ReactNode } from 'react';
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
 import { collection, query, where, onSnapshot, QuerySnapshot, orderBy, limit } from "firebase/firestore";
 import { Workspace, DailyLog, AuditLog, PartnerInvite, ScheduleItem } from '@/shared/types';
-import { useApp } from '@/react-hooks/state-hooks/use-app';
+import { useApp } from '@/features/workspace';
 import { snapshotToRecord } from '@/shared/infra/firestore/firestore.utils';
 
 // State and Action Types

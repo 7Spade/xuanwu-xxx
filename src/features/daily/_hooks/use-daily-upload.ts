@@ -13,7 +13,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useStorage } from "@/react-hooks/service-hooks/use-storage";
+import { useStorage } from "@/features/files";
 import { useWorkspace } from "@/features/workspace";
 
 export function useDailyUpload() {
