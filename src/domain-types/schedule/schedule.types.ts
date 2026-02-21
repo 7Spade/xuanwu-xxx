@@ -1,4 +1,5 @@
 import type { Location } from '../workspace/workspace.types'
+import type { SkillRequirement } from '../skill/skill.types'
 
 export type ScheduleStatus = 'PROPOSAL' | 'OFFICIAL' | 'REJECTED';
 
@@ -18,4 +19,6 @@ export interface ScheduleItem {
   originTaskId?: string;
   assigneeIds: string[];
   location?: Location;
+  /** Skill & staffing requirements proposed by the workspace. */
+  requiredSkills?: SkillRequirement[];
 }

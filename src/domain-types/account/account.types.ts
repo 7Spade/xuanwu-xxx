@@ -1,3 +1,5 @@
+import type { SkillGrant } from '../skill/skill.types'
+
 export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
 
@@ -10,6 +12,20 @@ export interface Account {
   bio?: string
   achievements?: string[]
   expertiseBadges?: ExpertiseBadge[]
+  /**
+   * Individual skill grants — permanently attached to this user.
+   * Only meaningful on `accountType === 'user'` accounts.
+   * Survives org/team deletion; matched by `tagSlug` against the global
+   * static library in shared/constants/skills.ts.
+   */
+  skillGrants?: SkillGrant[]
+  /**
+   * Wallet — pre-embedded for future currency/reward system.
+   * Only meaningful on `accountType === 'user'` accounts.
+   * Balance is the authoritative figure; full transaction history lives in
+   * the `accounts/{userId}/walletTransactions` sub-collection when needed.
+   */
+  wallet?: Wallet
   // org-specific
   description?: string
   ownerId?: string
@@ -29,6 +45,12 @@ export interface MemberReference {
   presence: 'active' | 'away' | 'offline';
   isExternal?: boolean;
   expiryDate?: any; // FirestoreTimestamp
+  /**
+   * Display cache of this individual's skill grants.
+   * Derived from accounts/{id}.skillGrants at read time — not the source of truth.
+   * Do not write XP here; write to accounts/{userId}.skillGrants instead.
+   */
+  skillGrants?: SkillGrant[];
 }
 
 export interface Team {
@@ -45,6 +67,23 @@ export interface ThemeConfig {
   accent: string;
 }
 
+/**
+ * User wallet — inline balance summary stored on the user account document.
+ *
+ * Design contract:
+ *   - `balance` is always the authoritative total (never negative).
+ *   - Detailed transaction history goes in `accounts/{userId}/walletTransactions`
+ *     sub-collection when that feature is built — this struct stays as the
+ *     fast-read summary that loads with the profile in a single document fetch.
+ *   - Extend this struct with optional fields (e.g. `currency`, `pendingBalance`)
+ *     as needed — no migration required since all fields are optional beyond `balance`.
+ */
+export interface Wallet {
+  /** Current coin balance. Incremented by XP rewards, decremented by spending. */
+  balance: number;
+}
+
+/** @deprecated Use SkillDefinition from shared/constants/skills for new code. */
 export interface ExpertiseBadge {
   id: string;
   name: string;

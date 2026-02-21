@@ -37,6 +37,15 @@
     --sidebar-accent-foreground: 222 47% 11.2%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 197 100% 45%;
+
+    /* Skill-tier badge palette (light mode) */
+    --tier-1-apprentice:  #CCEDEB;
+    --tier-2-journeyman:  #A2C7C7;
+    --tier-3-expert:      #78A1A3;
+    --tier-4-artisan:     #4D7A7F;
+    --tier-5-grandmaster: #23545B; /* core colour */
+    --tier-6-legendary:   #17393E;
+    --tier-7-titan:       #0A1F21;
   }
 
   .dark {
@@ -67,6 +76,15 @@
     --sidebar-accent-foreground: 213 31% 91%;
     --sidebar-border: 222.2 47.4% 11.2%;
     --sidebar-ring: 197 100% 45%;
+
+    /* Skill-tier badge palette (dark mode — same hues, slightly lighter for contrast) */
+    --tier-1-apprentice:  #b8dbd9;
+    --tier-2-journeyman:  #8eb5b5;
+    --tier-3-expert:      #6a9294;
+    --tier-4-artisan:     #3f6b70;
+    --tier-5-grandmaster: #1c464d; /* core colour */
+    --tier-6-legendary:   #112d31;
+    --tier-7-titan:       #071518;
   }
 }
 

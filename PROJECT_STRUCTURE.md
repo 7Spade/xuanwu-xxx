@@ -1,19 +1,31 @@
 # Project Structure
 
-> Last updated: 2026-02-20 — reflects current repo after RSC/parallel-routes migration.
+> Last updated: 2026-02-21 — Vertical Slice Architecture (VSA) target state.
+>
+> **Migration status**: Existing code resides in legacy layers (`domain-types/`, `firebase/`, etc.).
+> New features must be built in `src/features/`. Incremental migration plan in
+> `docs/vertical-slice-architecture.md` § 7.
 
 ---
 
-## Layer Architecture
+## Architecture Overview
 
-One-way dependency flow (each layer may only depend on layers below it):
+Vertical Slice Architecture — **3 categories, 22 modules**.
 
 ```
-app  →  view-modules  →  use-cases  →  react-providers  →  react-hooks
-     →  server-commands  →  firebase / genkit-flows / shared  →  domain-rules  →  domain-types
+src/
+├── app/          ← Next.js routing only (1)
+├── features/     ← Business domain slices (17)
+└── shared/       ← Cross-cutting infrastructure (5)
 ```
 
-Enforced via ESLint `no-restricted-imports` rules in `eslint.config.mts`.
+Dependency flow (one-way, left to right):
+
+```
+app  ->  features/{name}/index.ts  ->  shared/*
+```
+
+Full design: `docs/vertical-slice-architecture.md`
 
 ---
 
@@ -22,8 +34,8 @@ Enforced via ESLint `no-restricted-imports` rules in `eslint.config.mts`.
 ```
 /
 ├── apphosting.yaml
-├── components.json          ← shadcn config: aliases → @/shared/shadcn-ui/*
-├── eslint.config.mts        ← one-way layer import rules
+├── components.json          ← shadcn config: aliases -> @/shared/ui/*
+├── eslint.config.mts        ← import boundary rules
 ├── firebase.json
 ├── firestore.indexes.json
 ├── firestore.rules
@@ -49,437 +61,160 @@ Architecture documentation, migration plans, and design decisions:
 ```
 docs/
 ├── architecture.md
-├── backend.json
-├── blueprints.md
+├── vertical-slice-architecture.md   ← VSA design: slices, structure tree, rules
 ├── boundaries.md
-├── complexity-analysis.md
-├── context.md
 ├── conventions.md
-├── events.md
-├── GEMINI.md
-├── glossary.md
-├── interactions.md
-├── limits.md
-├── over-engineering-analysis.md
-├── performance.md
-├── plan-app-to-rsc-and-parallel-routes.md   ← Wave migration plan (app→RSC)
-├── plan-workspace-architecture-2026.md      ← Workspace parallel-routes plan
-├── README.md
-├── renamed-file-tree.md
-├── rules.md
 ├── schema.md
 ├── security.md
-└── tools.md
-```
-
----
-
-## src/
-
-### src/domain-types/
-
-Foundation layer — core TypeScript types and interfaces. Zero dependencies.
-
-```
-src/domain-types/
-├── domain.ts        ← All domain types: Account, Workspace, ScheduleItem, Capability, ...
-├── GEMINI.md
-└── README.md
-```
-
-### src/domain-rules/
-
-Pure business logic — no React, no I/O, no network. Depends only on `domain-types`.
-
-```
-src/domain-rules/
-├── account/index.ts    ← isOwner, setupOrganizationWithTeam
-├── schedule/index.ts   ← canTransitionScheduleStatus
-├── task/index.ts       ← buildTaskTree
-├── user/index.ts       ← getUserTeamIds
-├── workspace/index.ts  ← filterVisibleWorkspaces
-├── GEMINI.md
-├── index.ts            ← barrel
-└── README.md
-```
-
-### src/shared/
-
-Globally shared utilities and UI. Import via `@/shared/*`.
-
-```
-src/shared/
-├── app-providers/
-│   ├── auth-provider.tsx       ← Firebase Auth state provider
-│   ├── firebase-provider.tsx   ← Firebase SDK instances provider
-│   ├── i18n-provider.tsx       ← Internationalization provider
-│   └── theme-provider.tsx      ← UI theme provider
-├── config/
-│   └── README.md
-├── constants/
-│   ├── routes.ts               ← ROUTES constants (LOGIN, DASHBOARD, ...)
-│   └── README.md
-├── i18n-types/
-│   ├── i18n.schema.ts          ← Full i18n key schema
-│   ├── i18n.ts                 ← i18n type helpers
-│   └── README.md
-├── shadcn-ui/                  ← shadcn/ui components (55 components)
-│   ├── accordion.tsx
-│   ├── alert-dialog.tsx
-│   ├── avatar.tsx
-│   ├── badge.tsx
-│   ├── button.tsx
-│   ├── card.tsx
-│   ├── dialog.tsx
-│   ├── dropdown-menu.tsx
-│   ├── page-header.tsx         ← Shared PageHeader: title, description, badge, children
-│   ├── sheet.tsx
-│   ├── sidebar.tsx             ← Sidebar system (SidebarProvider, useSidebar, ...)
-│   ├── skeleton.tsx            ← Use for ALL loading states
-│   ├── table.tsx
-│   ├── tabs.tsx
-│   ├── toast.tsx
-│   ├── tooltip.tsx
-│   └── ...                    ← (all other shadcn components)
-├── utility-hooks/
-│   ├── use-mobile.tsx
-│   └── use-toast.ts
-├── utils/
-│   ├── format-bytes.ts
-│   ├── i18n.ts
-│   └── utils.ts               ← cn(), hexToHsl()
-├── GEMINI.md
-└── README.md
-```
-
-### src/styles/
-
-```
-src/styles/
-└── globals.css    ← Tailwind base + CSS custom properties
-```
-
-### src/firebase/
-
-External service I/O — Firebase adapters, facades, and repositories. Depends on `domain-types` and `shared`.
-
-```
-src/firebase/
-├── analytics/
-│   ├── analytics.adapter.ts
-│   └── analytics.client.ts
-├── auth/
-│   ├── auth.adapter.ts
-│   └── auth.client.ts
-├── firestore/
-│   ├── repositories/
-│   │   ├── account.repository.ts
-│   │   ├── index.ts
-│   │   ├── read.repository.ts
-│   │   └── workspace.repository.ts
-│   ├── firestore.client.ts
-│   ├── firestore.converter.ts
-│   ├── firestore.facade.ts
-│   ├── firestore.read.adapter.ts
-│   ├── firestore.utils.ts
-│   └── firestore.write.adapter.ts
-├── messaging/
-│   ├── messaging.adapter.ts
-│   └── messaging.client.ts
-├── storage/
-│   ├── storage.client.ts
-│   ├── storage.facade.ts
-│   ├── storage.read.adapter.ts
-│   └── storage.write.adapter.ts
-├── app.client.ts
-├── firebase.config.ts
-├── GEMINI.md
-└── README.md
-```
-
-### src/genkit-flows/
-
-Generative AI (Genkit + Gemini). Server-only. Depends on `domain-types`.
-
-```
-src/genkit-flows/
-├── flows/
-│   ├── adapt-ui-color-to-account-context.ts
-│   └── extract-invoice-items.ts
-├── schemas/
-│   └── docu-parse.ts
-├── dev.ts
-├── GEMINI.md
-├── genkit.ts
-└── README.md
-```
-
-### src/server-commands/
-
-Server boundary — `"use server"` async functions. One subdirectory per domain. Depends on `firebase`, `domain-rules`, `domain-types`, `shared`.
-
-```
-src/server-commands/
-├── account/index.ts    ← org CRUD, team, partner ops
-├── audit/index.ts
-├── auth/index.ts       ← register, login, logout
-├── bookmark/index.ts   ← toggle, remove bookmark
-├── daily/index.ts      ← toggleLike, addDailyLogComment
-├── document-parser/index.ts
-├── files/index.ts
-├── issue/index.ts      ← createIssue, addCommentToIssue
-├── members/index.ts
-├── schedule/index.ts   ← create/assign/unassign/updateStatus
-├── storage/index.ts    ← uploadFile, deleteFile
-├── task/index.ts       ← createTask, updateTask, deleteTask
-├── user/index.ts       ← updateProfile, createUserAccount
-├── workspace/index.ts  ← createWorkspace, mountCapabilities
-├── GEMINI.md
-├── index.ts            ← barrel re-export of all
-└── README.md
-```
-
-### src/react-hooks/
-
-Reusable React hooks — data fetching and business logic. Depends on `firebase`, `domain-rules`, `domain-types`, `shared`.
-
-```
-src/react-hooks/
-├── command-hooks/
-│   ├── use-bookmark-commands.ts
-│   ├── use-daily-commands.ts
-│   └── use-schedule-commands.ts
-├── service-hooks/
-│   ├── use-daily-upload.ts
-│   ├── use-logger.ts
-│   └── use-storage.ts
-├── state-hooks/
-│   ├── use-account-audit.ts
-│   ├── use-account-management.ts
-│   ├── use-account.ts
-│   ├── use-aggregated-logs.ts
-│   ├── use-app.ts
-│   ├── use-global-schedule.ts
-│   ├── use-user.ts
-│   ├── use-visible-workspaces.ts
-│   ├── use-workspace-audit.ts
-│   ├── use-workspace-daily.ts
-│   ├── use-workspace-filters.ts
-│   └── use-workspace-schedule.ts
-├── GEMINI.md
-└── README.md
-```
-
-### src/react-providers/
-
-Domain React context providers. Depends on `react-hooks`, `firebase`, `domain-types`, `shared`.
-
-```
-src/react-providers/
-├── account-provider.tsx
-├── app-provider.tsx
-├── GEMINI.md
-├── README.md
-├── workspace-event-context.ts   ← WorkspaceEventContext + useWorkspaceEvents()
-└── workspace-provider.tsx       ← WorkspaceProvider: wraps WorkspaceEventContext
-```
-
-### src/use-cases/
-
-Use-case orchestration — coordinates server-commands and domain logic. Depends on `server-commands`, `react-hooks`, `firebase`, `domain-rules`, `domain-types`, `shared`.
-
-```
-src/use-cases/
-├── account/index.ts             ← setupOrganizationWithTeam
-├── auth/index.ts                ← completeRegistration
-├── schedule/index.ts            ← approveScheduleItem, rejectScheduleItem
-├── workspace/
-│   ├── event-bus/
-│   │   ├── workspace-event-bus.ts
-│   │   └── workspace-events.ts
-│   ├── index.ts
-│   └── workspace-actions.ts    ← createWorkspaceWithCapabilities
-├── GEMINI.md
-├── index.ts                     ← barrel
-└── README.md
-```
-
-### src/view-modules/
-
-"Smart" UI view components. Compose hooks and use-cases into presentable views. Depends on `use-cases`, `react-providers`, `react-hooks`, `domain-types`, `shared`.
-
-```
-src/view-modules/
-├── account/
-│   └── permission-matrix-view.tsx
-├── auth/
-│   ├── auth-background.tsx
-│   ├── auth-tabs-root.tsx
-│   ├── login-form.tsx
-│   ├── login-view.tsx
-│   ├── register-form.tsx
-│   └── reset-password-dialog.tsx
-├── dashboard/
-│   ├── layout/
-│   │   ├── global-search.tsx
-│   │   ├── header.tsx
-│   │   ├── notification-center.tsx
-│   │   └── theme-adapter.tsx
-│   ├── sidebar/
-│   │   ├── account-create-dialog.tsx
-│   │   ├── account-switcher.tsx
-│   │   ├── index.tsx              ← DashboardSidebar (smart container)
-│   │   ├── nav-main.tsx
-│   │   ├── nav-user.tsx
-│   │   └── nav-workspaces.tsx
-│   ├── account-grid.tsx
-│   ├── dashboard-view.tsx
-│   ├── permission-tree.tsx
-│   ├── stat-cards.tsx
-│   └── workspace-list.tsx
-├── members/
-│   └── members-view.tsx
-├── partners/
-│   ├── partner-detail-view.tsx
-│   └── partners-view.tsx
-├── teams/
-│   ├── team-detail-view.tsx
-│   └── teams-view.tsx
-├── user-settings/
-│   ├── preferences-card.tsx
-│   ├── profile-card.tsx
-│   ├── security-card.tsx
-│   ├── user-settings-view.tsx
-│   └── user-settings.tsx
-├── workspaces/
-│   ├── create-workspace-dialog.tsx
-│   ├── workspace-card.tsx
-│   ├── workspace-grid-view.tsx
-│   ├── workspace-list-header.tsx
-│   ├── workspace-nav-tabs.tsx
-│   ├── workspace-settings.tsx
-│   ├── workspace-status-bar.tsx
-│   ├── workspace-table-view.tsx
-│   └── workspaces-view.tsx
-├── GEMINI.md
-└── README.md
+├── events.md
+├── glossary.md
+└── ...
 ```
 
 ---
 
 ## src/app/
 
-Pure route tree and RSC boundaries only. No `useState`, `useEffect`, or custom hooks in page/layout files.
-
-### Root
+Pure Next.js routing. Only `layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `default.tsx`.
+No business logic. All imports come from `@/features/*/` (public API) or `@/shared/*`.
 
 ```
 src/app/
-├── layout.tsx    ← Root providers (Firebase, Auth, i18n, Theme)
-└── page.tsx      ← Redirect → /dashboard
+├── layout.tsx    ← Root providers
+├── page.tsx      ← Redirect -> /dashboard
+├── (auth-routes)/
+│   ├── login/page.tsx
+│   ├── reset-password/page.tsx
+│   ├── @modal/(.)reset-password/page.tsx
+│   └── layout.tsx
+└── dashboard/
+    ├── layout.tsx
+    ├── page.tsx
+    ├── @modal/
+    │   ├── (.)account/new/page.tsx
+    │   └── default.tsx
+    ├── @header/default.tsx
+    ├── @sidebar/default.tsx
+    ├── account/
+    │   ├── schedule/page.tsx
+    │   ├── members/page.tsx
+    │   ├── teams/[id]/page.tsx
+    │   ├── partners/[id]/page.tsx
+    │   ├── settings/page.tsx
+    │   ├── audit/page.tsx
+    │   ├── daily/page.tsx
+    │   ├── matrix/page.tsx
+    │   └── new/page.tsx
+    └── workspaces/
+        ├── layout.tsx
+        ├── page.tsx
+        ├── new/page.tsx
+        ├── @modal/(.)new/page.tsx
+        └── [id]/
+            ├── layout.tsx
+            ├── page.tsx
+            ├── @plugin-tab/
+            │   ├── schedule/page.tsx
+            │   ├── daily/page.tsx
+            │   ├── tasks/page.tsx
+            │   ├── audit/page.tsx
+            │   ├── members/page.tsx
+            │   ├── files/page.tsx
+            │   ├── issues/page.tsx
+            │   ├── finance/page.tsx
+            │   ├── qa/page.tsx
+            │   ├── acceptance/page.tsx
+            │   ├── document-parser/page.tsx
+            │   ├── capabilities/page.tsx
+            │   ├── default.tsx
+            │   ├── error.tsx
+            │   └── loading.tsx
+            ├── @modal/
+            │   ├── (.)schedule-proposal/page.tsx
+            │   ├── (.)daily-log/[logId]/page.tsx
+            │   ├── (.)settings/page.tsx
+            │   └── default.tsx
+            ├── @panel/
+            │   ├── (.)governance/page.tsx
+            │   └── default.tsx
+            ├── governance/page.tsx
+            ├── schedule-proposal/page.tsx
+            ├── settings/page.tsx
+            └── daily-log/[logId]/page.tsx
 ```
 
-### src/app/(auth-routes)/
+---
+
+## src/features/
+
+17 vertical feature slices. Each slice is self-contained — owns types, actions, queries, hooks,
+and components for its business domain.
 
 ```
-(auth-routes)/
-├── @modal/
-│   ├── (.)reset-password/page.tsx   ← Intercepted reset-password modal
-│   └── default.tsx
-├── login/page.tsx
-├── reset-password/page.tsx
-└── layout.tsx
+src/features/
+├── auth/           ← Login, register, reset password
+├── account/        ← Organization CRUD, stats, permissions
+├── workspace/      ← Workspace CRUD, settings, dashboard shell
+├── members/        ← Member management (account + workspace)
+├── teams/          ← Team management
+├── partners/       ← Partner management
+├── schedule/       ← Schedule items, proposals, governance
+├── daily/          ← Daily logs, comments, bookmarks, likes
+├── tasks/          ← Task tree, CRUD
+├── audit/          ← Audit trail, event timeline
+├── files/          ← File upload, management
+├── issues/         ← Issue tracking, comments
+├── finance/        ← Finance workspace plugin
+├── qa/             ← QA workspace plugin
+├── document-parser/← AI document parsing (invoice extraction)
+├── acceptance/     ← Acceptance workspace plugin
+└── user-settings/  ← User profile, preferences, security
 ```
 
-### src/app/dashboard/
+Each slice follows the standard layout:
 
 ```
-dashboard/
-├── @modal/
-│   ├── (.)account/new/page.tsx    ← Intercepted account creation modal
-│   └── default.tsx
-├── account/
-│   ├── GEMINI.md
-│   ├── audit/page.tsx
-│   ├── daily/page.tsx
-│   ├── matrix/page.tsx
-│   ├── members/page.tsx
-│   ├── new/page.tsx
-│   ├── partners/
-│   │   ├── [id]/page.tsx
-│   │   └── page.tsx
-│   ├── schedule/page.tsx
-│   ├── settings/page.tsx
-│   └── teams/
-│       ├── [id]/page.tsx
-│       └── page.tsx
-├── workspaces/
-│   ├── GEMINI.md
-│   ├── @modal/
-│   │   ├── (.)new/page.tsx        ← Intercepted workspace creation modal
-│   │   └── default.tsx
-│   ├── [id]/
-│   │   ├── _event-handlers/
-│   │   │   └── workspace-event-handler.tsx
-│   │   ├── @modal/                ← PARALLEL SLOT: overlay dialogs
-│   │   │   ├── (.)daily-log/[logId]/page.tsx
-│   │   │   ├── (.)schedule-proposal/page.tsx
-│   │   │   ├── (.)settings/page.tsx
-│   │   │   └── default.tsx
-│   │   ├── @panel/                ← PARALLEL SLOT: side panels
-│   │   │   ├── (.)governance/page.tsx
-│   │   │   └── default.tsx
-│   │   ├── @plugin-tab/           ← PARALLEL SLOT: active capability tab
-│   │   │   ├── acceptance/page.tsx
-│   │   │   ├── audit/
-│   │   │   │   ├── loading.tsx
-│   │   │   │   └── page.tsx
-│   │   │   ├── capabilities/page.tsx
-│   │   │   ├── daily/
-│   │   │   │   ├── loading.tsx
-│   │   │   │   └── page.tsx
-│   │   │   ├── document-parser/page.tsx
-│   │   │   ├── files/page.tsx
-│   │   │   ├── finance/page.tsx
-│   │   │   ├── issues/page.tsx
-│   │   │   ├── members/page.tsx
-│   │   │   ├── qa/page.tsx
-│   │   │   ├── schedule/
-│   │   │   │   ├── loading.tsx
-│   │   │   │   └── page.tsx
-│   │   │   ├── tasks/
-│   │   │   │   ├── loading.tsx
-│   │   │   │   └── page.tsx
-│   │   │   ├── default.tsx
-│   │   │   ├── error.tsx          ← Shared error boundary for @plugin-tab
-│   │   │   └── loading.tsx        ← Shared loading fallback for @plugin-tab
-│   │   ├── daily-log/[logId]/page.tsx
-│   │   ├── governance/page.tsx
-│   │   ├── plugins/               ← Capability UI components
-│   │   │   ├── acceptance/
-│   │   │   ├── audit/
-│   │   │   │   └── _plugin-components/
-│   │   │   ├── daily/
-│   │   │   │   └── _plugin-components/
-│   │   │   ├── document-parser/
-│   │   │   ├── files/
-│   │   │   ├── finance/
-│   │   │   ├── issues/
-│   │   │   ├── members/
-│   │   │   ├── plugin-settings/
-│   │   │   ├── qa/
-│   │   │   ├── schedule/
-│   │   │   │   └── _plugin-components/
-│   │   │   ├── tasks/
-│   │   │   └── index.ts           ← barrel export
-│   │   ├── schedule-proposal/page.tsx
-│   │   ├── settings/page.tsx
-│   │   ├── layout.tsx             ← WorkspaceProvider + @plugin-tab + @modal + @panel slots
-│   │   └── page.tsx
-│   ├── new/page.tsx
-│   ├── layout.tsx
-│   └── page.tsx
-├── GEMINI.md
-├── layout.tsx    ← SidebarProvider + DashboardSidebar + Header
-└── page.tsx
+features/{name}/
+├── GEMINI.md        ← AI instructions (required)
+├── _actions.ts      ← "use server" mutations
+├── _queries.ts      ← Firestore reads / onSnapshot
+├── _types.ts        ← Feature-specific types
+├── _hooks/          ← React hooks
+├── _components/     ← UI components
+└── index.ts         ← Public API (required)
+```
+
+---
+
+## src/shared/
+
+5 cross-cutting infrastructure modules. No feature logic here.
+
+```
+src/shared/
+├── types/       ← Global domain types (was: domain-types/)
+├── lib/         ← Pure utils + domain rules (was: domain-rules/ + shared/utils/)
+├── infra/       ← Firebase adapters + repositories (was: firebase/)
+├── ai/          ← Genkit AI flows (was: genkit-flows/)
+└── ui/          ← shadcn-ui, app-providers, i18n, constants (was: shared/)
+```
+
+---
+
+## Legacy Layers (Migration In Progress)
+
+The following directories exist from the previous horizontal-layer architecture.
+They will be migrated into `features/` and `shared/` incrementally:
+
+```
+src/
+├── domain-types/    → shared/types/
+├── domain-rules/    → shared/lib/
+├── firebase/        → shared/infra/
+├── genkit-flows/    → shared/ai/
+├── server-commands/ → features/{name}/_actions.ts
+├── react-hooks/     → features/{name}/_hooks/
+├── react-providers/ → features/{name}/_hooks/ or shared/ui/
+├── use-cases/       → features/{name}/ (inline into hooks or actions)
+└── view-modules/    → features/{name}/_components/
 ```
