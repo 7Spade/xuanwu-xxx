@@ -1,1 +1,1 @@
-export * from "./members.commands"
+export * from "./members.commands" // getWorkspaceGrants
