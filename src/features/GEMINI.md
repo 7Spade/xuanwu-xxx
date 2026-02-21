@@ -29,7 +29,7 @@ it owns types, server actions, queries, hooks, and UI components.
 | `qa/` | QA workspace plugin |
 | `document-parser/` | AI document parsing |
 | `acceptance/` | Acceptance workspace plugin |
-| `user-settings/` | User profile, preferences, security |
+| `user-settings/` | User profile, preferences, security (now `account-user.profile/`) |
 
 ## Standard Slice Layout
 
