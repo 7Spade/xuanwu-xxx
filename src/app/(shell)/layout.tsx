@@ -15,7 +15,7 @@
 
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { Fragment, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -56,9 +56,9 @@ export default function ShellLayout({ children, sidebar, modal }: ShellLayoutPro
   return (
     <SidebarProvider>
       <AccountProvider>
-        {sidebar}
-        {children}
-        {modal}
+        <Fragment key="sidebar">{sidebar}</Fragment>
+        <Fragment key="main">{children}</Fragment>
+        <Fragment key="modal">{modal}</Fragment>
       </AccountProvider>
     </SidebarProvider>
   );
