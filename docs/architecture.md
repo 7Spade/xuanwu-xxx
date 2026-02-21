@@ -19,13 +19,28 @@
 
 本專案遵循一系列核心原則，以確保程式碼的清晰度、可維護性和可擴展性。
 
-### A. 單向依賴流 (One-Way Dependency Flow)
+### A. 垂直切片架構 (Vertical Slice Architecture — VSA)
 
-這是專案的基石。各層之間有嚴格的依賴方向，防止循環依賴，確保程式碼的可測試性和可維護性。
+> **目標：AI 開發零認知 — 實作任何功能只需讀一個資料夾。**
 
-**依賴鏈**: `app` → `view-modules` → `use-cases` → `react-providers` → `react-hooks` → `server-commands` → `firebase` / `genkit-flows` / `shared` → `domain-rules` → `domain-types`
+專案採用 **垂直切片架構 (VSA)**，以業務領域為單位組織程式碼，而非以技術層為單位。
 
-*詳細規則請參閱 `docs/boundaries.md`。*
+```
+src/
+├── app/          ← Next.js 路由（純組裝，零業務邏輯）
+├── features/     ← 17 個垂直功能切片（每個業務領域一個）
+└── shared/       ← 5 個跨切片共用基礎設施模組
+```
+
+**依賴流（單向）**：`app` → `features/{name}/index.ts` → `shared/*`
+
+- `app/` 僅引用 `features/*/index.ts`（公開 API）和 `shared/*`
+- `features/*` 引用 `shared/*`，以及其他切片的 `index.ts`（禁止引用私有 `_` 路徑）
+- `shared/*` 零功能依賴
+
+**詳細設計請參閱 `docs/vertical-slice-architecture.md`。**
+
+### B. 關注點分離 (Separation of Concerns)
 
 ### B. 關注點分離 (Separation of Concerns)
 
@@ -42,18 +57,29 @@
 
 ## 3. 目錄結構概覽 (Directory Structure Overview)
 
-- `src/app`: Next.js 的 App Router 根目錄，包含所有頁面、佈局和路由。
-- `src/view-modules`: 可重用的「智慧」UI 視圖元件（組合 hooks 和 use-cases）。
-- `src/use-cases`: 用例協調層，組合 server-commands 和 domain 邏輯。
-- `src/react-providers`: 全域狀態管理提供者 (`Providers`)。
-- `src/react-hooks`: 可重用的 React Hooks，封裝業務邏輯。
-- `src/server-commands`: 伺服器端 `"use server"` 動作，唯一負責資料修改的層。
-- `src/firebase`: 與外部服務（特別是 Firebase）互動的程式碼。
-- `src/genkit-flows`: 包含所有 Genkit 流程和 AI 相關的 schema。
-- `src/domain-rules`: 純粹的業務邏輯函式，無副作用。
-- `src/domain-types`: 專案中所有的 TypeScript 類型和介面定義。
-- `src/shared`: 全域共享的工具和 UI 元件（shadcn/ui、工具函式、常數）。
-- `docs`: 所有專案架構、規範和設計文件。
+**目標狀態（VSA）：**
+
+- `src/app`: Next.js App Router 路由入口，純組裝層，不含業務邏輯。
+- `src/features/`: 17 個垂直功能切片，每個切片擁有其業務領域的所有程式碼。
+- `src/shared/types/`: 全域 TypeScript 類型定義（原 `domain-types/`）。
+- `src/shared/lib/`: 純工具函式與領域規則（原 `domain-rules/` + `shared/utils/`）。
+- `src/shared/infra/`: Firebase 基礎設施（原 `firebase/`）。
+- `src/shared/ai/`: Genkit AI 流程（原 `genkit-flows/`）。
+- `src/shared/ui/`: shadcn-ui、Providers、i18n、常數（原 `shared/`）。
+
+**遷移中（舊水平層，逐步搬移至上述結構）：**
+
+- `src/domain-types/` → `src/shared/types/`
+- `src/domain-rules/` → `src/shared/lib/`
+- `src/firebase/` → `src/shared/infra/`
+- `src/genkit-flows/` → `src/shared/ai/`
+- `src/server-commands/` → `src/features/{name}/_actions.ts`
+- `src/react-hooks/` → `src/features/{name}/_hooks/`
+- `src/react-providers/` → `src/features/{name}/_hooks/` 或 `src/shared/ui/`
+- `src/use-cases/` → `src/features/{name}/`（內嵌至 hooks 或 actions）
+- `src/view-modules/` → `src/features/{name}/_components/`
+
+詳細切片列表請參閱 `docs/vertical-slice-architecture.md`。
 
 ## 4. 狀態管理策略 (State Management Strategy)
 
