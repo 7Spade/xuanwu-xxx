@@ -1196,3 +1196,83 @@ Sidebar nav（NavMain）：
 3. **Settings 中的 `ExpertiseBadges` checkbox 何時廢棄？**  
    建議：等 skill-grant 系統的管理 UI（admin 授予流程）完成後一併移除，避免空白期
 
+
+---
+
+## 15. 靜態技能常量庫 — 取代 Firestore SkillTag Collection
+
+> **觸發決策**：「讓技能不受限於組織，讓組織保持單純」
+
+---
+
+### 15-A. 決策摘要
+
+**之前（本次前）：**  
+`SkillTag` 是存在 Firestore `accounts/{orgId}.skillTags[]` 的組織私有文件。  
+每個組織各自維護自己的技能庫，且 `SkillTag.createdAt` 包含 Firestore Timestamp 依賴。
+
+**之後（本次）：**  
+技能庫改為 `src/shared/constants/skills.ts` 中的靜態常量陣列。  
+無 Firestore 讀寫、無組織依賴、全域可用。
+
+---
+
+### 15-B. 因此做出的三項代碼變更
+
+| 文件 | 變更 |
+|------|------|
+| `src/shared/constants/skills.ts` | **新增** — 31 個工程施工技能定義 |
+| `src/domain-types/skill/skill.types.ts` | `SkillTag` 移除 `id` 和 `createdAt: any`，變成純值類型 |
+| `src/domain-types/account/account.types.ts` | `Account` 移除 `skillTags?: SkillTag[]`（組織不再擁有技能庫） |
+
+---
+
+### 15-C. 靜態技能庫的結構
+
+```typescript
+// src/shared/constants/skills.ts
+export const SKILLS: readonly SkillDefinition[] = [
+  { slug: 'concrete-work',      name: 'Concrete Work',       category: 'Civil'          },
+  { slug: 'rebar-installation', name: 'Rebar Installation',  category: 'Civil'          },
+  { slug: 'electrical-wiring',  name: 'Electrical Wiring',   category: 'Electrical'     },
+  { slug: 'crane-operation',    name: 'Crane Operation',     category: 'HeavyEquipment' },
+  { slug: 'project-management', name: 'Project Management',  category: 'Management'     },
+  // ... 31 total
+]
+```
+
+**分類：** Civil / Electrical / Mechanical / Finishing / HeavyEquipment / Safety / Engineering / Management
+
+**輔助函式：**
+- `findSkill(slug)` → `SkillDefinition | undefined`（O(1) Map 查找）
+- `SKILL_BY_SLUG` — 預建 Map，供組件直接讀取
+- `SkillSlug` — TypeScript 型別，限定為陣列中的合法 slug
+
+---
+
+### 15-D. 優勢對比
+
+| 面向 | 舊設計（Firestore） | 新設計（靜態常量） |
+|------|--------------------|-------------------|
+| Firestore 讀寫 | 每次渲染需 query | 零 I/O |
+| 組織間共用 | 每個 org 各自一份，不一致 | 全域唯一，永遠一致 |
+| 新增技能 | 需要管理員 UI + Firestore write | 改一行代碼，PR 合併即生效 |
+| AI Agent 枚舉 | 需 query 才能知道有哪些技能 | 直接 import `SKILLS` |
+| 刪除 org 後 | 技能庫消失 | 不受影響 |
+| TypeScript 安全 | `id: string`（執行期才知道） | `SkillSlug` union type（編譯期檢查） |
+
+---
+
+### 15-E. `SkillGrant` 的銜接
+
+`SkillGrant.tagSlug` 繼續作為跨組織識別符，
+現在它同時也是 `SkillSlug`（`SKILLS` 中的合法 slug）。
+驗證：`findSkill(grant.tagSlug) !== undefined`
+
+---
+
+### 15-F. 未來擴展策略
+
+需要新增工程技能時：在 `SKILLS` 陣列中 append 一個新物件即可。  
+**絕不刪除或重命名現有 slug** — 否則會孤兒化使用者的 SkillGrant 記錄。
+

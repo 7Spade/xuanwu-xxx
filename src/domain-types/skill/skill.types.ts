@@ -2,13 +2,17 @@
  * @fileoverview Skill & Tag-Badge system — core domain types.
  *
  * Design principles:
- *   - SkillTag        = org-level skill library entry (the "what")
+ *   - SkillTag        = a single entry from the GLOBAL static skill library
+ *                       (see shared/constants/skills.ts — no Firestore, no org dependency)
  *   - SkillGrant      = assignment of a skill + tier to an individual user (the "who has it")
  *                       Stored permanently on accounts/{userId} — survives org deletion.
  *   - SkillRequirement = what a schedule proposal needs (the "what is needed")
  *
- * Key decision: XP and skill grants belong to the PERSON, not the organisation.
- * `tagSlug` is the portable cross-org identifier; `tagId` is org-local (optional).
+ * Key decisions:
+ *   - The skill library is static code, not a Firestore collection.
+ *     Any user can hold any skill; organisations do not own the library.
+ *   - XP and skill grants belong to the PERSON, not the organisation.
+ *   - `tagSlug` is the portable cross-org identifier (matches SkillSlug in constants/skills).
  * Naming is intentionally industry-semantic to support future AI-agent scheduling.
  */
 
@@ -41,27 +45,27 @@ export interface TierDefinition {
 }
 
 // ---------------------------------------------------------------------------
-// Global skill-tag library
+// Global skill-tag library (static reference type)
 // ---------------------------------------------------------------------------
 
 /**
- * A skill definition in the organisation's global tag library.
- * Stored as `Account.skillTags[]` on the organisation document.
+ * A resolved skill entry, derived from the global static library
+ * in shared/constants/skills.ts.
+ *
+ * This type is a pure value — no Firestore fields.
+ * Use `findSkill(slug)` from constants/skills to resolve a slug into this shape.
  */
 export interface SkillTag {
-  id: string;
-  /** Human-readable name (e.g. "Electrical Work", "Project Management"). */
-  name: string;
   /**
-   * Machine-readable, hyphen-separated identifier.
-   * Used by AI agents and as stable keys in Firestore queries.
-   * Example: "electrical-work", "project-management"
+   * Stable hyphen-separated identifier — never change an existing slug.
+   * Matches SkillSlug in shared/constants/skills.ts.
    */
   slug: string;
-  /** Optional grouping category (e.g. "Construction", "Engineering", "Soft Skills"). */
+  /** Human-readable name (e.g. "Concrete Work", "Crane Operation"). */
+  name: string;
+  /** Grouping category (e.g. "Civil", "Electrical", "Management"). */
   category?: string;
   description?: string;
-  createdAt: any; // Firestore Timestamp
 }
 
 // ---------------------------------------------------------------------------

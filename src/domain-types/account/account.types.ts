@@ -1,4 +1,4 @@
-import type { SkillTag, SkillGrant } from '../skill/skill.types'
+import type { SkillGrant } from '../skill/skill.types'
 
 export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
@@ -12,12 +12,11 @@ export interface Account {
   bio?: string
   achievements?: string[]
   expertiseBadges?: ExpertiseBadge[]
-  /** Global skill-tag library for this organisation. Only present on org accounts. */
-  skillTags?: SkillTag[]
   /**
    * Individual skill grants — permanently attached to this user.
    * Only meaningful on `accountType === 'user'` accounts.
-   * Survives org/team deletion; matched by `tagSlug` for cross-org portability.
+   * Survives org/team deletion; matched by `tagSlug` against the global
+   * static library in shared/constants/skills.ts.
    */
   skillGrants?: SkillGrant[]
   /**
@@ -84,7 +83,7 @@ export interface Wallet {
   balance: number;
 }
 
-/** @deprecated Use SkillTag from domain-types/skill for new code. */
+/** @deprecated Use SkillDefinition from shared/constants/skills for new code. */
 export interface ExpertiseBadge {
   id: string;
   name: string;
