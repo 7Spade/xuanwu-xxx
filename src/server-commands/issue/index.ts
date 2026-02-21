@@ -1,1 +1,1 @@
-export * from "./issue.commands"
+export * from "./issue.commands" // createIssue, addCommentToIssue

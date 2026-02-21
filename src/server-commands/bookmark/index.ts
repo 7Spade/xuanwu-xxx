@@ -1,1 +1,1 @@
-export * from "./bookmark.commands"
+export * from "./bookmark.commands" // toggleBookmark

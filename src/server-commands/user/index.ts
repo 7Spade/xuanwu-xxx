@@ -1,1 +1,1 @@
-export * from "./user.commands"
+export * from "./user.commands" // createUserAccount, getUserProfile, updateUserProfile

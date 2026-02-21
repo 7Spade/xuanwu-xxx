@@ -1,1 +1,1 @@
-export * from './workspace.types'
+export * from './workspace.types' // WorkspaceRole, WorkspaceLifecycleState, Workspace, WorkspaceGrant, CapabilitySpec, Capability, Address, Location, WorkspaceTask, IssueComment, WorkspaceIssue, WorkspaceFileVersion, WorkspaceFile

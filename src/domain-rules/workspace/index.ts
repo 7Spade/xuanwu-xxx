@@ -1,1 +1,1 @@
-export * from "./workspace.rules"
+export * from "./workspace.rules" // hasWorkspaceAccess, isWorkspaceVisibleToUser, filterVisibleWorkspaces
