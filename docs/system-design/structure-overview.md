@@ -45,10 +45,7 @@ src/
 app/
 ├── layout.tsx                        ← 根佈局（providers）
 │
-├── (shell)/
-│   └── page.tsx                      ← / 根入口（redirect）
-│
-├── (public)/                         ← 公開路由（未登入）
+├── (public)/                         ← 公開路由（未登入可存取）
 │   ├── layout.tsx
 │   ├── @modal/
 │   │   ├── (.)reset-password/page.tsx← 攔截：重設密碼 Dialog
@@ -56,11 +53,14 @@ app/
 │   ├── login/page.tsx                ← /login
 │   └── reset-password/page.tsx       ← /reset-password（canonical）
 │
-└── (dashboard)/                      ← 認證後路由
+└── (shell)/                          ← 全域 UI 容器層（外殼層）
+    ├── layout.tsx                    ← Auth Guard + SidebarProvider（不承載業務）
+    ├── @sidebar/default.tsx          ← DashboardSidebar（全域側欄 slot）
+    ├── @modal/default.tsx            ← 全域覆蓋層 slot（預設 null）
+    ├── page.tsx                      ← / 根入口（redirect）
     └── dashboard/
-        ├── layout.tsx                ← Auth Guard + AccountProvider
+        ├── layout.tsx                ← AccountProvider + SidebarInset + @header + @modal
         ├── page.tsx                  ← /dashboard（redirect）
-        ├── @sidebar/default.tsx
         ├── @header/default.tsx
         ├── @modal/
         │   ├── (.)account/new/page.tsx

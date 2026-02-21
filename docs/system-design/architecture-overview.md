@@ -62,9 +62,9 @@ import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-s
 
 ```
 src/app/
-├── (dashboard)/   ← 認證後路由（/dashboard/**）
-├── (public)/      ← 公開路由（/login、/reset-password）
-├── (shell)/       ← 根入口（/ → redirect）
+├── (public)/      ← 公開路由（未登入可存取：/login、/reset-password）
+├── (shell)/       ← 全域 UI 容器層（外殼層）：Auth Guard + SidebarProvider + @sidebar + @modal
+│   └── dashboard/ ← 認證後業務路由（/dashboard/**）
 └── layout.tsx     ← 根 layout（providers，必須在根層）
 ```
 
@@ -152,19 +152,26 @@ dailyLogs/{logId}
 
 ## 六、Next.js App Router 平行路由
 
+### Shell 頂層（全域 UI 外殼）
+
+```
+app/(shell)/layout.tsx
+  ├── @sidebar/default.tsx   → DashboardSidebar（全域側欄）
+  └── @modal/default.tsx     → 全域覆蓋層（預設 null）
+```
+
 ### Dashboard 頂層
 
 ```
-app/(dashboard)/dashboard/layout.tsx
-  ├── @sidebar/default.tsx   → DashboardSidebar
-  ├── @header/default.tsx    → Header
-  └── @modal/                → Dialog overlays
+app/(shell)/dashboard/layout.tsx
+  ├── @header/default.tsx    → Header（SidebarTrigger + Breadcrumb）
+  └── @modal/                → Dialog overlays（路由攔截）
 ```
 
 ### Workspace 詳情頁
 
 ```
-app/(dashboard)/dashboard/workspaces/[id]/layout.tsx
+app/(shell)/dashboard/workspaces/[id]/layout.tsx
   ├── @plugin-tab/     → 工作區功能插件
   ├── @modal/          → 攔截路由 Dialog
   └── @panel/          → 右側面板攔截

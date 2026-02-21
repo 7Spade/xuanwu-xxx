@@ -61,15 +61,17 @@ src/features/schedule/
 src/
 ├── app/                              ← Next.js App Router（路由組裝）
 │   ├── layout.tsx
-│   ├── (shell)/
-│   │   └── page.tsx                  ← 根入口（redirect）
 │   ├── (public)/
 │   │   ├── login/page.tsx            ← import { LoginView } from "@/features/auth"
 │   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/auth"
 │   │   └── layout.tsx
-│   └── (dashboard)/
-│       └── dashboard/
-│           ├── layout.tsx                ← import { DashboardShell } from "@/features/workspace"
+│   └── (shell)/                      ← 全域 UI 容器層（外殼層）
+│       ├── layout.tsx                ← Auth Guard + SidebarProvider（@sidebar + @modal 插槽）
+│       ├── @sidebar/default.tsx      ← import { DashboardSidebar } from "@/features/workspace"
+│       ├── @modal/default.tsx        ← 全域覆蓋層（預設 null）
+│       ├── page.tsx                  ← 根入口（redirect）
+│       └── dashboard/                ← 認證後業務路由
+│           ├── layout.tsx                ← AccountProvider + SidebarInset + @header + @modal
 │           ├── page.tsx                  ← import { DashboardView } from "@/features/workspace"
 │           ├── account/
 │           │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/schedule"

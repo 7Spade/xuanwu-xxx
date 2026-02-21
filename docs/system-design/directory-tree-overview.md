@@ -132,10 +132,7 @@ src/
     ├── layout.tsx                ← 根佈局（providers：FirebaseProvider → AuthProvider → AppProvider）
     ├── favicon.ico
     │
-    ├── (shell)/                  ← 路由群組：根入口
-    │   └── page.tsx              ← 根頁（重定向至 /login 或 /dashboard）
-    │
-    ├── (public)/                 ← 路由群組（不影響 URL 路徑）
+    ├── (public)/                 ← 路由群組：未登入頁面
     │   ├── layout.tsx            ← 認證頁佈局
     │   ├── @modal/               ← Parallel Route slot
     │   │   ├── (.)reset-password/page.tsx ← Intercepting Route → 重設密碼 Dialog
@@ -143,11 +140,17 @@ src/
     │   ├── login/page.tsx        ← 登入/註冊頁（LoginView）
     │   └── reset-password/page.tsx ← 重設密碼全頁（canonical）
     │
-    └── (dashboard)/              ← 路由群組：認證後路由
-        └── dashboard/
-            ├── layout.tsx        ← Auth Guard + AccountProvider + SidebarProvider
+    └── (shell)/                  ← 路由群組：全域 UI 容器層（外殼層）
+        ├── layout.tsx            ← Auth Guard + SidebarProvider（不承載業務）
+        ├── @sidebar/             ← Parallel Route slot — DashboardSidebar
+        │   └── default.tsx
+        ├── @modal/               ← Parallel Route slot — 全域覆蓋層（預設 null）
+        │   └── default.tsx
+        ├── page.tsx              ← 根頁 / → 重定向至 /login 或 /dashboard
+        │
+        └── dashboard/            ← 認證後業務路由（/dashboard/**）
+            ├── layout.tsx        ← AccountProvider + SidebarInset + @header + @modal
             ├── page.tsx          ← 重定向至 /workspaces
-            ├── @sidebar/default.tsx  ← DashboardSidebar
             ├── @header/default.tsx   ← Header（SidebarTrigger + Breadcrumb）
             ├── @modal/
             │   ├── (.)account/new/page.tsx ← 新建帳號 Dialog
