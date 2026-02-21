@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/shadcn-ui/card"
 import { Badge } from "@/shared/shadcn-ui/badge"
 import { Button } from "@/shared/shadcn-ui/button"
-import { Handshake, Plus, FolderTree, ArrowRight, Globe, AlertCircle } from "lucide-react"
+import { Handshake, Plus, ArrowRight, Globe, AlertCircle } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { 
   Dialog, 
@@ -70,12 +70,12 @@ export function PartnersView() {
       setNewTeamName("")
       setIsCreateOpen(false)
       toast({ title: "Partner Team created" })
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error creating partner team:", e)
       toast({
         variant: "destructive",
         title: "Failed to Create Team",
-        description: e.message || "An unknown error occurred.",
+        description: (e instanceof Error ? e.message : null) || "An unknown error occurred.",
       })
     }
   }
@@ -119,15 +119,16 @@ export function PartnersView() {
           </Card>
         ))}
 
-        <div 
-          className="group flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center transition-all hover:border-accent/20 hover:bg-accent/5"
+        <button 
+          type="button"
+          className="group flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center transition-all hover:border-accent/20 hover:bg-accent/5"
           onClick={() => setIsCreateOpen(true)}
         >
           <div className="rounded-full bg-muted/10 p-4 transition-colors group-hover:bg-accent/10">
             <Handshake className="size-10 text-muted-foreground opacity-30 transition-colors group-hover:text-accent" />
           </div>
           <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t('account.createCollaborationBoundary')}</p>
-        </div>
+        </button>
       </div>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

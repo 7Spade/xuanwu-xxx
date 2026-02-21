@@ -15,6 +15,7 @@ import {
   query,
   orderBy,
   runTransaction,
+  type FieldValue,
 } from 'firebase/firestore';
 import { db } from '../firestore.client';
 import {
@@ -46,7 +47,7 @@ export const createWorkspace = async (
   name: string,
   account: Account
 ): Promise<string> => {
-  const workspaceData: Omit<Workspace, 'id'> = {
+  const workspaceData: Omit<Workspace, 'id' | 'createdAt'> & { createdAt: FieldValue } = {
     name: name.trim(),
     dimensionId: account.id, // The single source of truth for ownership.
     lifecycleState: 'preparatory',
@@ -117,7 +118,7 @@ export const grantIndividualWorkspaceAccess = async (
       throw new Error('User already has an active grant for this workspace.');
     }
 
-    const newGrant: WorkspaceGrant = {
+    const newGrant: Omit<WorkspaceGrant, 'grantedAt'> & { grantedAt: FieldValue } = {
       grantId: crypto.randomUUID(),
       userId,
       role,
@@ -164,7 +165,7 @@ export const createIssue = async (
   type: 'technical' | 'financial',
   priority: 'high' | 'medium'
 ): Promise<void> => {
-  const issueData: Omit<WorkspaceIssue, 'id'> = {
+  const issueData: Omit<WorkspaceIssue, 'id' | 'createdAt'> & { createdAt: FieldValue } = {
     title,
     type,
     priority,
@@ -184,7 +185,7 @@ export const addCommentToIssue = async (
   author: string,
   content: string
 ): Promise<void> => {
-  const newComment: IssueComment = {
+  const newComment: Omit<IssueComment, 'createdAt'> & { createdAt: FieldValue } = {
     id: `comment-${Math.random().toString(36).substring(2, 11)}`,
     author,
     content,

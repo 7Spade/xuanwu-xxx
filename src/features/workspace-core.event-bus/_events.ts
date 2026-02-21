@@ -97,5 +97,5 @@ export type PublishFn = <T extends WorkspaceEventName>(
 
 export type SubscribeFn = <T extends WorkspaceEventName>(
   type: T,
-  handler: (payload: WorkspaceEventPayloadMap[T]) => void
+  handler: WorkspaceEventHandler<T>
 ) => () => void // Returns an unsubscribe function

@@ -1,4 +1,5 @@
 import type { SkillGrant } from './skill.types'
+import type { Timestamp } from 'firebase/firestore'
 
 export type AccountType = 'user' | 'organization'
 export type OrganizationRole = 'Owner' | 'Admin' | 'Member' | 'Guest';
@@ -34,7 +35,7 @@ export interface Account {
   members?: MemberReference[]
   memberIds?: string[]
   teams?: Team[]
-  createdAt?: any
+  createdAt?: Timestamp
 }
 
 export interface MemberReference {
@@ -44,7 +45,7 @@ export interface MemberReference {
   role: OrganizationRole;
   presence: 'active' | 'away' | 'offline';
   isExternal?: boolean;
-  expiryDate?: any; // FirestoreTimestamp
+  expiryDate?: Timestamp; // FirestoreTimestamp
   /**
    * Display cache of this individual's skill grants.
    * Derived from accounts/{id}.skillGrants at read time — not the source of truth.
@@ -105,6 +106,6 @@ export interface PartnerInvite {
   teamId: string;
   role: OrganizationRole;
   inviteState: 'pending' | 'accepted' | 'expired';
-  invitedAt: any; // Event Timestamp
+  invitedAt: Timestamp; // Event Timestamp
   protocol: string;
 }

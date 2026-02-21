@@ -16,12 +16,13 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { Loader2 } from "lucide-react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { type Account } from "@/shared/types"
+import type { AppAction } from '../_components/app-provider'
 
 interface AccountCreateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   createOrganization: (name: string) => Promise<string>
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<AppAction>
   accounts: Record<string, Account>
   t: (key: string) => string
 }
@@ -62,8 +63,8 @@ export function AccountCreateDialog({
       setPendingOrgId(newOrgId)
       onOpenChange(false)
       toast({ title: t('dimension.newDimensionCreated') })
-    } catch (error: any) {
-      toast({ variant: "destructive", title: t('dimension.failedToCreate'), description: error.message })
+    } catch (error: unknown) {
+      toast({ variant: "destructive", title: t('dimension.failedToCreate'), description: error instanceof Error ? error.message : String(error) })
       setPendingOrgId(null)
     } finally {
       setIsLoading(false)

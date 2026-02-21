@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { type Locale, type TranslationMessages } from '@/shared/i18n-types/i18n';
 import { getPreferredLocale, setLocalePreference, loadMessages, i18nConfig } from '@/shared/utils/i18n';
 
@@ -62,11 +62,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (!messages) return key;
 
     const keys = key.split('.');
-    let value: any = messages;
+    let value: unknown = messages;
 
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+        value = (value as Record<string, unknown>)[k];
       } else {
         return key; // Return key if path not found
       }

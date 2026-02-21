@@ -2,7 +2,7 @@
 "use client";
 
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
-import { serverTimestamp } from "firebase/firestore";
+import { serverTimestamp, type FieldValue } from "firebase/firestore";
 import { addDocument } from "@/shared/infra/firestore/firestore.write.adapter";
 import { useCallback } from "react";
 import type { AuditLog, Account } from "@/shared/types";
@@ -43,7 +43,7 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
   const logAudit = useCallback(async (action: string, target: string, type: AuditLog['type']) => {
     if (!activeAccount || activeAccount.accountType !== 'organization' || !db) return;
 
-    const eventData: Omit<AuditLog, 'id'| 'recordedAt'> & { recordedAt: any } = {
+    const eventData: Omit<AuditLog, 'id'| 'recordedAt'> & { recordedAt: FieldValue } = {
       actor: activeAccount.name,
       action,
       target,

@@ -8,6 +8,7 @@ import type {
 } from "./_events"
 
 // A map where keys are event names (strings) and values are arrays of handler functions (Observers).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type HandlerRegistry = Map<WorkspaceEventName, WorkspaceEventHandler<any>[]>
 
 /**

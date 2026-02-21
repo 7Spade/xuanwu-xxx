@@ -28,6 +28,8 @@ type Action =
   | { type: 'REQUEST_SCHEDULE_TASK'; payload: { taskName: string; workspaceId: string; } }
   | { type: 'CLEAR_SCHEDULE_TASK_REQUEST' }
 
+export type { Action as AppAction }
+
 
 // Initial State
 const initialState: AppState = {
@@ -78,7 +80,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
       return { ...state, accounts: newAccounts, activeAccount: newActiveAccount }
     }
       
-    case 'ADD_NOTIFICATION':
+    case 'ADD_NOTIFICATION': {
       const newNotification = { 
         ...action.payload, 
         id: Math.random().toString(36).substring(2, 9), 
@@ -89,6 +91,7 @@ const appReducer = (state: AppState, action: Action): AppState => {
         ...state, 
         notifications: [newNotification, ...state.notifications].slice(0, 50) // Limit to 50 notifications
       }
+    }
     case 'MARK_NOTIFICATION_READ':
       return { ...state, notifications: state.notifications.map(n => n.id === action.payload ? { ...n, read: true } : n) }
     case 'CLEAR_NOTIFICATIONS':

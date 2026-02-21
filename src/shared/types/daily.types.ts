@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore'
+
 export interface DailyLogComment {
   id: string;
   author: {
@@ -6,7 +8,7 @@ export interface DailyLogComment {
     avatarUrl?: string;
   };
   content: string;
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp; // Firestore Timestamp
 }
 
 export interface DailyLog {
@@ -21,8 +23,8 @@ export interface DailyLog {
   };
   content: string;
   photoURLs: string[];
-  recordedAt: any; // The actual time the event happened, editable by user
-  createdAt: any; // The system time the log was created
+  recordedAt: Timestamp; // The actual time the event happened, editable by user
+  createdAt: Timestamp; // The system time the log was created
   likes?: string[]; // Array of user IDs who liked the log
   likeCount?: number; // Denormalized count of likes
   commentCount?: number; // Denormalized count of comments

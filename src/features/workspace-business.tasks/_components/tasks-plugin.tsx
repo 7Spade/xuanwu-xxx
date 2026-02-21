@@ -111,7 +111,7 @@ function ProgressReportDialog({
         <DialogHeader>
           <DialogTitle>Report Progress</DialogTitle>
           <DialogDescription>
-            Submit completed quantity for "{task.name}". Current: {currentCompleted} / {totalQuantity}
+            Submit completed quantity for &quot;{task.name}&quot;. Current: {currentCompleted} / {totalQuantity}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">

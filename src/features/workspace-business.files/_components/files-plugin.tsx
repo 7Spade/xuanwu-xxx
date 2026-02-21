@@ -24,9 +24,10 @@ import {
 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion, type FieldValue } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useMemo, useState, useRef } from "react";
+import type { Timestamp } from "firebase/firestore";
 import { 
   Sheet, 
   SheetContent, 
@@ -71,7 +72,10 @@ export function WorkspaceFiles() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const files = useMemo(() => Object.values(workspace.files || {}).sort((a,b) => (b.updatedAt?.seconds ?? 0) - (a.updatedAt?.seconds ?? 0)), [workspace.files]);
+  const files = useMemo(() => Object.values(workspace.files || {}).sort((a,b) => {
+    const getMs = (d: Timestamp | Date) => d instanceof Date ? d.getTime() : d.seconds * 1000;
+    return getMs(b.updatedAt) - getMs(a.updatedAt);
+  }), [workspace.files]);
 
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
@@ -137,7 +141,7 @@ export function WorkspaceFiles() {
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
 
-        const newFileData: Omit<WorkspaceFile, 'id'> = {
+        const newFileData: Omit<WorkspaceFile, 'id' | 'updatedAt'> & { updatedAt: FieldValue } = {
           name: file.name,
           type: file.type,
           currentVersionId: versionId,

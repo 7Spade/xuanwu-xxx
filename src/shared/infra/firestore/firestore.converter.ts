@@ -19,7 +19,7 @@ export const createConverter = <T extends { id: string }>(): FirestoreDataConver
    * as the ID is stored in the document path, not within the document itself.
    */
   toFirestore(modelObject: WithFieldValue<T>): DocumentData {
-    const { id, ...data } = modelObject;
+    const { id: _id, ...data } = modelObject;
     return data;
   },
 

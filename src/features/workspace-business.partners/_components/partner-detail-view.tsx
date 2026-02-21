@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/shadcn-ui/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/shared/shadcn-ui/card"
 import { Badge } from "@/shared/shadcn-ui/badge"
 import { Button } from "@/shared/shadcn-ui/button"
 import { 
@@ -80,12 +80,12 @@ export function PartnerDetailView() {
       setInviteEmail("")
       setIsInviteOpen(false)
       toast({ title: "Recruitment protocol sent", description: `${inviteEmail} will receive a resonance request.` })
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error sending invite:", e)
       toast({
         variant: "destructive",
         title: "Failed to Send Invite",
-        description: e.message || "An unknown error occurred.",
+        description: (e instanceof Error ? e.message : null) || "An unknown error occurred.",
       })
     }
   }
@@ -96,12 +96,12 @@ export function PartnerDetailView() {
     try {
       await dismissPartnerMember(team.id, member)
       toast({ title: "Partner relationship terminated" })
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error dismissing partner member:", e)
       toast({
         variant: "destructive",
         title: "Failed to Dismiss Partner",
-        description: e.message || "An unknown error occurred.",
+        description: (e instanceof Error ? e.message : null) || "An unknown error occurred.",
       })
     }
   }
@@ -196,7 +196,7 @@ export function PartnerDetailView() {
                 <SendHorizontal className="size-8" /> Send Recruitment Protocol
               </DialogTitle>
               <DialogDescription className="mt-2 font-medium text-accent-foreground/80">
-                Send a temporary digital resonance invitation to an external entity and mount them to "{team.name}".
+                Send a temporary digital resonance invitation to an external entity and mount them to &quot;{team.name}&quot;.
               </DialogDescription>
             </DialogHeader>
           </div>
@@ -215,7 +215,7 @@ export function PartnerDetailView() {
               <div className="space-y-1">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Security Declaration</p>
                 <p className="text-[10px] leading-relaxed text-muted-foreground">
-                  Upon acceptance, the invitee will be granted "Guest" permissions. All operations will be restricted by the isolation protocol and will not have access to other unrelated dimensional spaces.
+                  Upon acceptance, the invitee will be granted &quot;Guest&quot; permissions. All operations will be restricted by the isolation protocol and will not have access to other unrelated dimensional spaces.
                 </p>
               </div>
             </div>

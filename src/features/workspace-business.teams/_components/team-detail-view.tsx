@@ -48,12 +48,12 @@ export function TeamDetailView() {
     try {
       await updateTeamMembers(team.id, memberId, action)
       toast({ title: action === 'add' ? "Member Assigned" : "Member Removed" })
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error updating team members:", e)
       toast({
         variant: "destructive",
         title: `Failed to ${action === 'add' ? 'Add' : 'Remove'} Member`,
-        description: e.message || "An unknown error occurred.",
+        description: (e instanceof Error ? e.message : null) || "An unknown error occurred.",
       })
     }
   }

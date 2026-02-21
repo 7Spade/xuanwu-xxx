@@ -14,7 +14,7 @@ import {
   updateOrganizationSettings as updateOrganizationSettingsAction,
   deleteOrganization as deleteOrganizationAction,
 } from '../_actions';
-import type { MemberReference, Account, ThemeConfig } from '@/shared/types';
+import type { MemberReference, ThemeConfig } from '@/shared/types';
 
 /**
  * @fileoverview A hook for managing account-level (organization) write operations.

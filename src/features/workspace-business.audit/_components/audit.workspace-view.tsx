@@ -24,7 +24,7 @@ export function WorkspaceAudit() {
           <ScrollArea className="h-full p-6">
             <div className="space-y-6">
               {localAuditLogs.map((log) => (
-                <div key={log.id} className="relative cursor-pointer pl-8" onClick={() => setSelectedLog(log)}>
+                <button key={log.id} type="button" className="relative w-full cursor-pointer pl-8 text-left" onClick={() => setSelectedLog(log)}>
                   <div className="absolute left-[7px] top-1 h-full w-px bg-border/50" />
                   <div className="absolute left-1.5 top-1 flex size-4 items-center justify-center rounded-full border-2 border-primary/40 bg-background">
                     <AuditTypeIcon type={log.type} />
@@ -33,7 +33,7 @@ export function WorkspaceAudit() {
                   <p className="mt-1 text-[10px] text-muted-foreground">
                     {log.actor} • {log.recordedAt?.seconds ? format(log.recordedAt.seconds * 1000, "HH:mm") : "..."}
                   </p>
-                </div>
+                </button>
               ))}
               {localAuditLogs.length === 0 && (
                 <div className="pt-20 text-center text-xs italic text-muted-foreground opacity-50">

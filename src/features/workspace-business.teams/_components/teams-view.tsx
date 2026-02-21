@@ -114,13 +114,14 @@ export function TeamsView() {
           </Card>
         ))}
 
-        <div 
-          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center transition-colors hover:bg-muted/10"
+        <button 
+          type="button"
+          className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center transition-colors hover:bg-muted/10"
           onClick={() => setIsCreateOpen(true)}
         >
           <FolderTree className="mb-4 size-8 text-muted-foreground opacity-20" />
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t('account.createNewTeam')}</p>
-        </div>
+        </button>
       </div>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

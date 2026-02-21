@@ -101,5 +101,6 @@ export default {
   		}
   	}
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- tailwindcss-animate has no ESM export; require() is intentional in Tailwind's sync config
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { type MemberReference, type ScheduleItem } from "@/shared/types";
+import type { Timestamp } from "firebase/firestore";
 import { Button } from "@/shared/shadcn-ui/button";
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
@@ -13,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/shared/shadcn-ui/tooltip";
 import { cn } from "@/shared/utils/utils";
-import { format, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, addMonths, subMonths } from "date-fns";
+import { format, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday } from "date-fns";
 import { Plus, Check, X, Layers, ChevronLeft, ChevronRight } from "lucide-react";
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -43,7 +44,7 @@ export function UnifiedCalendarGrid({
   viewMode,
   currentDate,
   onMonthChange,
-  onItemClick,
+  onItemClick: _onItemClick,
   onAddClick,
   onApproveProposal,
   onRejectProposal,
@@ -57,11 +58,10 @@ export function UnifiedCalendarGrid({
     [members]
   );
   
-  const toDate = (timestamp: any): Date | null => {
+  const toDate = (timestamp: Timestamp | Date | null | undefined): Date | null => {
     if (!timestamp) return null;
-    if (timestamp.toDate) return timestamp.toDate();
-    const date = new Date(timestamp);
-    return isNaN(date.getTime()) ? null : date;
+    if (timestamp instanceof Date) return timestamp;
+    return timestamp.toDate();
   };
   
   const itemsByDate = useMemo(() => {
@@ -136,8 +136,9 @@ export function UnifiedCalendarGrid({
                         >
                             {/* Section 1: Workspace */}
                             {viewMode === 'organization' && (
-                                <div 
-                                    className="flex cursor-pointer items-center gap-1.5 rounded-t-md border-b p-1.5 transition-colors hover:bg-muted/50"
+                                <button
+                                    type="button"
+                                    className="flex w-full cursor-pointer items-center gap-1.5 rounded-t-md border-b p-1.5 text-left transition-colors hover:bg-muted/50"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(`/workspaces/${item.workspaceId}?capability=schedule`);
@@ -145,7 +146,7 @@ export function UnifiedCalendarGrid({
                                 >
                                     <Layers className="size-3 text-muted-foreground" />
                                     <p className="truncate text-[9px] font-bold text-muted-foreground">{item.workspaceName}</p>
-                                </div>
+                                </button>
                             )}
 
                             {/* Section 2: Title */}

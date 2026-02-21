@@ -103,6 +103,8 @@ export default tseslint.config(
       // JSX hygiene
       "react/jsx-no-useless-fragment": "error",
       "react/self-closing-comp": "error",
+      // TypeScript handles prop types — no need for runtime prop-types validation
+      "react/prop-types": "off",
       // React Hooks correctness
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
@@ -125,10 +127,21 @@ export default tseslint.config(
       },
     },
     rules: {
-      // Catches async callbacks passed where synchronous callbacks are expected
-      "@typescript-eslint/no-misused-promises": "error",
+      // Catches async callbacks passed where synchronous callbacks are expected.
+      // attributes: false — async JSX event handlers (onClick, onSubmit) are intentional in React.
+      "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": { "attributes": false } }],
       // Warns when non-boolean values are used in boolean contexts
       "@typescript-eslint/strict-boolean-expressions": "warn",
+    },
+  },
+
+  // shadcn-ui: ForwardRef components use `{...props}` to pass children — heading/anchor content
+  // arrives at runtime via props spread, so these rules produce false positives here.
+  {
+    files: ["src/shared/shadcn-ui/**/*.{ts,tsx}"],
+    rules: {
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
     },
   },
 

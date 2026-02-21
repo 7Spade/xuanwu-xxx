@@ -30,7 +30,7 @@ export function AuditEventItem({ log, onSelect }: AuditEventItemProps) {
       <div className="relative z-10 flex size-6 items-center justify-center rounded-full border-2 border-border bg-background">
         <AuditTypeIcon type={log.type} />
       </div>
-      <div className="flex-1 cursor-pointer space-y-1" onClick={onSelect}>
+      <button type="button" className="flex-1 cursor-pointer space-y-1 text-left" onClick={onSelect}>
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium leading-none">
             <span className="font-bold">{log.actor}</span>{" "}
@@ -42,7 +42,7 @@ export function AuditEventItem({ log, onSelect }: AuditEventItemProps) {
         {log.workspaceName && (
             <Badge variant="secondary" className="text-[10px]">{log.workspaceName}</Badge>
         )}
-      </div>
+      </button>
     </AuditEventItemContainer>
   );
 }

@@ -16,6 +16,8 @@
  * Naming is intentionally industry-semantic to support future AI-agent scheduling.
  */
 
+import type { Timestamp } from 'firebase/firestore'
+
 // ---------------------------------------------------------------------------
 // Tier system
 // ---------------------------------------------------------------------------
@@ -107,7 +109,7 @@ export interface SkillGrant {
   /** The organisation in which this XP was earned (audit trail). */
   earnedInOrgId?: string;
   /** When the skill was granted / last updated. */
-  grantedAt?: any; // Firestore Timestamp
+  grantedAt?: Timestamp; // Firestore Timestamp
 }
 
 // ---------------------------------------------------------------------------

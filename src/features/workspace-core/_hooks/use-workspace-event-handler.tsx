@@ -8,6 +8,7 @@ import type { WorkspaceTask } from "@/shared/types";
 import { createIssue } from "@/features/workspace-business.issues";
 import { createScheduleItem } from "@/features/workspace-governance.schedule";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
+import { Timestamp } from "firebase/firestore";
 
 type DocParserPayload = {
   sourceDocument: string;
@@ -180,8 +181,8 @@ export function useWorkspaceEventHandler() {
             workspaceId: workspace.id,
             workspaceName: workspace.name,
             title: `Review: ${payload.task.name}`,
-            startDate: new Date(),
-            endDate: new Date(),
+            startDate: Timestamp.fromDate(new Date()),
+            endDate: Timestamp.fromDate(new Date()),
             status: "PROPOSAL",
             originType: "TASK_AUTOMATION",
             originTaskId: payload.task.id,

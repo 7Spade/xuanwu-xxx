@@ -19,6 +19,7 @@ import {
 } from "@/shared/shadcn-ui/sidebar"
 import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import type { Account } from "@/shared/types"
+import type { AppAction } from '../_components/app-provider'
 import { cn } from "@/shared/utils/utils"
 import Link from "next/link"
 import { ROUTES } from "@/shared/constants/routes"
@@ -27,7 +28,7 @@ interface AccountSwitcherProps {
   user: Account | null
   accounts: Record<string, Account>
   activeAccount: Account | null
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<AppAction>
   createOrganization: (name: string) => Promise<string>
   t: (key: string) => string
 }
@@ -41,7 +42,7 @@ function AccountSwitcherItem({
 }: {
   account: Account
   activeAccount: Account | null
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<AppAction>
 }) {
   const isUser = account.accountType === "user"
   const avatarClass = isUser ? "bg-accent/10 text-accent border-accent/20" : "bg-primary/10 text-primary border-primary/20"

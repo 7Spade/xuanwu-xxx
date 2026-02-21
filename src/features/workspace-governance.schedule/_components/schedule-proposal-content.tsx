@@ -7,6 +7,7 @@ import { toast } from "@/shared/utility-hooks/use-toast"
 import type { ScheduleItem, Location } from "@/shared/types"
 import { parseISO } from "date-fns"
 import { ProposalDialog } from "./proposal-dialog"
+import { Timestamp } from "firebase/firestore"
 
 interface ScheduleProposalContentProps {
   /** Wrap the dialog in a full-page centering container (for canonical route). */
@@ -34,8 +35,8 @@ export function ScheduleProposalContent({ fullPage = false }: ScheduleProposalCo
       workspaceName: workspace.name,
       title: data.title.trim(),
       description: data.description?.trim(),
-      startDate: data.startDate,
-      endDate: data.endDate,
+      startDate: data.startDate ? Timestamp.fromDate(data.startDate) : Timestamp.now(),
+      endDate: data.endDate ? Timestamp.fromDate(data.endDate) : Timestamp.now(),
       location: data.location,
       status: "PROPOSAL",
       originType: "MANUAL",

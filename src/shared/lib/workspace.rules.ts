@@ -4,7 +4,7 @@
  */
 
 import type { Workspace, Account } from "@/shared/types"
-import { isOrganization, isOwner, getUserTeamIds } from "@/shared/lib/account.rules"
+import { isOwner, getUserTeamIds } from "@/shared/lib/account.rules"
 
 // ---------------------------------------------------------------------------
 // Access predicates

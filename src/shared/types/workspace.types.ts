@@ -1,6 +1,8 @@
 export type WorkspaceRole = 'Manager' | 'Contributor' | 'Viewer';
 export type WorkspaceLifecycleState = 'preparatory' | 'active' | 'stopped';
 
+import type { Timestamp } from 'firebase/firestore'
+
 export interface Workspace {
   id: string;
   dimensionId: string; // The ID of the User or Organization this workspace belongs to.
@@ -16,7 +18,7 @@ export interface Workspace {
   issues?: Record<string, WorkspaceIssue>;
   files?: Record<string, WorkspaceFile>;
   address?: Address; // The physical address of the entire workspace.
-  createdAt: any; // FirestoreTimestamp
+  createdAt: Timestamp; // FirestoreTimestamp
 }
 
 export interface WorkspaceGrant {
@@ -25,9 +27,9 @@ export interface WorkspaceGrant {
   role: WorkspaceRole;
   protocol: string; // Strategy Definition, immutable
   status: 'active' | 'revoked' | 'expired';
-  grantedAt: any; // Event Timestamp
-  revokedAt?: any; // Event Timestamp
-  expiresAt?: any; // State Boundary
+  grantedAt: Timestamp; // Event Timestamp
+  revokedAt?: Timestamp; // Event Timestamp
+  expiresAt?: Timestamp; // State Boundary
 }
 
 export interface CapabilitySpec {
@@ -76,19 +78,19 @@ export interface WorkspaceTask {
   subtotal: number;
   parentId?: string;
   assigneeId?: string;
-  dueDate?: any; // Firestore Timestamp
+  dueDate?: Timestamp; // Firestore Timestamp
   photoURLs?: string[];
   location?: Location; // The specific place within the workspace address.
-  createdAt: any; // FirestoreTimestamp
-  updatedAt?: any; // FirestoreTimestamp
-  [key: string]: any;
+  createdAt: Timestamp; // FirestoreTimestamp
+  updatedAt?: Timestamp; // FirestoreTimestamp
+  [key: string]: unknown;
 }
 
 export interface IssueComment {
   id: string;
   author: string;
   content: string;
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp; // Firestore Timestamp
 }
 
 export interface WorkspaceIssue {
@@ -97,7 +99,7 @@ export interface WorkspaceIssue {
   type: 'technical' | 'financial';
   priority: 'high' | 'medium';
   issueState: 'open' | 'closed';
-  createdAt: any; // FirestoreTimestamp
+  createdAt: Timestamp; // FirestoreTimestamp
   comments?: IssueComment[];
 }
 
@@ -107,7 +109,7 @@ export interface WorkspaceFileVersion {
   versionName: string;
   size: number;
   uploadedBy: string;
-  createdAt: any; // Can be Date for client-side, becomes Timestamp on server
+  createdAt: Timestamp | Date; // Can be Date for client-side, becomes Timestamp on server
   downloadURL: string;
 }
 
@@ -116,6 +118,6 @@ export interface WorkspaceFile {
   name: string;
   type: string;
   currentVersionId: string;
-  updatedAt: any; // Can be Date for client-side, becomes Timestamp on server
+  updatedAt: Timestamp | Date; // Can be Date for client-side, becomes Timestamp on server
   versions: WorkspaceFileVersion[];
 }

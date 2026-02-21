@@ -59,8 +59,8 @@ export function UserSettings() {
         title: "Profile Updated",
         description: "Your personal information has been successfully saved.",
       });
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Update Failed", description: e.message });
+    } catch (e: unknown) {
+      toast({ variant: "destructive", title: "Update Failed", description: e instanceof Error ? e.message : String(e) });
     } finally {
       setIsSaving(false);
     }
@@ -86,8 +86,8 @@ export function UserSettings() {
     try {
       await uploadAvatar(file);
       toast({ title: "Avatar updated successfully" });
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Upload Failed", description: e.message });
+    } catch (e: unknown) {
+      toast({ variant: "destructive", title: "Upload Failed", description: e instanceof Error ? e.message : String(e) });
     } finally {
       setIsUploading(false);
     }

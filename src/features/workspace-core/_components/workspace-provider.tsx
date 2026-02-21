@@ -3,11 +3,10 @@
 
 import type React from 'react';
 import { createContext, useContext, useMemo, useCallback } from 'react';
-import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem, Location } from '@/shared/types';
+import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
 import { useLogger } from '@/features/workspace-business.audit';
 import { WorkspaceEventBus , WorkspaceEventContext } from '@/features/workspace-core.event-bus';
 import { type Firestore } from 'firebase/firestore';
-import { useApp } from '../_hooks/use-app';
 import { useAccount } from '@/features/account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { Loader2 } from 'lucide-react';

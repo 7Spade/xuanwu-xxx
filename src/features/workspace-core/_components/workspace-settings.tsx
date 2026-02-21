@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
 import { Button } from "@/shared/shadcn-ui/button";

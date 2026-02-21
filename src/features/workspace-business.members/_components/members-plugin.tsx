@@ -9,7 +9,6 @@ import {
   Trash2, 
   ShieldCheck, 
   Globe, 
-  User, 
   Plus, 
   CheckCircle2,
   ShieldAlert,
@@ -18,7 +17,7 @@ import {
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { type Team, WorkspaceGrant, type WorkspaceRole, type MemberReference } from "@/shared/types";
+import { type Team, type WorkspaceRole, type MemberReference } from "@/shared/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/shadcn-ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/shadcn-ui/select";
 import { Label } from "@/shared/shadcn-ui/label";
@@ -268,8 +267,8 @@ export function WorkspaceMembers() {
           <h4 className="text-xs font-bold uppercase tracking-widest">Access Governance Principles</h4>
         </div>
         <p className="text-[11px] italic leading-relaxed text-muted-foreground">
-          This workspace uses "Composite Authorization". A member's final access = (Team Inheritance ∪ Direct Individual Grant).
-          When access is granted via multiple paths, the "Least Restrictive" principle is applied to ensure uninterrupted operational momentum.
+          This workspace uses &quot;Composite Authorization&quot;. A member&apos;s final access = (Team Inheritance ∪ Direct Individual Grant).
+          When access is granted via multiple paths, the &quot;Least Restrictive&quot; principle is applied to ensure uninterrupted operational momentum.
         </p>
       </div>
 
@@ -277,7 +276,7 @@ export function WorkspaceMembers() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Grant Individual Access</DialogTitle>
-            <CardDescription>Grant direct access for "{grantTarget?.name}" to this workspace.</CardDescription>
+            <CardDescription>Grant direct access for &quot;{grantTarget?.name}&quot; to this workspace.</CardDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Label>Workspace Role</Label>

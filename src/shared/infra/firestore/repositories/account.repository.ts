@@ -86,7 +86,7 @@ export const updateTeamMembers = async (orgId: string, teamId: string, memberId:
   const orgSnap = await getDoc(orgRef)
   if (!orgSnap.exists()) throw new Error('Organization not found')
 
-  const organization = orgSnap.data() as any
+  const organization = orgSnap.data() as Account
   const updatedTeams = (organization.teams || []).map((t: Team) => {
     if (t.id === teamId) {
       const currentMemberIds = t.memberIds || []
@@ -113,7 +113,7 @@ export const dismissPartnerMember = async (orgId: string, teamId: string, member
   const orgSnap = await getDoc(orgRef)
   if (!orgSnap.exists()) throw new Error('Organization not found')
 
-  const organization = orgSnap.data() as any
+  const organization = orgSnap.data() as Account
   const updatedTeams = (organization.teams || []).map((t: Team) => t.id === teamId ? { ...t, memberIds: (t.memberIds || []).filter((mid) => mid !== member.id) } : t)
   const updatedMembers = (organization.members || []).filter((m: MemberReference) => m.id !== member.id)
   const updatedMemberIds = (organization.memberIds || []).filter((id: string) => id !== member.id)

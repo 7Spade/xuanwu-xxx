@@ -14,6 +14,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/shared/shadcn-ui/card";
 import { type DailyLog, type Account } from "@/shared/types";
+import type { Timestamp } from "firebase/firestore";
 import { ImageCarousel } from "./image-carousel";
 import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
 
@@ -35,7 +36,7 @@ function WorkspaceAvatar({ name }: { name: string }) {
 }
 
 // Internal component to display relative time.
-function TimeAgo({ date }: { date: any }) {
+function TimeAgo({ date }: { date: Timestamp | Date | null | undefined }) {
     const [timeAgo, setTimeAgo] = useState('');
 
     useEffect(() => {
@@ -43,7 +44,7 @@ function TimeAgo({ date }: { date: any }) {
         
         const update = () => {
             import('date-fns').then(({ formatDistanceToNow }) => {
-                const d = date.toDate ? date.toDate() : new Date(date);
+                const d = date instanceof Date ? date : date.toDate();
                 setTimeAgo(formatDistanceToNow(d, { addSuffix: true }));
             });
         };
@@ -84,9 +85,9 @@ export function DailyLogCard({ log, currentUser, onOpen }: DailyLogCardProps) {
 
       {/* 2. Media: Image carousel, triggers onOpen */}
       {log.photoURLs && log.photoURLs.length > 0 && (
-        <div onClick={onOpen} className="relative aspect-square cursor-pointer bg-black/5">
+        <button type="button" onClick={onOpen} className="relative aspect-square w-full cursor-pointer bg-black/5">
            <ImageCarousel images={log.photoURLs} />
-        </div>
+        </button>
       )}
 
       {/* 3. Actions: Compose self-contained action components */}
@@ -99,12 +100,12 @@ export function DailyLogCard({ log, currentUser, onOpen }: DailyLogCardProps) {
       </div>
       
       {/* 4. Content, triggers onOpen */}
-      <div className="cursor-pointer px-4 pb-4" onClick={onOpen}>
+      <button type="button" className="w-full cursor-pointer px-4 pb-4 text-left" onClick={onOpen}>
         <div className={'line-clamp-2 text-sm leading-relaxed'}>
             <span className="mr-2 font-bold">{log.author.name}</span>
             {log.content}
         </div>
-      </div>
+      </button>
     </Card>
   );
 }

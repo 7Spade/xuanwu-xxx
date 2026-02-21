@@ -17,6 +17,7 @@ import {
   limit as firestoreLimit,
   runTransaction,
   writeBatch,
+  type FieldValue,
 } from 'firebase/firestore'
 import { db } from '../firestore.client'
 import { getDocuments } from '../firestore.read.adapter'
@@ -68,7 +69,7 @@ export const addDailyLogComment = async (
   )
 
   const newComment: Omit<DailyLogComment, 'id' | 'createdAt'> & {
-    createdAt: any
+    createdAt: FieldValue
   } = {
     author,
     content,

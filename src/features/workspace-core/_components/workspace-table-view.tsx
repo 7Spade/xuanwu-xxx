@@ -4,7 +4,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
-import { Eye, EyeOff, Shield, Trash2, ArrowUpRight } from "lucide-react";
+import { Eye, EyeOff, Shield, ArrowUpRight } from "lucide-react";
 import type { Workspace } from "@/shared/types";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 
@@ -17,8 +17,9 @@ function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
   const { t } = useI18n();
 
   return (
-    <div
-      className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/60 bg-card p-4 transition-colors hover:bg-muted/30"
+    <button
+      type="button"
+      className="group flex w-full cursor-pointer items-center justify-between rounded-xl border border-border/60 bg-card p-4 text-left transition-colors hover:bg-muted/30"
       onClick={() => router.push(`/workspaces/${workspace.id}`)}
     >
       <div className="flex items-center gap-4">
@@ -66,7 +67,7 @@ function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 

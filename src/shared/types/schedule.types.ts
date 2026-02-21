@@ -1,5 +1,6 @@
 import type { Location } from './workspace.types'
 import type { SkillRequirement } from './skill.types'
+import type { Timestamp } from 'firebase/firestore'
 
 export type ScheduleStatus = 'PROPOSAL' | 'OFFICIAL' | 'REJECTED';
 
@@ -10,10 +11,10 @@ export interface ScheduleItem {
   workspaceName?: string;
   title: string;
   description?: string;
-  createdAt: any; // Firestore Timestamp
-  updatedAt?: any; // Firestore Timestamp
-  startDate: any; // Firestore Timestamp
-  endDate: any; // Firestore Timestamp
+  createdAt: Timestamp; // Firestore Timestamp
+  updatedAt?: Timestamp; // Firestore Timestamp
+  startDate: Timestamp; // Firestore Timestamp
+  endDate: Timestamp; // Firestore Timestamp
   status: ScheduleStatus;
   originType: 'MANUAL' | 'TASK_AUTOMATION';
   originTaskId?: string;

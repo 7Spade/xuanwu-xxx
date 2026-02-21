@@ -12,6 +12,7 @@ export { WorkspaceListHeader } from './_components/workspace-list-header'
 // Providers
 export { WorkspaceProvider, useWorkspace } from './_components/workspace-provider'
 export { AppProvider, AppContext } from './_components/app-provider'
+export type { AppAction } from './_components/app-provider'
 // Event bus — re-exported from workspace-core.event-bus
 export { WorkspaceEventContext, useWorkspaceEvents } from '@/features/workspace-core.event-bus'
 // Shell

@@ -82,7 +82,7 @@ export function ProposalDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New Schedule Proposal</DialogTitle>
-          <DialogDescription>Submit a new item to the organization's timeline for approval.</DialogDescription>
+          <DialogDescription>Submit a new item to the organization&apos;s timeline for approval.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[60vh] space-y-4 overflow-y-auto py-4 pr-4">
           <div className="space-y-2">

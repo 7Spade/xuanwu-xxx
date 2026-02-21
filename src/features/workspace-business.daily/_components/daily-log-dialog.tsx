@@ -15,6 +15,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/shadcn-ui/dialog";
 import { type DailyLog, type DailyLogComment, type Account } from "@/shared/types";
+import type { Timestamp } from "firebase/firestore";
 import { ImageCarousel } from "./image-carousel";
 import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar";
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
@@ -50,7 +51,7 @@ function WorkspaceAvatar({ name }: { name: string }) {
 }
 
 // Internal component to display relative time.
-function TimeAgo({ date }: { date: any }) {
+function TimeAgo({ date }: { date: Timestamp | Date | null | undefined }) {
     const [timeAgo, setTimeAgo] = useState('');
 
     useEffect(() => {
@@ -58,7 +59,7 @@ function TimeAgo({ date }: { date: any }) {
         
         const update = () => {
             import('date-fns').then(({ formatDistanceToNow }) => {
-                const d = date.toDate ? date.toDate() : new Date(date);
+                const d = date instanceof Date ? date : date.toDate();
                 setTimeAgo(formatDistanceToNow(d, { addSuffix: true }));
             });
         };

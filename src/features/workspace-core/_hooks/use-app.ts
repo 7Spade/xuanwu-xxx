@@ -1,7 +1,6 @@
 
 import { useContext } from 'react';
 import { AppContext } from '../_components/app-provider';
-import { useAuth } from '@/shared/app-providers/auth-provider';
 
 export const useApp = () => {
   const context = useContext(AppContext);

@@ -39,7 +39,7 @@ export function useGlobalSchedule() {
     return allItems
       .filter(item => 
         (item.status === 'OFFICIAL' || item.status === 'REJECTED') && 
-        item.updatedAt?.toDate() > sevenDaysAgo
+        (item.updatedAt?.toDate() ?? new Date(0)) > sevenDaysAgo
       )
       .sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
   }, [allItems]);

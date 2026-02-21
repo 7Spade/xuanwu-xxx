@@ -11,7 +11,7 @@ import { logEvent } from 'firebase/analytics';
  * @param eventName The name of the event to log.
  * @param eventParams Optional parameters to associate with the event.
  */
-export const logAnalyticsEvent = (eventName: string, eventParams?: { [key: string]: any }) => {
+export const logAnalyticsEvent = (eventName: string, eventParams?: Record<string, unknown>) => {
   if (analytics) {
     logEvent(analytics, eventName, eventParams);
   } else {

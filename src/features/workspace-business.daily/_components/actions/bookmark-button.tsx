@@ -34,7 +34,7 @@ export function BookmarkButton({ logId }: BookmarkButtonProps) {
 
     try {
       await toggleBookmark(logId, newOptimisticState);
-    } catch (error) {
+    } catch {
       // Revert on error
       setIsBookmarked(!newOptimisticState);
     } finally {

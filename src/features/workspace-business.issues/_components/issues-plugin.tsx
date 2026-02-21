@@ -11,7 +11,7 @@ import { Label } from "@/shared/shadcn-ui/label";
 import { Input } from "@/shared/shadcn-ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/shadcn-ui/select";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/shared/shadcn-ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/shared/shadcn-ui/sheet";
 import { type WorkspaceIssue } from "@/shared/types";
 import { format } from "date-fns";
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
@@ -92,7 +92,7 @@ export function WorkspaceIssues() {
 
       <div className="grid grid-cols-1 gap-3">
         {issues?.map(issue => (
-          <div key={issue.id} className="flex cursor-pointer items-center justify-between rounded-r-2xl border border-l-4 border-border/60 border-l-accent bg-card/40 p-4 hover:bg-muted/30" onClick={() => setSelectedIssue(issue)}>
+          <button key={issue.id} type="button" className="flex w-full cursor-pointer items-center justify-between rounded-r-2xl border border-l-4 border-border/60 border-l-accent bg-card/40 p-4 text-left hover:bg-muted/30" onClick={() => setSelectedIssue(issue)}>
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-accent/10 p-2 text-accent">
                 {getIssueIcon(issue.type)}
@@ -108,7 +108,7 @@ export function WorkspaceIssues() {
             <Button variant="ghost" size="icon" className="size-8 text-muted-foreground">
               <ArrowRight className="size-4" />
             </Button>
-          </div>
+          </button>
         ))}
       </div>
 

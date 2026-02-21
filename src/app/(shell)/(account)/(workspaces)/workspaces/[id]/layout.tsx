@@ -108,8 +108,8 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
             </DialogTitle>
           </DialogHeader>
           <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-[11px] italic text-destructive">
-            This action will permanently erase the workspace node "
-            {workspace.name}" and all its subordinate atomic data and technical
+            This action will permanently erase the workspace node &quot;
+            {workspace.name}&quot; and all its subordinate atomic data and technical
             specifications.
           </div>
           <DialogFooter>

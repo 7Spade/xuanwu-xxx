@@ -7,11 +7,11 @@
  * handling foreground messages.
  */
 
+// Example of a potential adapter function:
+/*
 import { messaging } from './messaging.client';
 import { getToken, onMessage } from 'firebase/messaging';
 
-// Example of a potential adapter function:
-/*
 export const getFCMToken = async () => {
   if (messaging && process.env.NEXT_PUBLIC_VAPID_KEY) {
     try {
@@ -31,7 +31,7 @@ export const getFCMToken = async () => {
   return null;
 };
 
-export const onForegroundMessage = (callback: (payload: any) => void) => {
+export const onForegroundMessage = (callback: (payload: unknown) => void) => {
   if (messaging) {
     return onMessage(messaging, callback);
   }

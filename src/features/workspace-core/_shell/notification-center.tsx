@@ -6,10 +6,11 @@ import { Button } from "@/shared/shadcn-ui/button";
 import { ScrollArea } from "@/shared/shadcn-ui/scroll-area";
 import { Bell, Trash2, Check } from "lucide-react";
 import { type Notification } from "@/shared/types";
+import type { AppAction } from '../_components/app-provider'
 
 interface NotificationCenterProps {
   notifications: Notification[];
-  dispatch: React.Dispatch<any>;
+  dispatch: React.Dispatch<AppAction>;
 }
 
 export function NotificationCenter({ notifications, dispatch }: NotificationCenterProps) {
