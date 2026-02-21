@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useWorkspace } from "@/react-providers/workspace-provider";
+import { useWorkspace } from "@/features/workspace";
 import { type DailyLog } from "@/shared/types";
 import { Button } from "@/shared/shadcn-ui/button";
 import {

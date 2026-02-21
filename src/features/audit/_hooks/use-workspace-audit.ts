@@ -11,7 +11,7 @@
 "use client";
 
 import { useState } from "react";
-import { useWorkspace } from "@/react-providers/workspace-provider";
+import { useWorkspace } from "@/features/workspace";
 import { AuditLog } from "@/shared/types";
 
 export function useWorkspaceAudit() {

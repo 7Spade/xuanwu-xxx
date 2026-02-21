@@ -3,7 +3,7 @@
 
 import { Badge } from "@/shared/shadcn-ui/badge";
 import { Eye, EyeOff } from "lucide-react";
-import { useWorkspace } from "@/react-providers/workspace-provider";
+import { useWorkspace } from "@/features/workspace";
 
 export function WorkspaceStatusBar() {
   const { workspace } = useWorkspace();

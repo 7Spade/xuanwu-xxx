@@ -13,7 +13,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { useWorkspace } from "@/react-providers/workspace-provider";
+import { useWorkspace } from "@/features/workspace";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { useAccount } from "@/react-hooks/state-hooks/use-account";
 import { useRouter } from "next/navigation";

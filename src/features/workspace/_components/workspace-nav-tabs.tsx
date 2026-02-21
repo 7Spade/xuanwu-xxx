@@ -3,7 +3,7 @@
 import { useMemo } from "react"
 import { useSelectedLayoutSegment } from "next/navigation"
 import Link from "next/link"
-import { useWorkspace } from "@/react-providers/workspace-provider"
+import { useWorkspace } from "@/features/workspace"
 import { useApp } from "@/react-hooks/state-hooks/use-app"
 import type { Capability } from "@/shared/types"
 

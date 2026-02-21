@@ -2,7 +2,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useWorkspace } from "@/react-providers/workspace-provider"
+import { useWorkspace } from "@/features/workspace"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import type { ScheduleItem, Location } from "@/shared/types"
 import { parseISO } from "date-fns"
