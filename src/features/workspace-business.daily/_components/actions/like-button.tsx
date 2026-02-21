@@ -11,7 +11,7 @@ import { useDailyActions } from '../../_hooks/use-daily-commands';
 import { type DailyLog, type Account } from "@/shared/types";
 import { Button } from "@/shared/shadcn-ui/button";
 import { Heart } from "lucide-react";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@/shared/lib";
 
 interface LikeButtonProps {
   log: DailyLog;

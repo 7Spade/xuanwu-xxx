@@ -1,7 +1,8 @@
 // [職責] 監聽事件並執行副作用 (The Orchestrator)
 "use client";
 import { useEffect } from "react";
-import { useWorkspace , useApp } from "@/features/workspace-core";
+import { useWorkspace } from '../_components/workspace-provider';
+import { useApp } from './use-app';
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";

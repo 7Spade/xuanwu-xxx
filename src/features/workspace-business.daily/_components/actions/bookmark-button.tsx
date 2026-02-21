@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useBookmarkActions } from '../../_hooks/use-bookmark-commands';
 import { Button } from "@/shared/shadcn-ui/button";
 import { Bookmark, Loader2 } from "lucide-react";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@/shared/lib";
 
 interface BookmarkButtonProps {
   logId: string;
