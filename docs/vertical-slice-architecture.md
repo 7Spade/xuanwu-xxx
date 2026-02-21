@@ -83,23 +83,24 @@ src/
 │           │   └── ...
 │           └── workspaces/
 │               ├── [id]/
-│               │   ├── layout.tsx        ← import { WorkspaceLayout } from "@/features/workspace-core/
-│               │   ├── @plugin-tab/
-│               │   │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
-│               │   │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
-│               │   │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
-│               │   │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
-│               │   │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-business.members"
-│               │   │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
-│               │   │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
-│               │   │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
-│               │   │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/workspace-business.qa"
-│               │   │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/workspace-business.acceptance"
-│               │   │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/workspace-business.document-parser"
-│               │   └── ...
+│               │   └── (workspace)/      ← 路由群組：單一工作區上下文（WorkspaceProvider）
+│               │       ├── layout.tsx    ← import { WorkspaceLayout } from "@/features/workspace-core"
+│               │       ├── @plugin-tab/
+│               │       │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
+│               │       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
+│               │       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
+│               │       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
+│               │       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-business.members"
+│               │       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
+│               │       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
+│               │       │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
+│               │       │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/workspace-business.qa"
+│               │       │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/workspace-business.acceptance"
+│               │       │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/workspace-business.document-parser"
+│               │       └── ...
 │               └── ...
 │
-├── features/                         ← 17 個垂直功能切片
+├── features/                         ← 20 個垂直功能切片
 │   │
 │   ├── auth/                         ← [切片 1] 認證：登入、註冊、重設密碼
 │   │   ├── GEMINI.md

@@ -62,7 +62,7 @@ src/
 
 ## 3. 目錄結構概覽 (Directory Structure Overview)
 
-- `src/app/`: Next.js App Router 路由入口，純組裝層，含 3 個路由群組：`(dashboard)/`、`(public)/`、`(shell)/`。
+- `src/app/`: Next.js App Router 路由入口，純組裝層，含 4 個路由群組：`(shell)/`、`(dashboard)/`（巢狀於 shell）、`(workspace)/`（巢狀於 [id]）、`(public)/`。
 - `src/features/`: 17 個垂直功能切片，每個切片擁有其業務領域的所有程式碼。
 - `src/shared/types/`: 全域 TypeScript 類型定義。
 - `src/shared/lib/`: 純工具函式與領域規則（無 I/O）。

@@ -106,7 +106,7 @@ src/
 │           ├── use-mobile.tsx    ← 響應式斷點偵測
 │           └── use-toast.ts      ← Toast 通知
 │
-├── features/                     ← 17 個垂直功能切片
+├── features/                     ← 20 個垂直功能切片
 │   │   (每個切片: GEMINI.md + _actions.ts + _queries.ts + _hooks/ + _components/ + index.ts)
 │   │
 │   ├── auth/                     ← [切片 1] 認證：登入、註冊、重設密碼
@@ -176,23 +176,24 @@ src/
                 │   ├── (.)new/page.tsx  ← 新建工作區 Dialog
                 │   └── default.tsx
                 └── [id]/
-                    ├── layout.tsx       ← WorkspaceProvider
-                    ├── page.tsx
-                    ├── settings/page.tsx
-                    ├── governance/page.tsx
-                    ├── schedule-proposal/page.tsx
-                    ├── daily-log/[logId]/page.tsx
-                    ├── @plugin-tab/     ← Parallel Route（插件 Tab 內容）
-                    │   ├── acceptance/ audit/ capabilities/ daily/
-                    │   ├── document-parser/ files/ finance/ issues/
-                    │   ├── members/ qa/ schedule/ tasks/
-                    │   └── default.tsx  loading.tsx  error.tsx
-                    ├── @modal/          ← Dialog 攔截
-                    │   ├── (.)settings/
-                    │   ├── (.)schedule-proposal/
-                    │   ├── (.)daily-log/[logId]/
-                    │   └── default.tsx
-                    └── @panel/          ← 右側面板攔截
-                        ├── (.)governance/
-                        └── default.tsx
+                    └── (workspace)/     ← 路由群組：單一工作區上下文
+                        ├── layout.tsx   ← WorkspaceProvider
+                        ├── page.tsx
+                        ├── settings/page.tsx
+                        ├── governance/page.tsx
+                        ├── schedule-proposal/page.tsx
+                        ├── daily-log/[logId]/page.tsx
+                        ├── @plugin-tab/     ← Parallel Route（插件 Tab 內容）
+                        │   ├── acceptance/ audit/ capabilities/ daily/
+                        │   ├── document-parser/ files/ finance/ issues/
+                        │   ├── members/ qa/ schedule/ tasks/
+                        │   └── default.tsx  loading.tsx  error.tsx
+                        ├── @modal/          ← Dialog 攔截
+                        │   ├── (.)settings/
+                        │   ├── (.)schedule-proposal/
+                        │   ├── (.)daily-log/[logId]/
+                        │   └── default.tsx
+                        └── @panel/          ← 右側面板攔截
+                            ├── (.)governance/
+                            └── default.tsx
 ```

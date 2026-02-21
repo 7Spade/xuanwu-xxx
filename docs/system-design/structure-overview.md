@@ -39,7 +39,7 @@ src/
 
 ---
 
-## `src/app/` — 路由層（含 3 個路由群組）
+## `src/app/` — 路由層（含 4 個路由群組）
 
 ```
 app/
@@ -86,25 +86,26 @@ app/
             │   ├── (.)new/page.tsx
             │   └── default.tsx
             └── [id]/
-                ├── layout.tsx        ← WorkspaceProvider
-                ├── page.tsx
-                ├── settings/page.tsx
-                ├── governance/page.tsx
-                ├── schedule-proposal/page.tsx
-                ├── daily-log/[logId]/page.tsx
-                ├── @plugin-tab/      ← 插件 Tab slot
-                │   ├── acceptance/ audit/ capabilities/ daily/
-                │   ├── document-parser/ files/ finance/ issues/
-                │   ├── members/ qa/ schedule/ tasks/
-                │   ├── default.tsx  loading.tsx  error.tsx
-                ├── @modal/           ← Dialog 攔截
-                │   ├── (.)settings/
-                │   ├── (.)schedule-proposal/
-                │   ├── (.)daily-log/[logId]/
-                │   └── default.tsx
-                └── @panel/           ← 右側面板攔截
-                    ├── (.)governance/
-                    └── default.tsx
+                └── (workspace)/          ← 路由群組：單一工作區上下文
+                    ├── layout.tsx        ← WorkspaceProvider
+                    ├── page.tsx
+                    ├── settings/page.tsx
+                    ├── governance/page.tsx
+                    ├── schedule-proposal/page.tsx
+                    ├── daily-log/[logId]/page.tsx
+                    ├── @plugin-tab/      ← 插件 Tab slot
+                    │   ├── acceptance/ audit/ capabilities/ daily/
+                    │   ├── document-parser/ files/ finance/ issues/
+                    │   ├── members/ qa/ schedule/ tasks/
+                    │   ├── default.tsx  loading.tsx  error.tsx
+                    ├── @modal/           ← Dialog 攔截
+                    │   ├── (.)settings/
+                    │   ├── (.)schedule-proposal/
+                    │   ├── (.)daily-log/[logId]/
+                    │   └── default.tsx
+                    └── @panel/           ← 右側面板攔截
+                        ├── (.)governance/
+                        └── default.tsx
 ```
 
 ---
