@@ -3,11 +3,11 @@ import type {Metadata} from 'next';
 import '../styles/globals.css';
 import {Toaster} from '@/shared/shadcn-ui/toaster';
 import { Inter } from 'next/font/google';
-import { cn } from '@/shared/utils/utils';
+import { cn } from '@/shared/lib';
 import { ThemeProvider } from '@/shared/app-providers/theme-provider';
 import { FirebaseClientProvider } from '@/shared/app-providers/firebase-provider';
 import { AuthProvider } from '@/shared/app-providers/auth-provider';
-import { AppProvider } from '@/react-providers/app-provider';
+import { AppProvider } from '@/features/workspace-core';
 import { I18nProvider } from '@/shared/app-providers/i18n-provider';
 
 export const metadata: Metadata = {

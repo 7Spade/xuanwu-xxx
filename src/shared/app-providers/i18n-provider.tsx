@@ -1,14 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Locale, TranslationMessages } from '@/shared/i18n-types/i18n';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { type Locale, type TranslationMessages } from '@/shared/i18n-types/i18n';
 import { getPreferredLocale, setLocalePreference, loadMessages, i18nConfig } from '@/shared/utils/i18n';
 
 interface I18nContextValue {
   locale: Locale;
   messages: TranslationMessages | null;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   isLoading: boolean;
 }
 
@@ -58,21 +58,23 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   // Translation function with dot notation support
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     if (!messages) return key;
 
     const keys = key.split('.');
-    let value: any = messages;
+    let value: unknown = messages;
 
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+        value = (value as Record<string, unknown>)[k];
       } else {
         return key; // Return key if path not found
       }
     }
 
-    return typeof value === 'string' ? value : key;
+    if (typeof value !== 'string') return key;
+    if (!params) return value;
+    return value.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`));
   };
 
   return (

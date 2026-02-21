@@ -17,7 +17,7 @@ The project uses **Vertical Slice Architecture (VSA)**. Code is organized by **b
 ```
 src/
 ├── app/          ← Next.js routing ONLY (pure composition)
-├── features/     ← 17 vertical feature slices (one per business domain)
+├── features/     ← 22 vertical feature slices (one per business domain)
 └── shared/       ← 5 cross-cutting infrastructure modules
 ```
 
@@ -26,7 +26,7 @@ src/
 | Directory | Role | Count |
 |-----------|------|-------|
 | `app/` | Next.js App Router — routing & layout composition only | 1 |
-| `features/` | Self-contained business domain slices | 17 |
+| `features/` | Self-contained business domain slices | 22 |
 | `shared/` | Cross-cutting infrastructure (types, lib, infra, ai, ui) | 5 |
 
 ### Dependency Flow
@@ -41,37 +41,43 @@ app/  ->  features/{name}/index.ts  ->  shared/*
 
 ### Feature Slice Index
 
-Each slice lives at `src/features/{name}/` and owns everything for its domain:
+Each slice lives at `src/features/{name}/` and owns everything for its domain.
+Workspace slices use dot-namespace: `workspace-core.*` for infrastructure, `workspace-business.*` for day-to-day operations, `workspace-governance.*` for organizational governance.
+Account slices use dot-namespace: `account-user.*` for personal user features, `account-organization.*` for org-level features.
 
 | Slice | Domain |
 |-------|--------|
-| `features/auth` | Login, register, reset password |
+| `features/account.auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
-| `features/workspace` | Workspace CRUD, settings, shell |
-| `features/members` | Member management |
-| `features/teams` | Team management |
-| `features/partners` | Partner management |
-| `features/schedule` | Schedule, proposals, governance |
-| `features/daily` | Daily logs, comments, bookmarks |
-| `features/tasks` | Task tree, CRUD |
-| `features/audit` | Audit trail, event timeline |
-| `features/files` | File upload, management |
-| `features/issues` | Issue tracking |
-| `features/finance` | Finance plugin |
-| `features/qa` | QA plugin |
-| `features/document-parser` | AI document parsing |
-| `features/acceptance` | Acceptance plugin |
-| `features/user-settings` | User profile, preferences |
+| `features/user-settings` | User profile, preferences, security |
+| `features/account-user.wallet` | User personal wallet, balance (stub) |
+| `features/account-organization.member` | Org-level member invite/remove (stub) |
+| `features/workspace-core` | Workspace CRUD, shell, provider, list |
+| `features/workspace-core.event-bus` | Intra-workspace event bus |
+| `features/workspace-governance.members` | Workspace member access & roles |
+| `features/workspace-governance.teams` | Team structure management |
+| `features/workspace-governance.partners` | External partner relationships |
+| `features/workspace-governance.schedule` | Schedule, proposals, decisions |
+| `features/workspace-business.daily` | Daily logs, comments, bookmarks |
+| `features/workspace-business.tasks` | Task tree, CRUD |
+| `features/workspace-business.audit` | Audit trail, event timeline |
+| `features/workspace-business.files` | File upload, management |
+| `features/workspace-business.issues` | Issue tracking |
+| `features/workspace-business.finance` | Finance plugin |
+| `features/workspace-business.qa` | QA plugin |
+| `features/workspace-business.document-parser` | AI document parsing |
+| `features/workspace-business.acceptance` | Acceptance plugin |
+| `features/workspace-business.capabilities` | Capabilities plugin |
 
 ### Shared Module Index
 
-| Module | Maps From | Contents |
-|--------|-----------|----------|
-| `shared/types` | `domain-types/` | All TypeScript domain types |
-| `shared/lib` | `domain-rules/` + `shared/utils/` | Pure utilities + domain rules |
-| `shared/infra` | `firebase/` | Firebase adapters + repositories |
-| `shared/ai` | `genkit-flows/` | Genkit AI flows |
-| `shared/ui` | `shared/` | shadcn-ui, providers, i18n, constants |
+| Module | Contents |
+|--------|----------|
+| `shared/types` | All TypeScript domain types |
+| `shared/lib` | Pure utilities + domain rules |
+| `shared/infra` | Firebase adapters + repositories |
+| `shared/ai` | Genkit AI flows |
+| `shared/ui` | shadcn-ui, app-providers, i18n, constants |
 
 > **Full design doc**: `docs/vertical-slice-architecture.md`
 

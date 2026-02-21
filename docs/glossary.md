@@ -39,7 +39,7 @@
 
 ### **單向依賴 (One-Way Dependency)**
 - **定義**: 本專案的核心架構原則。指程式碼的依賴關係只能是單向的，例如 UI 層可以依賴邏輯層，但邏輯層不能依賴 UI 層。
-- **流向**: `app` → `view-modules` → `use-cases` → `react-providers` → `react-hooks` → `server-commands` → `firebase` / `shared` → `domain-rules` → `domain-types`。
+- **流向**: `app/` → `features/{name}/index.ts` → `shared/*`。
 - **目的**: 避免循環依賴，提高程式碼的可測試性和可維護性。
 
 ### **kebab-case (短橫線命名法)**

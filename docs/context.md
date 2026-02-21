@@ -35,7 +35,7 @@
 
 ### 2. `FirebaseClientProvider`
 - **職責**: 初始化並提供所有 Firebase SDK 的客戶端實例（如 `db`, `auth`, `storage`）。
-- **數據來源**: `@/firebase/*/*.client.ts`。
+- **數據來源**: `@/shared/infra/*/*.client.ts`。
 - **提供 Hook**: `useFirebase()`。
 
 ### 3. `AuthProvider`
@@ -62,7 +62,7 @@
 - **提供 Hook**: `useAccount()`。
 
 ### 6. `WorkspaceProvider` (最內層)
-- **職責**: 用於單一工作區頁面 (`/dashboard/workspaces/[id]`)，管理該工作區內部的所有狀態。
+- **職責**: 用於單一工作區頁面 (`/workspaces/[id]`)，管理該工作區內部的所有狀態。
 - **核心狀態**:
   - `workspace`: 當前工作區的詳細資料。
   - `tasks`: 工作區內的任務。

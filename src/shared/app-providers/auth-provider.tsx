@@ -1,9 +1,11 @@
 "use client";
 
-import React, { createContext, useReducer, useContext, useEffect, ReactNode } from 'react';
+import {type ReactNode} from 'react';
+import type React from 'react';
+import { createContext, useReducer, useContext, useEffect } from 'react';
 import { type User as FirebaseUser } from "firebase/auth";
-import { authAdapter } from '@/firebase/auth/auth.adapter';
-import { Account } from '@/domain-types/domain';
+import { authAdapter } from '@/shared/infra/auth/auth.adapter';
+import { type Account } from '@/shared/types';
 
 interface AuthState {
   user: Account | null;

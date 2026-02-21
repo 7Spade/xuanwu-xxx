@@ -42,12 +42,17 @@ src/
 
 ### B. 關注點分離 (Separation of Concerns)
 
-### B. 關注點分離 (Separation of Concerns)
+每個功能切片 (`features/{name}/`) 內部的關注點分離：
 
-- **UI 元件 (`view-modules`)**: 只負責渲染，不應包含業務邏輯或直接的資料庫請求。
-- **邏輯 (`react-hooks`)**: 封裝可重用的 UI 邏輯或業務邏輯。
-- **狀態 (`react-providers`)**: 作為 UI 與基礎設施層之間的橋樑，管理共享數據。
-- **外部通訊 (`firebase`)**: 唯一負責與 Firebase 等外部服務互動的層。
+- **`_components/`**: 只負責渲染，不應包含直接的資料庫請求。
+- **`_hooks/`**: 封裝可重用的 UI 邏輯或業務邏輯。
+- **`_actions.ts`**: 唯一負責寫入 Firebase 的 `"use server"` 函式。
+- **`_queries.ts`**: Firestore 即時監聽，為 Provider 提供狀態資料。
+
+跨切片共用的基礎設施位於 `shared/`：
+- **`shared/infra/`**: Firebase SDK 唯一閘道。
+- **`shared/ai/`**: Genkit AI 流程（Server-side）。
+- **`shared/lib/`**: 純業務規則函式（無 I/O）。
 
 ### C. 事件驅動架構 (Event-Driven Architecture)
 
@@ -57,29 +62,15 @@ src/
 
 ## 3. 目錄結構概覽 (Directory Structure Overview)
 
-**目標狀態（VSA）：**
-
-- `src/app`: Next.js App Router 路由入口，純組裝層，不含業務邏輯。
+- `src/app/`: Next.js App Router 路由入口，純組裝層，含 5 個路由群組：`(shell)/`、`(account)/`（AccountProvider，巢狀於 shell）、`(dashboard)/`（巢狀於 account）、`(workspaces)/`（工作區列表 + 詳情，巢狀於 account）、`(public)/`。
 - `src/features/`: 17 個垂直功能切片，每個切片擁有其業務領域的所有程式碼。
-- `src/shared/types/`: 全域 TypeScript 類型定義（原 `domain-types/`）。
-- `src/shared/lib/`: 純工具函式與領域規則（原 `domain-rules/` + `shared/utils/`）。
-- `src/shared/infra/`: Firebase 基礎設施（原 `firebase/`）。
-- `src/shared/ai/`: Genkit AI 流程（原 `genkit-flows/`）。
-- `src/shared/ui/`: shadcn-ui、Providers、i18n、常數（原 `shared/`）。
+- `src/shared/types/`: 全域 TypeScript 類型定義。
+- `src/shared/lib/`: 純工具函式與領域規則（無 I/O）。
+- `src/shared/infra/`: Firebase 基礎設施（Auth、Firestore、Storage）。
+- `src/shared/ai/`: Genkit AI 流程。
+- `src/shared/ui/`: Shadcn/UI、Providers、i18n、常數。
 
-**遷移中（舊水平層，逐步搬移至上述結構）：**
-
-- `src/domain-types/` → `src/shared/types/`
-- `src/domain-rules/` → `src/shared/lib/`
-- `src/firebase/` → `src/shared/infra/`
-- `src/genkit-flows/` → `src/shared/ai/`
-- `src/server-commands/` → `src/features/{name}/_actions.ts`
-- `src/react-hooks/` → `src/features/{name}/_hooks/`
-- `src/react-providers/` → `src/features/{name}/_hooks/` 或 `src/shared/ui/`
-- `src/use-cases/` → `src/features/{name}/`（內嵌至 hooks 或 actions）
-- `src/view-modules/` → `src/features/{name}/_components/`
-
-詳細切片列表請參閱 `docs/vertical-slice-architecture.md`。
+詳細切片列表與內部結構請參閱 `docs/vertical-slice-architecture.md`。
 
 ## 4. 狀態管理策略 (State Management Strategy)
 

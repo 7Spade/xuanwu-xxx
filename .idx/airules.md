@@ -74,10 +74,10 @@ Remember, the XML structure you generate is the only mechanism for applying chan
 ### 嚴格邊界（Strict Boundaries）
 - 禁止在 Page 或 Component 中直接調用 Firebase SDK
 - 禁止 Component 直接 import Repository
-- 禁止跨 Feature 直接互相依賴
+- 禁止跨 Feature 直接互相依賴（必須透過 `features/{name}/index.ts`）
 - 禁止在 app/ 目錄中撰寫商業邏輯
 - 資料流必須為：
-  Component → Logic Hook → Repository → Adapter → Firebase SDK
+  Component → `_hooks/` → `_actions.ts` / `_queries.ts` → `@/shared/infra/`
 
 ### 高內聚 / 低耦合
 - 同一功能的 UI / Logic / Types 必須集中在同一 Feature 區域
@@ -97,32 +97,32 @@ Remember, the XML structure you generate is the only mechanism for applying chan
 - 所有檔案與目錄一律使用 kebab-case
 - 禁止例外
 
-### 檔案類型規範
-- 組件檔案：`.component.tsx`
-- 複雜邏輯 Hook：`.logic.ts`
-- 類型定義：`.types.ts`
-- Repository：`.repository.ts`
-- Adapter：`.adapter.ts`
+### VSA 切片內部結構
+每個 `features/{name}/` 切片遵循：
+- `_components/`：切片私有 UI 組件
+- `_hooks/`：切片私有 React Hooks
+- `_actions.ts`：`"use server"` 異動操作
+- `_queries.ts`：Firestore 讀取 / onSnapshot
+- `_types.ts`：切片專屬型別擴充（可選）
+- `index.ts`：公開 API（僅導出供其他切片使用的 symbols）
 
 ### Next.js App Router 結構邊界
-- `app/`：僅存放路由、Layout、Server Components
+- `app/`：僅存放路由、Layout、Server Components（含 route groups: `(shell)`, `(account)`, `(dashboard)`, `(workspaces)`, `(public)`）
 - `app/**/_components/`：僅該路由可用的區域組件
-- `infra/firebase/`：Firebase 唯一操作層
+- `shared/infra/`：Firebase 唯一操作層
   - `adapters/`
   - `repositories/`
-- `context/`：全域狀態（Auth / Theme / App）
-- `hooks/`
-  - `infra/`
-  - `state/`
+- `shared/ui/`：shadcn-ui、app-providers、i18n、constants
+- `features/{name}/`：垂直功能切片（20 個）
 
 
 ## 3. UI 組件優先準則 (UI Library Whitelist)
 
 ### 使用規則
 - 構建 UI 時禁止直接使用原生 HTML 標籤（除非必要）
-- 必須優先使用：`@/app/_components/ui/...`
+- 必須優先使用：`@/shared/ui/...`
 - 若已有現成組件，禁止重寫
-- 引用路徑必須使用別名 `@/app/_components/ui/...`
+- 引用路徑必須使用別名 `@/shared/ui/...`
 
 ### Whitelist
 
@@ -157,8 +157,8 @@ skeleton, progress
 
 ### 超過 100 行的組件
 必須拆分為：
-- `[name].component.tsx`（純 View）
-- `[name].logic.ts`（use[Name]Logic Hook）
+- `_components/[name].tsx`（純 View）
+- `_hooks/use-[name].ts`（邏輯與狀態）
 
 限制：
 - Component 僅接受 props
@@ -167,7 +167,7 @@ skeleton, progress
 
 ### Firebase 操作規則
 - 禁止在 Component 的 useEffect 中直接操作 Firestore
-- 必須透過 `infra/firebase/repositories`
+- 必須透過 `@/shared/infra/`（repositories/adapters）
 - Repository 必須包裹 try-catch
 - 不得回傳 SDK 原始物件
 - 必須提供錯誤轉換與安全資料模型
@@ -197,8 +197,8 @@ Client 僅允許情境：
 
 ## 6. 資料取得優先順序
 
-1. Server Component → Repository
-2. Client Component → Logic Hook → Repository
+1. Server Component → `_queries.ts` → `@/shared/infra/`
+2. Client Component → `_hooks/` → `_actions.ts` / `_queries.ts` → `@/shared/infra/`
 
 禁止：
 - Client 直接調用 Firebase SDK
@@ -235,5 +235,5 @@ Client 僅允許情境：
 ## 10. 上下文讀取命令 (Context Commands)
 
 - 開發新功能前必須先讀取該目錄下 GEMINI.md
-- 若涉及 UI 修改，先檢查 `@/app/_components/ui` 是否已有可用組件
+- 若涉及 UI 修改，先檢查 `@/shared/ui` 是否已有可用組件
 - 不得跳過 Types 與 Repository 設計

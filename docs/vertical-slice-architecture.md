@@ -29,7 +29,7 @@ src/app/.../schedule/               ← 路由
 要理解「排班功能」，只需讀 **1 個資料夾**：
 
 ```
-src/features/schedule/
+src/features/workspace-governance.schedule/
 ├── _actions.ts        ← 所有寫入操作
 ├── _queries.ts        ← 所有讀取/訂閱
 ├── _types.ts          ← 所有類型定義
@@ -61,40 +61,50 @@ src/features/schedule/
 src/
 ├── app/                              ← Next.js App Router（路由組裝）
 │   ├── layout.tsx
-│   ├── page.tsx
-│   ├── (auth-routes)/
-│   │   ├── login/page.tsx            ← import { LoginView } from "@/features/auth"
-│   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/auth"
+│   ├── (public)/
+│   │   ├── login/page.tsx            ← import { LoginView } from "@/features/account.auth"
+│   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/account.auth"
 │   │   └── layout.tsx
-│   └── dashboard/
-│       ├── layout.tsx                ← import { DashboardShell } from "@/features/workspace"
-│       ├── page.tsx                  ← import { DashboardView } from "@/features/workspace"
-│       ├── account/
-│       │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/schedule"
-│       │   ├── members/page.tsx      ← import { MembersView } from "@/features/members"
-│       │   ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/teams"
-│       │   ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/partners"
-│       │   ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
-│       │   └── ...
-│       └── workspaces/
-│           ├── [id]/
-│           │   ├── layout.tsx        ← import { WorkspaceLayout } from "@/features/workspace"
-│           │   ├── @plugin-tab/
-│           │   │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/schedule"
-│           │   │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/daily"
-│           │   │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/tasks"
-│           │   │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/audit"
-│           │   │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/members"
-│           │   │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/files"
-│           │   │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/issues"
-│           │   │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/finance"
-│           │   │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/qa"
-│           │   │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/acceptance"
-│           │   │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/document-parser"
-│           │   └── ...
-│           └── ...
+│   └── (shell)/                      ← 全域 UI 容器層（外殼層，純視覺結構）
+│       ├── layout.tsx                ← SidebarProvider（提供 @sidebar + @modal 插槽）
+│       ├── @sidebar/default.tsx      ← import { DashboardSidebar } from "@/features/workspace-core"
+│       ├── @modal/default.tsx        ← 全域覆蓋層（預設 null）
+│       ├── page.tsx                  ← 根入口（redirect）
+│       └── (account)/                ← 路由群組：AccountProvider 共用上下文
+│           ├── layout.tsx            ← AccountProvider（(dashboard) + (workspaces) 共用）
+│           ├── (dashboard)/          ← 路由群組：組織管理業務路由
+│           │   └── dashboard/        ← /dashboard/**
+│           │       ├── layout.tsx    ← Auth Guard + SidebarInset + @header + @modal
+│           │       ├── page.tsx      ← import { DashboardView } from "@/features/workspace-core"
+│           │       └── account/
+│           │           ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/workspace-governance.schedule"
+│           │           ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-governance.members"
+│           │           ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-governance.teams"
+│           │           ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-governance.partners"
+│           │           ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
+│           │           └── ...
+│           └── (workspaces)/         ← 路由群組：工作區模組（列表 + 詳情）
+│               └── workspaces/       ← /workspaces/**
+│                   ├── layout.tsx
+│                   ├── page.tsx      ← import { WorkspacesView } from "@/features/workspace-core"
+│                   └── [id]/         ← /workspaces/[id]（WorkspaceProvider）
+│                       ├── layout.tsx← import { WorkspaceLayout } from "@/features/workspace-core"
+│                       ├── @plugin-tab/
+│                       │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
+│                       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
+│                       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
+│                       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
+│                       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-governance.members"
+│                       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
+│                       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
+│                       │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
+│                       │   ├── qa/page.tsx            ← import { QaPlugin } from "@/features/workspace-business.qa"
+│                       │   ├── acceptance/page.tsx    ← import { AcceptancePlugin } from "@/features/workspace-business.acceptance"
+│                       │   └── document-parser/page.tsx← import { DocumentParserPlugin } from "@/features/workspace-business.document-parser"
+│                       └── ...
+│               └── ...
 │
-├── features/                         ← 17 個垂直功能切片
+├── features/                         ← 20 個垂直功能切片
 │   │
 │   ├── auth/                         ← [切片 1] 認證：登入、註冊、重設密碼
 │   │   ├── GEMINI.md
@@ -125,7 +135,7 @@ src/
 │   │   │   └── stat-cards.tsx
 │   │   └── index.ts
 │   │
-│   ├── workspace/                    ← [切片 3] 工作區：CRUD、設定、導航、外殼
+│   ├── workspace-core/               ← [切片 3] 工作區：CRUD、設定、導航、外殼
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts               ← createWorkspace, mountCapabilities, updateSettings
 │   │   ├── _queries.ts
@@ -154,7 +164,7 @@ src/
 │   │   │   └── theme-adapter.tsx
 │   │   └── index.ts
 │   │
-│   ├── members/                      ← [切片 4] 成員：帳號級 + 工作區級成員管理
+│   ├── workspace-governance.members/    ← [切片 4] 成員：帳號級 + 工作區級成員管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts               ← addMember, removeMember, updateMemberRole
 │   │   ├── _queries.ts
@@ -163,7 +173,7 @@ src/
 │   │   │   └── members-view.tsx
 │   │   └── index.ts
 │   │
-│   ├── teams/                        ← [切片 5] 團隊：團隊管理
+│   ├── workspace-governance.teams/      ← [切片 5] 團隊：團隊管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts
 │   │   ├── _components/
@@ -171,7 +181,7 @@ src/
 │   │   │   └── teams-view.tsx
 │   │   └── index.ts
 │   │
-│   ├── partners/                     ← [切片 6] 協力廠商：夥伴管理
+│   ├── workspace-governance.partners/   ← [切片 6] 協力廠商：夥伴管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts
 │   │   ├── _components/
@@ -179,7 +189,7 @@ src/
 │   │   │   └── partners-view.tsx
 │   │   └── index.ts
 │   │
-│   ├── schedule/                     ← [切片 7] 排班：排程、提案、審核
+│   ├── workspace-governance.schedule/ ← [切片 7] 排班：排程、提案、審核
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts               ← createScheduleItem, assignMember, updateStatus
 │   │   ├── _queries.ts               ← onSnapshot listeners for schedule items
@@ -304,7 +314,7 @@ src/
 │
 └── shared/                           ← 跨切片共用基礎設施（5 個模組）
     │
-    ├── types/                        ← [模組 1] 全域領域類型（原 domain-types/）
+    ├── types/                        ← [模組 1] 全域領域類型
     │   ├── GEMINI.md
     │   ├── account.types.ts
     │   ├── workspace.types.ts
@@ -315,7 +325,7 @@ src/
     │   ├── skill.types.ts
     │   └── index.ts
     │
-    ├── lib/                          ← [模組 2] 純工具 + 領域規則（原 domain-rules/ + shared/utils/）
+    ├── lib/                          ← [模組 2] 純工具 + 領域規則
     │   ├── GEMINI.md
     │   ├── account.rules.ts
     │   ├── schedule.rules.ts
@@ -326,7 +336,7 @@ src/
     │   ├── i18n.ts
     │   └── utils.ts
     │
-    ├── infra/                        ← [模組 3] Firebase 基礎設施（原 firebase/）
+    ├── infra/                        ← [模組 3] Firebase 基礎設施
     │   ├── GEMINI.md
     │   ├── auth/
     │   ├── firestore/
@@ -335,12 +345,12 @@ src/
     │   ├── storage/
     │   └── ...
     │
-    ├── ai/                           ← [模組 4] Genkit AI 流程（原 genkit-flows/）
+    ├── ai/                           ← [模組 4] Genkit AI 流程
     │   ├── GEMINI.md
     │   ├── flows/
     │   └── schemas/
     │
-    └── ui/                           ← [模組 5] UI 原語（原 shared/）
+    └── ui/                           ← [模組 5] UI 原語
         ├── GEMINI.md
         ├── shadcn-ui/                ← shadcn 元件庫
         ├── app-providers/            ← Firebase/Auth/i18n/Theme providers
@@ -371,15 +381,15 @@ features/{name}/
 ### `_` 前綴慣例
 
 - `_actions.ts`、`_queries.ts`、`_types.ts`、`_hooks/`、`_components/` 是**切片私有**的。
-- 其他切片**不得**直接引用切片私有路徑（例如禁止 `@/features/schedule/_hooks/use-workspace-schedule`）。
-- 切片間的引用**只能**透過 `index.ts` 公開 API（例如允許 `@/features/schedule`）。
+- 其他切片**不得**直接引用切片私有路徑（例如禁止 `@/features/workspace-governance.schedule/_hooks/use-workspace-schedule`）。
+- 切片間的引用**只能**透過 `index.ts` 公開 API（例如允許 `@/features/workspace-governance.schedule`）。
 
 ### `index.ts` 公開 API
 
 只暴露其他切片或 `app/` 確實需要的符號：
 
 ```ts
-// features/schedule/index.ts
+// features/workspace-governance.schedule/index.ts
 export { AccountScheduleSection } from "./_components/schedule.account-view";
 export { WorkspaceSchedule } from "./_components/schedule.workspace-view";
 export { GovernanceSidebar } from "./_components/governance-sidebar";
@@ -394,8 +404,8 @@ export { ScheduleProposalContent } from "./_components/schedule-proposal-content
 ✅ 允許的引用模式：
 
 // App 引用功能切片公開 API
-import { LoginView } from "@/features/auth";
-import { WorkspaceSchedule } from "@/features/schedule";
+import { LoginView } from "@/features/account.auth";
+import { WorkspaceSchedule } from "@/features/workspace-governance.schedule";
 
 // 切片引用共用基礎設施
 import type { ScheduleItem } from "@/shared/types";
@@ -403,17 +413,17 @@ import { canTransitionScheduleStatus } from "@/shared/lib";
 import { scheduleRepository } from "@/shared/infra";
 
 // 切片間（僅透過 index.ts）
-import { AccountScheduleSection } from "@/features/schedule";
+import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
 //                                                         ↑ 只引用到切片根目錄，不到內部子路徑
 
 ❌ 禁止的引用模式：
 
 // 直接引用切片私有路徑
-import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
 //                                                              ↑ 禁止：_ 前綴表示私有
 
 // 切片引用另一個切片的私有路徑
-import { GovernanceSidebar } from "@/features/schedule/_components/governance-sidebar";
+import { GovernanceSidebar } from "@/features/workspace-governance.schedule/_components/governance-sidebar";
 //                                                               ↑ 禁止：必須透過 index.ts
 ```
 
@@ -423,7 +433,7 @@ import { GovernanceSidebar } from "@/features/schedule/_components/governance-si
 
 | 場景 | 水平層架構 | 垂直切片架構 |
 |------|-----------|-------------|
-| 修改排班邏輯 | 需查 7 個資料夾 | 只需查 `features/schedule/` |
+| 修改排班邏輯 | 需查 7 個資料夾 | 只需查 `features/workspace-governance.schedule/` |
 | 新增一個功能 | 需在 7 個層各加一個檔案 | 只需在 `features/{name}/` 加所需檔案 |
 | AI 開發上下文 | 需載入整個 layer 的所有檔案 | 只需載入 `features/{name}/` 的 1 個資料夾 |
 | 刪除一個功能 | 需從 7 個資料夾分別清除 | 只需刪除 `features/{name}/` |
@@ -431,33 +441,7 @@ import { GovernanceSidebar } from "@/features/schedule/_components/governance-si
 
 ---
 
-## 7. 遷移路徑（增量遷移）
-
-現有程式碼**不需要一次性遷移**。可按以下順序逐步進行：
-
-### 第一階段：建立 `features/` 骨架
-- 為每個功能切片建立目錄 + `GEMINI.md`
-- 此為目前已完成的部分 ✅
-
-### 第二階段：遷移 `shared/`（基礎設施重組）
-1. `domain-types/` → `shared/types/`
-2. `domain-rules/` → `shared/lib/`
-3. `firebase/` → `shared/infra/`
-4. `genkit-flows/` → `shared/ai/`
-5. `shared/` (現有) → `shared/ui/`
-- 更新 `tsconfig.json` 路徑別名（`@/shared/types`、`@/shared/infra` 等）
-- 更新 ESLint 引用規則
-
-### 第三階段：逐切片遷移（推薦順序）
-1. `auth` — 最獨立，依賴最少
-2. `user-settings` — 僅依賴 user 資料
-3. `account` — 組織管理
-4. `workspace` — 工作區外殼
-5. `schedule` — 複雜度最高，最後遷移
-
----
-
-## 8. ESLint 邊界規則（目標狀態）
+## 7. ESLint 邊界規則
 
 ```ts
 // eslint.config.mts — VSA 邊界規則
@@ -473,7 +457,7 @@ import { GovernanceSidebar } from "@/features/schedule/_components/governance-si
 
 ---
 
-## 9. 新增切片流程
+## 8. 新增切片流程
 
 當需要新增一個功能時，AI 的完整指引：
 

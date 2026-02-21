@@ -1,0 +1,112 @@
+"use client"
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/shadcn-ui/table"
+import { ShieldCheck, ShieldAlert, Users, AlertCircle } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
+import { useApp } from "@/features/workspace-core"
+import { useAccount } from "@/features/account"
+
+// DEPRECATED FOR WRITE: This permission matrix visualises mappings between internal teams and
+// workspaces. The WorkspaceMembersManagement component handles writes. This is read-only.
+export function PermissionMatrixView() {
+  const { state: appState } = useApp()
+  const { state: accountState } = useAccount()
+  const { accounts, activeAccount } = appState
+  const { workspaces } = accountState
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  const workspacesArray = useMemo(() => Object.values(workspaces), [workspaces])
+
+  const activeOrg = useMemo(() =>
+    activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null,
+    [accounts, activeAccount]
+  )
+
+  if (!mounted) return null
+
+  if (!activeOrg) {
+    return (
+      <div className="flex flex-col items-center gap-4 p-8 text-center">
+        <AlertCircle className="size-10 text-muted-foreground" />
+        <h3 className="font-bold">Governance Center Not Available</h3>
+        <p className="text-sm text-muted-foreground">
+          Permission matrix is only available within an organization dimension.
+        </p>
+      </div>
+    )
+  }
+
+  const teams = (activeOrg.teams || []).filter((t) => t.type === "internal")
+  const orgWorkspaces = workspacesArray.filter((w) => w.dimensionId === activeAccount?.id)
+
+  const hasAccess = (teamId: string, workspaceId: string) => {
+    const ws = workspaces[workspaceId]
+    return ws?.teamIds?.includes(teamId) || false
+  }
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6 duration-500 animate-in fade-in">
+      <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div className="space-y-1">
+          <h1 className="font-headline text-4xl font-bold tracking-tight">Permission Resonance Matrix</h1>
+          <p className="text-muted-foreground">
+            Visualize mappings between internal teams and logical workspaces. Access management is
+            handled within each workspace&apos;s governance panel.
+          </p>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/50 shadow-sm backdrop-blur-sm">
+        <Table>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[220px] p-6 text-[10px] font-bold uppercase tracking-widest">
+                Team / Workspace Node
+              </TableHead>
+              {orgWorkspaces.map((ws) => (
+                <TableHead key={ws.id} className="min-w-[120px] text-center">
+                  <span className="text-[10px] font-bold uppercase tracking-tight text-primary">{ws.name}</span>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {teams.map((team) => (
+              <TableRow key={team.id} className="group transition-colors hover:bg-muted/5">
+                <TableCell className="px-6 py-5 font-bold">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/5 p-2 text-primary">
+                      <Users className="size-4" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-headline text-sm">{team.name}</span>
+                      <span className="text-[9px] text-muted-foreground">
+                        {(team.memberIds || []).length} Members
+                      </span>
+                    </div>
+                  </div>
+                </TableCell>
+                {orgWorkspaces.map((ws) => {
+                  const access = hasAccess(team.id, ws.id)
+                  return (
+                    <TableCell key={ws.id} className="p-0 text-center">
+                      <div className="flex h-full min-h-[80px] items-center justify-center">
+                        {access ? (
+                          <ShieldCheck className="size-5 text-green-500" />
+                        ) : (
+                          <ShieldAlert className="size-5 text-muted-foreground opacity-10" />
+                        )}
+                      </div>
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+}

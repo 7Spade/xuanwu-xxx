@@ -6,8 +6,9 @@
 export const ROUTES = {
   LOGIN: "/login",
   DASHBOARD: "/dashboard",
-  WORKSPACES: "/dashboard/workspaces",
-  WORKSPACES_NEW: "/dashboard/workspaces/new",
+  WORKSPACES: "/workspaces",
+  WORKSPACES_NEW: "/workspaces/new",
+  WORKSPACE: (id: string) => `/workspaces/${id}` as const,
   ACCOUNT_NEW: "/dashboard/account/new",
   ACCOUNT_MEMBERS: "/dashboard/account/members",
   ACCOUNT_TEAMS: "/dashboard/account/teams",

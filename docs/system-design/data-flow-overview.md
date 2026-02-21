@@ -10,11 +10,11 @@
 
 | 情境 | 使用 | 位置 |
 |------|------|------|
-| 單一 domain 的使用者觸發寫入 | **Flow A** — command hook | `react-hooks/command-hooks/` |
-| 插件 A 完成後需觸發插件 B | **Flow B** — event bus | `use-cases/workspace/event-bus/` |
-| 單一動作需 ≥2 次 Firebase 寫入 | **Flow C** — use-case | `use-cases/{domain}/` |
-| 多元件共享的即時資料 | **Flow D** — provider listener | `react-providers/` |
-| 純業務規則驗證 | `domain-rules` 直接呼叫 | `domain-rules/{domain}/` |
+| 單一 domain 的使用者觸發寫入 | **Flow A** — command hook | `features/{name}/_hooks/` |
+| 插件 A 完成後需觸發插件 B | **Flow B** — event bus | `features/workspace-core/_components/` (WorkspaceEventBus) |
+| 單一動作需 ≥2 次 Firebase 寫入 | **Flow C** — use-case | `features/{name}/_use-cases.ts` |
+| 多元件共享的即時資料 | **Flow D** — provider listener | `features/{name}/_components/` (provider) |
+| 純業務規則驗證 | `shared/lib` 直接呼叫 | `shared/lib/{domain}.rules.ts` |
 
 ---
 
@@ -25,18 +25,18 @@
 ### 呼叫路徑
 
 ```
-1. view-modules / app component
+1. features/{name}/_components/ or app/ component
    └── 呼叫 command hook 函式（例如 toggleLike()）
 
-2. react-hooks/command-hooks/use-daily-commands.ts
+2. features/{name}/_hooks/use-daily-commands.ts
    ├── useCallback（穩定參照）
    ├── auth guard（無 activeAccount → 提早返回 + toast）
-   └── await server-commands/daily/toggleLike(logId, userId)
+   └── await features/workspace-business.daily/_actions.ts → toggleLike(logId, userId)
 
-3. server-commands/daily/daily.commands.ts
+3. features/workspace-business.daily/_actions.ts ("use server")
    └── await dailyRepository.toggleLike(logId, userId)
 
-4. firebase/firestore/repositories/daily.repository.ts
+4. shared/infra/firestore/repositories/daily.repository.ts
    └── firestore.write.adapter.updateDocument(...)
 
 5. Firestore（Google Cloud）
@@ -48,10 +48,10 @@
 
 | Hook | 檔案 | 主要動作 |
 |------|------|---------|
-| `useScheduleCommands` | `command-hooks/use-schedule-commands.ts` | approve / reject / assign / unassign |
-| `useWorkspaceCommands` | `command-hooks/use-workspace-commands.ts` | deleteWorkspace |
-| `useDailyCommands` | `command-hooks/use-daily-commands.ts` | toggleLike, addComment |
-| `useBookmarkCommands` | `command-hooks/use-bookmark-commands.ts` | toggleBookmark |
+| `useScheduleCommands` | `features/workspace-governance.schedule/_hooks/use-schedule-commands.ts` | approve / reject / assign / unassign |
+| `useWorkspaceCommands` | `features/workspace-core/_hooks/use-workspace-commands.ts` | deleteWorkspace |
+| `useDailyCommands` | `features/workspace-business.daily/_hooks/use-daily-commands.ts` | toggleLike, addComment |
+| `useBookmarkCommands` | `features/workspace-business.daily/_hooks/use-bookmark-commands.ts` | toggleBookmark |
 
 ---
 
@@ -71,11 +71,11 @@
 
 3. app/dashboard/workspaces/[id]/_event-handlers/workspace-event-handler.tsx
    └── subscribe("workspace:tasks:completed", async ({ task }) => {
-         await createScheduleItem(task)    // server-commands/schedule
-         await addToQAQueue(task)          // server-commands/qa
+         await createScheduleItem(task)    // features/{name}/_actions.ts → schedule
+         await addToQAQueue(task)          // features/{name}/_actions.ts → qa
        })
 
-4. server-commands/{target-domain}
+4. features/{name}/_actions.ts → {target-domain}
    └── 對應的 Firebase 寫入
 
 5. Firestore 更新
@@ -139,28 +139,28 @@ Issues Plugin ◄─────────────────────
 ### 呼叫路徑
 
 ```
-1. view-modules component（例如 CreateWorkspaceDialog）
+1. features/{name}/_components/ component（例如 CreateWorkspaceDialog）
    └── await createWorkspaceWithCapabilities(name, account, capabilities)
 
-2. use-cases/workspace/workspace.use-cases.ts
-   ├── await server-commands/workspace/createWorkspace(name, account)
+2. features/workspace-core/_use-cases.ts
+   ├── await features/workspace-core/_actions.ts → createWorkspace(name, account)
    │     → 寫入 workspaces/{id}（得到 workspaceId）
-   └── await server-commands/workspace/mountCapabilities(workspaceId, capabilities)
+   └── await features/workspace-core/_actions.ts → mountCapabilities(workspaceId, capabilities)
          → 寫入 workspaces/{id}/capabilities
 
-3. server-commands → firebase repositories → Firestore
+3. _actions.ts → shared/infra/firestore repositories → Firestore
 
-4. use-cases 回傳 workspaceId 給 UI
+4. _use-cases.ts 回傳 workspaceId 給 UI
    → router.push(`/dashboard/workspaces/${workspaceId}`)
 ```
 
 ### 現有 Use-Case 函式
 
-| 函式 | 模組 | 組合的 Commands |
+| 函式 | 模組 | 組合的 Actions |
 |------|------|----------------|
-| `completeRegistration(email, password, name)` | `use-cases/auth` | `registerUser` + `createUserProfile` |
-| `setupOrganizationWithTeam(orgName, owner, teamName, type)` | `use-cases/account` | `createOrganization` + `createTeam` |
-| `createWorkspaceWithCapabilities(name, account, caps)` | `use-cases/workspace` | `createWorkspace` + `mountCapabilities` |
+| `completeRegistration(email, password, name)` | `features/account.auth/_use-cases.ts` | `registerUser` + `createUserProfile` |
+| `setupOrganizationWithTeam(orgName, owner, teamName, type)` | `features/account/_use-cases.ts` | `createOrganization` + `createTeam` |
+| `createWorkspaceWithCapabilities(name, account, caps)` | `features/workspace-core/_use-cases.ts` | `createWorkspace` + `mountCapabilities` |
 
 ---
 
@@ -174,13 +174,13 @@ Issues Plugin ◄─────────────────────
 1. Firestore
    └── 文件發生變更（由 Flow A/B/C 觸發，或外部變更）
 
-2. react-providers/account-provider.tsx（或 workspace-provider.tsx）
+2. features/account/_components/account-provider.tsx（或 workspace-provider.tsx）
    └── onSnapshot callback 觸發
        dispatch({ type: 'SET_SCHEDULES', payload: newSchedules })
 
 3. AppContext / AccountContext / WorkspaceContext 狀態更新
 
-4. react-hooks/state-hooks/use-workspace-schedule.ts
+4. features/{name}/_hooks/use-workspace-schedule.ts
    └── useContext(WorkspaceContext)
        return { scheduleItems, isLoading }
 
@@ -220,7 +220,7 @@ Issues Plugin ◄─────────────────────
   │ Flow A
   ▼
 useScheduleCommands.approveScheduleItem(item)
-  → server-commands/schedule/approveScheduleItem(item)
+  → features/workspace-governance.schedule/_actions.ts → approveScheduleItem(item)
     → schedule.repository.update({ status: 'OFFICIAL' })
       → Firestore 文件更新
         │ Flow D（自動）
