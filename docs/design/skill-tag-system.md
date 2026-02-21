@@ -546,3 +546,276 @@ SkillMatchPanel (治理側邊欄中)
 | F-4 | Team XP 對個人的影響 | 完全獨立，不互換 | Team XP 可部分轉化個人 | **完全獨立**（防漏洞） |
 | F-5 | 管理員手動調整 | 允許 Owner 手動設置 tier（直接設定，不過 XP） | 完全由計算決定 | **允許手動**（行政彈性） |
 | F-6 | 技能標籤分類 | 自由字串（v1） | 預設枚舉類別 | **自由字串先行** |
+
+---
+
+## 11. XP 永久性問題 — 最優架構設計
+
+> **觸發點**：團隊（`Team`）和夥伴（外部 `Team`）隨時可以被用戶刪除，
+> 組織（`Account.accountType === 'organization'`）也可被 Owner 刪除。
+> 這些刪除事件會消滅 `Account.teams[]` 和 `Account.members[]` 中的所有 XP 記錄。
+> **我們該讓 XP 隨之流失，還是僅把 XP 系統擺放在個人用戶？**
+
+---
+
+### 11-A. 先把資料結構說清楚（從程式碼出發）
+
+```
+Firestore:
+  accounts/{userId}          ← Firebase Auth 錨定，PERMANENT
+    accountType: 'user'
+    name, email, photoURL…
+
+  accounts/{orgId}           ← Owner 可刪除，EPHEMERAL
+    accountType: 'organization'
+    members: MemberReference[]    ← 嵌入陣列，arrayRemove() 可刪除
+    teams: Team[]                 ← 嵌入陣列，包含 internal + external Teams
+```
+
+關鍵觀察：`MemberReference.id` **等於** `accounts/{userId}` 的文件 ID，
+也就是 Firebase Auth UID。因此每個成員都有一個永久的 Firestore 文件做錨點，
+只是目前 XP 並不存在那裡。
+
+---
+
+### 11-B. 三種方案的完整評估
+
+#### 方案一：接受流失（維持現狀）
+
+```
+個人 XP → accounts/{orgId}.members[].skillGrants  ← 隨 org/dismiss 消失
+團隊 XP → accounts/{orgId}.teams[].skillGrants     ← 隨 org/delete 消失
+```
+
+| 優點 | 缺點 |
+|------|------|
+| 實作最簡單，不改現有 schema | 用戶被踢出組織就失去所有技能記錄 |
+| XP 具備清晰的組織邊界 | 組織被刪除後無法重建歷史 |
+| — | 用戶無法「帶走」自己的技能聲譽 |
+
+**結論：不適合。** 技能是屬於人的，不是屬於組織的。讓組織刪除決定一個人的技能歸零，
+邏輯上說不通。
+
+---
+
+#### 方案二：完全移到個人帳戶（User-Only）
+
+```
+個人 XP → accounts/{userId}.skillGrants  ← PERMANENT
+團隊 XP → 廢除（不設）
+```
+
+| 優點 | 缺點 |
+|------|------|
+| 個人技能永久保留，跨組織可攜帶 | 無法為「作為一個整體的團隊」記錄表現 |
+| 符合直覺（技能屬於人） | 排班匹配時必須每次查詢多個用戶 profile |
+| 刪除組織/踢出成員不影響技能 | SkillTag 是 org-local 的，跨 org 的 tagId 無意義 |
+
+**問題**：`SkillTag.id` 是 org-local 的 UUID，若把 XP 存在用戶帳戶，
+跨組織後 `tagId` 就變成孤兒引用。
+
+**解法**：以 `tagSlug`（如 `"electrical-work"`）作為跨組織的可攜帶識別符，
+同時在授予時快照 `tagName`，讓記錄即使在 org 被刪後仍自我完備。
+
+---
+
+#### 方案三（推薦）：用戶錨定 + 組織快照 + 團隊信譽分離
+
+這是最優設計，核心洞察是：**技能熟練度是個人資產，而團隊信譽是組織上下文的產物**。
+
+```
+accounts/{userId}          ← 永久個人技能檔案
+  skillGrants: [
+    {
+      tagSlug: "electrical-work",   ← 可攜帶識別符（不用 orgId-bound tagId）
+      tagName: "Electrical Work",   ← 快照，防標籤被刪後失去顯示名稱
+      tier: "expert",
+      xp: 180,
+      earnedInOrgId: "org-abc"      ← 歸因審計用（選填）
+    }
+  ]
+
+accounts/{orgId}.teams[]   ← 團隊信譽（intentionally ephemeral）
+  skillGrants: [
+    { tagId: "...", tagSlug: "electrical-work", tier: "expert", xp: 90 }
+  ]
+
+accounts/{orgId}.members[] ← 僅作顯示快取（display cache）
+  skillGrants → 從 accounts/{userId}.skillGrants 讀取後快取
+```
+
+---
+
+### 11-C. 為什麼「讓團隊 XP 流失」是正確的？
+
+這是整個設計最反直覺也最重要的結論，請仔細聽：
+
+#### 哲學層面
+
+一個「團隊」的本質是「在特定組織脈絡下被創建的協作單位」。
+Alpha Crew 在 Org ABC 完成了 5 個排班 → 這份信譽是「Alpha Crew 對 Org ABC 的貢獻」，
+而不是 Alpha Crew 在宇宙中的永恆屬性。
+
+當 Org ABC 被刪除時，Alpha Crew 這個實體本身就消失了。
+**沒有自然的「用戶」可以繼承團隊 XP** — 因為 5 個成員各自的貢獻份額不同，
+沒有辦法公平分配。
+
+#### 現實層面
+
+Alpha Crew 的 5 個成員在每次任務中各自有 `task.assigneeId` 指向他們，
+所以他們的**個人 XP** 已經在任務驗收時被記錄到各自的 `accounts/{userId}` 上了。
+團隊 XP 只是對「這個團隊整體可信度」的額外度量，不是個人能力的替代品。
+
+**因此：個人 XP 在用戶帳戶上是完整的；團隊 XP 的流失不是資料損失，
+而是符合業務語意的生命週期結束。**
+
+---
+
+### 11-D. 修訂後的最優 Firestore 結構
+
+```
+────────────────────────────────────────────────────────
+PERMANENT (不受 org 刪除影響)
+────────────────────────────────────────────────────────
+
+accounts/{userId}
+  accountType: 'user'
+  skillGrants: SkillGrant[]   ← 個人技能檔案，永久保留
+
+  SkillGrant {
+    tagSlug: string           ← 跨 org 可攜帶識別符（取代 tagId）
+    tagName: string           ← 快照（防標籤被刪後失去名稱）
+    tier: SkillTier           ← 目前等級
+    xp: number                ← 累積 XP
+    earnedInOrgId?: string    ← 歸因審計（選填，可選擇不存）
+  }
+
+────────────────────────────────────────────────────────
+EPHEMERAL (org 刪除後消失 — 設計如此)
+────────────────────────────────────────────────────────
+
+accounts/{orgId}
+  skillTags: SkillTag[]
+    SkillTag {
+      id: string       ← org-local UUID
+      slug: string     ← 可攜帶識別符（授予 XP 時用 slug 而非 id）
+      name: string
+      category?: string
+    }
+
+  members: MemberReference[]
+    MemberReference {
+      id: string       ← 等於 accounts/{userId} 的 UID
+      skillGrants: SkillGrant[]  ← 顯示快取（可選）
+                                    當渲染 org member 列表時
+                                    從 accounts/{uid}.skillGrants 填入
+    }
+
+  teams: Team[]
+    Team {
+      skillGrants: SkillGrant[]  ← 團隊信譽（intentionally ephemeral）
+    }
+```
+
+---
+
+### 11-E. SkillTag 跨組織兼容性問題
+
+目前 `SkillGrant.tagId` 引用的是 org-local 的 UUID。
+當 XP 被儲存到用戶永久帳戶時，這個 ID 的引用在 org 消失後失效。
+
+**解法：授予時快照 `tagSlug` + `tagName`**
+
+```
+授予 XP 的流程：
+  1. 從 org.skillTags 找到 tag: { id, slug, name }
+  2. 將 XP 寫入 accounts/{userId}.skillGrants:
+     { tagSlug: tag.slug, tagName: tag.name, tier, xp, earnedInOrgId: orgId }
+  3. XP 記錄現在自我完備，不依賴 org 存在
+```
+
+```
+讀取個人技能的流程（跨 org）：
+  → 直接讀 accounts/{userId}.skillGrants
+  → 以 tagSlug 作為分組鍵（"electrical-work" = 同類技能）
+  → tagName 用於 UI 顯示
+```
+
+```
+排班匹配的流程：
+  scheduleItem.requiredSkills[].tagSlug = "electrical-work"
+    →  For each candidate member:
+         read accounts/{uid}.skillGrants where tagSlug === req.tagSlug
+         check: tierSatisfies(grant.tier, req.minimumTier)
+    → For each candidate team:
+         read org.teams[id].skillGrants where tagSlug === req.tagSlug
+         check: tierSatisfies(grant.tier, req.minimumTier)
+```
+
+---
+
+### 11-F. 修訂後的 SkillGrant 型別
+
+目前的型別（`src/domain-types/skill/skill.types.ts`）：
+```typescript
+export interface SkillGrant {
+  tagId: string;   ← org-local，跨 org 會成為孤兒引用
+  tier: SkillTier;
+  xp: number;
+}
+```
+
+**建議修訂**（讓用戶個人帳戶上的授予記錄可自我完備）：
+```typescript
+export interface SkillGrant {
+  tagId?: string;          // org-local UUID（org-scoped 場景，選填）
+  tagSlug: string;         // 跨 org 可攜帶識別符（必填）
+  tagName?: string;        // 快照顯示名稱（user 帳戶上的授予必填）
+  tier: SkillTier;
+  xp: number;
+  earnedInOrgId?: string;  // 歸因審計（選填）
+}
+```
+
+`tagId` 改為選填，`tagSlug` 升為必填。這個修改向下相容（現有有 `tagId` 的記錄仍有效）。
+
+---
+
+### 11-G. 最終結論與設計決策
+
+| 問題 | 最優答案 | 理由 |
+|------|---------|------|
+| 個人 XP 放哪裡？ | `accounts/{userId}.skillGrants` — **用戶自己的帳戶** | 技能屬於人，不屬於組織；跨 org 可攜帶 |
+| 組織/成員刪除時個人 XP 流失嗎？ | **不流失** | XP 在用戶帳戶上，不在 org 嵌入陣列裡 |
+| 團隊 XP 流失嗎？ | **流失，設計如此** | 無自然繼承人；個人 XP 已完整記錄個別貢獻 |
+| `MemberReference.skillGrants` 的角色 | **顯示快取** | 讀取時從 `accounts/{uid}` 填入，不是 XP 的來源 |
+| SkillTag 跨 org 兼容 | 使用 `tagSlug` 而非 `tagId` | slug 是語意可讀的跨 org 標識 |
+| 需要型別修改嗎？ | `SkillGrant` 加入 `tagSlug` + `tagName?` + `earnedInOrgId?` | `tagId` 降為選填 |
+
+#### 一句話設計原則
+
+> 「讓 XP 跟著**人**走，而不是跟著**組織的成員資格**走。
+> 團隊和夥伴是組織上下文的產物，其信譽的消失是有意為之的生命週期，
+> 不是需要修補的資料漏洞。」
+
+---
+
+### 11-H. 對現有 `§10-B 雙帳本架構` 的修訂
+
+§10-B 中的「個人帳本」需要做以下調整：
+
+```
+原設計（§10-B）：
+  個人 XP 位置：MemberReference.skillGrants[].xp  ← 在 org 文件內
+  問題：隨 org 刪除或成員被踢出而流失
+
+修訂設計（§11）：
+  個人 XP 位置：accounts/{userId}.skillGrants[].xp  ← 在用戶自己的文件
+  MemberReference.skillGrants  → 顯示快取（唯讀投影，非來源）
+
+雙帳本架構不變，只是個人帳本的儲存位置改了：
+  帳本 1（個人）：accounts/{userId}.skillGrants  — PERMANENT
+  帳本 2（團隊信譽）：Team.skillGrants           — EPHEMERAL（設計如此）
+```
+
+§10-B 其餘的防漏洞設計（對數縮放、雙重把關、無廣播等）全部保留。
