@@ -65,14 +65,15 @@ src/
 │   │   ├── login/page.tsx            ← import { LoginView } from "@/features/auth"
 │   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/auth"
 │   │   └── layout.tsx
-│   └── (shell)/                      ← 全域 UI 容器層（外殼層）
-│       ├── layout.tsx                ← Auth Guard + SidebarProvider（@sidebar + @modal 插槽）
-│       ├── @sidebar/default.tsx      ← import { DashboardSidebar } from "@/features/workspace-core/
+│   └── (shell)/                      ← 全域 UI 容器層（外殼層，純視覺結構）
+│       ├── layout.tsx                ← SidebarProvider（提供 @sidebar + @modal 插槽）
+│       ├── @sidebar/default.tsx      ← import { DashboardSidebar } from "@/features/workspace-core"
 │       ├── @modal/default.tsx        ← 全域覆蓋層（預設 null）
 │       ├── page.tsx                  ← 根入口（redirect）
-│       └── dashboard/                ← 認證後業務路由
-│           ├── layout.tsx                ← AccountProvider + SidebarInset + @header + @modal
-│           ├── page.tsx                  ← import { DashboardView } from "@/features/workspace-core/
+│       └── (dashboard)/              ← 路由群組：認證後業務路由（繼承 shell 佈局）
+│           └── dashboard/            ← 認證後業務路由
+│               ├── layout.tsx            ← Auth Guard + AccountProvider + SidebarInset + @header + @modal
+│               ├── page.tsx              ← import { DashboardView } from "@/features/workspace-core"
 │           ├── account/
 │           │   ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/workspace-governance.schedule"
 │           │   ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-business.members"

@@ -53,14 +53,15 @@ app/
 │   ├── login/page.tsx                ← /login
 │   └── reset-password/page.tsx       ← /reset-password（canonical）
 │
-└── (shell)/                          ← 全域 UI 容器層（外殼層）
-    ├── layout.tsx                    ← Auth Guard + SidebarProvider（不承載業務）
+└── (shell)/                          ← 全域 UI 容器層（外殼層，純視覺結構）
+    ├── layout.tsx                    ← SidebarProvider（提供 @sidebar + @modal 插槽，不承載業務）
     ├── @sidebar/default.tsx          ← DashboardSidebar（全域側欄 slot）
     ├── @modal/default.tsx            ← 全域覆蓋層 slot（預設 null）
     ├── page.tsx                      ← / 根入口（redirect）
-    └── dashboard/
-        ├── layout.tsx                ← AccountProvider + SidebarInset + @header + @modal
-        ├── page.tsx                  ← /dashboard（redirect）
+    └── (dashboard)/                  ← 路由群組：認證後業務路由（繼承 shell 佈局）
+        └── dashboard/
+            ├── layout.tsx                ← Auth Guard + AccountProvider + SidebarInset + @header + @modal
+            ├── page.tsx                  ← /dashboard（redirect）
         ├── @header/default.tsx
         ├── @modal/
         │   ├── (.)account/new/page.tsx
@@ -127,20 +128,21 @@ features/{name}/
 |------|---------|
 | `auth` | 登入、註冊、重設密碼 |
 | `account` | 組織 CRUD、統計、權限矩陣 |
-| `workspace` | 工作區 CRUD、設定、導航、外殼（Sidebar/Header） |
-| `members` | 成員管理（帳號層 + 工作區層） |
-| `teams` | 團隊管理 |
-| `partners` | 協力廠商管理 |
-| `schedule` | 排班、提案、治理審核 |
-| `daily` | 工作日誌、留言、書籤、按讚 |
-| `tasks` | 任務樹、CRUD |
-| `audit` | 稽核事件追蹤 |
-| `files` | 檔案上傳、管理 |
-| `issues` | 議題追蹤 |
-| `finance` | 財務插件 |
-| `qa` | QA 插件 |
-| `document-parser` | AI 文件解析 |
-| `acceptance` | 驗收插件 |
+| `workspace-core` | 工作區 CRUD、設定、導航、外殼（Sidebar/Header） |
+| `workspace-core.event-bus` | 跨切片事件匯流排（Observer 引擎、Context、Hooks） |
+| `workspace-business.members` | 成員管理（帳號層 + 工作區層） |
+| `workspace-business.teams` | 團隊管理 |
+| `workspace-business.partners` | 協力廠商管理 |
+| `workspace-governance.schedule` | 排班、提案、治理審核 |
+| `workspace-business.daily` | 工作日誌、留言、書籤、按讚 |
+| `workspace-business.tasks` | 任務樹、CRUD |
+| `workspace-business.audit` | 稽核事件追蹤 |
+| `workspace-business.files` | 檔案上傳、管理 |
+| `workspace-business.issues` | 議題追蹤 |
+| `workspace-business.finance` | 財務插件 |
+| `workspace-business.qa` | QA 插件 |
+| `workspace-business.document-parser` | AI 文件解析 |
+| `workspace-business.acceptance` | 驗收插件 |
 | `user-settings` | 使用者個人資料、偏好、安全 |
 
 ---

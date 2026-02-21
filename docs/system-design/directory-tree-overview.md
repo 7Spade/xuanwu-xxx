@@ -140,19 +140,20 @@ src/
     │   ├── login/page.tsx        ← 登入/註冊頁（LoginView）
     │   └── reset-password/page.tsx ← 重設密碼全頁（canonical）
     │
-    └── (shell)/                  ← 路由群組：全域 UI 容器層（外殼層）
-        ├── layout.tsx            ← Auth Guard + SidebarProvider（不承載業務）
+    └── (shell)/                  ← 路由群組：全域 UI 容器層（外殼層，不承載業務）
+        ├── layout.tsx            ← SidebarProvider（提供 @sidebar + @modal 插槽）
         ├── @sidebar/             ← Parallel Route slot — DashboardSidebar
         │   └── default.tsx
         ├── @modal/               ← Parallel Route slot — 全域覆蓋層（預設 null）
         │   └── default.tsx
         ├── page.tsx              ← 根頁 / → 重定向至 /login 或 /dashboard
         │
-        └── dashboard/            ← 認證後業務路由（/dashboard/**）
-            ├── layout.tsx        ← AccountProvider + SidebarInset + @header + @modal
-            ├── page.tsx          ← 重定向至 /workspaces
-            ├── @header/default.tsx   ← Header（SidebarTrigger + Breadcrumb）
-            ├── @modal/
+        └── (dashboard)/          ← 路由群組：認證後業務路由（繼承 shell 佈局）
+            └── dashboard/        ← 認證後業務路由（/dashboard/**）
+                ├── layout.tsx        ← Auth Guard + AccountProvider + SidebarInset + @header + @modal
+                ├── page.tsx          ← 重定向至 /workspaces
+                ├── @header/default.tsx   ← Header（SidebarTrigger + Breadcrumb）
+                ├── @modal/
             │   ├── (.)account/new/page.tsx ← 新建帳號 Dialog
             │   └── default.tsx
             │

@@ -62,11 +62,14 @@ import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_
 
 ```
 src/app/
-├── (public)/      ← 公開路由（未登入可存取：/login、/reset-password）
-├── (shell)/       ← 全域 UI 容器層（外殼層）：Auth Guard + SidebarProvider + @sidebar + @modal
-│   └── dashboard/ ← 認證後業務路由（/dashboard/**）
-└── layout.tsx     ← 根 layout（providers，必須在根層）
+├── (public)/          ← 公開路由（未登入可存取：/login、/reset-password）
+├── (shell)/           ← 全域 UI 容器層（純視覺結構：SidebarProvider + @sidebar + @modal）
+│   └── (dashboard)/   ← 認證後業務路由群組（繼承 shell 佈局，Auth Guard + AccountProvider）
+│       └── dashboard/ ← /dashboard/** 實際 URL 段
+└── layout.tsx         ← 根 layout（providers，必須在根層）
 ```
+
+`(shell)` 與 `(dashboard)` 皆為路由群組（對 URL 透明）。`(dashboard)` 嵌套在 `(shell)` 內，自動繼承 shell 佈局（SidebarProvider），再疊加自身的 Auth Guard + AccountProvider。
 
 路由群組（`(name)`）對 URL 透明，不影響路徑結構。
 
@@ -163,7 +166,7 @@ app/(shell)/layout.tsx
 ### Dashboard 頂層
 
 ```
-app/(shell)/dashboard/layout.tsx
+app/(shell)/(dashboard)/dashboard/layout.tsx
   ├── @header/default.tsx    → Header（SidebarTrigger + Breadcrumb）
   └── @modal/                → Dialog overlays（路由攔截）
 ```
@@ -171,7 +174,7 @@ app/(shell)/dashboard/layout.tsx
 ### Workspace 詳情頁
 
 ```
-app/(shell)/dashboard/workspaces/[id]/layout.tsx
+app/(shell)/(dashboard)/dashboard/workspaces/[id]/layout.tsx
   ├── @plugin-tab/     → 工作區功能插件
   ├── @modal/          → 攔截路由 Dialog
   └── @panel/          → 右側面板攔截
