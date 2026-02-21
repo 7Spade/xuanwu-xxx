@@ -483,20 +483,23 @@ view-modules/
 │       │   └── qa-plugin.tsx             ← QA 插件（驗證佇列 + 通過/拒絕）
 │       ├── tasks/
 │       │   └── tasks-plugin.tsx          ← 任務管理插件（樹狀 + 進度 + 批次匯入）
-│       └── schedule/
-│           ├── schedule.account-view.tsx  ← 帳號視角（治理審核 + 全域日曆）
-│           ├── schedule.workspace-view.tsx← 工作區視角（提案 + 工作區日曆）
-│           └── _plugin-components/
-│               ├── decision-history-columns.tsx  ← 審核歷史表格欄位定義
-│               ├── governance-sidebar.tsx         ← 治理側欄（待審清單 + 批准/拒絕）
-│               ├── proposal-dialog.tsx            ← 排程提案 Dialog（工作區視角用）
-│               ├── schedule-data-table.tsx        ← 排程資料表格
-│               ├── schedule-proposal-content.tsx  ← 排程提案共用邏輯元件（Dialog + 全頁共用）
-│               ├── unified-calendar-grid.tsx      ← 統一日曆格狀視圖
-│               └── upcoming-events-columns.tsx    ← 即將到來事件表格欄位定義
+│       └── (schedule 已提升為頂層 view-modules，見 src/view-modules/schedule/)
 │
 ├── account/
 │   └── permission-matrix-view.tsx  ← 權限矩陣頁（角色 × 能力 交叉表）
+│
+├── schedule/                        ← 一核兩視圖：跨 account + workspace 的排程模組
+│   ├── index.ts                     ← 統一出口（AccountScheduleSection, WorkspaceSchedule, GovernanceSidebar, ScheduleProposalContent）
+│   ├── schedule.account-view.tsx    ← Account 視角：全域日曆 + 治理審核 + 人力指派
+│   ├── schedule.workspace-view.tsx  ← Workspace 視角：工作區日曆 + 提案入口
+│   └── _components/                 ← 兩視角共用的排程子元件（私有）
+│       ├── decision-history-columns.tsx  ← 審核歷史表格欄位定義
+│       ├── governance-sidebar.tsx         ← 治理側欄（待審清單 + 批准/拒絕）
+│       ├── proposal-dialog.tsx            ← 排程提案 Dialog
+│       ├── schedule-data-table.tsx        ← 排程資料表格（TanStack Table）
+│       ├── schedule-proposal-content.tsx  ← 排程提案共用邏輯（Dialog + 全頁共用）
+│       ├── unified-calendar-grid.tsx      ← 統一日曆格狀視圖（workspace / organization 兩模式）
+│       └── upcoming-events-columns.tsx    ← 即將到來事件表格欄位定義
 │
 ├── members/
 │   └── members-view.tsx            ← 組織成員管理頁

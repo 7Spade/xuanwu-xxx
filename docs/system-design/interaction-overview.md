@@ -70,7 +70,7 @@ src/app/dashboard/layout.tsx   ← 含 auth guard（若未登入 → /login）
 
 ```
 app/dashboard/account/schedule/page.tsx
-  → import { AccountScheduleSection } from '@/view-modules/workspaces/plugins/schedule'
+  → import { AccountScheduleSection } from '@/view-modules/schedule'
   → return <AccountScheduleSection />
 ```
 

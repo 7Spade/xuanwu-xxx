@@ -309,18 +309,20 @@ view-modules/
 │       ├── members/             ← 成員管理插件
 │       ├── plugin-settings/     ← 能力設定插件
 │       ├── qa/                  ← QA 品質把關插件
-│       ├── tasks/               ← 任務管理插件
-│       └── schedule/            ← 排程插件
-│           ├── schedule.workspace-view.tsx  ← 工作區視角（提案 + 日曆）
-│           ├── schedule.account-view.tsx    ← 帳號視角（治理 + 全域日曆）
-│           └── _plugin-components/          ← 排程共用子元件
-│               ├── unified-calendar-grid.tsx
-│               ├── governance-sidebar.tsx
-│               ├── proposal-dialog.tsx
-│               ├── schedule-proposal-content.tsx ← 排程提案共用邏輯元件
-│               ├── schedule-data-table.tsx
-│               ├── decision-history-columns.tsx
-│               └── upcoming-events-columns.tsx
+│       └── tasks/               ← 任務管理插件
+│       (schedule 已提升為頂層模組，見下方 schedule/)
+├── schedule/                    ← 一核兩視圖頂層模組（跨 account + workspace）
+│   ├── index.ts                 ← 統一出口
+│   ├── schedule.account-view.tsx   ← Account 視角（全域日曆 + 治理審核 + 人力指派）
+│   ├── schedule.workspace-view.tsx ← Workspace 視角（工作區日曆 + 排程提案入口）
+│   └── _components/             ← 兩視角共用的私有子元件
+│       ├── unified-calendar-grid.tsx
+│       ├── governance-sidebar.tsx
+│       ├── proposal-dialog.tsx
+│       ├── schedule-proposal-content.tsx ← 排程提案共用邏輯元件
+│       ├── schedule-data-table.tsx
+│       ├── decision-history-columns.tsx
+│       └── upcoming-events-columns.tsx
 ├── user-settings/
 │   ├── user-settings.tsx        ← 使用者設定主頁
 │   └── profile-card.tsx         ← 個人資料卡
@@ -497,5 +499,5 @@ shared/
 | Command Hooks | `use-{domain}-commands.ts` | `use-schedule-commands.ts` |
 | View (workspace) | `{plugin}.workspace-view.tsx` | `schedule.workspace-view.tsx` |
 | View (account) | `{plugin}.account-view.tsx` | `schedule.account-view.tsx` |
-| Plugin sub-components | `_plugin-components/*.tsx` | `_plugin-components/governance-sidebar.tsx` |
+| Plugin sub-components | `_components/*.tsx` | `schedule/_components/governance-sidebar.tsx` |
 | Barrel | `index.ts` | `export * from './{name}'` |

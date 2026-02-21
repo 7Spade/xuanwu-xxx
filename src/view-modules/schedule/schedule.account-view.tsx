@@ -11,12 +11,12 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, UserPlus, Calendar, ListChecks, History } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import type { ScheduleItem } from "@/domain-types/domain";
-import { UnifiedCalendarGrid } from "./_plugin-components/unified-calendar-grid";
-import { ScheduleDataTable } from "./_plugin-components/schedule-data-table";
-import { GovernanceSidebar } from "./_plugin-components/governance-sidebar";
+import { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
+import { ScheduleDataTable } from "./_components/schedule-data-table";
+import { GovernanceSidebar } from "./_components/governance-sidebar";
 import { useGlobalSchedule } from "@/react-hooks/state-hooks/use-global-schedule";
-import { decisionHistoryColumns } from "./_plugin-components/decision-history-columns";
-import { upcomingEventsColumns } from "./_plugin-components/upcoming-events-columns";
+import { decisionHistoryColumns } from "./_components/decision-history-columns";
+import { upcomingEventsColumns } from "./_components/upcoming-events-columns";
 import { addMonths, subMonths } from "date-fns";
 import {
   DropdownMenu,

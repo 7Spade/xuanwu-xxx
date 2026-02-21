@@ -237,7 +237,7 @@ app/dashboard/workspaces/[id]/layout.tsx
 **攔截路由原則：**
 - 攔截路由提供 Modal/Sheet 體驗（URL 改變但不換頁）
 - 規範路由（canonical route）同時存在，支援直接 URL 存取
-- 共享邏輯萃取至 `_plugin-components/` 中的共用元件
+- 共享邏輯萃取至 `_components/` 中的共用元件
 
 ---
 

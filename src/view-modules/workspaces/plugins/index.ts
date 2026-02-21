@@ -19,8 +19,8 @@ export { WorkspaceIssues } from './issues/issues-plugin';
 export { WorkspaceMembers } from './members/members-plugin';
 export { WorkspaceQA } from './qa/qa-plugin';
 export { WorkspaceTasks } from './tasks/tasks-plugin';
-export { WorkspaceSchedule } from './schedule/schedule.workspace-view';
 export { WorkspaceDocumentParser } from './document-parser/document-parser-plugin';
-export { AccountScheduleSection } from './schedule/schedule.account-view';
+// Schedule is a top-level view-module (cross-cutting: account + workspace); forward from its barrel.
+export { WorkspaceSchedule, AccountScheduleSection } from '@/view-modules/schedule';
 export { AccountAuditComponent } from './audit/audit.account-view';
 export { AccountDailyComponent } from './daily/daily.account-view';
