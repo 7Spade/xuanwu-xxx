@@ -7,7 +7,7 @@ import { Input } from "@/shared/shadcn-ui/input";
 import { Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management";
+import { useAccountManagement } from "@/features/account";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 
 interface AccountNewFormProps {

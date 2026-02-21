@@ -13,7 +13,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
+import { useAccount } from "@/features/account";
 import { DailyLog } from "@/shared/types";
 
 export function useAggregatedLogs() {

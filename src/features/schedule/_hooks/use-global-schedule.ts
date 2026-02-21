@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useAccount } from "@/features/account";
+import { useApp } from "@/features/workspace";
 import { subDays, isFuture, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 
 /**

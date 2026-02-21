@@ -3,10 +3,10 @@
 
 import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { Workspace, AuditLog, WorkspaceTask, WorkspaceRole, Capability, WorkspaceLifecycleState, ScheduleItem, Location } from '@/shared/types';
-import { useLogger } from '@/react-hooks/service-hooks/use-logger';
-import { WorkspaceEventBus } from '@/use-cases/workspace/event-bus/workspace-event-bus';
+import { useLogger } from '@/features/audit/_hooks/use-logger';
+import { WorkspaceEventBus } from '@/features/workspace/_components/workspace-event-bus';
 import { Firestore } from 'firebase/firestore';
-import { useApp } from '@/react-hooks/state-hooks/use-app';
+import { useApp } from '@/features/workspace/_hooks/use-app';
 import { useAccount } from '@/features/account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { Loader2 } from 'lucide-react';
@@ -29,7 +29,7 @@ import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
 } from '@/features/issues'
-import { WorkspaceEventContext } from "@/react-providers/workspace-event-context"
+import { WorkspaceEventContext } from "@/features/workspace/_components/workspace-event-context"
 import {
   createScheduleItem as createScheduleItemAction,
 } from '@/features/schedule'

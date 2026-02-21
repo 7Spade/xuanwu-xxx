@@ -3,7 +3,7 @@
  * No React. No UI. Callable from hooks, context, or Server Actions.
  */
 
-import { createWorkspace, mountCapabilities } from "@/server-commands/workspace"
+import { createWorkspace, mountCapabilities } from "@/features/workspace/_actions"
 import type { Account, Capability } from "@/shared/types"
 
 /**

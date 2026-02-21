@@ -9,7 +9,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import {
     assignMember as assignMemberAction,

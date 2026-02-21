@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import { useSelectedLayoutSegment } from "next/navigation"
 import Link from "next/link"
 import { useWorkspace } from "@/features/workspace"
-import { useApp } from "@/react-hooks/state-hooks/use-app"
+import { useApp } from "@/features/workspace"
 import type { Capability } from "@/shared/types"
 
 // =================================================================

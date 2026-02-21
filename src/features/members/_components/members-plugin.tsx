@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/shared/shadcn-ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/shadcn-ui/dropdown-menu";
 import { cn } from "@/shared/utils/utils";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>

@@ -51,3 +51,11 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
 export async function signOut(): Promise<void> {
   await authAdapter.signOut()
 }
+
+// --- Registration Use Case ---
+import { createUserAccount } from '@/features/user-settings/_actions'
+
+export async function completeRegistration(email: string, password: string, name: string): Promise<void> {
+  const uid = await registerUser(email, password, name)
+  await createUserAccount(uid, name, email)
+}

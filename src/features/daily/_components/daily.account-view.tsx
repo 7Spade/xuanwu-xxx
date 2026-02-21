@@ -12,7 +12,7 @@
 "use client";
 
 import { useState } from "react";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { AlertCircle, MessageSquare } from "lucide-react";
 import { DailyLogCard } from "./daily-log-card";

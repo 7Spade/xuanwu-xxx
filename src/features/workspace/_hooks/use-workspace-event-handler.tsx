@@ -2,13 +2,13 @@
 "use client";
 import { useEffect } from "react";
 import { useWorkspace } from "@/features/workspace";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";
-import { createIssue } from "@/server-commands/issue";
-import { createScheduleItem } from "@/server-commands/schedule";
-import { batchImportTasks } from "@/server-commands/task";
+import { createIssue } from "@/features/issues";
+import { createScheduleItem } from "@/features/schedule";
+import { batchImportTasks } from "@/features/tasks";
 
 type DocParserPayload = {
   sourceDocument: string;

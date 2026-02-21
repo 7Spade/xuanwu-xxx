@@ -6,7 +6,7 @@ import { createContext, useContext } from "react"
 import type {
   PublishFn,
   SubscribeFn,
-} from "@/use-cases/workspace/event-bus/workspace-events"
+} from "@/features/workspace/_components/workspace-events"
 
 export interface WorkspaceEventContextType {
   publish: PublishFn

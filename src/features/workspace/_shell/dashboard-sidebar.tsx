@@ -37,10 +37,10 @@ import {
 // ============================================================================
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
-import { useUser } from "@/react-hooks/state-hooks/use-user";
-import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces";
-import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management";
+import { useApp } from "@/features/workspace";
+import { useUser } from "@/features/user-settings";
+import { useVisibleWorkspaces } from "@/features/workspace";
+import { useAccountManagement } from "@/features/account";
 
 // ============================================================================
 // Sidebar Sub-components

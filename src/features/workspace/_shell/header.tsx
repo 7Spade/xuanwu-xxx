@@ -17,7 +17,7 @@ import {
 import { Search, Command } from "lucide-react";
 import { NotificationCenter } from "./notification-center";
 import { GlobalSearch } from "./global-search";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import type { Account } from '@/shared/types'
 import { useVisibleWorkspaces } from '../_hooks/use-visible-workspaces';
 import Link from 'next/link';

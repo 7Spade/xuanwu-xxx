@@ -2,7 +2,7 @@
 "use client"
 
 import { useMemo } from 'react'
-import { useApp } from '@/react-hooks/state-hooks/use-app'
+import { useApp } from '@/features/workspace'
 import { useAuth } from '@/shared/app-providers/auth-provider'
 import { useAccount } from '@/features/account'
 import { filterVisibleWorkspaces } from '@/shared/lib'

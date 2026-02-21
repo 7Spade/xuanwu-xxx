@@ -27,9 +27,9 @@ import {
 import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
-import { useApp } from "@/react-hooks/state-hooks/use-app"
-import { useAccount } from "@/react-hooks/state-hooks/use-account"
-import { useAccountManagement } from "@/react-hooks/state-hooks/use-account-management"
+import { useApp } from "@/features/workspace"
+import { useAccount } from "@/features/account"
+import { useAccountManagement } from "@/features/account"
 import type { Team } from "@/shared/types"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 

@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { useApp } from '@/react-hooks/state-hooks/use-app';
+import { useApp } from '@/features/workspace';
 import {
   uploadDailyPhoto as uploadDailyPhotoAction,
   uploadTaskAttachment as uploadTaskAttachmentAction,

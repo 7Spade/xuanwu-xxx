@@ -13,7 +13,7 @@
 
 import { useState, useMemo } from "react";
 import { useWorkspace } from "@/features/workspace";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
+import { useAccount } from "@/features/account";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useLogger } from "@/react-hooks/service-hooks/use-logger";
 import { toast } from "@/shared/utility-hooks/use-toast";

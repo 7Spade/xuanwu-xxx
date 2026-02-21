@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from "react";
 import { Terminal } from "lucide-react";
-import { useVisibleWorkspaces } from "@/react-hooks/state-hooks/use-visible-workspaces";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useVisibleWorkspaces } from "@/features/workspace";
+import { useApp } from "@/features/workspace";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useWorkspaceFilters } from "@/react-hooks/state-hooks/use-workspace-filters";
 import { WorkspaceListHeader } from "./workspace-list-header";

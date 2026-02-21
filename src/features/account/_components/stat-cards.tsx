@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
+import { useAccount } from "@/features/account";
 import { useApp } from "@/react-hooks/state-hooks/use-app";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
 import { Progress } from "@/shared/shadcn-ui/progress";

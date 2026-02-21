@@ -13,8 +13,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
-import { useAccount } from "@/react-hooks/state-hooks/use-account";
+import { useApp } from "@/features/workspace";
+import { useAccount } from "@/features/account";
 import { AuditLog } from "@/shared/types";
 
 export function useAccountAudit() {

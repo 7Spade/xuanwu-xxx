@@ -7,7 +7,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/shared/shadcn-ui
 import { Mail } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { sendPasswordResetEmail } from "@/server-commands/auth";
+import { sendPasswordResetEmail } from "@/features/auth/_actions";
 
 interface ResetPasswordFormProps {
   defaultEmail?: string;

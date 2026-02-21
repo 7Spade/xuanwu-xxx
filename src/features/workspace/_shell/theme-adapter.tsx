@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useApp } from "@/react-hooks/state-hooks/use-app";
+import { useApp } from "@/features/workspace";
 import { hexToHsl } from "@/shared/utils/utils";
 import { Skeleton } from "@/shared/shadcn-ui/skeleton";
 
