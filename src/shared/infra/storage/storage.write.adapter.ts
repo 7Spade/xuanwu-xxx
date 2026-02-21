@@ -8,8 +8,8 @@ import {
   ref,
   uploadBytes,
   deleteObject,
-  UploadResult,
-  UploadMetadata,
+  type UploadResult,
+  type UploadMetadata,
 } from 'firebase/storage';
 import { storage } from './storage.client';
 

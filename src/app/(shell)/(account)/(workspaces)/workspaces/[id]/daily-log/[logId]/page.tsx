@@ -29,14 +29,14 @@ export default function DailyLogPage({ params }: PageProps) {
   const currentUser = authState.user
 
   return (
-    <div className="max-w-2xl mx-auto py-8 space-y-4">
+    <div className="mx-auto max-w-2xl space-y-4 py-8">
       <Button
         variant="ghost"
         size="sm"
-        className="gap-2 font-bold uppercase text-[10px] tracking-widest"
+        className="gap-2 text-[10px] font-bold uppercase tracking-widest"
         onClick={() => router.push(`/workspaces/${workspaceId}/daily`)}
       >
-        <ArrowLeft className="w-3.5 h-3.5" /> Back to Daily
+        <ArrowLeft className="size-3.5" /> Back to Daily
       </Button>
       <DailyLogDialog
         log={log}

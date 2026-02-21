@@ -43,10 +43,10 @@ export default function ShellLayout({ children, sidebar, modal }: ShellLayoutPro
 
   if (!authInitialized || !user) {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center space-y-4 bg-background">
-        <div className="text-4xl animate-bounce">🐢</div>
-        <div className="flex items-center gap-2 text-muted-foreground font-black uppercase text-[10px] tracking-widest">
-          <Loader2 className="w-3 h-3 animate-spin" /> Restoring dimension sovereignty...
+      <div className="flex h-screen w-full flex-col items-center justify-center space-y-4 bg-background">
+        <div className="animate-bounce text-4xl">🐢</div>
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <Loader2 className="size-3 animate-spin" /> Restoring dimension sovereignty...
         </div>
       </div>
     );

@@ -5,8 +5,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/utility-hooks/use-toast"
-import { completeRegistration } from "@/features/auth/_actions"
-import { signIn, signInAnonymously } from "@/features/auth/_actions"
+import { completeRegistration , signIn, signInAnonymously } from "../_actions"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { AuthBackground } from "./auth-background"
 import { AuthTabsRoot } from "./auth-tabs-root"
@@ -56,7 +55,7 @@ export function LoginView() {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background px-4 overflow-hidden">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4">
       <AuthBackground />
       <AuthTabsRoot
         isLoading={isLoading}

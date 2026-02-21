@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/shared/shadcn-ui/badge";
 import { Globe, Layers, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Account, Workspace, MemberReference } from "@/shared/types";
+import { type Account, type Workspace, type MemberReference } from "@/shared/types";
 import { ROUTES } from "@/shared/constants/routes";
 
 interface GlobalSearchProps {
@@ -48,27 +48,27 @@ export function GlobalSearch({
         <CommandGroup heading="Dimensions">
           {organizations.map((org) => (
             <CommandItem key={org.id} onSelect={() => handleSelect(() => onSwitchOrg(org))}>
-              <Globe className="mr-2 h-4 w-4 text-primary" />
+              <Globe className="mr-2 size-4 text-primary" />
               <span>{org.name}</span>
-              {activeOrgId === org.id && <Badge variant="outline" className="text-[8px] h-4 ml-auto">Current</Badge>}
+              {activeOrgId === org.id && <Badge variant="outline" className="ml-auto h-4 text-[8px]">Current</Badge>}
             </CommandItem>
           ))}
         </CommandGroup>
         <CommandGroup heading="Spaces">
           {workspaces.map((ws) => (
             <CommandItem key={ws.id} onSelect={() => handleSelect(() => router.push(`${ROUTES.WORKSPACES}/${ws.id}`))}>
-              <Layers className="mr-2 h-4 w-4 text-primary" />
+              <Layers className="mr-2 size-4 text-primary" />
               <span>{ws.name}</span>
-              <span className="text-[9px] text-muted-foreground font-mono ml-auto">{ws.id.toUpperCase()}</span>
+              <span className="ml-auto font-mono text-[9px] text-muted-foreground">{ws.id.toUpperCase()}</span>
             </CommandItem>
           ))}
         </CommandGroup>
         <CommandGroup heading="People">
           {members.map((member) => (
             <CommandItem key={member.id} onSelect={() => handleSelect(() => router.push(ROUTES.ACCOUNT_MEMBERS))}>
-              <User className="mr-2 h-4 w-4 text-primary" />
+              <User className="mr-2 size-4 text-primary" />
               <span>{member.name}</span>
-              <span className="text-[9px] text-muted-foreground ml-auto">{member.email}</span>
+              <span className="ml-auto text-[9px] text-muted-foreground">{member.email}</span>
             </CommandItem>
           ))}
         </CommandGroup>

@@ -18,7 +18,7 @@ import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useLogger } from "@/features/workspace-business.audit";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useDailyUpload } from "./use-daily-upload";
-import { DailyLog } from "@/shared/types";
+import { type DailyLog } from "@/shared/types";
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;

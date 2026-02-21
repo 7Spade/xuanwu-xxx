@@ -1,7 +1,7 @@
 "use client"
 
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { Locale } from "@/shared/i18n-types/i18n"
+import { type Locale } from "@/shared/i18n-types/i18n"
 import { Button } from "@/shared/shadcn-ui/button"
 import {
   DropdownMenu,
@@ -22,8 +22,8 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Globe className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="size-9">
+          <Globe className="size-4" />
           <span className="sr-only">Switch language</span>
         </Button>
       </DropdownMenuTrigger>

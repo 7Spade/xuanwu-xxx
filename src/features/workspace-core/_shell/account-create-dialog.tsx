@@ -15,7 +15,7 @@ import { Label } from "@/shared/shadcn-ui/label"
 import { Input } from "@/shared/shadcn-ui/input"
 import { Loader2 } from "lucide-react"
 import { toast } from "@/shared/utility-hooks/use-toast"
-import { Account } from "@/shared/types"
+import { type Account } from "@/shared/types"
 
 interface AccountCreateDialogProps {
   open: boolean
@@ -78,14 +78,14 @@ export function AccountCreateDialog({
           <DialogDescription>{t('dimension.createDescription')}</DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+          <Label className="ml-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             {t('dimension.dimensionName')}
           </Label>
           <Input
             value={newOrgName}
             onChange={(e) => setNewOrgName(e.target.value)}
             placeholder={t('dimension.dimensionNamePlaceholder')}
-            className="rounded-xl h-12"
+            className="h-12 rounded-xl"
           />
         </div>
         <DialogFooter>
@@ -95,7 +95,7 @@ export function AccountCreateDialog({
           <Button onClick={handleCreate} className="rounded-xl px-8 shadow-lg shadow-primary/20" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 {t('common.creating')}
               </>
             ) : (

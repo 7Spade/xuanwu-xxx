@@ -50,8 +50,8 @@ export function ShareButton({ log }: ShareButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Share2 className="w-5 h-5 text-muted-foreground" />
+        <Button variant="ghost" size="icon" className="size-9">
+          <Share2 className="size-5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

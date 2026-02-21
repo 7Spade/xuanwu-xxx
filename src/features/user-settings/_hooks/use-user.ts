@@ -8,8 +8,8 @@ import { useFirebase } from '@/shared/app-providers/firebase-provider'
 import {
   updateUserProfile as updateUserProfileAction,
   getUserProfile as getUserProfileAction,
-} from '@/features/user-settings/_actions'
-import { uploadProfilePicture } from '@/features/workspace-business.files/_storage-actions'
+} from '../_actions'
+import { uploadProfilePicture } from '@/features/workspace-business.files'
 import type { Account } from '@/shared/types'
 
 /**

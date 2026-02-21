@@ -26,8 +26,8 @@ import { BookmarkButton } from "./actions/bookmark-button";
 // Internal component for displaying workspace avatar
 function WorkspaceAvatar({ name }: { name: string }) {
     return (
-        <Avatar className="w-10 h-10 border-2 border-primary/20">
-            <AvatarFallback className="bg-primary/10 text-primary font-bold">
+        <Avatar className="size-10 border-2 border-primary/20">
+            <AvatarFallback className="bg-primary/10 font-bold text-primary">
                 {name?.[0]?.toUpperCase() || 'W'}
             </AvatarFallback>
         </Avatar>
@@ -72,10 +72,10 @@ export function DailyLogCard({ log, currentUser, onOpen }: DailyLogCardProps) {
   return (
     <Card className="overflow-hidden border-border/60 shadow-sm transition-all duration-300">
       {/* 1. Header: Workspace and author info */}
-      <div className="p-4 flex items-center gap-3">
+      <div className="flex items-center gap-3 p-4">
         <WorkspaceAvatar name={log.workspaceName} />
         <div className="flex flex-col">
-          <span className="font-bold text-sm">{log.workspaceName}</span>
+          <span className="text-sm font-bold">{log.workspaceName}</span>
           <span className="text-xs text-muted-foreground">
             by {log.author.name} • <TimeAgo date={log.createdAt} />
           </span>
@@ -84,13 +84,13 @@ export function DailyLogCard({ log, currentUser, onOpen }: DailyLogCardProps) {
 
       {/* 2. Media: Image carousel, triggers onOpen */}
       {log.photoURLs && log.photoURLs.length > 0 && (
-        <div onClick={onOpen} className="aspect-square relative bg-black/5 cursor-pointer">
+        <div onClick={onOpen} className="relative aspect-square cursor-pointer bg-black/5">
            <ImageCarousel images={log.photoURLs} />
         </div>
       )}
 
       {/* 3. Actions: Compose self-contained action components */}
-      <div className="px-2 pt-2 pb-1 flex items-center justify-between">
+      <div className="flex items-center justify-between px-2 pb-1 pt-2">
         <div className="flex items-center">
             <LikeButton log={log} currentUser={currentUser} />
             <CommentButton onClick={onOpen} count={log.commentCount} />
@@ -99,9 +99,9 @@ export function DailyLogCard({ log, currentUser, onOpen }: DailyLogCardProps) {
       </div>
       
       {/* 4. Content, triggers onOpen */}
-      <div className="px-4 pb-4 cursor-pointer" onClick={onOpen}>
-        <div className={'text-sm leading-relaxed line-clamp-2'}>
-            <span className="font-bold mr-2">{log.author.name}</span>
+      <div className="cursor-pointer px-4 pb-4" onClick={onOpen}>
+        <div className={'line-clamp-2 text-sm leading-relaxed'}>
+            <span className="mr-2 font-bold">{log.author.name}</span>
             {log.content}
         </div>
       </div>

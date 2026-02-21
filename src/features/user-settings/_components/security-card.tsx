@@ -11,18 +11,18 @@ interface SecurityCardProps {
 
 export function SecurityCard({ onWithdraw, t }: SecurityCardProps) {
   return (
-    <Card className="border-destructive/30 border-2 bg-destructive/5 shadow-sm">
+    <Card className="border-2 border-destructive/30 bg-destructive/5 shadow-sm">
       <CardHeader>
-        <div className="flex items-center gap-2 text-destructive mb-1">
-          <AlertTriangle className="w-4 h-4" />
+        <div className="mb-1 flex items-center gap-2 text-destructive">
+          <AlertTriangle className="size-4" />
           <span className="text-[10px] font-bold uppercase tracking-widest">Ultimate Security</span>
         </div>
         <CardTitle className="font-headline text-destructive">{t('settings.identityWithdrawal')}</CardTitle>
         <CardDescription className="text-destructive/80">{t('settings.withdrawalDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-xs font-medium text-destructive mb-4">{t('settings.confirmWithdrawal')}</p>
-        <Button variant="destructive" className="font-bold uppercase tracking-widest text-xs" onClick={onWithdraw}>{t('settings.withdraw')}</Button>
+        <p className="mb-4 text-xs font-medium text-destructive">{t('settings.confirmWithdrawal')}</p>
+        <Button variant="destructive" className="text-xs font-bold uppercase tracking-widest" onClick={onWithdraw}>{t('settings.withdraw')}</Button>
       </CardContent>
     </Card>
   );

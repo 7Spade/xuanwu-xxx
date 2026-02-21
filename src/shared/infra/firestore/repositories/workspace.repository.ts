@@ -34,8 +34,7 @@ import type {
   WorkspaceFile,
   Capability,
   WorkspaceLifecycleState,
-} from '@/shared/types'
-import type { Account } from '@/shared/types'
+ Account } from '@/shared/types'
 
 /**
  * Creates a new workspace with default values, based on the active account context.

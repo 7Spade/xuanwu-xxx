@@ -17,9 +17,9 @@ export default function CapabilityError({
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-      <AlertCircle className="w-10 h-10 text-destructive" />
+      <AlertCircle className="size-10 text-destructive" />
       <h2 className="text-lg font-semibold">Something went wrong</h2>
-      <p className="text-sm text-muted-foreground max-w-sm">
+      <p className="max-w-sm text-sm text-muted-foreground">
         {error.message || "An unexpected error occurred in this capability."}
       </p>
       <Button variant="outline" size="sm" onClick={reset}>

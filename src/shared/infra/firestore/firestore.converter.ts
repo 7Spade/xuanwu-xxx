@@ -5,11 +5,11 @@
  * It automatically handles `id` field exclusion/inclusion.
  */
 import {
-  DocumentData,
-  FirestoreDataConverter,
-  QueryDocumentSnapshot,
-  SnapshotOptions,
-  WithFieldValue,
+  type DocumentData,
+  type FirestoreDataConverter,
+  type QueryDocumentSnapshot,
+  type SnapshotOptions,
+  type WithFieldValue,
 } from 'firebase/firestore';
 
 export const createConverter = <T extends { id: string }>(): FirestoreDataConverter<T> => ({

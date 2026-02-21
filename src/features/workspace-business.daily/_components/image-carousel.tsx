@@ -18,13 +18,13 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
   if (!images || images.length === 0) return null;
 
   return (
-    <Carousel className="w-full h-full">
+    <Carousel className="size-full">
       <CarouselContent>
         {images.map((src, index) => (
           <CarouselItem key={index}>
             <div className="p-0">
-              <Card className="border-none rounded-none shadow-none">
-                <CardContent className="flex aspect-square items-center justify-center p-0 relative">
+              <Card className="rounded-none border-none shadow-none">
+                <CardContent className="relative flex aspect-square items-center justify-center p-0">
                   <Image src={src} alt={`Daily log image ${index + 1}`} fill className="object-cover" />
                 </CardContent>
               </Card>

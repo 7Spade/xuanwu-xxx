@@ -23,7 +23,7 @@ export function WorkspaceDaily() {
   } = useWorkspaceDailyLog();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="mx-auto max-w-3xl space-y-8 duration-500 animate-in fade-in">
       <DailyLogComposer
         content={content}
         setContent={setContent}
@@ -47,8 +47,8 @@ export function WorkspaceDaily() {
           />
         ))}
         {localLogs.length === 0 && (
-          <div className="p-12 text-center flex flex-col items-center gap-3 opacity-20">
-            <MessageSquare className="w-12 h-12" />
+          <div className="flex flex-col items-center gap-3 p-12 text-center opacity-20">
+            <MessageSquare className="size-12" />
             <p className="text-[10px] font-black uppercase tracking-widest">No activity recorded in this space yet.</p>
           </div>
         )}

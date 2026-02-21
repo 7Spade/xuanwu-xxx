@@ -22,35 +22,35 @@ interface GovernanceSidebarProps {
  */
 export function GovernanceSidebar({ proposals, onApprove, onReject }: GovernanceSidebarProps) {
   return (
-    <Card className="h-full border-none rounded-none shadow-none flex flex-col">
+    <Card className="flex h-full flex-col rounded-none border-none shadow-none">
       <CardHeader className="border-b">
         <CardTitle className="text-sm font-bold uppercase tracking-widest">
           Pending Proposals ({proposals.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0 flex-1 overflow-hidden">
+      <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 p-4">
             {proposals.map(item => (
-              <div key={item.id} className="p-3 rounded-lg border bg-background space-y-2">
-                <div className="flex justify-between items-start">
+              <div key={item.id} className="space-y-2 rounded-lg border bg-background p-3">
+                <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs font-bold">{item.title}</p>
-                    <Badge variant="outline" className="text-[9px] mt-1">{item.workspaceName}</Badge>
+                    <Badge variant="outline" className="mt-1 text-[9px]">{item.workspaceName}</Badge>
                   </div>
                   <div className="flex gap-1">
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => onReject(item)}>
-                      <X className="w-4 h-4" />
+                    <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => onReject(item)}>
+                      <X className="size-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-green-600" onClick={() => onApprove(item)}>
-                      <Check className="w-4 h-4" />
+                    <Button size="icon" variant="ghost" className="size-7 text-green-600" onClick={() => onApprove(item)}>
+                      <Check className="size-4" />
                     </Button>
                   </div>
                 </div>
               </div>
             ))}
             {proposals.length === 0 && (
-              <div className="text-center py-12 text-xs text-muted-foreground italic">
+              <div className="py-12 text-center text-xs italic text-muted-foreground">
                 No pending proposals.
               </div>
             )}

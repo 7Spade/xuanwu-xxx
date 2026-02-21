@@ -13,7 +13,7 @@ import {
 import { Button } from "@/shared/shadcn-ui/button";
 import { Input } from "@/shared/shadcn-ui/input";
 import { Label } from "@/shared/shadcn-ui/label";
-import { handleCreateWorkspace } from "@/features/workspace-core/_use-cases";
+import { handleCreateWorkspace } from "../_use-cases";
 import { useApp } from "@/features/workspace-core";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 
@@ -61,7 +61,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: CreateWorkspaceDia
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t("workspaces.spaceNamePlaceholder")}
-              className="rounded-xl h-11"
+              className="h-11 rounded-xl"
             />
           </div>
         </div>

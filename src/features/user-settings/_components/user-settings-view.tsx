@@ -8,7 +8,7 @@ export function UserSettingsView() {
   const { t } = useI18n()
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto pb-12 animate-in fade-in duration-500">
+    <div className="mx-auto max-w-4xl space-y-8 pb-12 duration-500 animate-in fade-in">
       <PageHeader 
         title={t('settings.userSettingsTitle')}
         description={t('settings.userSettingsDescription')}

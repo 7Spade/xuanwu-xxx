@@ -4,7 +4,7 @@
  */
 
 import { ai } from '@/shared/ai/genkit';
-import { z } from 'genkit';
+import { type z } from 'genkit';
 import {
   ExtractInvoiceItemsInputSchema,
   ExtractInvoiceItemsOutputSchema,

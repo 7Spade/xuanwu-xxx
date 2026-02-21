@@ -15,7 +15,7 @@ import {
     assignMember as assignMemberAction,
     unassignMember as unassignMemberAction,
     updateScheduleItemStatus,
-} from "@/features/workspace-governance.schedule/_actions";
+} from "../_actions";
 import { canTransitionScheduleStatus } from "@/shared/lib";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import type { ScheduleItem } from "@/shared/types";

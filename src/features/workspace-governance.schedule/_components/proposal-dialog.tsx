@@ -84,7 +84,7 @@ export function ProposalDialog({
           <DialogTitle>New Schedule Proposal</DialogTitle>
           <DialogDescription>Submit a new item to the organization's timeline for approval.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
+        <div className="max-h-[60vh] space-y-4 overflow-y-auto py-4 pr-4">
           <div className="space-y-2">
             <Label htmlFor="item-title">Title</Label>
             <Input id="item-title" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -98,7 +98,7 @@ export function ProposalDialog({
             <Popover>
               <PopoverTrigger asChild>
                 <Button id="date" variant={"outline"} className={cn( "w-full justify-start text-left font-normal", !dateRange && "text-muted-foreground" )}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 size-4" />
                   {dateRange?.from ? ( dateRange.to ? ( <> {format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")} </> ) : ( format(dateRange.from, "LLL dd, y") ) ) : ( <span>Pick a date</span> )}
                 </Button>
               </PopoverTrigger>
@@ -109,33 +109,33 @@ export function ProposalDialog({
           </div>
            <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4"/> Location
+                    <MapPin className="size-4"/> Location
                 </Label>
                 <div className="grid grid-cols-3 gap-4">
                     <Input
                         placeholder="Building"
                         value={location?.building || ''}
                         onChange={(e) => handleLocationChange('building', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                     <Input
                         placeholder="Floor"
                         value={location?.floor || ''}
                         onChange={(e) => handleLocationChange('floor', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                     <Input
                         placeholder="Room"
                         value={location?.room || ''}
                         onChange={(e) => handleLocationChange('room', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                 </div>
                 <Textarea
                     placeholder="Location details..."
                     value={location?.description || ''}
                     onChange={(e) => handleLocationChange('description', e.target.value)}
-                    className="rounded-xl bg-muted/30 border-none resize-none"
+                    className="resize-none rounded-xl border-none bg-muted/30"
                     rows={2}
                 />
             </div>

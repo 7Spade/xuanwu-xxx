@@ -1,6 +1,6 @@
 "use client";
 
-import { useWorkspace } from '@/features/workspace-core';
+import { useWorkspace , useApp } from '@/features/workspace-core';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/shadcn-ui/card";
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
@@ -24,7 +24,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/shared/shadcn-ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/shadcn-ui/dropdown-menu";
 import { cn } from "@/shared/utils/utils";
-import { useApp } from "@/features/workspace-core";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -131,15 +130,15 @@ export function WorkspaceMembers() {
     const isInternal = type === 'internal';
 
     return (
-      <Card key={team.id} className={`border-border/60 transition-all ${isAuthorized ? (isInternal ? 'bg-primary/5 border-primary/30 ring-1 ring-primary/20' : 'bg-accent/5 border-accent/30 ring-1 ring-accent/20') : 'bg-card/40'}`}>
-        <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0">
+      <Card key={team.id} className={`border-border/60 transition-all ${isAuthorized ? (isInternal ? 'border-primary/30 bg-primary/5 ring-1 ring-primary/20' : 'border-accent/30 bg-accent/5 ring-1 ring-accent/20') : 'bg-card/40'}`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isAuthorized ? (isInternal ? 'bg-primary text-white' : 'bg-accent text-white') : 'bg-muted text-muted-foreground'}`}>
-              {isInternal ? <Users className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
+            <div className={`rounded-lg p-2 ${isAuthorized ? (isInternal ? 'bg-primary text-white' : 'bg-accent text-white') : 'bg-muted text-muted-foreground'}`}>
+              {isInternal ? <Users className="size-4" /> : <Globe className="size-4" />}
             </div>
             <div>
               <CardTitle className="text-sm font-bold">{team.name}</CardTitle>
-              <CardDescription className="text-[9px] uppercase font-bold">{team.memberIds.length} Members</CardDescription>
+              <CardDescription className="text-[9px] font-bold uppercase">{team.memberIds.length} Members</CardDescription>
             </div>
           </div>
           <Button 
@@ -154,8 +153,8 @@ export function WorkspaceMembers() {
         </CardHeader>
         {isAuthorized && (
           <CardContent className="p-4 pt-0">
-            <div className={`mt-3 p-2 bg-background/50 rounded-lg border flex items-center gap-2 ${isInternal ? 'border-primary/10' : 'border-accent/10'}`}>
-              {isInternal ? <CheckCircle2 className="w-3 h-3 text-primary" /> : <ShieldAlert className="w-3 h-3 text-accent" />}
+            <div className={`mt-3 flex items-center gap-2 rounded-lg border bg-background/50 p-2 ${isInternal ? 'border-primary/10' : 'border-accent/10'}`}>
+              {isInternal ? <CheckCircle2 className="size-3 text-primary" /> : <ShieldAlert className="size-3 text-accent" />}
               <span className={`text-[9px] font-bold uppercase tracking-widest ${isInternal ? 'text-primary' : 'text-accent'}`}>
                 {isInternal ? 'Access Resonating' : 'External Controlled Access'}
               </span>
@@ -167,38 +166,38 @@ export function WorkspaceMembers() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-8 pb-20 duration-500 animate-in fade-in">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-primary" /> Workspace Access Governance
+          <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            <ShieldCheck className="size-4 text-primary" /> Workspace Access Governance
           </h3>
-          <p className="text-[10px] text-muted-foreground uppercase font-bold">Strategy: Granular Grant-Based Authorization</p>
+          <p className="text-[10px] font-bold uppercase text-muted-foreground">Strategy: Granular Grant-Based Authorization</p>
         </div>
       </div>
 
       <Tabs defaultValue="internal-teams" className="space-y-6">
-        <TabsList className="bg-muted/40 p-1 border border-border/50 rounded-xl">
-          <TabsTrigger value="internal-teams" className="text-[10px] font-bold uppercase tracking-widest px-6 data-[state=active]:text-primary">
+        <TabsList className="rounded-xl border border-border/50 bg-muted/40 p-1">
+          <TabsTrigger value="internal-teams" className="px-6 text-[10px] font-bold uppercase tracking-widest data-[state=active]:text-primary">
             Internal Teams ({internalTeams.length})
           </TabsTrigger>
-          <TabsTrigger value="partner-teams" className="text-[10px] font-bold uppercase tracking-widest px-6 data-[state=active]:text-accent">
+          <TabsTrigger value="partner-teams" className="px-6 text-[10px] font-bold uppercase tracking-widest data-[state=active]:text-accent">
             Partner Teams ({partnerTeams.length})
           </TabsTrigger>
-          <TabsTrigger value="individuals" className="text-[10px] font-bold uppercase tracking-widest px-6">
+          <TabsTrigger value="individuals" className="px-6 text-[10px] font-bold uppercase tracking-widest">
             Individuals ({(activeOrg.members || []).length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="internal-teams" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <TabsContent value="internal-teams" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {internalTeams.map(team => renderTeamCard(team, 'internal'))}
         </TabsContent>
 
-        <TabsContent value="partner-teams" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <TabsContent value="partner-teams" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {partnerTeams.map(team => renderTeamCard(team, 'external'))}
         </TabsContent>
 
-        <TabsContent value="individuals" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <TabsContent value="individuals" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {(activeOrg.members || []).map(member => {
             const directGrant = (workspace.grants || []).find(g => g.userId === member.id && g.status === 'active');
             const hasInheritedAccess = (activeOrg.teams || [])
@@ -212,24 +211,24 @@ export function WorkspaceMembers() {
 
             return (
               <Card key={member.id} className={cardClass}>
-                <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold border shadow-sm">
+                    <div className="flex size-8 items-center justify-center rounded-full border bg-muted text-[10px] font-bold shadow-sm">
                       {member.name[0]}
                     </div>
                     <div>
                       <CardTitle className="text-sm font-bold">{member.name}</CardTitle>
                       <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-[7px] h-3.5 px-1 uppercase tracking-tighter">
+                        <Badge variant="outline" className="h-3.5 px-1 text-[7px] uppercase tracking-tighter">
                           {member.role}
                         </Badge>
                         {hasInheritedAccess && !directGrant && (
-                          <Badge variant="secondary" className="text-[7px] h-3.5 px-1 bg-primary/10 text-primary border-none font-black uppercase">
+                          <Badge variant="secondary" className="h-3.5 border-none bg-primary/10 px-1 text-[7px] font-black uppercase text-primary">
                             Inherited
                           </Badge>
                         )}
                         {directGrant && (
-                           <Badge variant="secondary" className="text-[7px] h-3.5 px-1 bg-green-500/10 text-green-600 border-none font-black uppercase">
+                           <Badge variant="secondary" className="h-3.5 border-none bg-green-500/10 px-1 text-[7px] font-black uppercase text-green-600">
                             {directGrant.role}
                           </Badge>
                         )}
@@ -239,18 +238,18 @@ export function WorkspaceMembers() {
                   {!hasInheritedAccess && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                         <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!!loadingGrantId}>
-                           <MoreVertical className="w-4 h-4" />
+                         <Button variant="ghost" size="icon" className="size-8" disabled={!!loadingGrantId}>
+                           <MoreVertical className="size-4" />
                          </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         {directGrant ? (
-                          <DropdownMenuItem onClick={() => handleRevokeGrant(directGrant.grantId)} className="text-destructive cursor-pointer" disabled={loadingGrantId === directGrant.grantId}>
-                             <Trash2 className="mr-2 h-4 w-4" /> {loadingGrantId === directGrant.grantId ? 'Revoking...' : 'Revoke Access'}
+                          <DropdownMenuItem onClick={() => handleRevokeGrant(directGrant.grantId)} className="cursor-pointer text-destructive" disabled={loadingGrantId === directGrant.grantId}>
+                             <Trash2 className="mr-2 size-4" /> {loadingGrantId === directGrant.grantId ? 'Revoking...' : 'Revoke Access'}
                           </DropdownMenuItem>
                         ) : (
                           <DropdownMenuItem onClick={() => setGrantTarget(member)} className="cursor-pointer">
-                             <Plus className="mr-2 h-4 w-4" /> Grant Access
+                             <Plus className="mr-2 size-4" /> Grant Access
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -263,12 +262,12 @@ export function WorkspaceMembers() {
         </TabsContent>
       </Tabs>
 
-      <div className="p-6 bg-muted/30 border border-dashed rounded-3xl space-y-4">
+      <div className="space-y-4 rounded-3xl border border-dashed bg-muted/30 p-6">
         <div className="flex items-center gap-2 text-muted-foreground">
-          <ShieldCheck className="w-4 h-4" />
+          <ShieldCheck className="size-4" />
           <h4 className="text-xs font-bold uppercase tracking-widest">Access Governance Principles</h4>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed italic">
+        <p className="text-[11px] italic leading-relaxed text-muted-foreground">
           This workspace uses "Composite Authorization". A member's final access = (Team Inheritance ∪ Direct Individual Grant).
           When access is granted via multiple paths, the "Least Restrictive" principle is applied to ensure uninterrupted operational momentum.
         </p>
@@ -280,7 +279,7 @@ export function WorkspaceMembers() {
             <DialogTitle>Grant Individual Access</DialogTitle>
             <CardDescription>Grant direct access for "{grantTarget?.name}" to this workspace.</CardDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
+          <div className="space-y-4 py-4">
             <Label>Workspace Role</Label>
             <Select value={selectedRole} onValueChange={(v: WorkspaceRole) => setSelectedRole(v)}>
               <SelectTrigger>

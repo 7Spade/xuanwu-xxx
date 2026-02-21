@@ -20,7 +20,7 @@ export const decisionHistoryColumns: ColumnDef<DecisionHistoryItem>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Proposal
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 size-4" />
         </Button>
       )
     },
@@ -35,10 +35,10 @@ export const decisionHistoryColumns: ColumnDef<DecisionHistoryItem>[] = [
     cell: ({ row }) => {
       const status = row.original.status
       if (status === "OFFICIAL") {
-        return <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-500/20"><CheckCircle className="w-3 h-3 mr-1"/>Approved</Badge>
+        return <Badge variant="secondary" className="border-green-500/20 bg-green-500/10 text-green-700"><CheckCircle className="mr-1 size-3"/>Approved</Badge>
       }
       if (status === "REJECTED") {
-         return <Badge variant="destructive" className="bg-red-500/10 text-red-700 border-red-500/20"><XCircle className="w-3 h-3 mr-1"/>Rejected</Badge>
+         return <Badge variant="destructive" className="border-red-500/20 bg-red-500/10 text-red-700"><XCircle className="mr-1 size-3"/>Rejected</Badge>
       }
       return <Badge variant="outline">{status}</Badge>
     },
@@ -52,7 +52,7 @@ export const decisionHistoryColumns: ColumnDef<DecisionHistoryItem>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Handled At
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-2 size-4" />
           </Button>
         )
       },

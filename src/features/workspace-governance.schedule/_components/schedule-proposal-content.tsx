@@ -61,7 +61,7 @@ export function ScheduleProposalContent({ fullPage = false }: ScheduleProposalCo
 
   if (fullPage) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex min-h-[60vh] items-center justify-center">
         {dialog}
       </div>
     )

@@ -40,11 +40,11 @@ export function useLogger(workspaceId?: string, workspaceName?: string) {
     return addDocument(`accounts/${activeAccount.id}/dailyLogs`, dailyData);
   }, [db, activeAccount, workspaceId, workspaceName]);
 
-  const logAudit = useCallback(async (action: string, target: string, type: AuditLog['type'], user: Account) => {
-    if (!activeAccount || activeAccount.accountType !== 'organization' || !user || !db) return;
+  const logAudit = useCallback(async (action: string, target: string, type: AuditLog['type']) => {
+    if (!activeAccount || activeAccount.accountType !== 'organization' || !db) return;
 
     const eventData: Omit<AuditLog, 'id'| 'recordedAt'> & { recordedAt: any } = {
-      actor: user.name,
+      actor: activeAccount.name,
       action,
       target,
       type,

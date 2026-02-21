@@ -43,35 +43,35 @@ export function WorkspaceListHeader({
         )}
       >
         <div className="flex items-center gap-2">
-          <div className="flex items-center border rounded-lg bg-background p-1 shadow-sm border-border/60">
+          <div className="flex items-center rounded-lg border border-border/60 bg-background p-1 shadow-sm">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
-              className="h-8 w-8 p-0"
+              className="size-8 p-0"
               onClick={() => onViewModeChange("grid")}
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="size-4" />
             </Button>
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="sm"
-              className="h-8 w-8 p-0"
+              className="size-8 p-0"
               onClick={() => onViewModeChange("list")}
             >
-              <ListIcon className="w-4 h-4" />
+              <ListIcon className="size-4" />
             </Button>
           </div>
-          <Button className="gap-2 shadow-sm font-bold uppercase tracking-widest text-[11px] h-10 px-4" onClick={() => router.push(ROUTES.WORKSPACES_NEW)}>
-            <Plus className="w-4 h-4" /> {t("workspaces.createSpace")}
+          <Button className="h-10 gap-2 px-4 text-[11px] font-bold uppercase tracking-widest shadow-sm" onClick={() => router.push(ROUTES.WORKSPACES_NEW)}>
+            <Plus className="size-4" /> {t("workspaces.createSpace")}
           </Button>
         </div>
       </PageHeader>
-      <div className="flex items-center gap-4 bg-card/50 p-3 rounded-2xl border border-border/50 shadow-sm backdrop-blur-sm">
+      <div className="flex items-center gap-4 rounded-2xl border border-border/50 bg-card/50 p-3 shadow-sm backdrop-blur-sm">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t("workspaces.searchPlaceholder")}
-            className="pl-10 h-10 bg-background border-border/40 focus-visible:ring-primary/30 rounded-xl"
+            className="h-10 rounded-xl border-border/40 bg-background pl-10 focus-visible:ring-primary/30"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
           />
@@ -79,9 +79,9 @@ export function WorkspaceListHeader({
         <Button
           variant="outline"
           size="sm"
-          className="h-10 px-4 gap-2 text-xs font-bold uppercase tracking-widest border-border/60 rounded-xl"
+          className="h-10 gap-2 rounded-xl border-border/60 px-4 text-xs font-bold uppercase tracking-widest"
         >
-          <Filter className="w-3.5 h-3.5" /> {t("common.filter")}
+          <Filter className="size-3.5" /> {t("common.filter")}
         </Button>
       </div>
     </>

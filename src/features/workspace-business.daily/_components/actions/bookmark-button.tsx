@@ -45,9 +45,9 @@ export function BookmarkButton({ logId }: BookmarkButtonProps) {
   const isLoading = hookLoading || isToggling;
 
   return (
-    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleToggle} disabled={isLoading}>
+    <Button variant="ghost" size="icon" className="size-9" onClick={handleToggle} disabled={isLoading}>
       {isLoading ? (
-        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
       ) : (
         <Bookmark
           className={cn(

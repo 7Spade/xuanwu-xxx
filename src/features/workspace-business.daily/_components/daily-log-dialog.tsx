@@ -24,7 +24,7 @@ import { BookmarkButton } from "./actions/bookmark-button";
 import { ShareButton } from './actions/share-button';
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { addDailyLogComment } from "@/features/workspace-business.daily/_actions";
+import { addDailyLogComment } from "../_actions";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { Textarea } from "@/shared/shadcn-ui/textarea";
@@ -41,8 +41,8 @@ interface DailyLogDialogProps {
 // Internal component for displaying workspace avatar
 function WorkspaceAvatar({ name }: { name: string }) {
     return (
-        <Avatar className="w-10 h-10 border-2 border-primary/20">
-            <AvatarFallback className="bg-primary/10 text-primary font-bold">
+        <Avatar className="size-10 border-2 border-primary/20">
+            <AvatarFallback className="bg-primary/10 font-bold text-primary">
                 {name?.[0]?.toUpperCase() || 'W'}
             </AvatarFallback>
         </Avatar>
@@ -126,21 +126,21 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-full h-[90vh] p-0 grid grid-cols-1 md:grid-cols-2 gap-0">
+      <DialogContent className="grid h-[90vh] w-full max-w-4xl grid-cols-1 gap-0 p-0 md:grid-cols-2">
         
         {/* Image Section */}
-        <div className="aspect-square md:aspect-auto relative bg-muted order-1 md:order-2">
+        <div className="relative order-1 aspect-square bg-muted md:order-2 md:aspect-auto">
             {log.photoURLs && log.photoURLs.length > 0 && <ImageCarousel images={log.photoURLs} />}
         </div>
         
         {/* Content Section */}
-        <div className="flex flex-col h-full max-h-[90vh] order-2 md:order-1">
+        <div className="order-2 flex h-full max-h-[90vh] flex-col md:order-1">
             {/* Header */}
-            <DialogHeader className="p-4 border-b flex-row items-center justify-between space-y-0">
+            <DialogHeader className="flex-row items-center justify-between space-y-0 border-b p-4">
                 <div className="flex items-center gap-3">
                     <WorkspaceAvatar name={log.workspaceName} />
                     <div className="flex flex-col text-left">
-                      <DialogTitle className="font-bold text-sm">{log.workspaceName}</DialogTitle>
+                      <DialogTitle className="text-sm font-bold">{log.workspaceName}</DialogTitle>
                       <span className="text-xs text-muted-foreground">
                         by {log.author.name} • <TimeAgo date={log.createdAt} />
                       </span>
@@ -152,19 +152,19 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
             {/* Content & Comments Body */}
             <ScrollArea className="flex-1">
               <div className="p-6">
-                <p className="text-sm leading-relaxed whitespace-pre-wrap mb-6 border-b pb-6">
-                    <span className="font-bold mr-2">{log.author.name}</span>
+                <p className="mb-6 whitespace-pre-wrap border-b pb-6 text-sm leading-relaxed">
+                    <span className="mr-2 font-bold">{log.author.name}</span>
                     {log.content}
                 </p>
                 <div className="space-y-4">
                   {comments.map((comment) => (
                     <div key={comment.id} className="flex items-start gap-3">
-                       <Avatar className="w-8 h-8 border-2 border-primary/10">
-                          <AvatarFallback className="bg-primary/5 text-primary font-bold text-xs">{comment.author.name?.[0]}</AvatarFallback>
+                       <Avatar className="size-8 border-2 border-primary/10">
+                          <AvatarFallback className="bg-primary/5 text-xs font-bold text-primary">{comment.author.name?.[0]}</AvatarFallback>
                        </Avatar>
                        <div className="flex-1">
                           <p className="text-xs leading-relaxed">
-                            <span className="font-bold mr-2">{comment.author.name}</span>
+                            <span className="mr-2 font-bold">{comment.author.name}</span>
                             {comment.content}
                           </p>
                           <TimeAgo date={comment.createdAt} />
@@ -176,7 +176,7 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
             </ScrollArea>
             
             {/* Actions & Comment Input Footer */}
-            <div className="p-2 border-t mt-auto space-y-2">
+            <div className="mt-auto space-y-2 border-t p-2">
                 <div className="flex items-center justify-between px-2">
                     <div className="flex items-center">
                         <LikeButton log={log} currentUser={currentUser} />
@@ -187,13 +187,13 @@ export function DailyLogDialog({ log, currentUser, isOpen, onOpenChange }: Daily
                 <div className="flex items-center gap-2 p-2">
                   <Textarea 
                     placeholder="Add a comment..." 
-                    className="flex-1 resize-none bg-muted/50 border-border/50 rounded-lg focus-visible:ring-1 focus-visible:ring-primary"
+                    className="flex-1 resize-none rounded-lg border-border/50 bg-muted/50 focus-visible:ring-1 focus-visible:ring-primary"
                     rows={1}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                   />
-                  <Button size="icon" className="h-9 w-9 rounded-lg" onClick={handlePostComment} disabled={isPosting || !newComment.trim()}>
-                    {isPosting ? <Loader2 className="w-4 h-4 animate-spin"/> : <CornerUpLeft className="w-4 h-4" />}
+                  <Button size="icon" className="size-9 rounded-lg" onClick={handlePostComment} disabled={isPosting || !newComment.trim()}>
+                    {isPosting ? <Loader2 className="size-4 animate-spin"/> : <CornerUpLeft className="size-4" />}
                   </Button>
                 </div>
             </div>

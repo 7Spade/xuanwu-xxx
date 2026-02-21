@@ -55,9 +55,9 @@ export function ThemeAdapter({ children }: ThemeAdapterProps) {
   
   if (isAdapting) {
     return (
-        <div className="flex flex-col gap-6 p-8 max-w-7xl mx-auto">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 p-8">
             <Skeleton className="h-14 w-[300px] rounded-2xl" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <Skeleton className="h-[160px] w-full rounded-2xl" />
                 <Skeleton className="h-[160px] w-full rounded-2xl" />
                 <Skeleton className="h-[160px] w-full rounded-2xl" />

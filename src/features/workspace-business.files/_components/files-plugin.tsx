@@ -76,11 +76,11 @@ export function WorkspaceFiles() {
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
     switch (ext) {
-      case 'jpg': case 'jpeg': case 'png': case 'gif': return <ImageIcon className="w-5 h-5" />;
-      case 'zip': case '7z': case 'rar': return <FileArchive className="w-5 h-5" />;
-      case 'ts': case 'tsx': case 'js': return <FileCode className="w-5 h-5" />;
-      case 'json': return <FileJson className="w-5 h-5" />;
-      default: return <FileText className="w-5 h-5" />;
+      case 'jpg': case 'jpeg': case 'png': case 'gif': return <ImageIcon className="size-5" />;
+      case 'zip': case '7z': case 'rar': return <FileArchive className="size-5" />;
+      case 'ts': case 'tsx': case 'js': return <FileCode className="size-5" />;
+      case 'json': return <FileJson className="size-5" />;
+      default: return <FileText className="size-5" />;
     }
   };
 
@@ -193,24 +193,24 @@ export function WorkspaceFiles() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-6 pb-20 duration-500 animate-in fade-in">
       <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
       <div className="flex items-center justify-between">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-          <FileText className="w-3.5 h-3.5" /> Space File Sovereignty
+        <h3 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+          <FileText className="size-3.5" /> Space File Sovereignty
         </h3>
         <Button 
             size="sm" 
-            className="h-9 gap-2 font-black uppercase text-[10px] rounded-full shadow-lg" 
+            className="h-9 gap-2 rounded-full text-[10px] font-black uppercase shadow-lg" 
             onClick={handleUploadClick}
             disabled={isUploading}
         >
-          {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
+          {isUploading ? <Loader2 className="size-4 animate-spin" /> : <UploadCloud className="size-4" />}
           {isUploading ? "Uploading..." : "Upload Document"}
         </Button>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card/40 backdrop-blur-md overflow-hidden shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/40 shadow-sm backdrop-blur-md">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -228,36 +228,36 @@ export function WorkspaceFiles() {
                 <TableRow key={file.id} className="group">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-background rounded-xl border shadow-sm text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                      <div className="rounded-xl border bg-background p-2.5 text-primary shadow-sm transition-all group-hover:bg-primary group-hover:text-white">
                         {getFileIcon(file.name)}
                       </div>
-                      <span className="text-sm font-black tracking-tight truncate">{file.name}</span>
+                      <span className="truncate text-sm font-black tracking-tight">{file.name}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="secondary" className="text-[9px] font-black h-5 bg-primary/10 text-primary border-none">V{current?.versionNumber}</Badge>
+                    <Badge variant="secondary" className="h-5 border-none bg-primary/10 text-[9px] font-black text-primary">V{current?.versionNumber}</Badge>
                   </TableCell>
-                  <TableCell className="text-[10px] font-mono text-muted-foreground uppercase">{formatBytes(current?.size || 0)}</TableCell>
+                  <TableCell className="font-mono text-[10px] uppercase text-muted-foreground">{formatBytes(current?.size || 0)}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold">{current?.uploadedBy}</span>
-                      <span className="text-[9px] text-muted-foreground flex items-center gap-1 font-medium"><Clock className="w-2.5 h-2.5" /> SYNCED</span>
+                      <span className="flex items-center gap-1 text-[9px] font-medium text-muted-foreground"><Clock className="size-2.5" /> SYNCED</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/5"><MoreVertical className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" className="size-8 hover:bg-primary/5"><MoreVertical className="size-4" /></Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-xl w-48">
-                         <DropdownMenuItem onClick={() => window.open(current?.downloadURL, '_blank')} disabled={!current?.downloadURL} className="gap-2 text-[10px] font-bold uppercase py-2.5 cursor-pointer">
-                          <Download className="w-3.5 h-3.5 text-primary" /> Download
+                      <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                         <DropdownMenuItem onClick={() => window.open(current?.downloadURL, '_blank')} disabled={!current?.downloadURL} className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase">
+                          <Download className="size-3.5 text-primary" /> Download
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setHistoryFile(file)} className="gap-2 text-[10px] font-bold uppercase py-2.5 cursor-pointer">
-                          <History className="w-3.5 h-3.5 text-primary" /> Version History
+                        <DropdownMenuItem onClick={() => setHistoryFile(file)} className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase">
+                          <History className="size-3.5 text-primary" /> Version History
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-[10px] font-bold uppercase py-2.5 text-destructive cursor-pointer">
-                          <Trash2 className="w-3.5 h-3.5" /> Deregister File
+                        <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase text-destructive">
+                          <Trash2 className="size-3.5" /> Deregister File
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -269,27 +269,27 @@ export function WorkspaceFiles() {
         </Table>
         
         {(!files || files.length === 0) && (
-            <div className="p-20 text-center flex flex-col items-center gap-3 opacity-20">
-              <AlertCircle className="w-12 h-12" />
+            <div className="flex flex-col items-center gap-3 p-20 text-center opacity-20">
+              <AlertCircle className="size-12" />
               <p className="text-[10px] font-black uppercase tracking-widest">No technical documents in this space</p>
             </div>
         )}
       </div>
 
       <Sheet open={!!historyFile} onOpenChange={(o) => !o && setHistoryFile(null)}>
-        <SheetContent className="sm:max-w-md flex flex-col p-0 border-l-border/40">
-          <div className="p-8 border-b bg-primary/5">
+        <SheetContent className="flex flex-col border-l-border/40 p-0 sm:max-w-md">
+          <div className="border-b bg-primary/5 p-8">
             <SheetHeader>
-              <div className="flex items-center gap-3 mb-2">
-                <History className="w-5 h-5 text-primary" />
-                <SheetTitle className="font-black text-xl">Version History</SheetTitle>
+              <div className="mb-2 flex items-center gap-3">
+                <History className="size-5 text-primary" />
+                <SheetTitle className="text-xl font-black">Version History</SheetTitle>
               </div>
               <SheetDescription className="font-mono text-[10px] uppercase tracking-widest">{historyFile?.name}</SheetDescription>
             </SheetHeader>
           </div>
           
           <ScrollArea className="flex-1 p-8">
-            <div className="relative pl-8 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-primary/20">
+            <div className="relative space-y-8 pl-8 before:absolute before:inset-y-2 before:left-[11px] before:w-[2px] before:bg-primary/20">
               {historyFile?.versions?.slice().reverse().map((v: WorkspaceFileVersion) => (
                 <div key={v.versionId} className="relative">
                   <div className={cn(
@@ -300,25 +300,25 @@ export function WorkspaceFiles() {
                     "p-5 rounded-2xl border transition-all", 
                     historyFile.currentVersionId === v.versionId ? "bg-primary/5 border-primary/30 shadow-sm" : "bg-muted/30 border-border/60"
                   )}>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <p className="text-xs font-black">{v.versionName}</p>
                       {historyFile.currentVersionId === v.versionId && (
-                        <Badge className="text-[8px] bg-primary uppercase font-black gap-1">
-                          <CheckCircle2 className="w-2.5 h-2.5" /> Active
+                        <Badge className="gap-1 bg-primary text-[8px] font-black uppercase">
+                          <CheckCircle2 className="size-2.5" /> Active
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center justify-between text-[9px] font-bold text-muted-foreground uppercase">
-                      <span className="flex items-center gap-1"><User className="w-2.5 h-2.5" /> {v.uploadedBy}</span>
+                    <div className="flex items-center justify-between text-[9px] font-bold uppercase text-muted-foreground">
+                      <span className="flex items-center gap-1"><User className="size-2.5" /> {v.uploadedBy}</span>
                       <span>{formatBytes(v.size)}</span>
                     </div>
-                     <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-border/10">
+                     <div className="mt-4 flex items-center justify-end gap-2 border-t border-border/10 pt-3">
                         <Button variant="ghost" size="sm" className="h-7 text-[9px] font-bold" onClick={() => window.open(v.downloadURL, '_blank')} disabled={!v.downloadURL}>
-                            <Download className="w-3 h-3 mr-1" /> Download
+                            <Download className="mr-1 size-3" /> Download
                         </Button>
                         {historyFile.currentVersionId !== v.versionId && (
-                          <Button variant="outline" size="sm" className="h-7 text-[9px] font-black uppercase bg-background hover:bg-primary hover:text-white transition-all" onClick={() => handleRestore(historyFile!, v.versionId)}>
-                            <RotateCcw className="w-3 h-3 mr-2" /> Restore
+                          <Button variant="outline" size="sm" className="h-7 bg-background text-[9px] font-black uppercase transition-all hover:bg-primary hover:text-white" onClick={() => handleRestore(historyFile!, v.versionId)}>
+                            <RotateCcw className="mr-2 size-3" /> Restore
                           </Button>
                         )}
                     </div>

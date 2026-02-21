@@ -48,8 +48,8 @@ export function TeamsView() {
 
   if (!activeOrg) {
     return (
-        <div className="p-8 text-center flex flex-col items-center gap-4">
-            <AlertCircle className="w-10 h-10 text-muted-foreground" />
+        <div className="flex flex-col items-center gap-4 p-8 text-center">
+            <AlertCircle className="size-10 text-muted-foreground" />
             <h3 className="font-bold">{t('account.governanceNotAvailable')}</h3>
             <p className="text-sm text-muted-foreground">
                 {t('account.governanceNotAvailableDescription')}
@@ -80,24 +80,24 @@ export function TeamsView() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in duration-500">
+    <div className="mx-auto max-w-7xl space-y-6 duration-500 animate-in fade-in">
       <PageHeader 
         title={t('account.teamsTitle')} 
         description={t('account.teamsDescription')}
       >
-        <Button className="gap-2 font-bold uppercase text-[11px] tracking-widest h-10" onClick={() => setIsCreateOpen(true)}>
-          <Plus className="w-4 h-4" /> {t('account.createInternalTeam')}
+        <Button className="h-10 gap-2 text-[11px] font-bold uppercase tracking-widest" onClick={() => setIsCreateOpen(true)}>
+          <Plus className="size-4" /> {t('account.createInternalTeam')}
         </Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {teams.map((team: Team) => (
-          <Card key={team.id} className="border-border/60 hover:border-primary/40 transition-all cursor-pointer group" onClick={() => router.push(`/dashboard/account/teams/${team.id}`)}>
+          <Card key={team.id} className="group cursor-pointer border-border/60 transition-all hover:border-primary/40" onClick={() => router.push(`/dashboard/account/teams/${team.id}`)}>
             <CardHeader>
-              <div className="p-2.5 w-fit bg-primary/5 rounded-xl text-primary mb-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                <Users className="w-5 h-5" />
+              <div className="mb-2 w-fit rounded-xl bg-primary/5 p-2.5 text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground">
+                <Users className="size-5" />
               </div>
-              <CardTitle className="text-lg font-headline">{team.name}</CardTitle>
+              <CardTitle className="font-headline text-lg">{team.name}</CardTitle>
               <CardDescription className="text-xs">{team.description}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -105,21 +105,21 @@ export function TeamsView() {
                 {(team.memberIds || []).length} {t('account.members')}
               </Badge>
             </CardContent>
-            <CardFooter className="border-t py-4 flex justify-between items-center bg-muted/5">
-              <span className="text-[9px] font-mono text-muted-foreground">ID: {team.id.toUpperCase()}</span>
+            <CardFooter className="flex items-center justify-between border-t bg-muted/5 py-4">
+              <span className="font-mono text-[9px] text-muted-foreground">ID: {team.id.toUpperCase()}</span>
               <Button variant="ghost" size="sm" className="h-8 gap-1 text-[9px] font-bold uppercase tracking-widest text-primary">
-                {t('account.manageMembers')} <ArrowRight className="w-3 h-3" />
+                {t('account.manageMembers')} <ArrowRight className="size-3" />
               </Button>
             </CardFooter>
           </Card>
         ))}
 
         <div 
-          className="p-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center bg-muted/5 border-border/40 hover:bg-muted/10 transition-colors cursor-pointer"
+          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center transition-colors hover:bg-muted/10"
           onClick={() => setIsCreateOpen(true)}
         >
-          <FolderTree className="w-8 h-8 text-muted-foreground mb-4 opacity-20" />
-          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em]">{t('account.createNewTeam')}</p>
+          <FolderTree className="mb-4 size-8 text-muted-foreground opacity-20" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t('account.createNewTeam')}</p>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export function TeamsView() {
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">{t('account.createInternalTeam')}</DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-4">
+          <div className="space-y-4 py-4">
             <Label>{t('account.teamName')}</Label>
             <Input value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} placeholder={t('account.teamNamePlaceholder')} />
           </div>

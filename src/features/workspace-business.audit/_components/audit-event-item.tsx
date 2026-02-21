@@ -27,10 +27,10 @@ export function AuditEventItem({ log, onSelect }: AuditEventItemProps) {
 
   return (
     <AuditEventItemContainer>
-      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-background border-2 border-border relative z-10">
+      <div className="relative z-10 flex size-6 items-center justify-center rounded-full border-2 border-border bg-background">
         <AuditTypeIcon type={log.type} />
       </div>
-      <div className="flex-1 space-y-1 cursor-pointer" onClick={onSelect}>
+      <div className="flex-1 cursor-pointer space-y-1" onClick={onSelect}>
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium leading-none">
             <span className="font-bold">{log.actor}</span>{" "}

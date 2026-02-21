@@ -25,7 +25,7 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Date
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <ArrowUpDown className="ml-2 size-4" />
           </Button>
         )
       },
@@ -50,7 +50,7 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Event
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 size-4" />
         </Button>
       )
     },
@@ -65,7 +65,7 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
       const assigneeDetails = assignees.map(id => members.find(m => m.id === id)).filter(Boolean) as MemberReference[];
 
       if (assigneeDetails.length === 0) {
-        return <span className="text-muted-foreground/50 text-[10px] italic">Unassigned</span>
+        return <span className="text-[10px] italic text-muted-foreground/50">Unassigned</span>
       }
 
       return (
@@ -75,7 +75,7 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
               <TooltipProvider key={member.id}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Avatar className="w-7 h-7 border-2 border-background">
+                        <Avatar className="size-7 border-2 border-background">
                             <AvatarFallback className="text-[10px] font-bold">{member.name?.[0]}</AvatarFallback>
                         </Avatar>
                     </TooltipTrigger>
@@ -89,7 +89,7 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Avatar className="w-7 h-7 border-2 border-background">
+                            <Avatar className="size-7 border-2 border-background">
                                 <AvatarFallback className="text-[10px] font-bold">+{assignees.length - 3}</AvatarFallback>
                             </Avatar>
                         </TooltipTrigger>

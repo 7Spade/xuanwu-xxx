@@ -22,7 +22,7 @@ interface NavUserProps {
   accounts: Record<string, Account>
   activeAccount: Account | null
   logout: () => void
-  t: (key: string) => void
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const getAccountInitial = (name?: string) => name?.[0] ?? ""
@@ -57,9 +57,9 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="size-8 rounded-lg">
                 {user?.photoURL ? <AvatarImage src={user.photoURL} alt={user?.name} /> : null}
-                <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">{getAccountInitial(user?.name)}</AvatarFallback>
+                <AvatarFallback className="rounded-lg bg-primary/10 font-bold text-primary">{getAccountInitial(user?.name)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.name}</span>
@@ -81,14 +81,14 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={ROUTES.ACCOUNT_SETTINGS} className="cursor-pointer flex items-center gap-2 py-2">
-                <UserCircle className="w-4 h-4 text-muted-foreground" />
+              <Link href={ROUTES.ACCOUNT_SETTINGS} className="flex cursor-pointer items-center gap-2 py-2">
+                <UserCircle className="size-4 text-muted-foreground" />
                 <span className="text-xs font-medium">{t('sidebar.userSettings')}</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer flex items-center gap-2 py-2">
-              <LogOut className="w-4 h-4" />
+            <DropdownMenuItem onClick={handleLogout} className="flex cursor-pointer items-center gap-2 py-2 text-destructive">
+              <LogOut className="size-4" />
               <span className="text-xs font-bold">{t('auth.disconnect')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

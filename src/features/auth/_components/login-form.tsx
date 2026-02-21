@@ -34,30 +34,30 @@ export function LoginForm({
   return (
     <>
       <div className="space-y-2">
-        <div className="flex justify-between items-center px-1">
+        <div className="flex items-center justify-between px-1">
           <Label htmlFor="l-email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.contactEndpoint')}</Label>
         </div>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <Mail className="w-4 h-4 text-muted-foreground/30" />
+            <Mail className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput id="l-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('auth.email')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="space-y-2">
-        <div className="flex justify-between items-center px-1">
+        <div className="flex items-center justify-between px-1">
           <Label htmlFor="l-pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.securityKey')}</Label>
-          <Button variant="ghost" size="sm" type="button" onClick={onForgotPassword} className="h-auto p-0 text-[10px] font-black text-primary/60 hover:text-primary hover:bg-transparent transition-colors uppercase">{t('auth.forgotPassword')}</Button>
+          <Button variant="ghost" size="sm" type="button" onClick={onForgotPassword} className="h-auto p-0 text-[10px] font-black uppercase text-primary/60 transition-colors hover:bg-transparent hover:text-primary">{t('auth.forgotPassword')}</Button>
         </div>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <Lock className="w-4 h-4 text-muted-foreground/30" />
+            <Lock className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput id="l-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('auth.password')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="h-[80px]" /> {/* Spacer */}
-      <Button onClick={handleLogin} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-base shadow-xl shadow-primary/20 mt-auto" disabled={isLoading}>
+      <Button onClick={handleLogin} className="mt-auto h-14 w-full rounded-2xl text-base font-black uppercase tracking-widest shadow-xl shadow-primary/20" disabled={isLoading}>
         {isLoading ? <Loader2 className="animate-spin" /> : t('auth.enterDimension')}
       </Button>
     </>

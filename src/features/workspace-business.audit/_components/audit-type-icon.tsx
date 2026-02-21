@@ -11,13 +11,13 @@ interface AuditTypeIconProps {
 export function AuditTypeIcon({ type }: AuditTypeIconProps) {
     switch (type) {
         case 'create':
-            return <Zap className="w-3.5 h-3.5" />;
+            return <Zap className="size-3.5" />;
         case 'delete':
-            return <Shield className="w-3.5 h-3.5" />;
+            return <Shield className="size-3.5" />;
         case 'security':
-            return <Terminal className="w-3.5 h-3.5" />;
+            return <Terminal className="size-3.5" />;
         case 'update':
         default:
-            return <Activity className="w-3.5 h-3.5" />;
+            return <Activity className="size-3.5" />;
     }
 }

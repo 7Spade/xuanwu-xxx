@@ -10,8 +10,8 @@ export function PreferencesCard() {
   return (
     <Card className="border-border/60 shadow-sm">
       <CardHeader>
-        <div className="flex items-center gap-2 text-primary mb-1">
-          <Bell className="w-4 h-4" />
+        <div className="mb-1 flex items-center gap-2 text-primary">
+          <Bell className="size-4" />
           <span className="text-[10px] font-bold uppercase tracking-widest">Environment Preferences</span>
         </div>
         <CardTitle className="font-headline">Sovereignty Environment Settings</CardTitle>

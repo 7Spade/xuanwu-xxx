@@ -30,51 +30,51 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
 
   return (
     <Card
-      className="group border-border/60 hover:shadow-lg hover:border-primary/40 transition-all duration-300 cursor-pointer bg-card/60 backdrop-blur-sm"
+      className="group cursor-pointer border-border/60 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
       onClick={handleClick}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="p-2.5 bg-primary/5 rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-            <Shield className="w-5 h-5" />
+          <div className="rounded-xl bg-primary/5 p-2.5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+            <Shield className="size-5" />
           </div>
           <div className="flex items-center gap-1">
             <Badge
-              variant="ghost"
-              className="h-6 w-6 p-0 flex items-center justify-center text-muted-foreground"
+              variant="outline"
+              className="flex size-6 items-center justify-center p-0 text-muted-foreground"
             >
               {workspace.visibility === "visible" ? (
-                <Eye className="w-3.5 h-3.5" />
+                <Eye className="size-3.5" />
               ) : (
-                <EyeOff className="w-3.5 h-3.5" />
+                <EyeOff className="size-3.5" />
               )}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:bg-accent/10"
+              className="size-8 text-muted-foreground hover:bg-accent/10"
               onClick={(e) => {
                 e.stopPropagation();
               }}
             >
-              <MoreVertical className="w-4 h-4" />
+              <MoreVertical className="size-4" />
             </Button>
           </div>
         </div>
-        <CardTitle className="mt-4 font-headline text-lg group-hover:text-primary transition-colors truncate">
+        <CardTitle className="mt-4 truncate font-headline text-lg transition-colors group-hover:text-primary">
           {workspace.name}
         </CardTitle>
-        <CardDescription className="text-[9px] uppercase tracking-widest font-bold opacity-60">
+        <CardDescription className="text-[9px] font-bold uppercase tracking-widest opacity-60">
           {t("workspaces.lifecycleState")}: {workspace.lifecycleState}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-1.5 mt-1 min-h-[32px]">
+        <div className="mt-1 flex min-h-[32px] flex-wrap gap-1.5">
           {(workspace.scope || []).slice(0, 3).map((s) => (
             <Badge
               key={s}
               variant="secondary"
-              className="text-[8px] px-1.5 py-0 uppercase tracking-tighter bg-muted/50 border-none"
+              className="border-none bg-muted/50 px-1.5 py-0 text-[8px] uppercase tracking-tighter"
             >
               {s}
             </Badge>
@@ -86,12 +86,12 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="pt-0 flex justify-between items-center border-t border-border/20 mt-4 py-4">
+      <CardFooter className="mt-4 flex items-center justify-between border-t border-border/20 py-4 pt-0">
         <div className="flex flex-col">
-          <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-tighter leading-none">
+          <span className="text-[8px] font-bold uppercase leading-none tracking-tighter text-muted-foreground">
             [{t("workspaces.defaultProtocol")}]
           </span>
-          <span className="text-[10px] font-mono truncate max-w-[120px]">
+          <span className="max-w-[120px] truncate font-mono text-[10px]">
             {workspace.protocol || t("workspaces.standard")}
           </span>
         </div>
@@ -102,7 +102,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
             .map((g, i) => (
               <div
                 key={i}
-                className="w-6 h-6 rounded-full border-2 border-background bg-primary/10 text-[8px] flex items-center justify-center font-bold shadow-sm"
+                className="flex size-6 items-center justify-center rounded-full border-2 border-background bg-primary/10 text-[8px] font-bold shadow-sm"
               >
                 {g.userId?.[0].toUpperCase() || "U"}
               </div>

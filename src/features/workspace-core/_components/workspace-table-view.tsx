@@ -18,24 +18,24 @@ function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
 
   return (
     <div
-      className="flex items-center justify-between p-4 bg-card border border-border/60 rounded-xl hover:bg-muted/30 transition-colors group cursor-pointer"
+      className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/60 bg-card p-4 transition-colors hover:bg-muted/30"
       onClick={() => router.push(`/workspaces/${workspace.id}`)}
     >
       <div className="flex items-center gap-4">
-        <div className="p-2 bg-primary/5 rounded-lg text-primary">
-          <Shield className="w-5 h-5" />
+        <div className="rounded-lg bg-primary/5 p-2 text-primary">
+          <Shield className="size-5" />
         </div>
         <div>
-          <h3 className="font-semibold text-sm">{workspace.name}</h3>
-          <div className="flex items-center gap-2 mt-0.5">
+          <h3 className="text-sm font-semibold">{workspace.name}</h3>
+          <div className="mt-0.5 flex items-center gap-2">
             <Badge
               variant="outline"
-              className="text-[9px] uppercase tracking-tighter px-1.5 h-4 flex items-center gap-1"
+              className="flex h-4 items-center gap-1 px-1.5 text-[9px] uppercase tracking-tighter"
             >
               {workspace.visibility === "visible" ? (
-                <Eye className="w-3 h-3" />
+                <Eye className="size-3" />
               ) : (
-                <EyeOff className="w-3 h-3" />
+                <EyeOff className="size-3" />
               )}
               {workspace.visibility === "visible"
                 ? t("common.visible")
@@ -48,8 +48,8 @@ function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <div className="text-right hidden md:block">
-          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">
+        <div className="hidden text-right md:block">
+          <p className="mb-1 text-[9px] font-bold uppercase leading-none tracking-widest text-muted-foreground">
             {t("workspaces.accessProtocol")}
           </p>
           <p className="text-[11px] font-medium">
@@ -60,9 +60,9 @@ function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-primary"
+            className="size-8 text-muted-foreground hover:text-primary"
           >
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="size-4" />
           </Button>
         </div>
       </div>

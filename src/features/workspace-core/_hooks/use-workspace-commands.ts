@@ -4,7 +4,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { deleteWorkspace } from "@/features/workspace-core/_actions";
+import { deleteWorkspace } from "../_actions";
 import { toast } from "@/shared/utility-hooks/use-toast";
 
 export function useWorkspaceCommands() {

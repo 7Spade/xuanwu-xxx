@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useWorkspace } from '@/features/workspace-core';
+import { useWorkspace , useApp } from '@/features/workspace-core';
 import { Card, CardDescription, CardHeader, CardTitle, CardFooter } from "@/shared/shadcn-ui/card";
 import { Badge } from "@/shared/shadcn-ui/badge";
 import { Button } from "@/shared/shadcn-ui/button";
@@ -39,7 +39,6 @@ import {
   AlertDialogTitle,
 } from "@/shared/shadcn-ui/alert-dialog";
 import { type Capability } from "@/shared/types";
-import { useApp } from "@/features/workspace-core";
 import { Checkbox } from "@/shared/shadcn-ui/checkbox";
 import { Label } from "@/shared/shadcn-ui/label";
 
@@ -156,36 +155,36 @@ export function WorkspaceCapabilities() {
 
   const getIcon = (id: string) => {
     switch (id) {
-      case 'members': return <Users className="w-5 h-5" />;
-      case 'audit': return <Activity className="w-5 h-5" />;
-      case 'files': return <FileText className="w-5 h-5" />;
-      case 'tasks': return <ListTodo className="w-5 h-5" />;
-      case 'qa': return <ShieldCheck className="w-5 h-5" />;
-      case 'acceptance': return <Trophy className="w-5 h-5" />;
-      case 'finance': return <Landmark className="w-5 h-5" />;
-      case 'issues': return <AlertCircle className="w-5 h-5" />;
-      case 'daily': return <MessageSquare className="w-5 h-5" />;
-      case 'schedule': return <Calendar className="w-5 h-5" />;
-      case 'docu-import': return <FileScan className="w-5 h-5" />;
-      default: return <Layers className="w-5 h-5" />;
+      case 'members': return <Users className="size-5" />;
+      case 'audit': return <Activity className="size-5" />;
+      case 'files': return <FileText className="size-5" />;
+      case 'tasks': return <ListTodo className="size-5" />;
+      case 'qa': return <ShieldCheck className="size-5" />;
+      case 'acceptance': return <Trophy className="size-5" />;
+      case 'finance': return <Landmark className="size-5" />;
+      case 'issues': return <AlertCircle className="size-5" />;
+      case 'daily': return <MessageSquare className="size-5" />;
+      case 'schedule': return <Calendar className="size-5" />;
+      case 'docu-import': return <FileScan className="size-5" />;
+      default: return <Layers className="size-5" />;
     }
   };
 
   const getSpecIcon = (type: string) => {
     switch (type) {
-      case 'governance': return <Users className="w-6 h-6" />;
-      case 'monitoring': return <Activity className="w-6 h-6" />;
-      case 'data': return <FileText className="w-6 h-6" />;
-      case 'ui': return <Settings2 className="w-6 h-6" />;
-      default: return <Box className="w-6 h-6" />;
+      case 'governance': return <Users className="size-6" />;
+      case 'monitoring': return <Activity className="size-6" />;
+      case 'data': return <FileText className="size-6" />;
+      case 'ui': return <Settings2 className="size-6" />;
+      default: return <Box className="size-6" />;
     }
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 duration-300 animate-in fade-in">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-          <Box className="w-4 h-4" /> Mounted Atomic Capabilities
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          <Box className="size-4" /> Mounted Atomic Capabilities
         </h3>
         <Button
           variant="outline"
@@ -193,48 +192,48 @@ export function WorkspaceCapabilities() {
           className="h-8 gap-2 text-[10px] font-bold uppercase tracking-widest"
           onClick={() => setIsAddOpen(true)}
         >
-          <Plus className="w-3.5 h-3.5" /> Mount New Capability
+          <Plus className="size-3.5" /> Mount New Capability
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {(workspace.capabilities || []).map((cap: Capability) => (
-          <Card key={cap.id} className="border-border/60 hover:border-primary/40 transition-all group bg-card/40 backdrop-blur-sm overflow-hidden">
+          <Card key={cap.id} className="group overflow-hidden border-border/60 bg-card/40 backdrop-blur-sm transition-all hover:border-primary/40">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2.5 bg-primary/5 rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="rounded-xl bg-primary/5 p-2.5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                   {getIcon(cap.id)}
                 </div>
-                <Badge variant="outline" className="text-[9px] uppercase font-bold px-1.5 bg-background">
+                <Badge variant="outline" className="bg-background px-1.5 text-[9px] font-bold uppercase">
                   {cap.status === 'stable' ? 'PRODUCTION' : 'BETA'}
                 </Badge>
               </div>
-              <CardTitle className="text-lg font-headline group-hover:text-primary transition-colors">{cap.name}</CardTitle>
-              <CardDescription className="text-[11px] mt-1 leading-relaxed">{cap.description}</CardDescription>
+              <CardTitle className="font-headline text-lg transition-colors group-hover:text-primary">{cap.name}</CardTitle>
+              <CardDescription className="mt-1 text-[11px] leading-relaxed">{cap.description}</CardDescription>
             </CardHeader>
-            <CardFooter className="border-t border-border/10 flex justify-between items-center py-4 bg-muted/5">
-              <span className="text-[9px] font-mono text-muted-foreground opacity-60">SPEC_ID: {cap.id.toUpperCase()}</span>
+            <CardFooter className="flex items-center justify-between border-t border-border/10 bg-muted/5 py-4">
+              <span className="font-mono text-[9px] text-muted-foreground opacity-60">SPEC_ID: {cap.id.toUpperCase()}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" 
+                className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" 
                 onClick={() => setPendingUnmount(cap)}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="size-4" />
               </Button>
             </CardFooter>
           </Card>
         ))}
         {(workspace.capabilities || []).length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center gap-4 p-16 border-2 border-dashed rounded-3xl text-center">
-            <div className="p-4 bg-muted/40 rounded-2xl">
-              <Box className="w-10 h-10 text-muted-foreground/50" />
+          <div className="col-span-full flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed p-16 text-center">
+            <div className="rounded-2xl bg-muted/40 p-4">
+              <Box className="size-10 text-muted-foreground/50" />
             </div>
             <div className="space-y-1">
               <p className="text-sm font-bold">No capabilities mounted yet</p>
               <p className="text-[11px] text-muted-foreground">Add your first capability to start using this workspace.</p>
             </div>
             <Button size="sm" className="gap-2" onClick={() => setIsAddOpen(true)}>
-              <Plus className="w-4 h-4" /> Mount Your First Capability
+              <Plus className="size-4" /> Mount Your First Capability
             </Button>
           </div>
         )}
@@ -242,22 +241,22 @@ export function WorkspaceCapabilities() {
 
       {/* Mount Dialog */}
       <Dialog open={isAddOpen} onOpenChange={(open) => { if (!open) setSelectedCaps(new Set()); setIsAddOpen(open); }}>
-        <DialogContent className="rounded-2xl max-w-2xl">
+        <DialogContent className="max-w-2xl rounded-2xl">
           <DialogHeader>
             <DialogTitle className="font-headline text-2xl">Mount Atomic Capability</DialogTitle>
             <DialogDescription className="flex items-center gap-2 pt-2">
-              <Info className="w-4 h-4 text-muted-foreground" />
+              <Info className="size-4 text-muted-foreground" />
               {ownerType === 'user' 
                 ? "Showing core capabilities available for a Personal Workspace."
                 : "Showing all available capabilities for an Organizational Workspace."}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 max-h-[60vh] overflow-y-auto">
+          <div className="grid max-h-[60vh] grid-cols-1 gap-4 overflow-y-auto py-4 md:grid-cols-2">
             {availableSpecs.map((cap) => (
               <Label 
                 key={cap.id} 
                 htmlFor={`cap-${cap.id}`}
-                className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-colors ${
+                className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-4 transition-colors ${
                   selectedCaps.has(cap.id) ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
                 }`}
               >
@@ -266,12 +265,12 @@ export function WorkspaceCapabilities() {
                   checked={selectedCaps.has(cap.id)}
                   onCheckedChange={() => toggleCapSelection(cap.id)}
                 />
-                <div className="p-3 bg-primary/10 rounded-xl text-primary">
+                <div className="rounded-xl bg-primary/10 p-3 text-primary">
                   {getSpecIcon(cap.type)}
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-bold uppercase">{cap.name}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 whitespace-normal leading-tight">{cap.description}</p>
+                  <p className="mt-0.5 whitespace-normal text-[10px] leading-tight text-muted-foreground">{cap.description}</p>
                 </div>
               </Label>
             ))}
@@ -281,7 +280,7 @@ export function WorkspaceCapabilities() {
               <Button onClick={handleAddCapabilities} disabled={selectedCaps.size === 0 || isMounting}>
                 <span aria-live="polite" aria-busy={isMounting ? "true" : "false"}>
                   {isMounting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mounting...</>
+                    <><Loader2 className="mr-2 size-4 animate-spin" /> Mounting...</>
                   ) : (
                     `Mount Selected (${selectedCaps.size})`
                   )}
@@ -293,7 +292,7 @@ export function WorkspaceCapabilities() {
 
       {/* Unmount Confirmation Dialog */}
       <AlertDialog open={!!pendingUnmount} onOpenChange={(open) => !open && setPendingUnmount(null)}>
-        <AlertDialogContent className="rounded-2xl max-w-sm">
+        <AlertDialogContent className="max-w-sm rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Unmount Capability</AlertDialogTitle>
             <AlertDialogDescription>

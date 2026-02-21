@@ -22,12 +22,12 @@ export default function Home() {
   }, [state.user, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <Button
         aria-label={t('common.enterOrgVerse')}
         variant="ghost"
         onClick={() => router.push("/login")}
-        className="text-7xl h-auto w-auto p-0 hover:bg-transparent animate-bounce duration-[3000ms] hover:scale-110 transition-transform"
+        className="duration-[3000ms] size-auto animate-bounce p-0 text-7xl transition-transform hover:scale-110 hover:bg-transparent"
       >
         🐢
       </Button>

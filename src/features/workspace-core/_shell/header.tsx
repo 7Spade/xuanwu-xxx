@@ -102,17 +102,17 @@ export function Header() {
         </Breadcrumb>
       </div>
 
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <Button
           variant="outline"
-          className="relative w-full max-w-md justify-start text-sm text-muted-foreground bg-muted/40 border-none h-9 group"
+          className="group relative h-9 w-full max-w-md justify-start border-none bg-muted/40 text-sm text-muted-foreground"
           onClick={() => setIsSearchOpen(true)}
         >
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-hover:text-primary" />
           <span className="pl-7">Search dimensions, spaces, or people...</span>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <div className="hidden md:flex items-center gap-1 text-[10px] text-muted-foreground border rounded px-1.5 py-0.5 bg-background shadow-sm ml-1">
-              <Command className="w-2.5 h-2.5" /> K
+          <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
+            <div className="ml-1 hidden items-center gap-1 rounded border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground shadow-sm md:flex">
+              <Command className="size-2.5" /> K
             </div>
           </div>
         </Button>

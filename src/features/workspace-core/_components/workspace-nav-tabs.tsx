@@ -3,8 +3,7 @@
 import { useMemo } from "react"
 import { useSelectedLayoutSegment } from "next/navigation"
 import Link from "next/link"
-import { useWorkspace } from "@/features/workspace-core"
-import { useApp } from "@/features/workspace-core"
+import { useWorkspace , useApp } from "@/features/workspace-core"
 import type { Capability } from "@/shared/types"
 
 // =================================================================
@@ -90,7 +89,7 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
   }, [workspace.capabilities, showGovernanceTabs])
 
   return (
-    <div className="bg-muted/40 p-1 border border-border/50 rounded-xl w-full flex overflow-x-auto no-scrollbar">
+    <div className="no-scrollbar flex w-full overflow-x-auto rounded-xl border border-border/50 bg-muted/40 p-1">
       {mountedCapabilities.map((cap: { id: string; name: string }) => {
         const detail = CAPABILITY_REGISTRY[cap.id as keyof typeof CAPABILITY_REGISTRY]
         const isActive = activeCapability === cap.id
@@ -99,7 +98,7 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
           <Link
             key={cap.id}
             href={`/workspaces/${workspaceId}/${cap.id}`}
-            className={`text-[9px] font-bold uppercase tracking-widest px-4 rounded-lg whitespace-nowrap inline-flex items-center justify-center h-9 transition-colors ${
+            className={`inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg px-4 text-[9px] font-bold uppercase tracking-widest transition-colors ${
               isActive
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-background/50 hover:text-foreground"

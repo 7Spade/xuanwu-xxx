@@ -2,6 +2,7 @@ export interface AuditLog {
   id: string;
   accountId: string;
   workspaceId?: string;
+  workspaceName?: string;
   recordedAt: any; // Event Timestamp
   actor: string;
   actorId?: string;

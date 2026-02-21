@@ -28,10 +28,10 @@ function WorkItemsTable({
   return (
     <div>
       <div className="overflow-x-auto rounded-md border">
-         <pre className="p-4 bg-muted/50 rounded-lg text-xs">{JSON.stringify(initialData, null, 2)}</pre>
+         <pre className="rounded-lg bg-muted/50 p-4 text-xs">{JSON.stringify(initialData, null, 2)}</pre>
       </div>
 
-      <div className="flex justify-end items-center mt-6">
+      <div className="mt-6 flex items-center justify-end">
         <Button onClick={onImport}>Import as Root Tasks</Button>
       </div>
     </div>
@@ -105,7 +105,7 @@ export function WorkspaceDocumentParser() {
 
   return (
     <div className="space-y-6">
-      <Card className="w-full shadow-lg bg-card/50 backdrop-blur-sm">
+      <Card className="w-full bg-card/50 shadow-lg backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Document Upload</CardTitle>
           <CardDescription>
@@ -115,14 +115,14 @@ export function WorkspaceDocumentParser() {
         <CardContent>
           <form ref={formRef}>
             <div
-              className="relative flex flex-col items-center justify-center w-full p-8 border-2 border-dashed rounded-lg cursor-pointer border-border hover:border-primary transition-colors"
+              className="relative flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-8 transition-colors hover:border-primary"
               onClick={handleUploadClick}
               onKeyDown={(e) => e.key === 'Enter' && handleUploadClick()}
               role="button"
               tabIndex={0}
               aria-label="Upload document"
             >
-              <UploadCloud className="w-12 h-12 text-muted-foreground" />
+              <UploadCloud className="size-12 text-muted-foreground" />
               <p className="mt-4 text-sm text-muted-foreground">
                 <span className="font-semibold text-primary">
                   Click to upload
@@ -147,8 +147,8 @@ export function WorkspaceDocumentParser() {
       </Card>
 
        {isPending && (
-        <div className="flex flex-col items-center justify-center mt-8 text-center">
-          <Loader2 className="w-16 h-16 animate-spin text-primary mb-4" />
+        <div className="mt-8 flex flex-col items-center justify-center text-center">
+          <Loader2 className="mb-4 size-16 animate-spin text-primary" />
           <p className="text-lg font-medium text-foreground">Extracting Data...</p>
           <p className="text-muted-foreground">This may take a moment.</p>
         </div>
@@ -156,13 +156,13 @@ export function WorkspaceDocumentParser() {
 
       {state.data && !isPending && (
         <div className="mt-8">
-            <Card className="shadow-2xl bg-card">
+            <Card className="bg-card shadow-2xl">
                 <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
                     <CardTitle className="text-2xl">Extracted Items</CardTitle>
                     <CardDescription className="flex items-center gap-2 pt-2">
-                        <File className="w-4 h-4" />
+                        <File className="size-4" />
                         {state.fileName}
                     </CardDescription>
                     </div>

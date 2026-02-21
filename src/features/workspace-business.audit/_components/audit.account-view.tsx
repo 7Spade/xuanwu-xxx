@@ -12,8 +12,8 @@ export function AccountAuditComponent() {
 
   if (!isOrgContext) {
     return (
-      <div className="p-8 text-center flex flex-col items-center gap-4">
-        <AlertCircle className="w-10 h-10 text-muted-foreground" />
+      <div className="flex flex-col items-center gap-4 p-8 text-center">
+        <AlertCircle className="size-10 text-muted-foreground" />
         <h3 className="font-bold">Audit Log Not Available</h3>
         <p className="text-sm text-muted-foreground">
           Audit logs are only available within an organization dimension.
@@ -31,8 +31,8 @@ export function AccountAuditComponent() {
           ))}
         </AuditTimeline>
       ) : (
-        <div className="p-32 text-center flex flex-col items-center justify-center space-y-4 opacity-30">
-          <Terminal className="w-12 h-12" />
+        <div className="flex flex-col items-center justify-center space-y-4 p-32 text-center opacity-30">
+          <Terminal className="size-12" />
           <p className="text-sm font-black uppercase tracking-widest">No technical specification changes recorded</p>
         </div>
       )}

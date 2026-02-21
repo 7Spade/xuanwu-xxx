@@ -7,7 +7,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/shared/shadcn-ui
 import { Mail } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { sendPasswordResetEmail } from "@/features/auth/_actions";
+import { sendPasswordResetEmail } from "../_actions";
 
 interface ResetPasswordFormProps {
   defaultEmail?: string;
@@ -40,9 +40,9 @@ export function ResetPasswordForm({ defaultEmail = "", onSuccess, onCancel }: Re
         >
           {t("auth.email")}
         </Label>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <Mail className="w-4 h-4 text-muted-foreground/30" />
+            <Mail className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput
             id="reset-email"
@@ -55,17 +55,17 @@ export function ResetPasswordForm({ defaultEmail = "", onSuccess, onCancel }: Re
           />
         </InputGroup>
       </div>
-      <div className="flex gap-3 justify-center">
+      <div className="flex justify-center gap-3">
         <Button
           variant="ghost"
           onClick={onCancel}
-          className="rounded-xl font-black text-xs uppercase px-6"
+          className="rounded-xl px-6 text-xs font-black uppercase"
         >
           {t("common.cancel")}
         </Button>
         <Button
           onClick={handleSend}
-          className="rounded-xl font-black text-xs uppercase px-8 shadow-lg shadow-primary/20"
+          className="rounded-xl px-8 text-xs font-black uppercase shadow-lg shadow-primary/20"
         >
           {t("auth.sendEmail")}
         </Button>

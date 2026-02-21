@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/shared/shadcn-ui/button";
 import { ArrowLeft, Settings, Trash2, ChevronRight, MapPin } from "lucide-react";
 import { useState, use } from "react";
-import { WorkspaceProvider, useWorkspace } from "@/features/workspace-core"
-import { useWorkspaceEventHandler } from "@/features/workspace-core"
+import { WorkspaceProvider, useWorkspace , useWorkspaceEventHandler , WorkspaceStatusBar , WorkspaceNavTabs , useWorkspaceCommands } from "@/features/workspace-core"
 import { ROUTES } from "@/shared/constants/routes";
 import {
   Dialog,
@@ -16,9 +15,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
-import { WorkspaceStatusBar } from "@/features/workspace-core";
-import { WorkspaceNavTabs } from "@/features/workspace-core";
-import { useWorkspaceCommands } from "@/features/workspace-core";
 import { PageHeader } from "@/shared/shadcn-ui/page-header";
 
 /**
@@ -46,30 +42,30 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
   const formattedAddress = workspace.address ? [workspace.address.street, workspace.address.city, workspace.address.state, workspace.address.country, workspace.address.postalCode].filter(Boolean).join(', ') : 'No address defined.';
 
   return (
-     <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20 gpu-accelerated">
+     <div className="gpu-accelerated mx-auto max-w-7xl space-y-6 pb-20 duration-500 animate-in fade-in slide-in-from-bottom-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.back()}
-            className="h-8 w-8 hover:bg-primary/5"
+            className="size-8 hover:bg-primary/5"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="size-4" />
           </Button>
           <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em]">
             <span>Dimension Space</span>
-            <ChevronRight className="w-3 h-3 opacity-30" />
+            <ChevronRight className="size-3 opacity-30" />
             <span className="text-foreground">{workspace.name}</span>
           </div>
         </div>
         <Button
           variant="outline"
           size="sm"
-          className="text-destructive border-destructive/20 hover:bg-destructive/5 font-bold uppercase text-[10px] tracking-widest"
+          className="border-destructive/20 text-[10px] font-bold uppercase tracking-widest text-destructive hover:bg-destructive/5"
           onClick={() => setIsDeleteOpen(true)}
         >
-          <Trash2 className="w-3.5 h-3.5 mr-2" /> Destroy Space
+          <Trash2 className="mr-2 size-3.5" /> Destroy Space
         </Button>
       </div>
 
@@ -84,17 +80,17 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
           <Button
             variant="outline"
             size="sm"
-            className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
+            className="h-9 gap-2 text-[10px] font-bold uppercase tracking-widest"
             onClick={() => router.push(`/workspaces/${workspaceId}/settings`)}
           >
-            <Settings className="w-3.5 h-3.5" /> Space Settings
+            <Settings className="size-3.5" /> Space Settings
           </Button>
         </div>
       </PageHeader>
       
       {workspace.address && (
-          <div className="p-4 bg-muted/40 rounded-2xl border flex items-center gap-4 -mt-2">
-              <MapPin className="w-5 h-5 text-muted-foreground" />
+          <div className="-mt-2 flex items-center gap-4 rounded-2xl border bg-muted/40 p-4">
+              <MapPin className="size-5 text-muted-foreground" />
               <p className="text-sm font-medium text-muted-foreground">{formattedAddress}</p>
           </div>
       )}
@@ -107,11 +103,11 @@ function WorkspaceLayoutInner({ workspaceId, pluginTab, modal, panel }: { worksp
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-destructive font-headline text-xl">
+            <DialogTitle className="font-headline text-xl text-destructive">
               Initiate Workspace Destruction Protocol
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4 p-4 bg-destructive/5 rounded-2xl border border-destructive/20 text-[11px] text-destructive italic">
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-[11px] italic text-destructive">
             This action will permanently erase the workspace node "
             {workspace.name}" and all its subordinate atomic data and technical
             specifications.

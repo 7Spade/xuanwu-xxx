@@ -1,10 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
-import { Auth } from 'firebase/auth';
-import { FirebaseStorage } from 'firebase/storage';
+import React, { createContext, useContext, type ReactNode } from 'react';
+import { type FirebaseApp } from 'firebase/app';
+import { type Firestore } from 'firebase/firestore';
+import { type Auth } from 'firebase/auth';
+import { type FirebaseStorage } from 'firebase/storage';
 import { app } from '@/shared/infra/app.client';
 import { db } from '@/shared/infra/firestore/firestore.client';
 import { auth } from '@/shared/infra/auth/auth.client';

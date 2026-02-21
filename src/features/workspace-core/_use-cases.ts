@@ -3,8 +3,8 @@
  * No React. No UI. Callable from hooks, context, or Server Actions.
  */
 
-import { createWorkspace, mountCapabilities } from "@/features/workspace-core/_actions"
-import type { Account, Capability } from "@/shared/types"
+import { createWorkspace, mountCapabilities , updateWorkspaceSettings, deleteWorkspace } from "./_actions"
+import type { Account, Capability , WorkspaceLifecycleState, Address } from "@/shared/types"
 
 /**
  * Creates a workspace and immediately mounts a set of initial capabilities.
@@ -28,8 +28,6 @@ export async function createWorkspaceWithCapabilities(
 }
 
 import { toast } from "@/shared/utility-hooks/use-toast"
-import { updateWorkspaceSettings, deleteWorkspace } from "@/features/workspace-core/_actions"
-import type { WorkspaceLifecycleState, Address } from "@/shared/types"
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback

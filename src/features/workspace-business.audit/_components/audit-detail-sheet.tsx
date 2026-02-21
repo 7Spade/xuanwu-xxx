@@ -23,8 +23,8 @@ export function AuditDetailSheet({ log, isOpen, onOpenChange }: AuditDetailSheet
                         Detailed information about this audit event.
                     </SheetDescription>
                 </SheetHeader>
-                <ScrollArea className="h-[calc(100vh-10rem)] mt-4">
-                    <pre className="text-xs p-4 bg-muted rounded-md">
+                <ScrollArea className="mt-4 h-[calc(100vh-10rem)]">
+                    <pre className="rounded-md bg-muted p-4 text-xs">
                         {JSON.stringify(log, null, 2)}
                     </pre>
                 </ScrollArea>

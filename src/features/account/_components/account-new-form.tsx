@@ -51,7 +51,7 @@ export function AccountNewForm({ onSuccess, onCancel }: AccountNewFormProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+        <Label className="ml-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           {t("dimension.dimensionName")}
         </Label>
         <Input
@@ -59,10 +59,10 @@ export function AccountNewForm({ onSuccess, onCancel }: AccountNewFormProps) {
           onChange={e => setName(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleCreate()}
           placeholder={t("dimension.dimensionNamePlaceholder")}
-          className="rounded-xl h-12"
+          className="h-12 rounded-xl"
         />
       </div>
-      <div className="flex gap-3 justify-center">
+      <div className="flex justify-center gap-3">
         <Button
           variant="outline"
           onClick={onCancel}
@@ -78,7 +78,7 @@ export function AccountNewForm({ onSuccess, onCancel }: AccountNewFormProps) {
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 size-4 animate-spin" />
               {t("common.creating")}
             </>
           ) : (

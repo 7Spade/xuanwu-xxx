@@ -13,7 +13,7 @@ import {
 } from "@/shared/shadcn-ui/card"
 import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react"
 import { useApp } from "@/features/workspace-core"
-import { Account } from "@/shared/types"
+import { type Account } from "@/shared/types"
 
 interface AccountGridProps {
     accounts: Account[]
@@ -32,41 +32,41 @@ function AccountCard({ account }: { account: Account }) {
   
     return (
       <Card 
-        className="group border-border/60 hover:shadow-lg hover:border-primary/40 transition-all duration-300 cursor-pointer bg-card/60 backdrop-blur-sm"
+        className="group cursor-pointer border-border/60 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
         onClick={handleClick}
       >
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <div className="p-2.5 bg-primary/5 rounded-xl text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              <Globe className="w-5 h-5" />
+            <div className="rounded-xl bg-primary/5 p-2.5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+              <Globe className="size-5" />
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 text-muted-foreground hover:bg-accent/10" 
+              className="size-8 text-muted-foreground hover:bg-accent/10" 
               onClick={(e) => { e.stopPropagation(); }}
             >
-              <MoreVertical className="w-4 h-4" />
+              <MoreVertical className="size-4" />
             </Button>
           </div>
-          <CardTitle className="mt-4 font-headline text-lg group-hover:text-primary transition-colors">{account.name}</CardTitle>
-          <CardDescription className="text-[9px] uppercase tracking-widest font-bold opacity-60">
+          <CardTitle className="mt-4 font-headline text-lg transition-colors group-hover:text-primary">{account.name}</CardTitle>
+          <CardDescription className="text-[9px] font-bold uppercase tracking-widest opacity-60">
             Sovereignty Role: {account.role}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-muted-foreground line-clamp-2 min-h-[32px]">{account.description || "No dimension identity description provided."}</p>
+          <p className="line-clamp-2 min-h-[32px] text-xs text-muted-foreground">{account.description || "No dimension identity description provided."}</p>
         </CardContent>
-        <CardFooter className="pt-0 flex justify-between items-center border-t border-border/20 mt-4 py-4">
+        <CardFooter className="mt-4 flex items-center justify-between border-t border-border/20 py-4 pt-0">
           <div className="flex items-center gap-2">
-            <Users className="w-3 h-3 text-primary opacity-50" />
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+            <Users className="size-3 text-primary opacity-50" />
+            <span className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground">
               {(account.members || []).length} authorized members
             </span>
           </div>
           <div className="flex -space-x-1.5">
             {(account.members || []).slice(0, 3).map((m, i) => (
-              <div key={i} className="w-6 h-6 rounded-full border-2 border-background bg-muted text-[8px] flex items-center justify-center font-bold shadow-sm">
+              <div key={i} className="flex size-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[8px] font-bold shadow-sm">
                 {m.name?.[0]}
               </div>
             ))}
@@ -81,8 +81,8 @@ export function AccountGrid({ accounts }: AccountGridProps) {
 
   if (accounts.length === 0) {
     return (
-        <div className="col-span-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-muted/5 border-border/40">
-            <Globe className="w-8 h-8 text-muted-foreground mb-3 opacity-20" />
+        <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/40 bg-muted/5 p-8 text-center">
+            <Globe className="mb-3 size-8 text-muted-foreground opacity-20" />
             <p className="text-sm text-muted-foreground">No organizations have been created or joined yet.</p>
         </div>
     );
@@ -91,17 +91,17 @@ export function AccountGrid({ accounts }: AccountGridProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold font-headline tracking-tight">Recent Organizations</h2>
+        <h2 className="font-headline text-xl font-bold tracking-tight">Recent Organizations</h2>
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => router.push('/dashboard/account/settings')}
-          className="text-xs text-primary font-bold uppercase tracking-widest hover:bg-primary/5"
+          className="text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary/5"
         >
-          Governance Center <ArrowUpRight className="ml-1 w-3 h-3" />
+          Governance Center <ArrowUpRight className="ml-1 size-3" />
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {accounts.map((a) => <AccountCard key={a.id} account={a} />)}
       </div>
     </div>

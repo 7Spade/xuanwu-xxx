@@ -85,7 +85,7 @@ export function NavMain({ pathname, isOrganizationAccount, t }: NavMainProps) {
                   <SidebarMenuSubItem key={item.path}>
                     <SidebarMenuSubButton asChild isActive={isPartiallyActive(item.path)}>
                       <Link href={item.path} className="flex items-center gap-2">
-                        <item.icon className="w-3 h-3" /> {item.label}
+                        <item.icon className="size-3" /> {item.label}
                       </Link>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>

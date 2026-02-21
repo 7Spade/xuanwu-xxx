@@ -50,7 +50,7 @@ function AccountSwitcherItem({
     <DropdownMenuItem
       key={account.id}
       onSelect={() => dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: account })}
-      className="flex items-center justify-between cursor-pointer py-2.5 rounded-lg"
+      className="flex cursor-pointer items-center justify-between rounded-lg py-2.5"
     >
       <div className="flex items-center gap-3">
         <Avatar className={cn("w-8 h-8 border", avatarClass)}>
@@ -60,10 +60,10 @@ function AccountSwitcherItem({
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="font-bold text-xs">{account.name}</span>
+          <span className="text-xs font-bold">{account.name}</span>
         </div>
       </div>
-      {activeAccount?.id === account.id && <Check className="w-4 h-4 text-primary" />}
+      {activeAccount?.id === account.id && <Check className="size-4 text-primary" />}
     </DropdownMenuItem>
   )
 }
@@ -90,8 +90,8 @@ export function AccountSwitcher({
 
   return (
     <>
-      <Link href={ROUTES.DASHBOARD} className="flex items-center mb-2 px-1 hover:opacity-80 transition-opacity">
-        <div className="text-3xl select-none">🐢</div>
+      <Link href={ROUTES.DASHBOARD} className="mb-2 flex items-center px-1 transition-opacity hover:opacity-80">
+        <div className="select-none text-3xl">🐢</div>
       </Link>
 
       <SidebarMenu>
@@ -103,7 +103,7 @@ export function AccountSwitcher({
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 {activeAccount ? (
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="size-8 rounded-lg">
                     {activeAccount.accountType === 'user' && user?.photoURL ? (
                       <AvatarImage src={user.photoURL} alt={activeAccount.name} />
                     ) : null}
@@ -112,8 +112,8 @@ export function AccountSwitcher({
                     </AvatarFallback>
                   </Avatar>
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Globe className="h-4 w-4" />
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <Globe className="size-4" />
                   </div>
                 )}
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -131,7 +131,7 @@ export function AccountSwitcher({
               side={isMobile ? "bottom" : "right"}
               sideOffset={4}
             >
-              <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase tracking-widest font-black px-2 py-1.5">
+              <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                 {t('sidebar.switchAccountContext')}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -140,13 +140,13 @@ export function AccountSwitcher({
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="flex items-center gap-2 cursor-pointer py-2.5 text-primary font-black uppercase text-[10px] tracking-widest"
+                className="flex cursor-pointer items-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest text-primary"
                 onSelect={() => {
                   setIsDropdownOpen(false)
                   router.push(ROUTES.ACCOUNT_NEW)
                 }}
               >
-                <Plus className="w-4 h-4" /> {t('sidebar.createNewDimension')}
+                <Plus className="size-4" /> {t('sidebar.createNewDimension')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -25,10 +25,10 @@ export function WorkspaceSchedule() {
         <Button
           variant="outline"
           size="sm"
-          className="h-9 gap-2 font-bold uppercase text-[10px] tracking-widest"
+          className="h-9 gap-2 text-[10px] font-bold uppercase tracking-widest"
           onClick={() => router.push(`/workspaces/${workspace.id}/governance`)}
         >
-          <Shield className="w-3.5 h-3.5" /> Governance Panel
+          <Shield className="size-3.5" /> Governance Panel
         </Button>
       </div>
       <div className="h-[calc(100vh-22rem)]">

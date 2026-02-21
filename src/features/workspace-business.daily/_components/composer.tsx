@@ -48,32 +48,32 @@ export function DailyLogComposer({
   };
 
   return (
-    <Card className="p-4 border-dashed border-2 hover:border-solid transition-all">
+    <Card className="border-2 border-dashed p-4 transition-all hover:border-solid">
       <Textarea
         placeholder="What's the progress today?"
-        className="resize-none border-none focus-visible:ring-0 text-base min-h-[100px]"
+        className="min-h-[100px] resize-none border-none text-base focus-visible:ring-0"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         disabled={isSubmitting}
       />
 
       {photos.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto py-2 mt-2">
+          <div className="mt-2 flex gap-2 overflow-x-auto py-2">
               {photos.map((photo, index) => (
-                  <div key={index} className="relative w-24 h-24 flex-shrink-0">
-                      <Image src={URL.createObjectURL(photo)} alt={`Preview ${index}`} fill className="object-cover rounded-md" />
+                  <div key={index} className="relative size-24 shrink-0">
+                      <Image src={URL.createObjectURL(photo)} alt={`Preview ${index}`} fill className="rounded-md object-cover" />
                        <button
                           onClick={() => handleRemovePhoto(index)}
-                          className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-black/80 transition-colors"
+                          className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white transition-colors hover:bg-black/80"
                       >
-                          <X className="w-3 h-3" />
+                          <X className="size-3" />
                       </button>
                   </div>
               ))}
           </div>
       )}
 
-      <div className="flex justify-between items-center pt-2 mt-2 border-t">
+      <div className="mt-2 flex items-center justify-between border-t pt-2">
         <Button asChild variant="ghost" size="icon" disabled={isSubmitting}>
           <label htmlFor="photo-upload-daily" className="cursor-pointer">
               <ImagePlusIcon />
@@ -81,7 +81,7 @@ export function DailyLogComposer({
           </label>
         </Button>
         <Button onClick={onSubmit} disabled={isSubmitting || (!content.trim() && photos.length === 0)}>
-          {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+          {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Send className="mr-2 size-4" />}
           {isSubmitting ? "Posting..." : "Post Update"}
         </Button>
       </div>

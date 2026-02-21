@@ -114,7 +114,7 @@ function ProgressReportDialog({
             Submit completed quantity for "{task.name}". Current: {currentCompleted} / {totalQuantity}
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Label htmlFor="submission-quantity">Quantity for this submission</Label>
           <Input
             id="submission-quantity"
@@ -384,7 +384,7 @@ export function WorkspaceTasks() {
     const isViolating = node.descendantSum > node.subtotal;
 
     return (
-      <div className="animate-in slide-in-from-left-2 duration-300">
+      <div className="duration-300 animate-in slide-in-from-left-2">
         <div
           className={cn(
             'group flex items-center gap-3 p-3 rounded-2xl border transition-all mb-1',
@@ -408,31 +408,31 @@ export function WorkspaceTasks() {
             )}
           >
             {isExpanded ? (
-              <ChevronDown className="w-3.5 h-3.5 text-primary" />
+              <ChevronDown className="size-3.5 text-primary" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5 text-primary" />
+              <ChevronRight className="size-3.5 text-primary" />
             )}
           </button>
 
-          <div className="flex-1 grid grid-cols-12 gap-3 items-center">
+          <div className="grid flex-1 grid-cols-12 items-center gap-3">
             <div className="col-span-4 flex items-center gap-2">
-              <span className="text-[9px] font-mono font-black bg-primary/10 px-1.5 py-0.5 rounded text-primary">
+              <span className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] font-black text-primary">
                 {node.wbsNo}
               </span>
-              <div className="flex flex-col flex-1 truncate">
-                <p className="text-xs font-black tracking-tight truncate">
+              <div className="flex flex-1 flex-col truncate">
+                <p className="truncate text-xs font-black tracking-tight">
                   {node.name}
                 </p>
                 {node.location?.description && (
-                  <div className="flex items-center gap-1.5 mt-1 text-muted-foreground">
-                      <MapPin className="w-3 h-3" />
-                      <p className="text-[10px] font-medium truncate">{[node.location.building, node.location.floor, node.location.room, node.location.description].filter(Boolean).join(' - ')}</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-muted-foreground">
+                      <MapPin className="size-3" />
+                      <p className="truncate text-[10px] font-medium">{[node.location.building, node.location.floor, node.location.room, node.location.description].filter(Boolean).join(' - ')}</p>
                   </div>
                 )}
                  {node.photoURLs && node.photoURLs.length > 0 && (
-                  <div className="flex items-center gap-2 mt-1.5">
+                  <div className="mt-1.5 flex items-center gap-2">
                     {node.photoURLs.map((url, i) => (
-                       <button key={i} onClick={() => setPreviewingImage(url)} className="relative w-8 h-8 rounded border overflow-hidden hover:opacity-80 transition-opacity">
+                       <button key={i} onClick={() => setPreviewingImage(url)} className="relative size-8 overflow-hidden rounded border transition-opacity hover:opacity-80">
                          <Image src={url} alt={`Task attachment ${i + 1}`} fill sizes="32px" className="object-cover" />
                        </button>
                     ))}
@@ -441,9 +441,9 @@ export function WorkspaceTasks() {
               </div>
             </div>
 
-            <div className="col-span-8 grid grid-cols-6 gap-2 items-center">
+            <div className="col-span-8 grid grid-cols-6 items-center gap-2">
               {visibleColumns.has('type') && (
-                <div className="text-[9px] font-bold uppercase text-muted-foreground truncate">
+                <div className="truncate text-[9px] font-bold uppercase text-muted-foreground">
                   {node.type}
                 </div>
               )}
@@ -462,7 +462,7 @@ export function WorkspaceTasks() {
               )}
               {visibleColumns.has('discount') && (
                 <div className="text-right">
-                    <p className="text-[8px] font-black text-muted-foreground uppercase leading-none">
+                    <p className="text-[8px] font-black uppercase leading-none text-muted-foreground">
                         Discount
                     </p>
                     <p className="text-[10px] font-bold text-destructive">
@@ -472,7 +472,7 @@ export function WorkspaceTasks() {
               )}
               {visibleColumns.has('subtotal') && (
                 <div className="text-right">
-                  <p className="text-[8px] font-black text-muted-foreground uppercase leading-none">
+                  <p className="text-[8px] font-black uppercase leading-none text-muted-foreground">
                     Budget
                   </p>
                   <p
@@ -494,23 +494,23 @@ export function WorkspaceTasks() {
                     </span>
                   </div>
                   {(node.quantity ?? 1) > 1 && (
-                    <span className="text-[9px] text-muted-foreground font-mono font-bold text-right">
+                    <span className="text-right font-mono text-[9px] font-bold text-muted-foreground">
                       {node.completedQuantity || 0} / {node.quantity}
                     </span>
                   )}
                 </div>
               )}
               {visibleColumns.has('status') && (
-                <div className="flex justify-end items-center">
+                <div className="flex items-center justify-end">
                   {node.progress === 100 && ['todo', 'doing'].includes(node.progressState) ? (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-lg text-blue-500 hover:bg-blue-500/10 hover:text-blue-500"
+                      className="size-8 rounded-lg text-blue-500 hover:bg-blue-500/10 hover:text-blue-500"
                       onClick={() => handleSubmitForQA(node)}
                       title="Submit for QA"
                     >
-                      <Send className="w-4 h-4" />
+                      <Send className="size-4" />
                     </Button>
                   ) : (
                     <div
@@ -531,29 +531,29 @@ export function WorkspaceTasks() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-2">
+          <div className="ml-2 flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
              {(node.quantity ?? 1) > 1 && !hasChildren && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 rounded-lg text-primary"
+                className="size-7 rounded-lg text-primary"
                 onClick={() => setReportingTask(node)}
               >
-                <ClipboardPlus className="w-3.5 h-3.5" />
+                <ClipboardPlus className="size-3.5" />
               </Button>
             )}
              <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 rounded-lg text-primary"
+                className="size-7 rounded-lg text-primary"
                 onClick={() => handleScheduleRequest(node)}
             >
-                <CalendarPlus className="w-3.5 h-3.5" />
+                <CalendarPlus className="size-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-lg text-primary"
+              className="size-7 rounded-lg text-primary"
               onClick={() => {
                 setEditingTask({
                   parentId: node.id,
@@ -568,12 +568,12 @@ export function WorkspaceTasks() {
                 setIsAddOpen(true);
               }}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="size-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-lg text-primary"
+              className="size-7 rounded-lg text-primary"
               onClick={() => {
                 setEditingTask({
                     ...node,
@@ -582,15 +582,15 @@ export function WorkspaceTasks() {
                 setIsAddOpen(true);
               }}
             >
-              <Settings2 className="w-3.5 h-3.5" />
+              <Settings2 className="size-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-lg text-destructive"
+              className="size-7 rounded-lg text-destructive"
               onClick={() => handleDeleteTask(node)}
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="size-3.5" />
             </Button>
           </div>
         </div>
@@ -607,18 +607,18 @@ export function WorkspaceTasks() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-20">
-      <div className="flex items-center justify-between bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/20 shadow-sm">
+    <div className="space-y-6 pb-20 duration-500 animate-in fade-in">
+      <div className="flex items-center justify-between rounded-3xl border border-primary/20 bg-card/40 p-4 shadow-sm backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-xl text-primary">
-            <BarChart3 className="w-5 h-5" />
+          <div className="rounded-xl bg-primary/10 p-2 text-primary">
+            <BarChart3 className="size-5" />
           </div>
           <div>
             <h3 className="text-sm font-black uppercase tracking-widest text-foreground">
               WBS Governance
             </h3>
-            <p className="text-[9px] text-muted-foreground font-bold uppercase flex items-center gap-2">
-              <Clock className="w-3 h-3" /> Real-time Budget & Topology
+            <p className="flex items-center gap-2 text-[9px] font-bold uppercase text-muted-foreground">
+              <Clock className="size-3" /> Real-time Budget & Topology
               Monitoring
             </p>
           </div>
@@ -629,13 +629,13 @@ export function WorkspaceTasks() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 gap-2 font-black uppercase text-[10px] rounded-xl"
+                className="h-9 gap-2 rounded-xl text-[10px] font-black uppercase"
               >
-                <View className="w-3.5 h-3.5" /> View Options
+                <View className="size-3.5" /> View Options
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 rounded-xl">
-              <DropdownMenuLabel className="text-[10px] uppercase font-bold">
+              <DropdownMenuLabel className="text-[10px] font-bold uppercase">
                 Visible Columns
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -680,7 +680,7 @@ export function WorkspaceTasks() {
 
           <Button
             size="sm"
-            className="h-9 gap-2 font-black uppercase text-[10px] rounded-full shadow-lg shadow-primary/20 px-5"
+            className="h-9 gap-2 rounded-full px-5 text-[10px] font-black uppercase shadow-lg shadow-primary/20"
             onClick={() => {
               setEditingTask({
                 quantity: 1,
@@ -696,7 +696,7 @@ export function WorkspaceTasks() {
               setIsAddOpen(true);
             }}
           >
-            <Plus className="w-3.5 h-3.5" /> Create Root Node
+            <Plus className="size-3.5" /> Create Root Node
           </Button>
         </div>
       </div>
@@ -709,14 +709,14 @@ export function WorkspaceTasks() {
       />
 
       <Dialog open={!!previewingImage} onOpenChange={(open) => !open && setPreviewingImage(null)}>
-        <DialogContent className="max-w-4xl p-1 bg-transparent border-none shadow-none">
+        <DialogContent className="max-w-4xl border-none bg-transparent p-1 shadow-none">
           <DialogHeader>
             <DialogTitle className="sr-only">Image Preview</DialogTitle>
             <DialogDescription className="sr-only">A larger view of the attached image.</DialogDescription>
           </DialogHeader>
             {previewingImage && (
-                <div className="relative aspect-video w-full h-auto">
-                    <Image src={previewingImage} alt="Attachment preview" fill sizes="100vw" className="object-contain rounded-lg" />
+                <div className="relative aspect-video h-auto w-full">
+                    <Image src={previewingImage} alt="Attachment preview" fill sizes="100vw" className="rounded-lg object-contain" />
                 </div>
             )}
         </DialogContent>
@@ -726,8 +726,8 @@ export function WorkspaceTasks() {
         {tree.length > 0 ? (
           tree.map((root) => <RenderTask key={root.id} node={root} />)
         ) : (
-          <div className="p-20 text-center border-2 border-dashed rounded-3xl bg-muted/5 opacity-20 flex flex-col items-center gap-3">
-            <Coins className="w-12 h-12" />
+          <div className="flex flex-col items-center gap-3 rounded-3xl border-2 border-dashed bg-muted/5 p-20 text-center opacity-20">
+            <Coins className="size-12" />
             <p className="text-[10px] font-black uppercase tracking-widest">
               Awaiting Engineering Node Definition...
             </p>
@@ -746,19 +746,19 @@ export function WorkspaceTasks() {
           }
         }}
       >
-        <DialogContent className="max-w-3xl rounded-[2.5rem] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="max-w-3xl overflow-hidden rounded-[2.5rem] border-none p-0 shadow-2xl">
           <div className="bg-primary p-8 text-white">
             <DialogHeader>
-              <DialogTitle className="font-headline text-3xl flex items-center gap-3">
-                <Settings2 className="w-8 h-8" />{' '}
+              <DialogTitle className="flex items-center gap-3 font-headline text-3xl">
+                <Settings2 className="size-8" />{' '}
                 {editingTask?.id ? 'Calibrate WBS Node' : 'Define New Node'}
               </DialogTitle>
             </DialogHeader>
           </div>
 
-          <div className="p-8 grid grid-cols-2 gap-6 max-h-[70vh] overflow-y-auto">
+          <div className="grid max-h-[70vh] grid-cols-2 gap-6 overflow-y-auto p-8">
             <div className="col-span-2 space-y-1.5">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+              <Label className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                 Task Name
               </Label>
               <Input
@@ -766,12 +766,12 @@ export function WorkspaceTasks() {
                 onChange={(e) =>
                   setEditingTask({ ...editingTask, name: e.target.value })
                 }
-                className="h-12 rounded-xl bg-muted/30 border-none font-bold"
+                className="h-12 rounded-xl border-none bg-muted/30 font-bold"
               />
             </div>
 
             <div className="col-span-2 space-y-1.5">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+              <Label className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                 Description & Specs
               </Label>
               <Textarea
@@ -782,53 +782,53 @@ export function WorkspaceTasks() {
                     description: e.target.value,
                   })
                 }
-                className="rounded-xl bg-muted/30 border-none resize-none min-h-[100px]"
+                className="min-h-[100px] resize-none rounded-xl border-none bg-muted/30"
               />
             </div>
 
             <div className="col-span-2 space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1 flex items-center gap-2">
-                    <MapPin className="w-3 h-3"/> Location
+                <Label className="ml-1 flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground">
+                    <MapPin className="size-3"/> Location
                 </Label>
                 <div className="grid grid-cols-3 gap-4">
                     <Input
                         placeholder="Building"
                         value={editingTask?.location?.building || ''}
                         onChange={(e) => handleLocationChange('building', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                     <Input
                         placeholder="Floor"
                         value={editingTask?.location?.floor || ''}
                         onChange={(e) => handleLocationChange('floor', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                     <Input
                         placeholder="Room"
                         value={editingTask?.location?.room || ''}
                         onChange={(e) => handleLocationChange('room', e.target.value)}
-                        className="h-11 rounded-xl bg-muted/30 border-none"
+                        className="h-11 rounded-xl border-none bg-muted/30"
                     />
                 </div>
                 <Textarea
                     placeholder="Location details (e.g., 'Behind the main server rack')"
                     value={editingTask?.location?.description || ''}
                     onChange={(e) => handleLocationChange('description', e.target.value)}
-                    className="rounded-xl bg-muted/30 border-none resize-none"
+                    className="resize-none rounded-xl border-none bg-muted/30"
                     rows={2}
                 />
             </div>
             
             <div className="col-span-2 space-y-3">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1 flex items-center gap-2">
-                    <Paperclip className="w-3 h-3"/> Attachments
+                <Label className="ml-1 flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground">
+                    <Paperclip className="size-3"/> Attachments
                 </Label>
                 
                 {editingTask?.photoURLs && editingTask.photoURLs.length > 0 && (
                    <div className="grid grid-cols-4 gap-2">
                     {editingTask.photoURLs.map((url, index) => (
-                      <div key={index} className="relative group aspect-square">
-                        <Image src={url} alt={`Existing attachment ${index + 1}`} fill sizes="200px" className="object-cover rounded-lg" />
+                      <div key={index} className="group relative aspect-square">
+                        <Image src={url} alt={`Existing attachment ${index + 1}`} fill sizes="200px" className="rounded-lg object-cover" />
                       </div>
                     ))}
                   </div>
@@ -836,25 +836,25 @@ export function WorkspaceTasks() {
                 
                 <div className="grid grid-cols-4 gap-2">
                     {photos.map((photo, index) => (
-                      <div key={index} className="relative group aspect-square">
-                        <Image src={URL.createObjectURL(photo)} alt={`New attachment ${index}`} fill sizes="200px" className="object-cover rounded-lg" />
-                        <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleRemovePhoto(index)}>
-                            <X className="w-3 h-3"/>
+                      <div key={index} className="group relative aspect-square">
+                        <Image src={URL.createObjectURL(photo)} alt={`New attachment ${index}`} fill sizes="200px" className="rounded-lg object-cover" />
+                        <Button variant="destructive" size="icon" className="absolute right-1 top-1 size-5 opacity-0 transition-opacity group-hover:opacity-100" onClick={() => handleRemovePhoto(index)}>
+                            <X className="size-3"/>
                         </Button>
                       </div>
                     ))}
                 </div>
                 
-                <Button asChild variant="outline" className="w-full h-12 rounded-xl border-dashed border-2 bg-muted/30 hover:bg-muted/50 cursor-pointer">
+                <Button asChild variant="outline" className="h-12 w-full cursor-pointer rounded-xl border-2 border-dashed bg-muted/30 hover:bg-muted/50">
                     <label htmlFor="photo-upload">
-                        <UploadCloud className="w-4 h-4 mr-2" /> Upload Images
+                        <UploadCloud className="mr-2 size-4" /> Upload Images
                         <input id="photo-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handlePhotoSelect} />
                     </label>
                 </Button>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+              <Label className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                 Status
               </Label>
               <Select
@@ -866,7 +866,7 @@ export function WorkspaceTasks() {
                   })
                 }
               >
-                <SelectTrigger className="h-11 rounded-xl bg-muted/30 border-none">
+                <SelectTrigger className="h-11 rounded-xl border-none bg-muted/30">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -881,7 +881,7 @@ export function WorkspaceTasks() {
             
             <div className="col-span-2 grid grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                    <Label htmlFor="task-quantity" className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+                    <Label htmlFor="task-quantity" className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                     Quantity (Qty)
                     </Label>
                     <Input
@@ -894,11 +894,11 @@ export function WorkspaceTasks() {
                         quantity: Number(e.target.value),
                         })
                     }
-                    className="h-11 rounded-xl bg-muted/30 border-none"
+                    className="h-11 rounded-xl border-none bg-muted/30"
                     />
                 </div>
                 <div className="space-y-1.5">
-                    <Label htmlFor="task-unitprice" className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+                    <Label htmlFor="task-unitprice" className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                     Unit Price
                     </Label>
                     <Input
@@ -911,11 +911,11 @@ export function WorkspaceTasks() {
                         unitPrice: Number(e.target.value),
                         })
                     }
-                    className="h-11 rounded-xl bg-muted/30 border-none"
+                    className="h-11 rounded-xl border-none bg-muted/30"
                     />
                 </div>
                 <div className="space-y-1.5">
-                    <Label htmlFor="task-discount" className="text-[10px] font-black uppercase text-muted-foreground ml-1">
+                    <Label htmlFor="task-discount" className="ml-1 text-[10px] font-black uppercase text-muted-foreground">
                     Discount
                     </Label>
                     <Input
@@ -928,18 +928,18 @@ export function WorkspaceTasks() {
                         discount: Number(e.target.value),
                         })
                     }
-                    className="h-11 rounded-xl bg-muted/30 border-none"
+                    className="h-11 rounded-xl border-none bg-muted/30"
                     />
                 </div>
             </div>
 
-            <div className="col-span-2 p-6 bg-primary/5 rounded-3xl flex justify-between items-center border border-primary/10">
+            <div className="col-span-2 flex items-center justify-between rounded-3xl border border-primary/10 bg-primary/5 p-6">
               <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">
                   Subtotal
                 </p>
               </div>
-              <span className="text-2xl font-mono font-black text-primary">
+              <span className="font-mono text-2xl font-black text-primary">
                 $
                 {(
                   (editingTask?.quantity || 0) * (editingTask?.unitPrice || 0) - (editingTask?.discount || 0)
@@ -948,23 +948,23 @@ export function WorkspaceTasks() {
             </div>
           </div>
 
-          <DialogFooter className="p-6 bg-muted/30 border-t">
+          <DialogFooter className="border-t bg-muted/30 p-6">
             <Button
               variant="ghost"
               onClick={() => {
                 setIsAddOpen(false);
                 setEditingTask(null);
               }}
-              className="rounded-xl font-black uppercase text-[10px]"
+              className="rounded-xl text-[10px] font-black uppercase"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSaveTask}
               disabled={isUploading}
-              className="rounded-xl px-8 shadow-xl shadow-primary/20 font-black uppercase text-[10px]"
+              className="rounded-xl px-8 text-[10px] font-black uppercase shadow-xl shadow-primary/20"
             >
-              {isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {isUploading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
               {isUploading ? "Uploading & Syncing..." : "Sync to Cloud Sovereignty"}
             </Button>
           </DialogFooter>

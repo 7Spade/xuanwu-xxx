@@ -37,32 +37,32 @@ export function RegisterForm({
     <>
       <div className="space-y-2">
         <Label htmlFor="r-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.digitalDesignation')}</Label>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <User className="w-4 h-4 text-muted-foreground/30" />
+            <User className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput id="r-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('auth.nickname')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="space-y-2">
         <Label htmlFor="r-email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.contactEndpoint')}</Label>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <Mail className="w-4 h-4 text-muted-foreground/30" />
+            <Mail className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput id="r-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('auth.email')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="space-y-2">
         <Label htmlFor="r-pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.setSecurityKey')}</Label>
-        <InputGroup className="rounded-2xl bg-muted/20 border-none h-12">
+        <InputGroup className="h-12 rounded-2xl border-none bg-muted/20">
           <InputGroupAddon className="pl-4">
-            <Lock className="w-4 h-4 text-muted-foreground/30" />
+            <Lock className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
           <InputGroupInput id="r-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('auth.password')} className="font-medium" required />
         </InputGroup>
       </div>
-      <Button onClick={handleRegister} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-base shadow-xl shadow-primary/20 mt-auto" disabled={isLoading}>
+      <Button onClick={handleRegister} className="mt-auto h-14 w-full rounded-2xl text-base font-black uppercase tracking-widest shadow-xl shadow-primary/20" disabled={isLoading}>
         {isLoading ? <Loader2 className="animate-spin" /> : t('auth.registerSovereignty')}
       </Button>
     </>

@@ -29,6 +29,8 @@ export default tseslint.config(
       "next-env.d.ts",
       "functions/**",
     ],
+  },
+  {
     linterOptions: {
       reportUnusedDisableDirectives: "error",
     },

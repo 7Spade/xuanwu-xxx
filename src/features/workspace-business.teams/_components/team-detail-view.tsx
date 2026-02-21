@@ -59,10 +59,10 @@ export function TeamDetailView() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto animate-in slide-in-from-bottom-2 duration-500">
+    <div className="mx-auto max-w-7xl space-y-6 duration-500 animate-in slide-in-from-bottom-2">
       <div className="flex items-center gap-2 text-muted-foreground">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8">
-          <ArrowLeft className="w-4 h-4" />
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="size-8">
+          <ArrowLeft className="size-4" />
         </Button>
         <span className="text-xs font-bold uppercase tracking-widest">Internal Team Management / {team.name}</span>
       </div>
@@ -72,15 +72,15 @@ export function TeamDetailView() {
         description={team.description}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
           <h3 className="text-sm font-bold uppercase tracking-widest">Team Members ({teamMembers.length})</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {teamMembers.map((member: MemberReference) => (
               <Card key={member.id} className="border-border/60 bg-card/40 backdrop-blur-sm">
-                <CardContent className="p-4 flex items-center justify-between">
+                <CardContent className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
+                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                       {member.name?.[0] || 'U'}
                     </div>
                     <div>
@@ -91,17 +91,17 @@ export function TeamDetailView() {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    className="size-8 text-muted-foreground hover:text-destructive"
                     onClick={() => handleMemberToggle(member.id, 'remove')}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="size-4" />
                   </Button>
                 </CardContent>
               </Card>
             ))}
             {teamMembers.length === 0 && (
-              <div className="col-span-full p-12 border-2 border-dashed rounded-xl text-center">
-                <Users className="w-8 h-8 mx-auto mb-2 opacity-10" />
+              <div className="col-span-full rounded-xl border-2 border-dashed p-12 text-center">
+                <Users className="mx-auto mb-2 size-8 opacity-10" />
                 <p className="text-xs text-muted-foreground">No members are currently assigned to this team.</p>
               </div>
             )}
@@ -111,22 +111,22 @@ export function TeamDetailView() {
         <div className="space-y-6">
           <h3 className="text-sm font-bold uppercase tracking-widest">Available Members</h3>
           <Card className="border-border/60 bg-muted/5">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="space-y-4 p-4">
               {otherOrgMembers.map((member: MemberReference) => (
-                <div key={member.id} className="flex items-center justify-between group">
+                <div key={member.id} className="group flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-background border flex items-center justify-center text-[10px]">
+                    <div className="flex size-6 items-center justify-center rounded-full border bg-background text-[10px]">
                       {member.name?.[0] || 'U'}
                     </div>
                     <span className="text-xs font-medium">{member.name}</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-7 text-[10px] uppercase font-bold text-primary" onClick={() => handleMemberToggle(member.id, 'add')}>
-                    <UserPlus className="w-3.5 h-3.5 mr-1" /> Add
+                  <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold uppercase text-primary" onClick={() => handleMemberToggle(member.id, 'add')}>
+                    <UserPlus className="mr-1 size-3.5" /> Add
                   </Button>
                 </div>
               ))}
               {otherOrgMembers.length === 0 && (
-                <p className="text-[10px] text-center text-muted-foreground italic py-4">
+                <p className="py-4 text-center text-[10px] italic text-muted-foreground">
                   All internal members have been assigned to a team.
                 </p>
               )}

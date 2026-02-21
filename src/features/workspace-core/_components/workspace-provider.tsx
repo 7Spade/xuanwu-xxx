@@ -1,12 +1,13 @@
 
 "use client";
 
-import React, { createContext, useContext, useMemo, useCallback } from 'react';
-import { Workspace, AuditLog, WorkspaceTask, WorkspaceRole, Capability, WorkspaceLifecycleState, ScheduleItem, Location } from '@/shared/types';
-import { useLogger } from '@/features/workspace-business.audit/_hooks/use-logger';
-import { WorkspaceEventBus } from '@/features/workspace-core.event-bus';
-import { Firestore } from 'firebase/firestore';
-import { useApp } from '@/features/workspace-core/_hooks/use-app';
+import type React from 'react';
+import { createContext, useContext, useMemo, useCallback } from 'react';
+import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem, Location } from '@/shared/types';
+import { useLogger } from '@/features/workspace-business.audit';
+import { WorkspaceEventBus , WorkspaceEventContext } from '@/features/workspace-core.event-bus';
+import { type Firestore } from 'firebase/firestore';
+import { useApp } from '../_hooks/use-app';
 import { useAccount } from '@/features/account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { Loader2 } from 'lucide-react';
@@ -29,7 +30,6 @@ import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
 } from '@/features/workspace-business.issues'
-import { WorkspaceEventContext } from "@/features/workspace-core.event-bus"
 import {
   createScheduleItem as createScheduleItemAction,
 } from '@/features/workspace-governance.schedule'
@@ -108,10 +108,10 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   if (!workspace || !db) {
     return (
-      <div className="h-full w-full flex flex-col items-center justify-center space-y-4 bg-background p-20">
-        <div className="text-4xl animate-bounce">🐢</div>
-        <div className="flex items-center gap-2 text-muted-foreground font-black uppercase text-[10px] tracking-widest">
-          <Loader2 className="w-3 h-3 animate-spin" /> Entering logical space...
+      <div className="flex size-full flex-col items-center justify-center space-y-4 bg-background p-20">
+        <div className="animate-bounce text-4xl">🐢</div>
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <Loader2 className="size-3 animate-spin" /> Entering logical space...
         </div>
       </div>
     );

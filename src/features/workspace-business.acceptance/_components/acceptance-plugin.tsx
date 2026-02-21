@@ -116,58 +116,58 @@ export function WorkspaceAcceptance() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 duration-500 animate-in fade-in">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-500" /> A-Track: User Acceptance Testing (UAT)
+          <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <Trophy className="size-4 text-amber-500" /> A-Track: User Acceptance Testing (UAT)
           </h3>
         </div>
-        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px] font-bold">{verifiedTasks.length} Pending</Badge>
+        <Badge className="border-amber-500/20 bg-amber-500/10 text-[10px] font-bold text-amber-600">{verifiedTasks.length} Pending</Badge>
       </div>
 
       <div className="grid grid-cols-1 gap-3">
         {verifiedTasks.map(task => (
-          <div key={task.id} className="p-5 bg-card/40 border-2 border-amber-500/10 rounded-2xl flex items-center justify-between group hover:border-amber-500/40 transition-all">
+          <div key={task.id} className="group flex items-center justify-between rounded-2xl border-2 border-amber-500/10 bg-card/40 p-5 transition-all hover:border-amber-500/40">
             <div className="space-y-1">
               <h4 className="text-sm font-bold text-amber-900 dark:text-amber-100">{task.name}</h4>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[7px] bg-green-500/5 text-green-600 border-green-500/20 px-1">QA PASSED</Badge>
+                <Badge variant="outline" className="border-green-500/20 bg-green-500/5 px-1 text-[7px] text-green-600">QA PASSED</Badge>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-destructive/70 hover:bg-destructive/10 hover:text-destructive"
+                className="size-9 text-destructive/70 hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => handleFail(task)}
               >
-                <XCircle className="w-5 h-5" />
+                <XCircle className="size-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-amber-500/70 hover:bg-amber-500/10 hover:text-amber-500"
+                className="size-9 text-amber-500/70 hover:bg-amber-500/10 hover:text-amber-500"
                 onClick={() => handleAccept(task)}
               >
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="size-5" />
               </Button>
             </div>
           </div>
         ))}
         {verifiedTasks.length === 0 && (
-          <div className="p-12 text-center border-2 border-dashed rounded-2xl opacity-20">
-            <Search className="w-8 h-8 mx-auto mb-2" />
+          <div className="rounded-2xl border-2 border-dashed p-12 text-center opacity-20">
+            <Search className="mx-auto mb-2 size-8" />
             <p className="text-xs font-bold uppercase tracking-widest">No items pending acceptance</p>
           </div>
         )}
       </div>
 
-      <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-start gap-3">
-        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
+      <div className="flex items-start gap-3 rounded-2xl border border-amber-500/10 bg-amber-500/5 p-4">
+        <AlertTriangle className="mt-0.5 size-4 text-amber-500" />
         <div className="space-y-1">
-          <p className="text-[11px] font-bold text-amber-600 uppercase">Acceptance Security Notice</p>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[11px] font-bold uppercase text-amber-600">Acceptance Security Notice</p>
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
             Any acceptance failure is treated as a critical spec deviation and will automatically create a high-priority issue on the B-Track for immediate follow-up.
           </p>
         </div>

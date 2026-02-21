@@ -8,8 +8,8 @@ import { User, Loader2, Upload } from "lucide-react";
 import { Textarea } from "@/shared/shadcn-ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/shadcn-ui/avatar";
 import { Checkbox } from "@/shared/shadcn-ui/checkbox";
-import { ExpertiseBadge, Account } from "@/shared/types"
-import React from "react"
+import { type ExpertiseBadge, type Account } from "@/shared/types"
+import type React from "react"
 
 // A mock list of available expertise badges
 const AVAILABLE_BADGES: ExpertiseBadge[] = [
@@ -32,7 +32,7 @@ interface ProfileCardProps {
   handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
   isSaving: boolean
   isUploading: boolean
-  avatarInputRef: React.RefObject<HTMLInputElement>
+  avatarInputRef: React.RefObject<HTMLInputElement | null>
 }
 
 export function ProfileCard({
@@ -52,8 +52,8 @@ export function ProfileCard({
   return (
     <Card className="border-border/60 shadow-sm">
       <CardHeader>
-        <div className="flex items-center gap-2 text-primary mb-1">
-          <User className="w-4 h-4" />
+        <div className="mb-1 flex items-center gap-2 text-primary">
+          <User className="size-4" />
           <span className="text-[10px] font-bold uppercase tracking-widest">Personal Identity</span>
         </div>
         <CardTitle className="font-headline">Profile</CardTitle>
@@ -62,17 +62,17 @@ export function ProfileCard({
       <CardContent className="space-y-6">
         <div className="flex items-center gap-6">
           <div className="relative">
-            <Avatar className="w-20 h-20 border-2 border-primary/20">
+            <Avatar className="size-20 border-2 border-primary/20">
               <AvatarImage src={account?.photoURL} />
-              <AvatarFallback className="text-2xl font-bold bg-primary/5 text-primary">
+              <AvatarFallback className="bg-primary/5 text-2xl font-bold text-primary">
                 {name?.[0]}
               </AvatarFallback>
             </Avatar>
-            {isUploading && <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-full"><Loader2 className="animate-spin text-primary" /></div>}
+            {isUploading && <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/50"><Loader2 className="animate-spin text-primary" /></div>}
           </div>
           <div className="space-y-2">
             <Button onClick={() => avatarInputRef.current?.click()} disabled={isUploading}>
-              <Upload className="w-4 h-4 mr-2" /> Upload Image
+              <Upload className="mr-2 size-4" /> Upload Image
             </Button>
             <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB.</p>
             <input type="file" ref={avatarInputRef} onChange={handleAvatarUpload} className="hidden" accept="image/*" />
@@ -114,12 +114,12 @@ export function ProfileCard({
         <div className="grid gap-2">
           <Label htmlFor="user-email">Email</Label>
           <Input id="user-email" defaultValue={account?.email} disabled />
-          <p className="text-[10px] text-muted-foreground italic">Email address cannot be changed.</p>
+          <p className="text-[10px] italic text-muted-foreground">Email address cannot be changed.</p>
         </div>
       </CardContent>
-      <CardFooter className="bg-muted/20 border-t">
-        <Button onClick={handleSaveProfile} disabled={isSaving || isUploading} className="ml-auto font-bold uppercase text-xs tracking-widest">
-          {isSaving || isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+      <CardFooter className="border-t bg-muted/20">
+        <Button onClick={handleSaveProfile} disabled={isSaving || isUploading} className="ml-auto text-xs font-bold uppercase tracking-widest">
+          {isSaving || isUploading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
           {isSaving || isUploading ? "Saving..." : "Save Changes"}
         </Button>
       </CardFooter>

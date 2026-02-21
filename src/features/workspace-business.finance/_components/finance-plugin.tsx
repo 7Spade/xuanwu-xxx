@@ -54,44 +54,44 @@ export function WorkspaceFinance() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-primary/5 border-primary/20">
+    <div className="space-y-6 duration-500 animate-in fade-in">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-              <Wallet className="w-3.5 h-3.5" /> Total Disbursed
+            <CardTitle className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+              <Wallet className="size-3.5" /> Total Disbursed
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-headline">${totalSpent.toLocaleString()}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Based on {totalAcceptedTasks} accepted tasks</p>
+            <div className="font-headline text-2xl font-bold">${totalSpent.toLocaleString()}</div>
+            <p className="mt-1 text-[10px] text-muted-foreground">Based on {totalAcceptedTasks} accepted tasks</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-green-500/5 border-green-500/20">
+        <Card className="border-green-500/20 bg-green-500/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-green-600 flex items-center gap-2">
-              <TrendingUp className="w-3.5 h-3.5" /> Financial Resonance
+            <CardTitle className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-green-600">
+              <TrendingUp className="size-3.5" /> Financial Resonance
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-headline">100%</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Aligned with dimension budget protocol</p>
+            <div className="font-headline text-2xl font-bold">100%</div>
+            <p className="mt-1 text-[10px] text-muted-foreground">Aligned with dimension budget protocol</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4" /> Items Ready for Settlement ({totalAcceptedTasks})
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          <CheckCircle2 className="size-4" /> Items Ready for Settlement ({totalAcceptedTasks})
         </h3>
         
         <div className="space-y-2">
           {acceptedTasks.map(task => (
-            <div key={task.id} className="p-4 bg-card/40 border border-border/60 rounded-2xl flex items-center justify-between">
+            <div key={task.id} className="flex items-center justify-between rounded-2xl border border-border/60 bg-card/40 p-4">
               <div className="flex items-center gap-4">
-                <div className="p-2 bg-primary/5 rounded-lg text-primary">
-                  <Landmark className="w-4 h-4" />
+                <div className="rounded-lg bg-primary/5 p-2 text-primary">
+                  <Landmark className="size-4" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold">{task.name}</h4>
@@ -100,7 +100,7 @@ export function WorkspaceFinance() {
               </div>
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Approved Amount</p>
+                  <p className="text-[8px] font-bold uppercase text-muted-foreground">Approved Amount</p>
                   <p className="text-sm font-bold text-primary">${(Number(task.subtotal) || 0).toLocaleString()}</p>
                 </div>
                 <Button 
@@ -109,14 +109,14 @@ export function WorkspaceFinance() {
                   className="h-8 gap-2 text-[10px] font-bold uppercase tracking-widest"
                   onClick={() => handleDisburse(task.id, task.name)}
                 >
-                  Disburse <ArrowUpRight className="w-3 h-3" />
+                  Disburse <ArrowUpRight className="size-3" />
                 </Button>
               </div>
             </div>
           ))}
           {totalAcceptedTasks === 0 && (
-            <div className="p-12 text-center border-2 border-dashed rounded-2xl opacity-20">
-                <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+            <div className="rounded-2xl border-2 border-dashed p-12 text-center opacity-20">
+                <AlertCircle className="mx-auto mb-2 size-8" />
                 <p className="text-xs font-bold uppercase tracking-widest">No items pending financial settlement.</p>
             </div>
           )}

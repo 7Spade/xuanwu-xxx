@@ -4,7 +4,7 @@
  * such as getting download URLs and listing files.
  */
 
-import { ref, getDownloadURL, listAll, ListResult } from 'firebase/storage';
+import { ref, getDownloadURL, listAll, type ListResult } from 'firebase/storage';
 import { storage } from './storage.client';
 
 /**

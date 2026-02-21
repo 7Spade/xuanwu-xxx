@@ -12,10 +12,10 @@ function ResetPasswordContent() {
   const { t } = useI18n()
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="text-6xl mb-4">🐢</div>
+        <div className="mb-6 text-center">
+          <div className="mb-4 text-6xl">🐢</div>
           <h1 className="font-headline text-2xl font-bold">{t("auth.resetPassword")}</h1>
         </div>
         <ResetPasswordForm

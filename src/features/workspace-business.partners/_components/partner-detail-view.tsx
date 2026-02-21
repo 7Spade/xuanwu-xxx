@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { toast } from "@/shared/utility-hooks/use-toast"
-import type { PartnerInvite, MemberReference } from "@/shared/types"
+import type { PartnerInvite, MemberReference , Team } from "@/shared/types"
 import { 
   Dialog, 
   DialogContent, 
@@ -28,9 +28,7 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
 import { useApp } from "@/features/workspace-core"
-import { useAccount } from "@/features/account"
-import { useAccountManagement } from "@/features/account"
-import type { Team } from "@/shared/types"
+import { useAccount , useAccountManagement } from "@/features/account"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 /**
@@ -110,10 +108,10 @@ export function PartnerDetailView() {
 
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto animate-in slide-in-from-bottom-2 duration-500 pb-20">
+    <div className="mx-auto max-w-7xl space-y-6 pb-20 duration-500 animate-in slide-in-from-bottom-2">
       <div className="flex items-center gap-2 text-muted-foreground">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8 hover:bg-accent/5">
-          <ArrowLeft className="w-4 h-4" />
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="size-8 hover:bg-accent/5">
+          <ArrowLeft className="size-4" />
         </Button>
         <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Partner Governance / {team.name}</span>
       </div>
@@ -122,45 +120,45 @@ export function PartnerDetailView() {
         title={team.name} 
         description={team.description}
       >
-        <Button className="gap-2 font-bold uppercase text-[11px] tracking-widest h-10 px-6 shadow-lg shadow-accent/20 bg-accent hover:bg-accent/90" onClick={() => setIsInviteOpen(true)}>
-          <MailPlus className="w-4 h-4" /> Recruit New Partner
+        <Button className="h-10 gap-2 bg-accent px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-accent/20 hover:bg-accent/90" onClick={() => setIsInviteOpen(true)}>
+          <MailPlus className="size-4" /> Recruit New Partner
         </Button>
       </PageHeader>
 
       <Tabs defaultValue="members" className="space-y-6">
-        <TabsList className="bg-muted/40 p-1 border border-border/50 rounded-xl">
-          <TabsTrigger value="members" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:text-accent">Resonating Members ({teamMembers.length})</TabsTrigger>
-          <TabsTrigger value="invites" className="text-xs font-bold uppercase tracking-widest px-6">Pending Recruits ({teamInvites.length})</TabsTrigger>
+        <TabsList className="rounded-xl border border-border/50 bg-muted/40 p-1">
+          <TabsTrigger value="members" className="px-6 text-xs font-bold uppercase tracking-widest data-[state=active]:text-accent">Resonating Members ({teamMembers.length})</TabsTrigger>
+          <TabsTrigger value="invites" className="px-6 text-xs font-bold uppercase tracking-widest">Pending Recruits ({teamInvites.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {teamMembers.map((member: MemberReference) => (
-              <Card key={member.id} className="border-border/60 bg-card/40 backdrop-blur-sm border-l-4 border-l-accent group">
-                <CardHeader className="p-4 flex flex-row items-center gap-4 pb-4">
-                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold border border-accent/20">
+              <Card key={member.id} className="group border-l-4 border-border/60 border-l-accent bg-card/40 backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center gap-4 p-4">
+                  <div className="flex size-12 items-center justify-center rounded-full border border-accent/20 bg-accent/10 font-bold text-accent">
                     {member.name?.[0] || 'P'}
                   </div>
                   <div className="space-y-0.5">
                     <CardTitle className="text-sm font-bold">{member.name}</CardTitle>
-                    <CardDescription className="text-[10px] font-mono opacity-60">{member.email}</CardDescription>
+                    <CardDescription className="font-mono text-[10px] opacity-60">{member.email}</CardDescription>
                   </div>
                 </CardHeader>
-                <CardFooter className="border-t border-border/10 py-3 flex justify-end">
+                <CardFooter className="flex justify-end border-t border-border/10 py-3">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-7 w-7 ml-auto text-muted-foreground hover:text-destructive transition-colors"
+                    className="ml-auto size-7 text-muted-foreground transition-colors hover:text-destructive"
                     onClick={() => handleDismissMember(member)}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="size-3.5" />
                   </Button>
                 </CardFooter>
               </Card>
             ))}
             {teamMembers.length === 0 && (
-              <div className="col-span-full p-20 text-center border-2 border-dashed rounded-3xl bg-muted/5 opacity-30">
-                <Globe className="w-12 h-12 mx-auto mb-4" />
+              <div className="col-span-full rounded-3xl border-2 border-dashed bg-muted/5 p-20 text-center opacity-30">
+                <Globe className="mx-auto mb-4 size-12" />
                 <p className="text-xs font-bold uppercase tracking-widest">This team has no resonating partner identities yet.</p>
               </div>
             )}
@@ -168,21 +166,21 @@ export function PartnerDetailView() {
         </TabsContent>
 
         <TabsContent value="invites">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {teamInvites.map((invite: PartnerInvite) => (
-              <Card key={invite.id} className="border-border/60 bg-muted/5 backdrop-blur-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-2">
-                  <Badge variant="secondary" className="text-[8px] font-black uppercase bg-amber-500/10 text-amber-600 border-none">{invite.inviteState}</Badge>
+              <Card key={invite.id} className="relative overflow-hidden border-border/60 bg-muted/5 backdrop-blur-sm">
+                <div className="absolute right-0 top-0 p-2">
+                  <Badge variant="secondary" className="border-none bg-amber-500/10 text-[8px] font-black uppercase text-amber-600">{invite.inviteState}</Badge>
                 </div>
                 <CardHeader>
-                  <div className="p-2 bg-background rounded-lg border w-fit mb-3">
-                    <Clock className="w-4 h-4 text-muted-foreground animate-pulse" />
+                  <div className="mb-3 w-fit rounded-lg border bg-background p-2">
+                    <Clock className="size-4 animate-pulse text-muted-foreground" />
                   </div>
-                  <CardTitle className="text-sm font-bold truncate">{invite.email}</CardTitle>
-                  <CardDescription className="text-[10px] font-mono">Sent: {invite.invitedAt?.seconds ? new Date(invite.invitedAt.seconds * 1000).toLocaleDateString() : 'Syncing...'}</CardDescription>
+                  <CardTitle className="truncate text-sm font-bold">{invite.email}</CardTitle>
+                  <CardDescription className="font-mono text-[10px]">Sent: {invite.invitedAt?.seconds ? new Date(invite.invitedAt.seconds * 1000).toLocaleDateString() : 'Syncing...'}</CardDescription>
                 </CardHeader>
                 <CardFooter className="border-t border-border/10 py-3">
-                  <p className="text-[9px] text-muted-foreground italic">Awaiting external entity to sign in and accept protocol...</p>
+                  <p className="text-[9px] italic text-muted-foreground">Awaiting external entity to sign in and accept protocol...</p>
                 </CardFooter>
               </Card>
             ))}
@@ -191,40 +189,40 @@ export function PartnerDetailView() {
       </Tabs>
 
       <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-        <DialogContent className="rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="overflow-hidden rounded-[2rem] border-none p-0 shadow-2xl">
           <div className="bg-accent p-8 text-white">
             <DialogHeader>
-              <DialogTitle className="font-headline text-3xl flex items-center gap-3">
-                <SendHorizontal className="w-8 h-8" /> Send Recruitment Protocol
+              <DialogTitle className="flex items-center gap-3 font-headline text-3xl">
+                <SendHorizontal className="size-8" /> Send Recruitment Protocol
               </DialogTitle>
-              <DialogDescription className="text-accent-foreground/80 mt-2 font-medium">
+              <DialogDescription className="mt-2 font-medium text-accent-foreground/80">
                 Send a temporary digital resonance invitation to an external entity and mount them to "{team.name}".
               </DialogDescription>
             </DialogHeader>
           </div>
-          <div className="p-8 space-y-6">
+          <div className="space-y-6 p-8">
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground px-1">Partner Contact Endpoint (Email)</Label>
+              <Label className="px-1 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Partner Contact Endpoint (Email)</Label>
               <Input 
                 value={inviteEmail} 
                 onChange={(e) => setInviteEmail(e.target.value)} 
                 placeholder="partner@external-corp.io" 
-                className="rounded-2xl h-12 border-muted-foreground/20 focus-visible:ring-accent/30"
+                className="h-12 rounded-2xl border-muted-foreground/20 focus-visible:ring-accent/30"
               />
             </div>
-            <div className="p-4 bg-accent/5 rounded-2xl border border-accent/10 flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-accent mt-0.5" />
+            <div className="flex items-start gap-3 rounded-2xl border border-accent/10 bg-accent/5 p-4">
+              <ShieldCheck className="mt-0.5 size-5 text-accent" />
               <div className="space-y-1">
-                <p className="text-[11px] font-bold text-accent uppercase tracking-widest">Security Declaration</p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Security Declaration</p>
+                <p className="text-[10px] leading-relaxed text-muted-foreground">
                   Upon acceptance, the invitee will be granted "Guest" permissions. All operations will be restricted by the isolation protocol and will not have access to other unrelated dimensional spaces.
                 </p>
               </div>
             </div>
           </div>
-          <DialogFooter className="p-6 bg-muted/30 border-t">
-            <Button variant="ghost" onClick={() => setIsInviteOpen(false)} className="rounded-xl font-bold uppercase text-[10px] tracking-widest">Cancel</Button>
-            <Button onClick={handleSendInvite} className="bg-accent hover:bg-accent/90 rounded-xl px-8 shadow-lg shadow-accent/20 font-bold uppercase text-[10px] tracking-widest">Initiate Recruitment</Button>
+          <DialogFooter className="border-t bg-muted/30 p-6">
+            <Button variant="ghost" onClick={() => setIsInviteOpen(false)} className="rounded-xl text-[10px] font-bold uppercase tracking-widest">Cancel</Button>
+            <Button onClick={handleSendInvite} className="rounded-xl bg-accent px-8 text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-accent/20 hover:bg-accent/90">Initiate Recruitment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

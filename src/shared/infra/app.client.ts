@@ -3,7 +3,7 @@
  * This file is responsible for initializing the Firebase app singleton
  * and exporting the main app instance.
  */
-import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { firebaseConfig } from "./firebase.config";
 
 // Singleton Pattern: Initialize Firebase only once.

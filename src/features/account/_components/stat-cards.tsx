@@ -39,19 +39,19 @@ export function StatCards() {
   }, [workspacesArray]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 gpu-accelerated">
-      <Card className="border-border/60 shadow-sm hover:shadow-md transition-all duration-300">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Dimension Consistency</CardTitle>
-          <ShieldCheck className="w-4 h-4 text-primary" />
+    <div className="gpu-accelerated grid grid-cols-1 gap-6 md:grid-cols-3">
+      <Card className="border-border/60 shadow-sm transition-all duration-300 hover:shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Dimension Consistency</CardTitle>
+          <ShieldCheck className="size-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-headline">{consistency}% Protocol Alignment</div>
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <div className="font-headline text-2xl font-bold">{consistency}% Protocol Alignment</div>
+          <p className="mt-1 text-[10px] text-muted-foreground">
             Dimension {accountName} currently has {workspacesArray.length} workspace nodes mounted.
           </p>
           <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between text-[9px] uppercase font-bold tracking-tighter">
+            <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-tighter">
               <span>Environment Resonance</span>
               <span>{consistency}%</span>
             </div>
@@ -60,18 +60,18 @@ export function StatCards() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/60 shadow-sm hover:shadow-md transition-all duration-300">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Activity Pulse</CardTitle>
-          <Activity className="w-4 h-4 text-primary" />
+      <Card className="border-border/60 shadow-sm transition-all duration-300 hover:shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Activity Pulse</CardTitle>
+          <Activity className="size-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-headline">{pulseRate > 50 ? 'High-Frequency' : 'Steady-State'}</div>
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <div className="font-headline text-2xl font-bold">{pulseRate > 50 ? 'High-Frequency' : 'Steady-State'}</div>
+          <p className="mt-1 text-[10px] text-muted-foreground">
             Recent changes in technical specs and identity resonance.
           </p>
           <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between text-[9px] uppercase font-bold tracking-tighter">
+            <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-tighter">
               <span>Real-time Activity</span>
               <span>{Math.round(pulseRate)}%</span>
             </div>
@@ -80,18 +80,18 @@ export function StatCards() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/60 shadow-sm hover:shadow-md transition-all duration-300">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Capability Load</CardTitle>
-          <Layers className="w-4 h-4 text-primary" />
+      <Card className="border-border/60 shadow-sm transition-all duration-300 hover:shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium uppercase tracking-widest text-muted-foreground">Capability Load</CardTitle>
+          <Layers className="size-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-headline">{capabilityLoad}% Resource Utilization</div>
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <div className="font-headline text-2xl font-bold">{capabilityLoad}% Resource Utilization</div>
+          <p className="mt-1 text-[10px] text-muted-foreground">
             Pressure from atomic capability stacks on the underlying architecture.
           </p>
           <div className="mt-4 flex items-center gap-2 text-primary">
-            <Zap className="w-4 h-4 fill-primary animate-pulse" />
+            <Zap className="size-4 animate-pulse fill-primary" />
             <span className="text-[10px] font-bold uppercase tracking-tight text-primary">AI Optimization Active</span>
           </div>
         </CardContent>

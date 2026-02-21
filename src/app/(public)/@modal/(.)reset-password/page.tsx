@@ -20,9 +20,9 @@ function ResetPasswordModalContent() {
 
   return (
     <Dialog open onOpenChange={() => router.back()}>
-      <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-10 max-w-sm">
+      <DialogContent className="max-w-sm rounded-[2.5rem] border-none p-10 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="font-headline text-2xl flex items-center gap-3">
+          <DialogTitle className="flex items-center gap-3 font-headline text-2xl">
             🐢 {t("auth.resetPassword")}
           </DialogTitle>
         </DialogHeader>

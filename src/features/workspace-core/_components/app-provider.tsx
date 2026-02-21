@@ -1,9 +1,11 @@
 "use client"
 
-import React, { createContext, useReducer, useEffect, ReactNode } from 'react'
+import {type ReactNode} from 'react';
+import type React from 'react';
+import { createContext, useReducer, useEffect } from 'react'
 import { useFirebase } from "@/shared/app-providers/firebase-provider"
-import { collection, query, where, onSnapshot, QuerySnapshot } from "firebase/firestore"
-import { Account, CapabilitySpec, Notification } from '@/shared/types'
+import { collection, query, where, onSnapshot, type QuerySnapshot } from "firebase/firestore"
+import { type Account, type CapabilitySpec, type Notification } from '@/shared/types'
 import { useAuth } from "@/shared/app-providers/auth-provider"
 import { snapshotToRecord } from '@/shared/infra/firestore/firestore.utils'
 

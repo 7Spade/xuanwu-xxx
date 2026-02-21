@@ -37,9 +37,8 @@ import {
 // ============================================================================
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
-import { useApp } from "@/features/workspace-core";
+import { useApp , useVisibleWorkspaces } from "@/features/workspace-core";
 import { useUser } from "@/features/user-settings";
-import { useVisibleWorkspaces } from "@/features/workspace-core";
 import { useAccountManagement } from "@/features/account";
 
 // ============================================================================
@@ -93,7 +92,7 @@ export function DashboardSidebar() {
       <SidebarContent>
         {/* Main navigation section for core dashboard areas */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50 px-3">
+          <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
             {t('sidebar.dimensionCore')}
           </SidebarGroupLabel>
           <SidebarGroupContent>

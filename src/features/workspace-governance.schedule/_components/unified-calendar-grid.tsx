@@ -85,24 +85,24 @@ export function UnifiedCalendarGrid({
   const totalCells = Math.ceil((startingDayIndex + daysInMonth.length) / 7) * 7;
   
   return (
-     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-center gap-4 p-4 border-b">
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onMonthChange('prev')}>
-            <ChevronLeft className="w-4 h-4" />
+     <div className="flex h-full flex-col">
+      <div className="flex items-center justify-center gap-4 border-b p-4">
+        <Button variant="outline" size="icon" className="size-8" onClick={() => onMonthChange('prev')}>
+            <ChevronLeft className="size-4" />
         </Button>
-        <h2 className="text-xl font-bold text-center w-48">{format(currentDate, "MMMM yyyy")}</h2>
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onMonthChange('next')}>
-            <ChevronRight className="w-4 h-4" />
+        <h2 className="w-48 text-center text-xl font-bold">{format(currentDate, "MMMM yyyy")}</h2>
+        <Button variant="outline" size="icon" className="size-8" onClick={() => onMonthChange('next')}>
+            <ChevronRight className="size-4" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-7 flex-1">
+      <div className="grid flex-1 grid-cols-7">
         {DAYS_OF_WEEK.map((day) => (
-          <div key={day} className="border-r border-b p-2 text-center text-xs font-bold text-muted-foreground bg-muted/50">{day}</div>
+          <div key={day} className="border-b border-r bg-muted/50 p-2 text-center text-xs font-bold text-muted-foreground">{day}</div>
         ))}
         
         {Array.from({ length: startingDayIndex }).map((_, i) => (
-          <div key={`pad-start-${i}`} className="border-r border-b bg-muted/30" />
+          <div key={`pad-start-${i}`} className="border-b border-r bg-muted/30" />
         ))}
         
         {daysInMonth.map((day) => {
@@ -112,8 +112,8 @@ export function UnifiedCalendarGrid({
           return (
             <div key={dateKey} className={cn('group relative flex min-h-[140px] flex-col gap-1.5 border-r border-b p-1.5', { 'bg-muted/30': isWeekend(day) })}>
               {viewMode === 'workspace' && onAddClick && (
-                <Button variant="ghost" size="icon" className="absolute top-1 left-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onAddClick(day)}>
-                  <Plus className="w-4 h-4 text-muted-foreground" />
+                <Button variant="ghost" size="icon" className="absolute left-1 top-1 size-6 opacity-0 transition-opacity group-hover:opacity-100" onClick={() => onAddClick(day)}>
+                  <Plus className="size-4 text-muted-foreground" />
                 </Button>
               )}
               <div className="flex justify-end">
@@ -121,7 +121,7 @@ export function UnifiedCalendarGrid({
                   {format(day, 'd')}
                 </div>
               </div>
-              <ScrollArea className="flex-grow pr-2">
+              <ScrollArea className="grow pr-2">
                 <div className="space-y-2">
                   {dayItems.map(item => {
                     const assignedMembers = item.assigneeIds.map(id => membersMap.get(id)).filter(Boolean) as MemberReference[];
@@ -137,14 +137,14 @@ export function UnifiedCalendarGrid({
                             {/* Section 1: Workspace */}
                             {viewMode === 'organization' && (
                                 <div 
-                                    className="flex items-center gap-1.5 p-1.5 border-b cursor-pointer hover:bg-muted/50 rounded-t-md transition-colors"
+                                    className="flex cursor-pointer items-center gap-1.5 rounded-t-md border-b p-1.5 transition-colors hover:bg-muted/50"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(`/workspaces/${item.workspaceId}?capability=schedule`);
                                     }}
                                 >
-                                    <Layers className="w-3 h-3 text-muted-foreground" />
-                                    <p className="text-[9px] font-bold text-muted-foreground truncate">{item.workspaceName}</p>
+                                    <Layers className="size-3 text-muted-foreground" />
+                                    <p className="truncate text-[9px] font-bold text-muted-foreground">{item.workspaceName}</p>
                                 </div>
                             )}
 
@@ -158,7 +158,7 @@ export function UnifiedCalendarGrid({
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <p className="font-bold truncate cursor-default">{item.title}</p>
+                                            <p className="cursor-default truncate font-bold">{item.title}</p>
                                         </TooltipTrigger>
                                         <TooltipContent><p>{item.title}</p></TooltipContent>
                                     </Tooltip>
@@ -166,13 +166,13 @@ export function UnifiedCalendarGrid({
                             </div>
 
                             {/* Section 3: Assignees & Actions */}
-                            <div className="flex justify-between items-center mt-1 p-2 border-t">
+                            <div className="mt-1 flex items-center justify-between border-t p-2">
                                 <div className="flex -space-x-1">
                                   {assignedMembers.map(m => (
                                     <TooltipProvider key={m.id}>
                                       <Tooltip>
                                         <TooltipTrigger asChild>
-                                          <Avatar className="w-5 h-5 border border-background">
+                                          <Avatar className="size-5 border border-background">
                                             <AvatarFallback className="text-[8px] font-bold">{m.name[0]}</AvatarFallback>
                                           </Avatar>
                                         </TooltipTrigger>
@@ -185,11 +185,11 @@ export function UnifiedCalendarGrid({
                                   {renderItemActions && renderItemActions(item)}
                                   {viewMode === 'organization' && item.status === 'PROPOSAL' && onApproveProposal && onRejectProposal && (
                                     <div className="flex gap-1">
-                                        <Button size="xs" variant="ghost" className="h-6 w-6 p-0 text-destructive" onClick={(e) => { e.stopPropagation(); onRejectProposal(item); }}>
-                                            <X className="w-3 h-3"/>
+                                        <Button size="icon" variant="ghost" className="size-6 p-0 text-destructive" onClick={(e) => { e.stopPropagation(); onRejectProposal(item); }}>
+                                            <X className="size-3"/>
                                         </Button>
-                                        <Button size="xs" variant="ghost" className="h-6 w-6 p-0 text-green-600" onClick={(e) => { e.stopPropagation(); onApproveProposal(item); }}>
-                                            <Check className="w-3 h-3"/>
+                                        <Button size="icon" variant="ghost" className="size-6 p-0 text-green-600" onClick={(e) => { e.stopPropagation(); onApproveProposal(item); }}>
+                                            <Check className="size-3"/>
                                         </Button>
                                     </div>
                                   )}
@@ -205,7 +205,7 @@ export function UnifiedCalendarGrid({
         })}
         
         {Array.from({ length: totalCells > (startingDayIndex + daysInMonth.length) ? totalCells - (startingDayIndex + daysInMonth.length) : 0 }).map((_, i) => (
-          <div key={`pad-end-${i}`} className="border-r border-b bg-muted/30" />
+          <div key={`pad-end-${i}`} className="border-b border-r bg-muted/30" />
         ))}
       </div>
     </div>

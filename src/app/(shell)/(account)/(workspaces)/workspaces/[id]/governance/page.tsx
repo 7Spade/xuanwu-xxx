@@ -5,8 +5,7 @@ import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useWorkspace } from "@/features/workspace-core"
 import { useAccount } from "@/features/account"
-import { GovernanceSidebar } from "@/features/workspace-governance.schedule"
-import { useScheduleActions } from "@/features/workspace-governance.schedule"
+import { GovernanceSidebar , useScheduleActions } from "@/features/workspace-governance.schedule"
 import type { ScheduleItem } from "@/shared/types"
 
 export default function GovernancePage() {
@@ -23,7 +22,7 @@ export default function GovernancePage() {
   )
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
+    <div className="mx-auto max-w-2xl py-8">
       <GovernanceSidebar
         proposals={proposals}
         onApprove={approveItem}

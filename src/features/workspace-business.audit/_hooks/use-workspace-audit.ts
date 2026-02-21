@@ -12,7 +12,7 @@
 
 import { useState } from "react";
 import { useWorkspace } from "@/features/workspace-core";
-import { AuditLog } from "@/shared/types";
+import { type AuditLog } from "@/shared/types";
 
 export function useWorkspaceAudit() {
   const { localAuditLogs } = useWorkspace();

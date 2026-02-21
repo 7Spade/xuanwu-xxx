@@ -9,10 +9,8 @@ import { useAuth } from "@/shared/app-providers/auth-provider"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { useApp } from "@/features/workspace-core"
 import { useVisibleWorkspaces } from "../_hooks/use-visible-workspaces"
-import { StatCards } from "@/features/account"
-import { AccountGrid } from "@/features/account"
+import { StatCards , AccountGrid , PermissionTree } from "@/features/account"
 import { WorkspaceList } from "./workspace-list"
-import { PermissionTree } from "@/features/account"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 
@@ -58,7 +56,7 @@ export function DashboardView() {
   const isOrgContext = activeAccount.accountType === "organization" && activeOrg
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700 pb-20">
+    <div className="mx-auto max-w-7xl space-y-8 pb-20 duration-700 animate-in fade-in">
       <PageHeader
         title={activeAccount.name}
         description={
@@ -68,14 +66,14 @@ export function DashboardView() {
         }
       >
         {isOrgContext && (
-          <div className="flex items-center gap-6 bg-muted/40 p-4 rounded-2xl border border-border/50 shadow-sm backdrop-blur-sm">
-            <div className="text-center px-4 border-r border-border/50">
-              <p className="text-2xl font-bold font-headline">{dimensionWorkspaces.length}</p>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold">Workspace Nodes</p>
+          <div className="flex items-center gap-6 rounded-2xl border border-border/50 bg-muted/40 p-4 shadow-sm backdrop-blur-sm">
+            <div className="border-r border-border/50 px-4 text-center">
+              <p className="font-headline text-2xl font-bold">{dimensionWorkspaces.length}</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground">Workspace Nodes</p>
             </div>
-            <div className="text-center px-4">
-              <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Your Role</p>
-              <Badge className="font-headline bg-primary/10 text-primary border-primary/20">
+            <div className="px-4 text-center">
+              <p className="mb-1 text-[10px] font-bold uppercase text-muted-foreground">Your Role</p>
+              <Badge className="border-primary/20 bg-primary/10 font-headline text-primary">
                 {currentUserRoleInOrg}
               </Badge>
             </div>
@@ -84,10 +82,10 @@ export function DashboardView() {
       </PageHeader>
 
       {!isOrgContext && (
-        <div className="p-8 bg-accent/5 rounded-3xl border-2 border-dashed border-accent/20 flex flex-col items-center text-center">
-          <UserIcon className="w-16 h-16 text-accent/50 mb-4" />
-          <h3 className="text-xl font-bold font-headline">Personal Dimension</h3>
-          <p className="text-muted-foreground max-w-md mx-auto mt-2 text-sm">
+        <div className="flex flex-col items-center rounded-3xl border-2 border-dashed border-accent/20 bg-accent/5 p-8 text-center">
+          <UserIcon className="mb-4 size-16 text-accent/50" />
+          <h3 className="font-headline text-xl font-bold">Personal Dimension</h3>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             Manage your private projects and logical spaces. To collaborate with others, switch to or
             create an organization dimension using the switcher in the sidebar.
           </p>

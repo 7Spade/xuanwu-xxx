@@ -27,7 +27,7 @@ export function NavWorkspaces({ workspaces, pathname, t }: NavWorkspacesProps) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
+      <SidebarGroupLabel className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
         {t('sidebar.quickAccess')}
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -39,7 +39,7 @@ export function NavWorkspaces({ workspaces, pathname, t }: NavWorkspacesProps) {
                 isActive={pathname === `/workspaces/${workspace.id}`}
               >
                 <Link href={`/workspaces/${workspace.id}`}>
-                  <Terminal className="w-3 h-3 text-primary/60" />
+                  <Terminal className="size-3 text-primary/60" />
                   <span className="truncate text-xs font-medium">{workspace.name}</span>
                 </Link>
               </SidebarMenuButton>

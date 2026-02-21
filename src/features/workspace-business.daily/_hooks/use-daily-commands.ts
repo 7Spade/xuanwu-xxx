@@ -17,7 +17,7 @@
 import { useCallback } from "react";
 import { useApp } from "@/features/workspace-core";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { toggleLike as toggleLikeAction } from "@/features/workspace-business.daily/_actions";
+import { toggleLike as toggleLikeAction } from "../_actions";
 import { toast } from "@/shared/utility-hooks/use-toast";
 
 export function useDailyActions() {

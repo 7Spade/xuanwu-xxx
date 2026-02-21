@@ -53,7 +53,7 @@ export async function signOut(): Promise<void> {
 }
 
 // --- Registration Use Case ---
-import { createUserAccount } from '@/features/user-settings/_actions'
+import { createUserAccount } from '@/features/user-settings'
 
 export async function completeRegistration(email: string, password: string, name: string): Promise<void> {
   const uid = await registerUser(email, password, name)

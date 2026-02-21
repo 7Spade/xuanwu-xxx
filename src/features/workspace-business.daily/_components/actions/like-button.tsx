@@ -51,7 +51,7 @@ export function LikeButton({ log, currentUser }: LikeButtonProps) {
 
   return (
     <div className="flex items-center gap-1">
-      <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleToggleLike}>
+      <Button variant="ghost" size="icon" className="size-9" onClick={handleToggleLike}>
         <Heart
           className={cn(
             "w-5 h-5 transition-all",
@@ -60,7 +60,7 @@ export function LikeButton({ log, currentUser }: LikeButtonProps) {
         />
       </Button>
       {likeCount > 0 && (
-         <span className="text-xs font-bold text-muted-foreground pr-2">{likeCount}</span>
+         <span className="pr-2 text-xs font-bold text-muted-foreground">{likeCount}</span>
       )}
     </div>
   );

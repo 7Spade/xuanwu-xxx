@@ -12,18 +12,18 @@ export function WorkspaceStatusBar() {
   return (
     <div className="flex items-center gap-2">
       <Badge
-        className="bg-primary/10 text-primary border-primary/20 uppercase text-[9px] tracking-[0.1em] font-bold px-2 py-0.5"
+        className="border-primary/20 bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-primary"
       >
         ID: {workspace.id.toUpperCase()}
       </Badge>
       <Badge
         variant="outline"
-        className="text-[9px] uppercase font-bold flex items-center gap-1 bg-background/50 backdrop-blur-sm"
+        className="flex items-center gap-1 bg-background/50 text-[9px] font-bold uppercase backdrop-blur-sm"
       >
         {isVisible ? (
-          <Eye className="w-3.5 h-3.5" />
+          <Eye className="size-3.5" />
         ) : (
-          <EyeOff className="w-3.5 h-3.5" />
+          <EyeOff className="size-3.5" />
         )}
         {isVisible ? "Mounted" : "Isolated"}
       </Badge>

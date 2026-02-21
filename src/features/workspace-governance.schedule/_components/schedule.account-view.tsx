@@ -67,8 +67,8 @@ export function AccountScheduleSection() {
   const renderItemActions = useCallback((item: ScheduleItem) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="w-5 h-5 text-muted-foreground hover:text-primary">
-          <UserPlus className="w-3 h-3" />
+        <Button variant="ghost" size="icon" className="size-5 text-muted-foreground hover:text-primary">
+          <UserPlus className="size-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-60">
@@ -96,8 +96,8 @@ export function AccountScheduleSection() {
 
   if (activeAccount?.accountType !== "organization") {
     return (
-      <div className="p-8 text-center flex flex-col items-center gap-4">
-        <AlertCircle className="w-10 h-10 text-muted-foreground" />
+      <div className="flex flex-col items-center gap-4 p-8 text-center">
+        <AlertCircle className="size-10 text-muted-foreground" />
         <h3 className="font-bold">Schedule Not Available</h3>
         <p className="text-sm text-muted-foreground">
           The organization-wide schedule is only available within an organization dimension.
@@ -107,20 +107,20 @@ export function AccountScheduleSection() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-full mx-auto animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+    <div className="mx-auto flex h-full max-w-full flex-col duration-700 animate-in fade-in">
+      <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
-          <h1 className="text-4xl font-bold tracking-tight font-headline">Organization Schedule</h1>
+          <h1 className="font-headline text-4xl font-bold tracking-tight">Organization Schedule</h1>
           <p className="text-muted-foreground">
             Aggregated view of all proposed and official schedule items across all workspaces.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col h-full gap-8">
-        <div className="flex-1 rounded-xl border bg-card overflow-hidden flex flex-col md:flex-row min-h-[60vh]">
-          <div className="md:flex-[2] xl:flex-[3] flex flex-col">
-            <div className="flex-1 relative overflow-hidden">
+      <div className="flex h-full flex-col gap-8">
+        <div className="flex min-h-[60vh] flex-1 flex-col overflow-hidden rounded-xl border bg-card md:flex-row">
+          <div className="flex flex-col md:flex-[2] xl:flex-[3]">
+            <div className="relative flex-1 overflow-hidden">
               <UnifiedCalendarGrid
                 items={allItems}
                 members={orgMembers}
@@ -134,7 +134,7 @@ export function AccountScheduleSection() {
               />
             </div>
           </div>
-          <div className="md:flex-[1] min-w-[300px] border-t md:border-t-0 md:border-l flex flex-col">
+          <div className="flex min-w-[300px] flex-col border-t md:flex-[1] md:border-l md:border-t-0">
             <GovernanceSidebar
               proposals={pendingProposals}
               onApprove={approveProposal}
@@ -145,22 +145,22 @@ export function AccountScheduleSection() {
 
         <div className="space-y-8">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-4">
-              <Calendar className="w-4 h-4" />
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+              <Calendar className="size-4" />
               Future Events
             </h3>
             <ScheduleDataTable columns={upcomingEventsColumns} data={upcomingEvents} />
           </div>
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-4">
-              <ListChecks className="w-4 h-4" />
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+              <ListChecks className="size-4" />
               Present Events
             </h3>
             <ScheduleDataTable columns={upcomingEventsColumns} data={presentEvents} />
           </div>
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-4">
-              <History className="w-4 h-4" />
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+              <History className="size-4" />
               Decision History (Last 7 Days)
             </h3>
             <ScheduleDataTable columns={decisionHistoryColumns} data={decisionHistory} />

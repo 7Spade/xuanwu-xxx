@@ -3,7 +3,7 @@ export interface DailyLogComment {
   author: {
     uid: string;
     name: string;
-    avatarUrl: string;
+    avatarUrl?: string;
   };
   content: string;
   createdAt: any; // Firestore Timestamp

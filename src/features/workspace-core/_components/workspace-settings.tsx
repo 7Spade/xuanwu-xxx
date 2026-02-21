@@ -75,13 +75,13 @@ export function WorkspaceSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-2xl max-w-2xl">
+      <DialogContent className="max-w-2xl rounded-2xl">
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">
             Workspace Sovereignty Settings
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-4">
+        <div className="max-h-[70vh] space-y-6 overflow-y-auto py-4 pr-4">
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase tracking-widest opacity-60">
               Workspace Node Name
@@ -89,7 +89,7 @@ export function WorkspaceSettingsDialog({
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="rounded-xl h-11"
+              className="h-11 rounded-xl"
             />
           </div>
 
@@ -102,33 +102,33 @@ export function WorkspaceSettingsDialog({
                     placeholder="Country"
                     value={address.country}
                     onChange={(e) => handleAddressChange('country', e.target.value)}
-                    className="rounded-xl h-11"
+                    className="h-11 rounded-xl"
                 />
                 <Input
                     placeholder="State / Province"
                     value={address.state}
                     onChange={(e) => handleAddressChange('state', e.target.value)}
-                    className="rounded-xl h-11"
+                    className="h-11 rounded-xl"
                 />
             </div>
             <Input
                 placeholder="City"
                 value={address.city}
                 onChange={(e) => handleAddressChange('city', e.target.value)}
-                className="rounded-xl h-11"
+                className="h-11 rounded-xl"
             />
             <Input
                 placeholder="Street Address"
                 value={address.street}
                 onChange={(e) => handleAddressChange('street', e.target.value)}
-                className="rounded-xl h-11"
+                className="h-11 rounded-xl"
             />
             <div className="grid grid-cols-2 gap-4">
                 <Input
                     placeholder="Postal Code"
                     value={address.postalCode}
                     onChange={(e) => handleAddressChange('postalCode', e.target.value)}
-                    className="rounded-xl h-11"
+                    className="h-11 rounded-xl"
                 />
             </div>
           </div>
@@ -143,7 +143,7 @@ export function WorkspaceSettingsDialog({
                 setLifecycleState(v)
               }
             >
-              <SelectTrigger className="rounded-xl h-11">
+              <SelectTrigger className="h-11 rounded-xl">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
@@ -154,10 +154,10 @@ export function WorkspaceSettingsDialog({
             </Select>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border/60">
+          <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 p-4">
             <div className="space-y-0.5">
               <Label className="text-sm font-bold">Workspace Visibility</Label>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+              <p className="text-[10px] font-bold uppercase tracking-tight text-muted-foreground">
                 {visibility === "visible"
                   ? "Publicly visible in dimension directory"
                   : "Hidden, visible only to authorized personnel"}

@@ -3,8 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Terminal } from "lucide-react";
-import { useVisibleWorkspaces } from "@/features/workspace-core";
-import { useApp } from "@/features/workspace-core";
+import { useVisibleWorkspaces , useApp } from "@/features/workspace-core";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useWorkspaceFilters } from "@/features/workspace-business.files";
 import { WorkspaceListHeader } from "./workspace-list-header";
@@ -37,7 +36,7 @@ export function WorkspacesView() {
   if (!mounted || !activeAccount) return null;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in duration-500 gpu-accelerated">
+    <div className="gpu-accelerated mx-auto max-w-7xl space-y-6 duration-500 animate-in fade-in">
       <WorkspaceListHeader
         activeAccountName={activeAccount.name}
         viewMode={viewMode}
@@ -53,17 +52,17 @@ export function WorkspacesView() {
           <WorkspaceTableView workspaces={filteredWorkspaces} />
         )
       ) : (
-        <div className="p-24 text-center border-2 border-dashed rounded-3xl bg-muted/5 border-border/40">
-          <Terminal className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-10" />
-          <h3 className="text-2xl font-bold font-headline mb-2">
+        <div className="rounded-3xl border-2 border-dashed border-border/40 bg-muted/5 p-24 text-center">
+          <Terminal className="mx-auto mb-6 size-16 text-muted-foreground opacity-10" />
+          <h3 className="mb-2 font-headline text-2xl font-bold">
             {t("workspaces.spaceVoid")}
           </h3>
-          <p className="text-muted-foreground max-w-sm mx-auto mb-8 text-sm">
+          <p className="mx-auto mb-8 max-w-sm text-sm text-muted-foreground">
             {t("workspaces.noSpacesFound")}
           </p>
           <Button
             size="lg"
-            className="rounded-full px-8 shadow-lg font-bold uppercase tracking-widest text-xs"
+            className="rounded-full px-8 text-xs font-bold uppercase tracking-widest shadow-lg"
             onClick={() => router.push(ROUTES.WORKSPACES_NEW)}
           >
             {t("workspaces.createInitialSpace")}

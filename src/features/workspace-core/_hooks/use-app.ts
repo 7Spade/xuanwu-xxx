@@ -1,6 +1,6 @@
 
 import { useContext } from 'react';
-import { AppContext } from '@/features/workspace-core/_components/app-provider';
+import { AppContext } from '../_components/app-provider';
 import { useAuth } from '@/shared/app-providers/auth-provider';
 
 export const useApp = () => {
