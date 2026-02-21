@@ -1,20 +1,8 @@
-/**
- * @fileoverview useAggregatedLogs - Hook for fetching and memoizing daily logs.
- * @description This hook is responsible for retrieving all daily logs for the
- * currently active organization from the `AccountContext`. It also handles
- * sorting the logs by date to ensure the daily log wall is displayed in the
- * correct chronological order.
- *
- * @responsibility
- * - Access `dailyLogs` from `useAccount` context.
- * - Memoize the transformation of the logs from a record to a sorted array.
- * - Provide a stable, sorted array of logs for the `AccountDailyComponent`.
- */
 "use client";
 
 import { useMemo } from "react";
 import { useAccount } from "@/features/account";
-import { DailyLog } from "@/shared/types";
+import type { DailyLog } from "@/shared/types";
 
 export function useAggregatedLogs() {
   const { state: accountState } = useAccount();
@@ -26,8 +14,5 @@ export function useAggregatedLogs() {
     [dailyLogs]
   );
 
-  // In a more complex scenario, this hook could also handle pagination,
-  // filtering, or other data manipulations.
-  
   return { logs };
 }

@@ -12,3 +12,4 @@ export { useBookmarkActions } from './_hooks/use-bookmark-commands'
 export { useDailyUpload } from './_hooks/use-daily-upload'
 // Default (AccountDailyView) — used by app/dashboard/account/daily/page.tsx
 export { default } from './_components/daily.view'
+export { useAggregatedLogs } from './_hooks/use-aggregated-logs'
