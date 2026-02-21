@@ -1,4 +1,4 @@
-import { WorkspaceAudit } from "@/features/audit"
+import { WorkspaceAudit } from "@/features/workspace-business.audit"
 
 export default function AuditCapabilityPage() {
   return <WorkspaceAudit />

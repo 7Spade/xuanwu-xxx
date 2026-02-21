@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from 'react';
-import { useApp } from '@/features/workspace';
+import { useApp } from '@/features/workspace-core';
 import { useAuth } from '@/shared/app-providers/auth-provider';
 import {
   createOrganization as createOrganizationAction,

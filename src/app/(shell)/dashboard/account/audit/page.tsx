@@ -1,1 +1,1 @@
-export { default } from '@/features/audit';
+export { default } from '@/features/workspace-business.audit';

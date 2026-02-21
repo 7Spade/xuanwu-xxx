@@ -53,10 +53,10 @@ app/  →  features/{name}/index.ts  →  shared/*
 
 ```ts
 // ✅ 允許
-import { AccountScheduleSection } from "@/features/schedule";
+import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
 
 // ❌ 禁止：直接引用切片私有路徑
-import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
 ```
 
 ---

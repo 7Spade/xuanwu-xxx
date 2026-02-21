@@ -3,8 +3,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { WorkspaceSettingsDialog } from "@/features/workspace"
-import { useWorkspace } from "@/features/workspace"
+import { WorkspaceSettingsDialog } from "@/features/workspace-core"
+import { useWorkspace } from "@/features/workspace-core"
 import type { WorkspaceLifecycleState, Address } from "@/shared/types"
 
 export default function WorkspaceSettingsPage() {

@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useAccountManagement } from "@/features/account";
-import { useApp } from "@/features/workspace";
+import { useApp } from "@/features/workspace-core";
 
 interface AccountNewFormProps {
   onSuccess: () => void;

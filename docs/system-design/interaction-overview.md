@@ -129,14 +129,14 @@ Command Hook 是 UI 與 Firebase 寫入之間的標準橋樑：
 useScheduleCommands()
   ├── approveScheduleItem(item)
   │     ├── 驗證 activeAccount guard
-  │     ├── await features/schedule/_actions.ts → approveScheduleItem(item)
+  │     ├── await features/workspace-governance.schedule/_actions.ts → approveScheduleItem(item)
   │     └── toast.success("Schedule approved")
   ├── rejectScheduleItem(item, reason)
   │     ├── 驗證 activeAccount guard
-  │     ├── await features/schedule/_actions.ts → rejectScheduleItem(item, reason)
+  │     ├── await features/workspace-governance.schedule/_actions.ts → rejectScheduleItem(item, reason)
   │     └── toast.success("Schedule rejected")
   └── assignScheduleItem(itemId, assigneeIds)
-        └── await features/schedule/_actions.ts → assignScheduleMembers(...)
+        └── await features/workspace-governance.schedule/_actions.ts → assignScheduleMembers(...)
 ```
 
 **互動規則：**
@@ -196,7 +196,7 @@ Document Parser ─── workspace:document-parser:itemsExtracted ► EventHand
                                                         └── confirmation dialog → bulk task import
 
 Daily Plugin   ──── daily:log:forwardRequested ─────►  EventHandler
-                                                        └── features/tasks/_actions.ts →  or /issue
+                                                        └── features/workspace-business.tasks/_actions.ts →  or /issue
 ```
 
 ---

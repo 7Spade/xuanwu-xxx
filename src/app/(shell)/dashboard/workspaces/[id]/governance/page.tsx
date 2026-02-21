@@ -3,10 +3,10 @@
 
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { useWorkspace } from "@/features/workspace"
+import { useWorkspace } from "@/features/workspace-core"
 import { useAccount } from "@/features/account"
-import { GovernanceSidebar } from "@/features/schedule"
-import { useScheduleActions } from "@/features/schedule"
+import { GovernanceSidebar } from "@/features/workspace-governance.schedule"
+import { useScheduleActions } from "@/features/workspace-governance.schedule"
 import type { ScheduleItem } from "@/shared/types"
 
 export default function GovernancePage() {

@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib';
 import { ThemeProvider } from '@/shared/app-providers/theme-provider';
 import { FirebaseClientProvider } from '@/shared/app-providers/firebase-provider';
 import { AuthProvider } from '@/shared/app-providers/auth-provider';
-import { AppProvider } from '@/features/workspace';
+import { AppProvider } from '@/features/workspace-core';
 import { I18nProvider } from '@/shared/app-providers/i18n-provider';
 
 export const metadata: Metadata = {

@@ -2,7 +2,7 @@
 // to /dashboard/workspaces/[id]/schedule-proposal from within the workspace layout.
 "use client"
 
-import { ScheduleProposalContent } from "@/features/schedule"
+import { ScheduleProposalContent } from "@/features/workspace-governance.schedule"
 
 export default function ScheduleProposalModalPage() {
   return <ScheduleProposalContent />

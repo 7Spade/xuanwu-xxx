@@ -149,11 +149,11 @@ npm run typecheck
 ```ts
 // ✅ 正確
 import { ScheduleItem } from "@/shared/types";
-import { AccountScheduleSection } from "@/features/schedule";
+import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
 
 // ❌ 錯誤（相對路徑）
 import { ScheduleItem } from "../../shared/types/schedule.types";
 
 // ❌ 禁止（切片私有路徑）
-import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
 ```

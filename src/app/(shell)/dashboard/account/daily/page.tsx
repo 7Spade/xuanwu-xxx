@@ -1,1 +1,1 @@
-export { default } from '@/features/daily';
+export { default } from '@/features/workspace-business.daily';

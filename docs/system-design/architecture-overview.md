@@ -38,10 +38,10 @@ app/  →  features/{name}/index.ts  →  shared/*
 
 ```ts
 // ✅ 允許：透過 index.ts
-import { AccountScheduleSection } from "@/features/schedule";
+import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
 
 // ❌ 禁止：直接引用切片私有路徑
-import { useWorkspaceSchedule } from "@/features/schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
 ```
 
 ---
@@ -92,7 +92,7 @@ Plugin A 完成後需通知 Plugin B：
 ```
 Plugin A → publish("workspace:tasks:completed", payload)
   → WorkspaceEventBus
-    → features/workspace/_components/workspace-event-handler.tsx
+    → features/workspace-core/_components/workspace-event-handler.tsx
       → features/{target}/_actions.ts
 ```
 
@@ -101,9 +101,9 @@ Plugin A → publish("workspace:tasks:completed", payload)
 單一動作需 ≥2 次 Firebase 寫入：
 
 ```
-UI → features/workspace/_use-cases.ts
-  → features/workspace/_actions.ts  (write A)
-  → features/workspace/_actions.ts  (write B)
+UI → features/workspace-core/_use-cases.ts
+  → features/workspace-core/_actions.ts  (write A)
+  → features/workspace-core/_actions.ts  (write B)
 ```
 
 ### Flow D：實時狀態（Provider / Listener）
@@ -112,8 +112,8 @@ UI → features/workspace/_use-cases.ts
 
 ```
 Firestore onSnapshot
-  → features/workspace/_components/workspace-provider.tsx (setState)
-    → features/workspace/index.ts → useWorkspace()
+  → features/workspace-core/_components/workspace-provider.tsx (setState)
+    → features/workspace-core/index.ts → useWorkspace()
       → UI component (重新渲染)
 ```
 

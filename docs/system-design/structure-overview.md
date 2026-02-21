@@ -216,7 +216,7 @@ shared/
 | 類型 | 模式 | 範例 |
 |------|------|------|
 | 切片 hooks | `use-{what}.ts` | `use-workspace-schedule.ts` |
-| 切片 actions | `_actions.ts` | `features/schedule/_actions.ts` |
+| 切片 actions | `_actions.ts` | `features/workspace-governance.schedule/_actions.ts` |
 | 切片 views | `{name}.{context}-view.tsx` | `schedule.account-view.tsx` |
 | 共用類型 | `{domain}.types.ts` | `shared/types/schedule.types.ts` |
 | 共用規則 | `{domain}.rules.ts` | `shared/lib/schedule.rules.ts` |

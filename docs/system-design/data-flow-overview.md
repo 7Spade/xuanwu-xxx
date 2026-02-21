@@ -11,7 +11,7 @@
 | 情境 | 使用 | 位置 |
 |------|------|------|
 | 單一 domain 的使用者觸發寫入 | **Flow A** — command hook | `features/{name}/_hooks/` |
-| 插件 A 完成後需觸發插件 B | **Flow B** — event bus | `features/workspace/_components/` (WorkspaceEventBus) |
+| 插件 A 完成後需觸發插件 B | **Flow B** — event bus | `features/workspace-core/_components/` (WorkspaceEventBus) |
 | 單一動作需 ≥2 次 Firebase 寫入 | **Flow C** — use-case | `features/{name}/_use-cases.ts` |
 | 多元件共享的即時資料 | **Flow D** — provider listener | `features/{name}/_components/` (provider) |
 | 純業務規則驗證 | `shared/lib` 直接呼叫 | `shared/lib/{domain}.rules.ts` |
@@ -31,9 +31,9 @@
 2. features/{name}/_hooks/use-daily-commands.ts
    ├── useCallback（穩定參照）
    ├── auth guard（無 activeAccount → 提早返回 + toast）
-   └── await features/daily/_actions.ts → toggleLike(logId, userId)
+   └── await features/workspace-business.daily/_actions.ts → toggleLike(logId, userId)
 
-3. features/daily/_actions.ts ("use server")
+3. features/workspace-business.daily/_actions.ts ("use server")
    └── await dailyRepository.toggleLike(logId, userId)
 
 4. shared/infra/firestore/repositories/daily.repository.ts
@@ -48,10 +48,10 @@
 
 | Hook | 檔案 | 主要動作 |
 |------|------|---------|
-| `useScheduleCommands` | `features/schedule/_hooks/use-schedule-commands.ts` | approve / reject / assign / unassign |
-| `useWorkspaceCommands` | `features/workspace/_hooks/use-workspace-commands.ts` | deleteWorkspace |
-| `useDailyCommands` | `features/daily/_hooks/use-daily-commands.ts` | toggleLike, addComment |
-| `useBookmarkCommands` | `features/daily/_hooks/use-bookmark-commands.ts` | toggleBookmark |
+| `useScheduleCommands` | `features/workspace-governance.schedule/_hooks/use-schedule-commands.ts` | approve / reject / assign / unassign |
+| `useWorkspaceCommands` | `features/workspace-core/_hooks/use-workspace-commands.ts` | deleteWorkspace |
+| `useDailyCommands` | `features/workspace-business.daily/_hooks/use-daily-commands.ts` | toggleLike, addComment |
+| `useBookmarkCommands` | `features/workspace-business.daily/_hooks/use-bookmark-commands.ts` | toggleBookmark |
 
 ---
 
@@ -142,10 +142,10 @@ Issues Plugin ◄─────────────────────
 1. features/{name}/_components/ component（例如 CreateWorkspaceDialog）
    └── await createWorkspaceWithCapabilities(name, account, capabilities)
 
-2. features/workspace/_use-cases.ts
-   ├── await features/workspace/_actions.ts → createWorkspace(name, account)
+2. features/workspace-core/_use-cases.ts
+   ├── await features/workspace-core/_actions.ts → createWorkspace(name, account)
    │     → 寫入 workspaces/{id}（得到 workspaceId）
-   └── await features/workspace/_actions.ts → mountCapabilities(workspaceId, capabilities)
+   └── await features/workspace-core/_actions.ts → mountCapabilities(workspaceId, capabilities)
          → 寫入 workspaces/{id}/capabilities
 
 3. _actions.ts → shared/infra/firestore repositories → Firestore
@@ -160,7 +160,7 @@ Issues Plugin ◄─────────────────────
 |------|------|----------------|
 | `completeRegistration(email, password, name)` | `features/auth/_use-cases.ts` | `registerUser` + `createUserProfile` |
 | `setupOrganizationWithTeam(orgName, owner, teamName, type)` | `features/account/_use-cases.ts` | `createOrganization` + `createTeam` |
-| `createWorkspaceWithCapabilities(name, account, caps)` | `features/workspace/_use-cases.ts` | `createWorkspace` + `mountCapabilities` |
+| `createWorkspaceWithCapabilities(name, account, caps)` | `features/workspace-core/_use-cases.ts` | `createWorkspace` + `mountCapabilities` |
 
 ---
 
@@ -220,7 +220,7 @@ Issues Plugin ◄─────────────────────
   │ Flow A
   ▼
 useScheduleCommands.approveScheduleItem(item)
-  → features/schedule/_actions.ts → approveScheduleItem(item)
+  → features/workspace-governance.schedule/_actions.ts → approveScheduleItem(item)
     → schedule.repository.update({ status: 'OFFICIAL' })
       → Firestore 文件更新
         │ Flow D（自動）

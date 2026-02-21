@@ -4,7 +4,7 @@
 
 import { use } from "react"
 import { useRouter } from "next/navigation"
-import { DailyLogDialog } from "@/features/daily"
+import { DailyLogDialog } from "@/features/workspace-business.daily"
 import { useAccount } from "@/features/account"
 import { useAuth } from "@/shared/app-providers/auth-provider"
 

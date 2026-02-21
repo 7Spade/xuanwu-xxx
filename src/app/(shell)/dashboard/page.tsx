@@ -1,4 +1,4 @@
-import { DashboardView } from "@/features/workspace"
+import { DashboardView } from "@/features/workspace-core"
 
 export default function DashboardPage() {
   return <DashboardView />
