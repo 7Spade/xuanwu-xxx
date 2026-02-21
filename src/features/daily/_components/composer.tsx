@@ -1,4 +1,4 @@
-// @/view-modules/workspaces/plugins/daily/_plugin-components/composer.tsx
+// @/features/daily/_components/composer.tsx
 /**
  * @fileoverview Composer - The shared input component for creating daily logs.
  * @description This component encapsulates the UI and logic for the text area,

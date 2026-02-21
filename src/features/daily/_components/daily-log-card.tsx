@@ -1,4 +1,4 @@
-// @/view-modules/workspaces/plugins/daily/_plugin-components/daily-log-card.tsx
+// @/features/daily/_components/daily-log-card.tsx
 /**
  * @fileoverview DailyLogCard - The preview card for a single daily log entry.
  * @description This is a "dumb component" responsible for the visual representation

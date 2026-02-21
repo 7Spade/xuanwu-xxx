@@ -1,4 +1,4 @@
-// @/react-hooks/command-hooks/use-daily-commands.ts
+// @/features/daily/_hooks/use-daily-commands.ts
 /**
  * @fileoverview useDailyActions - A hook for managing actions on daily logs.
  * @description This hook centralizes business logic for interactive features

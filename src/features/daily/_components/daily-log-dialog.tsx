@@ -1,4 +1,4 @@
-// @/view-modules/workspaces/plugins/daily/_plugin-components/daily-log-dialog.tsx
+// @/features/daily/_components/daily-log-dialog.tsx
 /**
  * @fileoverview Daily Log Dialog - The detailed view for a single log entry.
  * @description This component displays a single daily log in a modal dialog.
