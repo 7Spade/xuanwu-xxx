@@ -1,1 +1,1 @@
-export * from "./auth.commands"
+export * from "./auth.commands" // signIn, registerUser, signInAnonymously, sendPasswordResetEmail, signOut

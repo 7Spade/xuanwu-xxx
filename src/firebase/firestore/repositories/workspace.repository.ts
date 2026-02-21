@@ -1,9 +1,8 @@
 /**
  * @fileoverview Workspace Repository.
  *
- * This file contains all Firestore write operations related to a single 'workspaces'
- * document and all of its sub-collections (tasks, issues, files, etc.).
- * It encapsulates the direct interactions with the Firebase SDK.
+ * All Firestore read and write operations for the `workspaces` collection
+ * and its sub-collections (tasks, issues, files, grants).
  */
 
 import {
@@ -11,6 +10,10 @@ import {
   arrayUnion,
   arrayRemove,
   doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
   runTransaction,
 } from 'firebase/firestore';
 import { db } from '../firestore.client';
@@ -19,17 +22,20 @@ import {
   addDocument,
   deleteDocument,
 } from '../firestore.write.adapter';
+import { getDocuments } from '../firestore.read.adapter';
+import { createConverter } from '../firestore.converter';
 import type {
   Workspace,
   WorkspaceRole,
   WorkspaceGrant,
-  Account,
   WorkspaceIssue,
   IssueComment,
   WorkspaceTask,
+  WorkspaceFile,
   Capability,
   WorkspaceLifecycleState,
-} from '@/domain-types/domain'
+} from '@/domain-types/workspace'
+import type { Account } from '@/domain-types/account'
 
 /**
  * Creates a new workspace with default values, based on the active account context.
@@ -305,3 +311,51 @@ export const deleteWorkspace = async (workspaceId: string): Promise<void> => {
   // to delete all subcollections (tasks, issues, etc.).
   return deleteDocument(`workspaces/${workspaceId}`);
 };
+
+// =================================================================
+// == Workspace Aggregate Reads
+// =================================================================
+
+export const getWorkspaceTasks = async (
+  workspaceId: string
+): Promise<WorkspaceTask[]> => {
+  const converter = createConverter<WorkspaceTask>()
+  const colRef = collection(
+    db,
+    `workspaces/${workspaceId}/tasks`
+  ).withConverter(converter)
+  const q = query(colRef, orderBy('createdAt', 'desc'))
+  return getDocuments(q)
+}
+
+export const getWorkspaceIssues = async (
+  workspaceId: string
+): Promise<WorkspaceIssue[]> => {
+  const converter = createConverter<WorkspaceIssue>()
+  const colRef = collection(
+    db,
+    `workspaces/${workspaceId}/issues`
+  ).withConverter(converter)
+  const q = query(colRef, orderBy('createdAt', 'desc'))
+  return getDocuments(q)
+}
+
+export const getWorkspaceFiles = async (
+  workspaceId: string
+): Promise<WorkspaceFile[]> => {
+  const wsRef = doc(db, 'workspaces', workspaceId)
+  const snap = await getDoc(wsRef)
+  if (!snap.exists()) return []
+  const data = snap.data() as Workspace
+  return Object.values(data.files ?? {})
+}
+
+export const getWorkspaceGrants = async (
+  workspaceId: string
+): Promise<WorkspaceGrant[]> => {
+  const wsRef = doc(db, 'workspaces', workspaceId)
+  const snap = await getDoc(wsRef)
+  if (!snap.exists()) return []
+  const data = snap.data() as Workspace
+  return data.grants ?? []
+}

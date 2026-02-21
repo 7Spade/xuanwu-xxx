@@ -1,4 +1,4 @@
-import AccountScheduleSection from "@/view-modules/workspaces/plugins/schedule/account-schedule-section";
+import { AccountScheduleSection } from "@/view-modules/workspaces/plugins";
 
 export default function AccountSchedulePage() {
   return <AccountScheduleSection />;
