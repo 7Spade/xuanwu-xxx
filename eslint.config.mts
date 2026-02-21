@@ -135,16 +135,23 @@ export default tseslint.config(
     },
   },
 
-  // shadcn-ui: ForwardRef components use `{...props}` to pass children — heading/anchor content
-  // arrives at runtime via props spread, so these rules produce false positives here.
-  // cmdk-input-wrapper is a valid custom attribute required by cmdk library.
-  // input-group addon uses controlled onClick delegation, not direct handler on non-interactive.
+  // shadcn-ui generated files — conform to official shadcn code as-is, never modify.
+  // These rules produce false positives or conflict with shadcn's official code patterns:
+  //   • consistent-type-imports  — shadcn imports type + value from same source without `import type`
+  //   • no-unused-vars           — `const actionTypes = {} as const; type T = typeof actionTypes`
+  //   • no-explicit-any          — shadcn internals (chart, sidebar) use `any` intentionally
+  //   • react/no-unknown-property — `cmdk-input-wrapper=""` is a valid cmdk custom attribute
+  //   • jsx-a11y/*               — shadcn uses onClick delegation on group divs (input-group)
+  //   • heading/anchor-has-content — ForwardRef components spread content via `{...props}`
   {
     files: ["src/shared/shadcn-ui/**/*.{ts,tsx}", "src/shared/utility-hooks/**/*.{ts,tsx}"],
     rules: {
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "react/no-unknown-property": "off",
       "jsx-a11y/heading-has-content": "off",
       "jsx-a11y/anchor-has-content": "off",
-      "react/no-unknown-property": "off",
       "jsx-a11y/click-events-have-key-events": "off",
       "jsx-a11y/no-noninteractive-element-interactions": "off",
     },
