@@ -21,6 +21,6 @@ export { WorkspaceQA } from './qa/qa-plugin';
 export { WorkspaceTasks } from './tasks/tasks-plugin';
 export { WorkspaceSchedule } from './schedule/schedule.workspace-view';
 export { WorkspaceDocumentParser } from './document-parser/document-parser-plugin';
-export { AccountScheduleComponent } from './schedule/schedule.account-view';
+export { AccountScheduleSection } from './schedule/schedule.account-view';
 export { AccountAuditComponent } from './audit/audit.account-view';
 export { AccountDailyComponent } from './daily/daily.account-view';
