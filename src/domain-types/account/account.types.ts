@@ -21,10 +21,12 @@ export interface Account {
    */
   skillGrants?: SkillGrant[]
   /**
-   * Platform coin balance — pre-embedded for future currency/reward system.
+   * Wallet — pre-embedded for future currency/reward system.
    * Only meaningful on `accountType === 'user'` accounts.
+   * Balance is the authoritative figure; full transaction history lives in
+   * the `accounts/{userId}/walletTransactions` sub-collection when needed.
    */
-  coin?: number
+  wallet?: Wallet
   // org-specific
   description?: string
   ownerId?: string
@@ -64,6 +66,22 @@ export interface ThemeConfig {
   primary: string;
   background: string;
   accent: string;
+}
+
+/**
+ * User wallet — inline balance summary stored on the user account document.
+ *
+ * Design contract:
+ *   - `balance` is always the authoritative total (never negative).
+ *   - Detailed transaction history goes in `accounts/{userId}/walletTransactions`
+ *     sub-collection when that feature is built — this struct stays as the
+ *     fast-read summary that loads with the profile in a single document fetch.
+ *   - Extend this struct with optional fields (e.g. `currency`, `pendingBalance`)
+ *     as needed — no migration required since all fields are optional beyond `balance`.
+ */
+export interface Wallet {
+  /** Current coin balance. Incremented by XP rewards, decremented by spending. */
+  balance: number;
 }
 
 /** @deprecated Use SkillTag from domain-types/skill for new code. */

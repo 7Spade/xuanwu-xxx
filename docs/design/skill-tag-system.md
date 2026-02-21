@@ -926,3 +926,104 @@ return (slugMatch || idMatch) && tierSatisfies(grant.tier, requirement.minimumTi
 | §10-B 雙帳本（實體帳本） | 簡化為單一帳本（個人）|
 | 「實體 XP 從 ScheduleItem OFFICIAL 觸發」| 不再有實體 XP |
 | `MemberReference.skillGrants` 作為寫入目標 | 降級為唯讀快取 |
+
+---
+
+## 13. 貨幣系統 — `Wallet` 結構決策
+
+> **決策日期**：2026-02-21  
+> **觸發問題**：`coin?: number` 直接改成 wallet 會不會對未來更有利？  
+> **答案**：**是，改成 `wallet?: Wallet` 結構。**
+
+---
+
+### 13-A. 三個方案的比較
+
+| 方案 | 現在 | 未來新增交易歷史 | 主要風險 |
+|------|------|-----------------|---------|
+| A：`coin?: number` | 0 成本預埋 | 必須**重命名欄位**或在旁邊尷尬地加 `coinHistory[]`；文件大小風險 | 製造唯一一次的遷移成本 |
+| **B：`wallet?: Wallet`（採用）** | **6 行 interface**，仍然是單次文件讀取 | 直接向 struct 加選填欄位；交易歷史用子集合正交擴展 | **無** |
+| C：`walletTransactions` 子集合 | 需要額外 Firestore read 才能顯示餘額 | 原生交易歷史，但現在根本不需要 | 過度設計 |
+
+**方案 B 是甜蜜點：** 比 `number` 多 6 行，換來永遠不需要做欄位遷移。
+
+---
+
+### 13-B. 類比：`ThemeConfig` 模式
+
+專案裡已有相同的設計模式：`ThemeConfig` 是一個三欄 struct 而不是三個分散的原始型別。
+`Wallet` 遵循完全相同的邏輯——把一個概念的相關欄位組合在一起。
+
+```typescript
+// 已有（ThemeConfig 模式）
+interface ThemeConfig {
+  primary: string;
+  background: string;
+  accent: string;
+}
+
+// 新增（同樣模式）
+interface Wallet {
+  balance: number;
+}
+```
+
+---
+
+### 13-C. 擴展路線圖（不需要遷移）
+
+```typescript
+// v1（現在）
+interface Wallet {
+  balance: number;
+}
+
+// v2（若需要多貨幣，直接加欄位）
+interface Wallet {
+  balance: number;
+  currency?: string;      // e.g. 'COIN', 'CREDIT'
+  pendingBalance?: number; // earned but not yet settled
+}
+
+// v3（若需要交易歷史）
+// Wallet struct 保持不變，成為快速讀取的摘要
+// 歷史記錄移到 Firestore 子集合：
+//   accounts/{userId}/walletTransactions/{txId}
+// 這兩件事完全正交，不相互干擾
+```
+
+---
+
+### 13-D. Firestore 最終結構（含 Wallet）
+
+```
+accounts/{userId}
+  wallet?: Wallet
+    balance: number           ← 快速讀取的權威餘額
+
+accounts/{userId}/walletTransactions/{txId}  ← 未來按需增加，不影響 wallet
+  amount: number
+  type: 'earn' | 'spend'
+  reason: string
+  timestamp: Timestamp
+```
+
+Wallet 永遠跟 User Profile 在同一個文件讀取，**零額外 Firestore read**。
+交易歷史是一個完全獨立的子集合，當需要時直接建，當不需要時完全不存在。
+
+---
+
+### 13-E. 更新 §12 的對應修訂
+
+§12-A 的「貨幣系統」欄位從 `coin?: number` 更新為 `wallet?: Wallet`：
+
+```
+舊：coin?: number                 ← 直接是一個數字
+新：wallet?: Wallet { balance: number }  ← 有結構的概念單元
+```
+
+§12-B 的 Firestore 結構中 `coin?: number` 同步更新為：
+```
+wallet?: Wallet
+  balance: number
+```
