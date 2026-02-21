@@ -158,7 +158,7 @@ Issues Plugin ◄─────────────────────
 
 | 函式 | 模組 | 組合的 Actions |
 |------|------|----------------|
-| `completeRegistration(email, password, name)` | `features/auth/_use-cases.ts` | `registerUser` + `createUserProfile` |
+| `completeRegistration(email, password, name)` | `features/account.auth/_use-cases.ts` | `registerUser` + `createUserProfile` |
 | `setupOrganizationWithTeam(orgName, owner, teamName, type)` | `features/account/_use-cases.ts` | `createOrganization` + `createTeam` |
 | `createWorkspaceWithCapabilities(name, account, caps)` | `features/workspace-core/_use-cases.ts` | `createWorkspace` + `mountCapabilities` |
 

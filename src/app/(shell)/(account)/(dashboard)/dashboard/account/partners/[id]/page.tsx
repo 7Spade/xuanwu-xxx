@@ -1,4 +1,4 @@
-import { PartnerDetailView } from "@/features/workspace-business.partners"
+import { PartnerDetailView } from "@/features/workspace-governance.partners"
 
 /**
  * PartnerTeamDetailPage - Manages recruitment and identity governance within a specific partner team.

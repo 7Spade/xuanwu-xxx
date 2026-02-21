@@ -1,4 +1,4 @@
-# Feature Slice: `auth`
+# Feature Slice: `account.auth`
 
 ## Domain
 

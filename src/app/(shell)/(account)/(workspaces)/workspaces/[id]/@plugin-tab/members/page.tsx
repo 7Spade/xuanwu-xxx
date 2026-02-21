@@ -1,4 +1,4 @@
-import { MembersPlugin } from "@/features/workspace-business.members"
+import { MembersPlugin } from "@/features/workspace-governance.members"
 
 export default function MembersCapabilityPage() {
   return <MembersPlugin />

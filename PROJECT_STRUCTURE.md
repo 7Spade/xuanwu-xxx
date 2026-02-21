@@ -6,12 +6,12 @@
 
 ## Architecture Overview
 
-Vertical Slice Architecture — **3 categories, 26 modules**.
+Vertical Slice Architecture — **3 categories, 27 modules**.
 
 ```
 src/
 ├── app/          ← Next.js routing only (1)
-├── features/     ← Business domain slices (20)
+├── features/     ← Business domain slices (21)
 └── shared/       ← Cross-cutting infrastructure (5)
 ```
 
@@ -168,31 +168,35 @@ src/app/
 20 vertical feature slices. Each slice is self-contained — owns types, actions, queries, hooks,
 and components for its business domain.
 
-Workspace slices follow dot-namespace convention:
-- `workspace-core.*` — infrastructure (CRUD, shell, event bus)
-- `workspace-business.*` — business plugins
-- `workspace-governance.*` — governance workflows
+Slices follow dot-namespace convention:
+- `account.*` / `account-user.*` / `account-organization.*` — auth and account features
+- `workspace-core.*` — workspace infrastructure (CRUD, shell, event bus)
+- `workspace-business.*` — day-to-day operational content
+- `workspace-governance.*` — organizational structure and decision workflows
 
 ```
 src/features/
-├── auth/                            ← Login, register, reset password
-├── account/                         ← Organization CRUD, stats, permissions
-├── user-settings/                   ← User profile, preferences, security
-├── workspace-core/                  ← Workspace CRUD, shell, provider, list
-├── workspace-core.event-bus/        ← Intra-workspace event bus
-├── workspace-business.members/      ← Member management (workspace-level)
-├── workspace-business.teams/        ← Team management
-├── workspace-business.partners/     ← Partner management
-├── workspace-business.daily/        ← Daily logs, comments, bookmarks
-├── workspace-business.tasks/        ← Task tree, CRUD
-├── workspace-business.audit/        ← Audit trail, event timeline
-├── workspace-business.files/        ← File upload, management
-├── workspace-business.issues/       ← Issue tracking
-├── workspace-business.finance/      ← Finance workspace plugin
-├── workspace-business.qa/           ← QA workspace plugin
-├── workspace-business.document-parser/ ← AI document parsing
-├── workspace-business.acceptance/   ← Acceptance workspace plugin
-└── workspace-governance.schedule/   ← Schedule, proposals, governance
+├── account.auth/                        ← Login, register, reset password
+├── account/                             ← Organization CRUD, stats, permissions
+├── user-settings/                       ← User profile, preferences, security
+├── account-user.wallet/                 ← User personal wallet (stub)
+├── account-organization.member/         ← Org-level member invite/remove (stub)
+├── workspace-core/                      ← Workspace CRUD, shell, provider, list
+├── workspace-core.event-bus/            ← Intra-workspace event bus
+├── workspace-governance.members/        ← Workspace member access & roles
+├── workspace-governance.teams/          ← Team structure management
+├── workspace-governance.partners/       ← External partner relationships
+├── workspace-governance.schedule/       ← Schedule, proposals, decisions
+├── workspace-business.daily/            ← Daily logs, comments, bookmarks
+├── workspace-business.tasks/            ← Task tree, CRUD
+├── workspace-business.audit/            ← Audit trail, event timeline
+├── workspace-business.files/            ← File upload, management
+├── workspace-business.issues/           ← Issue tracking
+├── workspace-business.finance/          ← Finance plugin
+├── workspace-business.qa/               ← QA plugin
+├── workspace-business.document-parser/  ← AI document parsing
+├── workspace-business.acceptance/       ← Acceptance plugin
+└── workspace-business.capabilities/     ← Capabilities plugin
 ```
 
 Each slice follows the standard layout:

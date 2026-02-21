@@ -405,7 +405,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 #### 區域 B：個人技能授予（成員資料卡內嵌）
 
 ```
-位置：features/workspace-business.members/_components/members-view.tsx 的成員卡片
+位置：features/workspace-governance.members/_components/members-view.tsx 的成員卡片
 路由：已有 app/dashboard/account/members/
 ```
 
@@ -418,17 +418,17 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | `SkillGrantEditor` | Command 選擇 tag + 直接選擇 SkillTier（下拉） |
 | XP 顯示 | 只讀，顯示目前 xp 值和進度條 |
 
-**架構位置**：`features/workspace-business.members/_components/` （已存在）
+**架構位置**：`features/workspace-governance.members/_components/` （已存在）
 
 ---
 
 #### 區域 C：團隊 / 夥伴技能授予（Detail View 內嵌）
 
 ```
-位置 (內部團隊)：features/workspace-business.teams/_components/team-detail-view.tsx
+位置 (內部團隊)：features/workspace-governance.teams/_components/team-detail-view.tsx
 路由：已有 app/dashboard/account/teams/[id]/page.tsx
 
-位置 (外部夥伴)：features/workspace-business.partners/_components/partner-detail-view.tsx
+位置 (外部夥伴)：features/workspace-governance.partners/_components/partner-detail-view.tsx
 路由：已有 app/dashboard/account/partners/[id]/page.tsx
 ```
 
@@ -440,7 +440,7 @@ ScheduleItem.status: PROPOSAL → OFFICIAL  (帳戶 Admin/Owner 審核通過)
 | `SkillGrantEditor` (Team) | 同區域 B，但授予對象是 `Team.skillGrants` |
 | XP 進度 | 顯示團隊在每個技能的 XP 和等級 |
 
-**架構位置**：`features/workspace-business.teams/_components/` + `features/workspace-business.partners/_components/` （均已存在）
+**架構位置**：`features/workspace-governance.teams/_components/` + `features/workspace-governance.partners/_components/` （均已存在）
 
 ---
 

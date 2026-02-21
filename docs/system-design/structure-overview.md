@@ -129,13 +129,13 @@ features/{name}/
 
 | 切片 | 主要職責 |
 |------|---------|
-| `auth` | 登入、註冊、重設密碼 |
+| `account.auth` | 登入、註冊、重設密碼 |
 | `account` | 組織 CRUD、統計、權限矩陣 |
 | `workspace-core` | 工作區 CRUD、設定、導航、外殼（Sidebar/Header） |
 | `workspace-core.event-bus` | 跨切片事件匯流排（Observer 引擎、Context、Hooks） |
-| `workspace-business.members` | 成員管理（帳號層 + 工作區層） |
-| `workspace-business.teams` | 團隊管理 |
-| `workspace-business.partners` | 協力廠商管理 |
+| `workspace-governance.members` | 成員管理（帳號層 + 工作區層） |
+| `workspace-governance.teams` | 團隊管理 |
+| `workspace-governance.partners` | 協力廠商管理 |
 | `workspace-governance.schedule` | 排班、提案、治理審核 |
 | `workspace-business.daily` | 工作日誌、留言、書籤、按讚 |
 | `workspace-business.tasks` | 任務樹、CRUD |

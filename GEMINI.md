@@ -17,7 +17,7 @@ The project uses **Vertical Slice Architecture (VSA)**. Code is organized by **b
 ```
 src/
 ├── app/          ← Next.js routing ONLY (pure composition)
-├── features/     ← 17 vertical feature slices (one per business domain)
+├── features/     ← 22 vertical feature slices (one per business domain)
 └── shared/       ← 5 cross-cutting infrastructure modules
 ```
 
@@ -26,7 +26,7 @@ src/
 | Directory | Role | Count |
 |-----------|------|-------|
 | `app/` | Next.js App Router — routing & layout composition only | 1 |
-| `features/` | Self-contained business domain slices | 20 |
+| `features/` | Self-contained business domain slices | 22 |
 | `shared/` | Cross-cutting infrastructure (types, lib, infra, ai, ui) | 5 |
 
 ### Dependency Flow
@@ -42,18 +42,22 @@ app/  ->  features/{name}/index.ts  ->  shared/*
 ### Feature Slice Index
 
 Each slice lives at `src/features/{name}/` and owns everything for its domain.
-Workspace slices use dot-namespace: `workspace-core.*` for infrastructure, `workspace-business.*` for plugins, `workspace-governance.*` for governance.
+Workspace slices use dot-namespace: `workspace-core.*` for infrastructure, `workspace-business.*` for day-to-day operations, `workspace-governance.*` for organizational governance.
+Account slices use dot-namespace: `account-user.*` for personal user features, `account-organization.*` for org-level features.
 
 | Slice | Domain |
 |-------|--------|
-| `features/auth` | Login, register, reset password |
+| `features/account.auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
 | `features/user-settings` | User profile, preferences, security |
+| `features/account-user.wallet` | User personal wallet, balance (stub) |
+| `features/account-organization.member` | Org-level member invite/remove (stub) |
 | `features/workspace-core` | Workspace CRUD, shell, provider, list |
 | `features/workspace-core.event-bus` | Intra-workspace event bus |
-| `features/workspace-business.members` | Member management (workspace-level) |
-| `features/workspace-business.teams` | Team management |
-| `features/workspace-business.partners` | Partner management |
+| `features/workspace-governance.members` | Workspace member access & roles |
+| `features/workspace-governance.teams` | Team structure management |
+| `features/workspace-governance.partners` | External partner relationships |
+| `features/workspace-governance.schedule` | Schedule, proposals, decisions |
 | `features/workspace-business.daily` | Daily logs, comments, bookmarks |
 | `features/workspace-business.tasks` | Task tree, CRUD |
 | `features/workspace-business.audit` | Audit trail, event timeline |
@@ -63,7 +67,7 @@ Workspace slices use dot-namespace: `workspace-core.*` for infrastructure, `work
 | `features/workspace-business.qa` | QA plugin |
 | `features/workspace-business.document-parser` | AI document parsing |
 | `features/workspace-business.acceptance` | Acceptance plugin |
-| `features/workspace-governance.schedule` | Schedule, proposals, governance |
+| `features/workspace-business.capabilities` | Capabilities plugin |
 
 ### Shared Module Index
 

@@ -113,9 +113,9 @@ src/
 │   ├── account/                  ← [切片 2] 組織：CRUD、統計、權限矩陣
 │   ├── workspace-core/            ← [切片 3] 工作區：CRUD、設定、導航、外殼
 │   │   └── _shell/               ← 儀表板外殼（Sidebar、Header）
-│   ├── workspace-business.members/  ← [切片 4] 成員管理
-│   ├── workspace-business.teams/    ← [切片 5] 團隊管理
-│   ├── workspace-business.partners/ ← [切片 6] 協力廠商管理
+│   ├── workspace-governance.members/  ← [切片 4] 成員管理
+│   ├── workspace-governance.teams/    ← [切片 5] 團隊管理
+│   ├── workspace-governance.partners/ ← [切片 6] 協力廠商管理
 │   ├── workspace-governance.schedule/ ← [切片 7] 排班、提案、治理審核
 │   ├── workspace-business.daily/    ← [切片 8] 工作日誌、留言、書籤、按讚
 │   ├── workspace-business.tasks/    ← [切片 9] 任務樹、CRUD

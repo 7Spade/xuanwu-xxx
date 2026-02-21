@@ -222,7 +222,7 @@ Firestore 文件變更
 ```
 使用者提交登入表單
   → LoginForm.handleSubmit()
-    → features/auth/_use-cases.ts: completeRegistration() 或 features/auth/_actions.ts → signIn()
+    → features/account.auth/_use-cases.ts: completeRegistration() 或 features/account.auth/_actions.ts → signIn()
       → shared/infra/auth/auth.adapter.signIn()
         → Firebase Auth（Google Cloud）
           → onAuthStateChanged 觸發
@@ -234,7 +234,7 @@ Firestore 文件變更
 **登出流程：**
 ```
 NavUser.handleSignOut()
-  → features/auth/_actions.ts → signOut()
+  → features/account.auth/_actions.ts → signOut()
     → shared/infra/auth/auth.adapter.signOut()
       → onAuthStateChanged({ user: null })
         → AuthProvider.setState({ user: null })

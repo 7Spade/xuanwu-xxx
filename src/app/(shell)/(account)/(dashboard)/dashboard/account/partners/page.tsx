@@ -1,4 +1,4 @@
-import { PartnersView } from "@/features/workspace-business.partners"
+import { PartnersView } from "@/features/workspace-governance.partners"
 
 /**
  * PartnersPage - Manages logical groupings of EXTERNAL partners (Partner Teams).

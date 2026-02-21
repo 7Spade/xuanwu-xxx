@@ -62,8 +62,8 @@ src/
 ├── app/                              ← Next.js App Router（路由組裝）
 │   ├── layout.tsx
 │   ├── (public)/
-│   │   ├── login/page.tsx            ← import { LoginView } from "@/features/auth"
-│   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/auth"
+│   │   ├── login/page.tsx            ← import { LoginView } from "@/features/account.auth"
+│   │   ├── reset-password/page.tsx   ← import { ResetPasswordForm } from "@/features/account.auth"
 │   │   └── layout.tsx
 │   └── (shell)/                      ← 全域 UI 容器層（外殼層，純視覺結構）
 │       ├── layout.tsx                ← SidebarProvider（提供 @sidebar + @modal 插槽）
@@ -78,9 +78,9 @@ src/
 │           │       ├── page.tsx      ← import { DashboardView } from "@/features/workspace-core"
 │           │       └── account/
 │           │           ├── schedule/page.tsx     ← import { AccountScheduleSection } from "@/features/workspace-governance.schedule"
-│           │           ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-business.members"
-│           │           ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-business.teams"
-│           │           ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-business.partners"
+│           │           ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-governance.members"
+│           │           ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-governance.teams"
+│           │           ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-governance.partners"
 │           │           ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
 │           │           └── ...
 │           └── (workspaces)/         ← 路由群組：工作區模組（列表 + 詳情）
@@ -94,7 +94,7 @@ src/
 │                       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
 │                       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
 │                       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
-│                       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-business.members"
+│                       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-governance.members"
 │                       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
 │                       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
 │                       │   ├── finance/page.tsx       ← import { FinancePlugin } from "@/features/workspace-business.finance"
@@ -164,7 +164,7 @@ src/
 │   │   │   └── theme-adapter.tsx
 │   │   └── index.ts
 │   │
-│   ├── workspace-business.members/    ← [切片 4] 成員：帳號級 + 工作區級成員管理
+│   ├── workspace-governance.members/    ← [切片 4] 成員：帳號級 + 工作區級成員管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts               ← addMember, removeMember, updateMemberRole
 │   │   ├── _queries.ts
@@ -173,7 +173,7 @@ src/
 │   │   │   └── members-view.tsx
 │   │   └── index.ts
 │   │
-│   ├── workspace-business.teams/      ← [切片 5] 團隊：團隊管理
+│   ├── workspace-governance.teams/      ← [切片 5] 團隊：團隊管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts
 │   │   ├── _components/
@@ -181,7 +181,7 @@ src/
 │   │   │   └── teams-view.tsx
 │   │   └── index.ts
 │   │
-│   ├── workspace-business.partners/   ← [切片 6] 協力廠商：夥伴管理
+│   ├── workspace-governance.partners/   ← [切片 6] 協力廠商：夥伴管理
 │   │   ├── GEMINI.md
 │   │   ├── _actions.ts
 │   │   ├── _components/
@@ -404,7 +404,7 @@ export { ScheduleProposalContent } from "./_components/schedule-proposal-content
 ✅ 允許的引用模式：
 
 // App 引用功能切片公開 API
-import { LoginView } from "@/features/auth";
+import { LoginView } from "@/features/account.auth";
 import { WorkspaceSchedule } from "@/features/workspace-governance.schedule";
 
 // 切片引用共用基礎設施

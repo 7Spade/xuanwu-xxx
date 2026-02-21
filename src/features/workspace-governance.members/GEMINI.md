@@ -1,4 +1,4 @@
-# Feature Slice: `workspace-business.members`
+# Feature Slice: `workspace-governance.members`
 
 ## Domain
 
