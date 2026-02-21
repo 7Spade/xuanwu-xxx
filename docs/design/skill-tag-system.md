@@ -1027,3 +1027,172 @@ Wallet 永遠跟 User Profile 在同一個文件讀取，**零額外 Firestore r
 wallet?: Wallet
   balance: number
 ```
+
+---
+
+## 14. Profile 頁面設計分析
+
+> **觸發問題**：目前結構要擴展 profile 頁面，因為單純 settings 已無法滿足  
+> **本節僅討論，不產生代碼**
+
+---
+
+### 14-A. 現狀診斷
+
+從程式碼讀出的事實：
+
+```
+src/app/dashboard/account/settings/page.tsx
+  → UserSettingsView
+    → UserSettings（smart container）
+      ├── ProfileCard    — 編輯 name, bio, avatar, ExpertiseBadges（checkbox）
+      ├── PreferencesCard — 開關：Auto-adapt UI Resonance, Notifications
+      └── SecurityCard   — 刪除帳戶 / 登出
+```
+
+**問題 1：位置錯誤**  
+`account/settings` 被放在 `NavMain` 的「Account Governance」collapsible 裡，
+這個 collapsible 只有 `isOrganizationAccount === true` 時才出現。
+個人用戶（user account）找不到 Settings，因為 nav 完全不顯示它。
+
+**問題 2：概念混淆**  
+「編輯個人資料」和「查看個人名片」是兩件截然不同的事：
+- Settings = 私人配置介面（填表、儲存）
+- Profile  = 公開身份頁（展示、閱讀）
+
+加入技能徽章、XP 進度條、Wallet 餘額後，Settings 頁要渲染的東西會超過它的職責範圍。
+
+**問題 3：`nav-user` 入口重複**  
+sidebar footer 的用戶 dropdown 也有一個「User Settings」連結（UserCircle icon）指向同一個 settings 路由。
+未來需要區分「看我的 Profile」和「修改設定」這兩個不同入口。
+
+---
+
+### 14-B. Profile vs Settings 的邊界劃分
+
+| 區域 | Profile（`/account/profile`） | Settings（`/account/settings`） |
+|------|-------------------------------|--------------------------------|
+| **核心職責** | 身份展示 / 公開名片 | 私人配置 / 管理操作 |
+| **主要動作** | 瀏覽（讀多寫少） | 編輯（寫多） |
+| **avatar 顯示** | ✅ 大尺寸展示 | ✅ 小尺寸 + 上傳按鈕 |
+| **name / bio** | ✅ 唯讀展示 | ✅ 表單編輯 |
+| **SkillGrant 徽章** | ✅ 技能卡片 + XP 進度條 + tier 色彩 | ❌ 不適合放在設定頁 |
+| **Wallet 餘額** | ✅ coin balance 摘要 | ❌ 不適合放在設定頁 |
+| **Preferences** | ❌ | ✅ 通知、UI 自適應等開關 |
+| **Security** | ❌ | ✅ 刪除帳號、密碼等危險操作 |
+| **外部可見性** | 未來可公開（組織內其他成員可查看） | 永遠私有 |
+
+---
+
+### 14-C. 路由方案
+
+```
+/dashboard/account/profile   ← 新增（個人 Profile 頁）
+/dashboard/account/settings  ← 保留（設定，只留 Preferences + Security）
+```
+
+**為什麼 profile 和 settings 是兩個路由，而不是 tab？**
+
+1. **可分享 URL**：未來若允許組織成員查看彼此 profile，URL 可以擴展為
+   `/dashboard/account/members/[userId]/profile` — 同一個 view-module 直接複用。
+2. **導航意圖清晰**：`nav-user` dropdown 可以有兩個明確入口：
+   - 「View Profile」→ `/account/profile`
+   - 「Settings」     → `/account/settings`
+3. **職責單一**：每個路由只做一件事，符合 Occam's Razor。
+
+---
+
+### 14-D. Profile 頁面的區塊組成
+
+```
+/dashboard/account/profile
+├── Hero 區
+│   ├── Avatar（大尺寸，帶 tier 最高技能的光環色）
+│   ├── Display Name
+│   ├── Bio
+│   └── 快速 Edit 按鈕 → 跳到 /account/settings
+│
+├── Skill Grants 區（核心新功能）
+│   ├── 每個 SkillGrant 一張技能卡
+│   │   ├── tagName（技能名稱）
+│   │   ├── tier badge（色彩從 CSS --tier-N-* token）
+│   │   ├── XP 進度條（xp / maxXp for this tier）
+│   │   └── earnedInOrgId → org 名稱（若 org 仍存在）
+│   └── 「No skills yet」empty state
+│
+└── Wallet 區（輕量預覽）
+    └── balance: number（coin 餘額）
+```
+
+---
+
+### 14-E. Settings 頁面的精簡後組成
+
+```
+/dashboard/account/settings（保留，只精簡）
+├── ProfileCard（改小）
+│   ├── Avatar 上傳
+│   ├── Display Name 編輯
+│   └── Bio 編輯
+│   （移除：ExpertiseBadges checkbox — 技能改由 admin 在 members 頁授予）
+│
+├── PreferencesCard（不變）
+│   └── 通知、UI 自適應開關
+│
+└── SecurityCard（不變）
+    └── 刪除帳號
+```
+
+`ExpertiseBadge` checkbox 可以在 settings 中移除，因為新的 SkillGrant 系統由 org admin 授予，不是用戶自己勾選。
+
+---
+
+### 14-F. 影響到的檔案清單（實施時參考）
+
+```
+新增：
+  src/app/dashboard/account/profile/page.tsx
+  src/view-modules/user-profile/              ← 新 view-module
+    user-profile-view.tsx                     ← 頁面組合（smart container）
+    profile-hero-card.tsx                     ← Avatar + name + bio
+    skill-grants-section.tsx                  ← 技能徽章列表
+    wallet-summary-card.tsx                   ← Wallet 餘額預覽
+
+修改：
+  src/shared/constants/routes.ts              ← 加入 ACCOUNT_PROFILE
+  src/view-modules/dashboard/sidebar/nav-user.tsx  ← 分拆兩個入口
+  src/view-modules/dashboard/sidebar/nav-main.tsx  ← 個人 Profile 入口（永遠可見，不限 org）
+  src/view-modules/user-settings/profile-card.tsx  ← 移除 ExpertiseBadges checkbox
+```
+
+---
+
+### 14-G. 導航入口設計
+
+```
+Sidebar footer（nav-user dropdown）：
+  ├── View Profile  → /dashboard/account/profile   ← 新
+  └── Settings      → /dashboard/account/settings  ← 已有
+
+Sidebar nav（NavMain）：
+  ├── 個人 Profile（永遠顯示，不限 org context）  ← 新
+  └── Account Governance（只對 org 顯示，不變）
+        ├── Members, Teams, Partners, Settings, Matrix, Schedule, Daily, Audit
+```
+
+---
+
+### 14-H. 問題確認
+
+在實施前，需要確認以下幾點：
+
+1. **Profile 是否允許其他組織成員查看？**  
+   若是 → URL 設計為 `/members/[userId]/profile`（view-module 複用）  
+   若否 → 只有 `/account/profile`（自己看自己）
+
+2. **Skill grants 是否可在 profile 頁顯示 org 名稱？**  
+   需要從 `earnedInOrgId` 反查 org 的 `name` — 若 org 已刪除則顯示 `(expired org)` 或隱藏
+
+3. **Settings 中的 `ExpertiseBadges` checkbox 何時廢棄？**  
+   建議：等 skill-grant 系統的管理 UI（admin 授予流程）完成後一併移除，避免空白期
+
