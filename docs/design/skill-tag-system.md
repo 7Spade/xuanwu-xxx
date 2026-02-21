@@ -819,3 +819,110 @@ export interface SkillGrant {
 ```
 
 §10-B 其餘的防漏洞設計（對數縮放、雙重把關、無廣播等）全部保留。
+
+---
+
+## 12. 最終簡化設計 — 人本 XP + Coin 預埋
+
+> **決策日期**：2026-02-21  
+> **狀態**：已確認，進入實施
+
+---
+
+### 12-A. 核心決策摘要
+
+| 決策 | 結論 |
+|------|------|
+| 誰持有 XP？ | **個人用戶** (`accounts/{userId}`) — 唯一 XP 持有者 |
+| 團隊 XP？ | **完全移除** — 不追蹤，不保留 |
+| 夥伴 XP？ | **不適用** — 夥伴成員以個人身分累積 XP |
+| MemberReference.skillGrants | **顯示快取**（唯讀投影，非 XP 來源） |
+| 貨幣系統 | **預埋 `coin: number`** 在 `Account` 上，供未來擴展 |
+
+---
+
+### 12-B. 最終 Firestore 結構
+
+```
+accounts/{userId}                    ← PERMANENT (Firebase Auth 錨定)
+  accountType: 'user'
+  skillGrants: SkillGrant[]          ← 個人技能 + XP，永久保留
+  coin?: number                      ← 貨幣餘額預埋，預設 undefined/0
+
+  SkillGrant {
+    tagSlug: string       ← 必填，跨 org 可攜帶識別符
+    tagName?: string      ← 快照，org 消失後仍可顯示
+    tagId?: string        ← 選填，org-local UUID（backward compat）
+    tier: SkillTier       ← 目前等級
+    xp: number            ← 累積 XP（必填，從 0 開始）
+    earnedInOrgId?: string ← 歸因審計
+    grantedAt?: Timestamp
+  }
+
+accounts/{orgId}                     ← EPHEMERAL
+  skillTags: SkillTag[]              ← 組織技能標籤庫
+  members: MemberReference[]
+    MemberReference.skillGrants      ← 顯示快取（從 accounts/{uid} 讀取填入）
+  teams: Team[]                      ← 不再有 skillGrants（已移除）
+```
+
+---
+
+### 12-C. `coin` 設計邊界
+
+`coin` 故意設計為最簡單的 `number` 型別，理由：
+
+1. **避免過度設計**：還不知道貨幣系統的完整需求（贈送？扣除？匯率？）
+2. **零破壞性預埋**：新增選填 `number` 欄位對現有所有程式碼完全透明
+3. **型別擴展路徑**：未來若需要多貨幣或交易歷史，可以：
+   - 增加 `coinHistory?: CoinTransaction[]` 選填欄位
+   - 或遷移到 `accounts/{userId}/wallet` 子集合
+   - 現有 `coin` 欄位成為快取摘要
+
+```typescript
+// 現在（預埋）
+coin?: number   // 餘額
+
+// 未來（若需要）
+coin?: number            // 快取餘額
+coinHistory?: CoinTransaction[]  // 交易歷史（選填，按需追加）
+```
+
+---
+
+### 12-D. `SkillRequirement` 的對應修改
+
+`ScheduleItem.requiredSkills[]` 中的 `SkillRequirement` 同步更新：
+
+```typescript
+interface SkillRequirement {
+  tagSlug: string     ← 必填，主要匹配鍵（對應個人 SkillGrant.tagSlug）
+  tagId?: string      ← 選填，org-local UUID（UI 連結標籤庫用）
+  minimumTier: SkillTier
+  quantity: number    ← 需要幾個「人」（不再是「團隊或人」）
+}
+```
+
+---
+
+### 12-E. `grantSatisfiesRequirement` 更新
+
+`domain-rules/skill/skill.rules.ts` 中的匹配函數改為：
+
+```typescript
+// 以 tagSlug 為主要匹配鍵，tagId 為向下相容備選
+slugMatch = grant.tagSlug === requirement.tagSlug
+idMatch   = requirement.tagId !== undefined && grant.tagId === requirement.tagId
+return (slugMatch || idMatch) && tierSatisfies(grant.tier, requirement.minimumTier)
+```
+
+---
+
+### 12-F. 已從先前設計移除的部分
+
+| 移除項目 | 理由 |
+|---------|------|
+| `Team.skillGrants` | 團隊不再是 XP 持有者；個人已完整記錄 |
+| §10-B 雙帳本（實體帳本） | 簡化為單一帳本（個人）|
+| 「實體 XP 從 ScheduleItem OFFICIAL 觸發」| 不再有實體 XP |
+| `MemberReference.skillGrants` 作為寫入目標 | 降級為唯讀快取 |

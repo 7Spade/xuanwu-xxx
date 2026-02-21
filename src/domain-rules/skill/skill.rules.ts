@@ -74,13 +74,17 @@ export function tierSatisfies(grantedTier: SkillTier, minimumTier: SkillTier): b
 
 /**
  * Returns true if the given SkillGrant array satisfies a single SkillRequirement.
+ * Matches on `tagSlug` (portable, primary key) with fallback to `tagId` for
+ * backward compatibility with older grant records.
  * Does not check quantity — only verifies that the skill & tier threshold is met.
  */
 export function grantSatisfiesRequirement(
   grants: SkillGrant[],
   requirement: SkillRequirement
 ): boolean {
-  return grants.some(
-    g => g.tagId === requirement.tagId && tierSatisfies(g.tier, requirement.minimumTier)
-  );
+  return grants.some(g => {
+    const slugMatch = g.tagSlug === requirement.tagSlug;
+    const idMatch = requirement.tagId !== undefined && g.tagId !== undefined && g.tagId === requirement.tagId;
+    return (slugMatch || idMatch) && tierSatisfies(g.tier, requirement.minimumTier);
+  });
 }

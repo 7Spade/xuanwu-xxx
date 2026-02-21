@@ -12,8 +12,19 @@ export interface Account {
   bio?: string
   achievements?: string[]
   expertiseBadges?: ExpertiseBadge[]
-  /** Global skill-tag library for this organisation. */
+  /** Global skill-tag library for this organisation. Only present on org accounts. */
   skillTags?: SkillTag[]
+  /**
+   * Individual skill grants — permanently attached to this user.
+   * Only meaningful on `accountType === 'user'` accounts.
+   * Survives org/team deletion; matched by `tagSlug` for cross-org portability.
+   */
+  skillGrants?: SkillGrant[]
+  /**
+   * Platform coin balance — pre-embedded for future currency/reward system.
+   * Only meaningful on `accountType === 'user'` accounts.
+   */
+  coin?: number
   // org-specific
   description?: string
   ownerId?: string
@@ -33,7 +44,11 @@ export interface MemberReference {
   presence: 'active' | 'away' | 'offline';
   isExternal?: boolean;
   expiryDate?: any; // FirestoreTimestamp
-  /** Skills held by this individual, with proficiency tier. */
+  /**
+   * Display cache of this individual's skill grants.
+   * Derived from accounts/{id}.skillGrants at read time — not the source of truth.
+   * Do not write XP here; write to accounts/{userId}.skillGrants instead.
+   */
   skillGrants?: SkillGrant[];
 }
 
@@ -43,8 +58,6 @@ export interface Team {
   description: string;
   type: 'internal' | 'external';
   memberIds: string[];
-  /** Skills held by this team as a whole, with proficiency tier. */
-  skillGrants?: SkillGrant[];
 }
 
 export interface ThemeConfig {

@@ -2,10 +2,13 @@
  * @fileoverview Skill & Tag-Badge system — core domain types.
  *
  * Design principles:
- *   - SkillTag  = a global library entry (the "what")
- *   - SkillGrant = an assignment of a skill + tier to an entity (the "who has it")
+ *   - SkillTag        = org-level skill library entry (the "what")
+ *   - SkillGrant      = assignment of a skill + tier to an individual user (the "who has it")
+ *                       Stored permanently on accounts/{userId} — survives org deletion.
  *   - SkillRequirement = what a schedule proposal needs (the "what is needed")
  *
+ * Key decision: XP and skill grants belong to the PERSON, not the organisation.
+ * `tagSlug` is the portable cross-org identifier; `tagId` is org-local (optional).
  * Naming is intentionally industry-semantic to support future AI-agent scheduling.
  */
 
@@ -66,22 +69,39 @@ export interface SkillTag {
 // ---------------------------------------------------------------------------
 
 /**
- * Records that a specific entity (Team or MemberReference) holds a skill
- * at a given tier. Stored inline on the entity document.
+ * Records that an individual user holds a skill at a given tier.
+ *
+ * Stored on `accounts/{userId}.skillGrants[]` — permanently attached to the
+ * person, not to the organisation.  Survives org deletion, team removal, and
+ * partner-contract expiry.
+ *
+ * `tagSlug` is the portable cross-org identifier (e.g. "electrical-work").
+ * `tagId`   is the org-local UUID and is optional for display/linking purposes.
  */
 export interface SkillGrant {
-  /** References SkillTag.id from the org's global library. */
-  tagId: string;
   /**
-   * Proficiency tier — set manually by an admin for now.
-   * Can be derived from `xp` via resolveSkillTier() in domain-rules/skill.
+   * Portable, hyphen-separated skill identifier — the primary lookup key.
+   * Derived from SkillTag.slug at grant time so the record is self-contained
+   * even after the originating organisation is deleted.
+   * Example: "electrical-work", "project-management"
+   */
+  tagSlug: string;
+  /** Snapshot of the human-readable tag name at grant time (for display). */
+  tagName?: string;
+  /** Org-local UUID — optional, only present when the org still exists. */
+  tagId?: string;
+  /**
+   * Proficiency tier — set manually by an admin or derived from `xp` via
+   * resolveSkillTier() in domain-rules/skill.
    */
   tier: SkillTier;
   /**
-   * Optional XP value (0–525).
-   * Provides finer-grained progress information within a tier.
+   * Accumulated XP (0–525).
+   * Drives tier progression; use resolveSkillTier(xp) to get the tier.
    */
-  xp?: number;
+  xp: number;
+  /** The organisation in which this XP was earned (audit trail). */
+  earnedInOrgId?: string;
   /** When the skill was granted / last updated. */
   grantedAt?: any; // Firestore Timestamp
 }
@@ -95,10 +115,15 @@ export interface SkillGrant {
  * Workspace managers specify what skills they require and how many people.
  */
 export interface SkillRequirement {
-  /** References SkillTag.id from the org's global library. */
-  tagId: string;
+  /**
+   * Portable skill identifier — the primary matching key.
+   * Matches SkillGrant.tagSlug on individual user profiles.
+   */
+  tagSlug: string;
+  /** Org-local tag UUID — optional, for UI linking to the tag library. */
+  tagId?: string;
   /** Minimum acceptable tier — entities below this tier are excluded. */
   minimumTier: SkillTier;
-  /** Number of people/teams needed with this skill. */
+  /** Number of individuals needed with this skill. */
   quantity: number;
 }
