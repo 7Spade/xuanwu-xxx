@@ -20,7 +20,7 @@ import {
 import { Check, ChevronsUpDown, Globe, Plus } from "lucide-react"
 import type { Account } from "@/shared/types"
 import type { AppAction } from '../_components/app-provider'
-import { cn } from "@/shared/utils/utils"
+import { cn } from "@/shared/lib"
 import Link from "next/link"
 import { ROUTES } from "@/shared/constants/routes"
 

@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
-import { useUser } from "@/features/user-settings";
+import { useUser } from "../_hooks/use-user";
 import { type ExpertiseBadge } from "@/shared/types";
 
 import { ProfileCard } from "./profile-card";

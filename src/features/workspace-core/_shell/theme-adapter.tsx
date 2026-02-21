@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useApp } from "@/features/workspace-core";
-import { hexToHsl } from "@/shared/utils/utils";
+import { hexToHsl } from "@/shared/lib";
 import { Skeleton } from "@/shared/shadcn-ui/skeleton";
 
 interface ThemeAdapterProps {

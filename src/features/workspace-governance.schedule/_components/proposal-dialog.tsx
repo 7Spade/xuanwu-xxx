@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/shadcn-ui/popo
 import { Calendar } from "@/shared/shadcn-ui/calendar";
 import { CalendarIcon, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@/shared/lib";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { type Location } from "@/shared/types";
 

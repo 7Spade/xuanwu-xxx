@@ -53,7 +53,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/shadcn-ui/dropdown-menu';
 import { Progress } from '@/shared/shadcn-ui/progress';
-import { cn } from '@/shared/utils/utils';
+import { cn } from '@/shared/lib';
 import { buildTaskTree } from '@/shared/lib';
 import { useStorage } from '@/features/workspace-business.files';
 import Image from "next/image";

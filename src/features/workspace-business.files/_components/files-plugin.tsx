@@ -41,9 +41,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/shadcn-ui/dropdown-menu";
-import { cn } from "@/shared/utils/utils";
+import { cn, formatBytes } from "@/shared/lib";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { formatBytes } from "@/shared/utils/format-bytes";
 import type { WorkspaceFile, WorkspaceFileVersion } from "@/shared/types";
 import {
   Table,

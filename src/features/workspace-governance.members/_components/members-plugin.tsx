@@ -22,7 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/shadcn-ui/select";
 import { Label } from "@/shared/shadcn-ui/label";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/shadcn-ui/dropdown-menu";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@/shared/lib";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>

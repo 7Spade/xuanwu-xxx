@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { type Locale, type TranslationMessages } from '@/shared/i18n-types/i18n';
-import { getPreferredLocale, setLocalePreference, loadMessages, i18nConfig } from '@/shared/utils/i18n';
+import { getPreferredLocale, setLocalePreference, loadMessages, i18nConfig } from '@/shared/lib';
 
 interface I18nContextValue {
   locale: Locale;

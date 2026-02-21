@@ -13,7 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/shared/shadcn-ui/tooltip";
-import { cn } from "@/shared/utils/utils";
+import { cn } from "@/shared/lib";
 import { format, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday } from "date-fns";
 import { Plus, Check, X, Layers, ChevronLeft, ChevronRight } from "lucide-react";
 

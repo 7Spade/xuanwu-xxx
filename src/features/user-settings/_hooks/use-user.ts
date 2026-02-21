@@ -9,7 +9,7 @@ import {
   updateUserProfile as updateUserProfileAction,
   getUserProfile as getUserProfileAction,
 } from '../_actions'
-import { uploadProfilePicture } from '@/features/workspace-business.files'
+import { uploadProfilePicture } from '@/shared/infra/storage/storage.facade'
 import type { Account } from '@/shared/types'
 
 /**
