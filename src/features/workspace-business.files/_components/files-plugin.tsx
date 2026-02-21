@@ -24,10 +24,9 @@ import {
 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion, type FieldValue } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion, type FieldValue , type Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useMemo, useState, useRef } from "react";
-import type { Timestamp } from "firebase/firestore";
 import { 
   Sheet, 
   SheetContent, 
