@@ -1,1 +1,1 @@
-export * from './daily.types'
+export * from './daily.types' // DailyLogComment, DailyLog

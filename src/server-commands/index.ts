@@ -9,17 +9,17 @@
  *   import { createWorkspace, signIn } from '@/server-commands'
  */
 
-export * from "./account"
-export * from "./audit"
-export * from "./auth"
-export * from "./workspace"
-export * from "./bookmark"
-export * from "./daily"
-export * from "./document-parser"
-export * from "./files"
-export * from "./issue"
-export * from "./members"
-export * from "./schedule"
-export * from "./storage"
-export * from "./task"
-export * from "./user"
+export * from "./account"         // createOrganization, recruitMember, dismissMember, createTeam, updateTeamMembers, sendPartnerInvite, dismissPartnerMember, updateOrganizationSettings, deleteOrganization
+export * from "./audit"           // getAuditLogs
+export * from "./auth"            // signIn, registerUser, signInAnonymously, sendPasswordResetEmail, signOut
+export * from "./workspace"       // createWorkspace, authorizeWorkspaceTeam, revokeWorkspaceTeam, grantIndividualWorkspaceAccess, revokeIndividualWorkspaceAccess, mountCapabilities, unmountCapability, updateWorkspaceSettings, deleteWorkspace
+export * from "./bookmark"        // toggleBookmark
+export * from "./daily"           // toggleLike, addDailyLogComment, getDailyLogs
+export * from "./document-parser" // ActionState, extractDataFromDocument
+export * from "./files"           // getWorkspaceFiles
+export * from "./issue"           // createIssue, addCommentToIssue
+export * from "./members"         // getWorkspaceGrants
+export * from "./schedule"        // assignMember, unassignMember, createScheduleItem, updateScheduleItemStatus, getScheduleItems
+export * from "./storage"         // uploadDailyPhoto, uploadTaskAttachment, uploadProfilePicture
+export * from "./task"            // createTask, updateTask, deleteTask, batchImportTasks, getWorkspaceTasks
+export * from "./user"            // createUserAccount, getUserProfile, updateUserProfile

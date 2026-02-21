@@ -1,1 +1,1 @@
-export * from "./audit.commands"
+export * from "./audit.commands" // getAuditLogs

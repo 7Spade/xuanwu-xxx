@@ -1,1 +1,1 @@
-export * from "./files.commands"
+export * from "./files.commands" // getWorkspaceFiles

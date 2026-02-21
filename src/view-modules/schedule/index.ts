@@ -9,7 +9,7 @@
  * Consumers import only from this barrel.
  */
 
-export { AccountScheduleSection } from './schedule.account-view';
-export { WorkspaceSchedule } from './schedule.workspace-view';
-export { ScheduleProposalContent } from './_components/schedule-proposal-content';
-export { GovernanceSidebar } from './_components/governance-sidebar';
+export { AccountScheduleSection } from './schedule.account-view';    // Account-wide schedule view with staffing & governance sections
+export { WorkspaceSchedule }       from './schedule.workspace-view';  // Per-workspace schedule view showing proposals for that workspace
+export { ScheduleProposalContent } from './_components/schedule-proposal-content'; // Shared proposal detail/list content used by both views
+export { GovernanceSidebar }       from './_components/governance-sidebar';        // Sidebar panel for approving/rejecting schedule proposals

@@ -1,1 +1,1 @@
-export * from "./document-parser.commands"
+export * from "./document-parser.commands" // ActionState, extractDataFromDocument
