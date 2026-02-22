@@ -1,4 +1,4 @@
-# Feature Slice: `user-settings`
+# Feature Slice: `account-user.profile`
 
 ## Domain
 
@@ -21,7 +21,7 @@ User personal settings — profile, preferences (language/theme), security (pass
 ## Maps From (Legacy)
 
 - `src/server-commands/user/` → `_actions.ts`
-- `src/view-modules/user-settings/` → `_components/`
+- `src/view-modules/user-settings/` → `_components/`  (formerly `user-settings` slice)
 
 ## Public API (`index.ts`)
 

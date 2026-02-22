@@ -178,7 +178,7 @@ Slices follow dot-namespace convention:
 src/features/
 ├── account.auth/                        ← Login, register, reset password
 ├── account/                             ← Organization CRUD, stats, permissions
-├── user-settings/                       ← User profile, preferences, security
+├── account-user.profile/                ← User profile, preferences, security
 ├── account-user.wallet/                 ← User personal wallet (stub)
 ├── account-organization.member/         ← Org-level member invite/remove (stub)
 ├── workspace-core/                      ← Workspace CRUD, shell, provider, list
@@ -187,9 +187,9 @@ src/features/
 ├── workspace-governance.teams/          ← Team structure management
 ├── workspace-governance.partners/       ← External partner relationships
 ├── workspace-governance.schedule/       ← Schedule, proposals, decisions
+├── workspace-governance.audit/          ← Audit trail, event timeline
 ├── workspace-business.daily/            ← Daily logs, comments, bookmarks
 ├── workspace-business.tasks/            ← Task tree, CRUD
-├── workspace-business.audit/            ← Audit trail, event timeline
 ├── workspace-business.files/            ← File upload, management
 ├── workspace-business.issues/           ← Issue tracking
 ├── workspace-business.finance/          ← Finance plugin
