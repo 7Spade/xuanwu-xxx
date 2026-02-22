@@ -119,14 +119,14 @@ src/
 │   ├── workspace-governance.schedule/ ← [切片 7] 排班、提案、治理審核
 │   ├── workspace-business.daily/    ← [切片 8] 工作日誌、留言、書籤、按讚
 │   ├── workspace-business.tasks/    ← [切片 9] 任務樹、CRUD
-│   ├── workspace-business.audit/   ← [切片 10] 稽核事件追蹤
+│   ├── workspace-governance.audit/  ← [切片 10] 稽核事件追蹤
 │   ├── workspace-business.files/   ← [切片 11] 檔案上傳、管理
 │   ├── workspace-business.issues/  ← [切片 12] 議題追蹤
 │   ├── workspace-business.finance/ ← [切片 13] 財務插件
 │   ├── workspace-business.qa/     ← [切片 14] QA 插件
 │   ├── workspace-business.document-parser/ ← [切片 15] AI 文件解析
 │   ├── workspace-business.acceptance/ ← [切片 16] 驗收插件
-│   └── user-settings/            ← [切片 17] 使用者個人資料、偏好、安全
+│   └── account-user.profile/     ← [切片 17] 使用者個人資料、偏好、安全
 │
 └── app/                          ← Next.js App Router（路由組裝，純 UI 組合層）
     ├── layout.tsx                ← 根佈局（providers：FirebaseProvider → AuthProvider → AppProvider）

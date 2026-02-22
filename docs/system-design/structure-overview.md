@@ -139,14 +139,14 @@ features/{name}/
 | `workspace-governance.schedule` | 排班、提案、治理審核 |
 | `workspace-business.daily` | 工作日誌、留言、書籤、按讚 |
 | `workspace-business.tasks` | 任務樹、CRUD |
-| `workspace-business.audit` | 稽核事件追蹤 |
+| `workspace-governance.audit` | 稽核事件追蹤 |
 | `workspace-business.files` | 檔案上傳、管理 |
 | `workspace-business.issues` | 議題追蹤 |
 | `workspace-business.finance` | 財務插件 |
 | `workspace-business.qa` | QA 插件 |
 | `workspace-business.document-parser` | AI 文件解析 |
 | `workspace-business.acceptance` | 驗收插件 |
-| `user-settings` | 使用者個人資料、偏好、安全 |
+| `account-user.profile` | 使用者個人資料、偏好、安全 |
 
 ---
 

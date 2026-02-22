@@ -15,12 +15,13 @@
 
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { Fragment, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { SidebarProvider } from "@/shared/shadcn-ui/sidebar";
 import { useAuth } from "@/shared/app-providers/auth-provider";
+import { AccountProvider } from "@/features/account";
 
 type ShellLayoutProps = {
   children: ReactNode;
@@ -54,9 +55,11 @@ export default function ShellLayout({ children, sidebar, modal }: ShellLayoutPro
 
   return (
     <SidebarProvider>
-      {sidebar}
-      {children}
-      {modal}
+      <AccountProvider>
+        <Fragment key="sidebar">{sidebar}</Fragment>
+        <Fragment key="main">{children}</Fragment>
+        <Fragment key="modal">{modal}</Fragment>
+      </AccountProvider>
     </SidebarProvider>
   );
 }

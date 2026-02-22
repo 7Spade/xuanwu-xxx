@@ -1,4 +1,4 @@
-# Feature Slice: `workspace-business.audit`
+# Feature Slice: `workspace-governance.audit`
 
 ## Domain
 

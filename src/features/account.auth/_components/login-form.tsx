@@ -32,7 +32,7 @@ export function LoginForm({
   const { t } = useI18n();
 
   return (
-    <>
+    <form className="flex flex-1 flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <Label htmlFor="l-email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{t('auth.contactEndpoint')}</Label>
@@ -41,7 +41,7 @@ export function LoginForm({
           <InputGroupAddon className="pl-4">
             <Mail className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
-          <InputGroupInput id="l-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('auth.email')} className="font-medium" required />
+          <InputGroupInput id="l-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('auth.email')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="space-y-2">
@@ -53,13 +53,13 @@ export function LoginForm({
           <InputGroupAddon className="pl-4">
             <Lock className="size-4 text-muted-foreground/30" />
           </InputGroupAddon>
-          <InputGroupInput id="l-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('auth.password')} className="font-medium" required />
+          <InputGroupInput id="l-pass" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('auth.password')} className="font-medium" required />
         </InputGroup>
       </div>
       <div className="h-[80px]" /> {/* Spacer */}
-      <Button onClick={handleLogin} className="mt-auto h-14 w-full rounded-2xl text-base font-black uppercase tracking-widest shadow-xl shadow-primary/20" disabled={isLoading}>
+      <Button type="submit" className="mt-auto h-14 w-full rounded-2xl text-base font-black uppercase tracking-widest shadow-xl shadow-primary/20" disabled={isLoading}>
         {isLoading ? <Loader2 className="animate-spin" /> : t('auth.enterDimension')}
       </Button>
-    </>
+    </form>
   );
 }

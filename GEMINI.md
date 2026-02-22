@@ -49,7 +49,7 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 |-------|--------|
 | `features/account.auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
-| `features/user-settings` | User profile, preferences, security |
+| `features/account-user.profile` | User profile, preferences, security |
 | `features/account-user.wallet` | User personal wallet, balance (stub) |
 | `features/account-organization.member` | Org-level member invite/remove (stub) |
 | `features/workspace-core` | Workspace CRUD, shell, provider, list |
@@ -58,9 +58,9 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 | `features/workspace-governance.teams` | Team structure management |
 | `features/workspace-governance.partners` | External partner relationships |
 | `features/workspace-governance.schedule` | Schedule, proposals, decisions |
+| `features/workspace-governance.audit` | Audit trail, event timeline |
 | `features/workspace-business.daily` | Daily logs, comments, bookmarks |
 | `features/workspace-business.tasks` | Task tree, CRUD |
-| `features/workspace-business.audit` | Audit trail, event timeline |
 | `features/workspace-business.files` | File upload, management |
 | `features/workspace-business.issues` | Issue tracking |
 | `features/workspace-business.finance` | Finance plugin |

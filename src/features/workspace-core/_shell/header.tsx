@@ -82,21 +82,19 @@ export function Header() {
         <Separator orientation="vertical" className="mr-2 h-4" />
         <Breadcrumb>
           <BreadcrumbList>
-            {breadcrumbs.map((crumb) =>
-              crumb.isLast ? (
+            {breadcrumbs.flatMap((crumb) =>
+              crumb.isLast ? [
                 <BreadcrumbItem key={crumb.href}>
                   <BreadcrumbPage className="font-semibold capitalize">{crumb.label}</BreadcrumbPage>
-                </BreadcrumbItem>
-              ) : (
-                <>
-                  <BreadcrumbItem key={crumb.href} className="hidden md:block">
-                    <BreadcrumbLink asChild>
-                      <Link href={crumb.href} className="capitalize">{crumb.label}</Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator key={`sep-${crumb.href}`} className="hidden md:block" />
-                </>
-              )
+                </BreadcrumbItem>,
+              ] : [
+                <BreadcrumbItem key={crumb.href} className="hidden md:block">
+                  <BreadcrumbLink asChild>
+                    <Link href={crumb.href} className="capitalize">{crumb.label}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>,
+                <BreadcrumbSeparator key={`sep-${crumb.href}`} className="hidden md:block" />,
+              ]
             )}
           </BreadcrumbList>
         </Breadcrumb>

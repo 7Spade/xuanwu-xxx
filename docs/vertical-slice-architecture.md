@@ -81,7 +81,7 @@ src/
 │           │           ├── members/page.tsx      ← import { MembersView } from "@/features/workspace-governance.members"
 │           │           ├── teams/[id]/page.tsx   ← import { TeamDetailView } from "@/features/workspace-governance.teams"
 │           │           ├── partners/[id]/page.tsx← import { PartnerDetailView } from "@/features/workspace-governance.partners"
-│           │           ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/user-settings"
+│           │           ├── settings/page.tsx     ← import { UserSettingsView } from "@/features/account-user.profile"
 │           │           └── ...
 │           └── (workspaces)/         ← 路由群組：工作區模組（列表 + 詳情）
 │               └── workspaces/       ← /workspaces/**
@@ -93,7 +93,7 @@ src/
 │                       │   ├── schedule/page.tsx      ← import { WorkspaceSchedule } from "@/features/workspace-governance.schedule"
 │                       │   ├── daily/page.tsx         ← import { WorkspaceDailyView } from "@/features/workspace-business.daily"
 │                       │   ├── tasks/page.tsx         ← import { TasksPlugin } from "@/features/workspace-business.tasks"
-│                       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-business.audit"
+│                       │   ├── audit/page.tsx         ← import { AuditWorkspaceView } from "@/features/workspace-governance.audit"
 │                       │   ├── members/page.tsx       ← import { MembersPlugin } from "@/features/workspace-governance.members"
 │                       │   ├── files/page.tsx         ← import { FilesPlugin } from "@/features/workspace-business.files"
 │                       │   ├── issues/page.tsx        ← import { IssuesPlugin } from "@/features/workspace-business.issues"
@@ -301,7 +301,7 @@ src/
 │   │   │   └── acceptance-plugin.tsx
 │   │   └── index.ts
 │   │
-│   └── user-settings/                ← [切片 17] 使用者：個人資料、偏好、安全
+│   └── account-user.profile/         ← [切片 17] 使用者：個人資料、偏好、安全
 │       ├── GEMINI.md
 │       ├── _actions.ts               ← updateProfile, updatePassword
 │       ├── _components/

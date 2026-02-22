@@ -15,7 +15,7 @@ import { useState, useMemo } from "react";
 import { useWorkspace } from "@/features/workspace-core";
 import { useAccount } from "@/features/account";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { useLogger } from "@/features/workspace-business.audit";
+import { useLogger } from "@/features/workspace-governance.audit";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useDailyUpload } from "./use-daily-upload";
 import { type DailyLog } from "@/shared/types";
