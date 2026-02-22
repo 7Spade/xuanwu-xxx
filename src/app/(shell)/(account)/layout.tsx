@@ -1,16 +1,14 @@
 
 /**
- * Account Layout — Shared account context for all authenticated routes.
+ * Account Layout — Pass-through layout for (dashboard) and (workspaces) route groups.
  *
- * Responsibility: Provides AccountProvider to both (dashboard) and (workspace) groups.
- * Auth guard and SidebarProvider live in the parent (shell)/layout.tsx.
- *
- * This layout is transparent (no visual structure) — it only injects data context.
+ * AccountProvider is provided by the parent (shell)/layout.tsx so that it wraps
+ * both the @sidebar slot and the page children. This layout is intentionally
+ * transparent — it exists only to group routes under the (account) segment.
  */
 
 import type { ReactNode } from "react";
-import { AccountProvider } from "@/features/account";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
-  return <AccountProvider>{children}</AccountProvider>;
+  return <>{children}</>;
 }
