@@ -5,10 +5,15 @@
 
 ## 命名規則
 
-切片名稱遵循 `{主體}-{子類型}.{功能}` 格式：
+切片名稱遵循 **`{主體}-{子類型或次命名空間}.{功能}`** 格式：
 
-| 主體前綴 | 適用範圍 | 範例 |
-|----------|----------|------|
+- **`-`（連字號）** 分隔主體與子類型／次命名空間（如 `account-user`、`workspace-core`）
+- **`.`（點）** 分隔子類型與具體功能（如 `account-user.profile`、`workspace-core.event-bus`）
+- 若一個次命名空間只有單一功能（無需再細分），則以 `{主體}-{次命名空間}` 命名，不加 `.`（如 `account-auth`）
+
+| 前綴 | 適用範圍 | 範例 |
+|------|----------|------|
+| `account-auth` | 身份驗證（Identity Layer，不屬於任何子類型） | `account-auth` |
 | `account-user.*` | 個人使用者功能（User 是 Account 的子類型） | `account-user.profile` |
 | `account-organization.*` | 組織功能（Organization 也是 Account 的子類型） | `account-organization.core` |
 | `account-governance.*` | 帳號層級的橫切治理（角色、政策、通知路由） | `account-governance.role` |
@@ -35,7 +40,7 @@
 src/features/
 │
 ├── ── Identity Layer ─────────────────────────────────────────────
-│   └── account.auth/                     ✅  登入 · 註冊 · 重設密碼
+│   └── account-auth/                     ✅  登入 · 註冊 · 重設密碼（原名 account.auth）
 │
 ├── ── Account Layer（含 Organization sub-type）───────────────────
 │   │
