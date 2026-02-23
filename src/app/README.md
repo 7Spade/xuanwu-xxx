@@ -76,15 +76,15 @@ Every async data fetch must be wrapped in `<Suspense>` or be an async Server Com
 - Local `<Suspense>` handles sub-region latency independently.
 - Do **not** use a single global loading state for the whole page.
 
-### 7. Clear Boundaries — Depend Only on `features/` and `lib/`
+### 7. Clear Boundaries — Depend Only on `features/` and `shared/`
 
 ```ts
 // ✅ Correct
-import { AuditView } from "@/view-modules/audit/audit-view"
-import { getAuditLogs } from "@/server-commands/audit"
+import { AuditView } from "@/features/workspace-governance.audit"
+import { AuditLog } from "@/shared/types"
 
 // ❌ Never import infra directly from a route page
-import { firestoreFacade } from "@/firebase/firestore/firestore.facade"
+import { firestoreFacade } from "@/shared/infra/firestore/firestore.facade"
 ```
 
 No cross-route-group global side effects.
@@ -92,11 +92,11 @@ No cross-route-group global side effects.
 ### 8. Writes and External Integration — Server Actions / Route Handlers Only
 
 ```ts
-// ✅ Correct
-import { createWorkspace } from "@/server-commands/workspace"
+// ✅ Correct: call feature server actions
+import { createWorkspace } from "@/features/workspace-core"
 
 // ❌ Never call Firebase SDK directly from a route component
-import { db } from "@/firebase/firestore/db"
+import { db } from "@/shared/infra/firestore/firestore.client"
 ```
 
 Mutations and external API calls go through `src/actions/` or `app/api/` route handlers.
@@ -144,25 +144,22 @@ src/app/
 
 | Concern | Correct location |
 |---------|-----------------|
-| Reusable UI components | `src/shared/ui/` or `src/use-cases/ or src/view-modules/*/` |
-| Business / domain logic | `src/use-cases/ or src/view-modules/` or `src/entities/` |
-| Global state | `src/react-providers/` |
-| Server-side reads/writes | `src/actions/` |
-| Pure utilities | `src/lib/` |
-| Real-time Firebase listeners | `src/react-hooks/` |
+| Reusable UI components | `src/shared/ui/` or `src/features/{slice}/_components/` |
+| Business / domain logic | `src/features/{slice}/_actions.ts` or `_queries.ts` |
+| Global state | `src/shared/ui/app-providers/` or feature context in `features/{slice}/_hooks/` |
+| Server-side reads/writes | `src/features/{slice}/_actions.ts` or `app/api/` |
+| Pure utilities | `src/shared/lib/` |
+| Real-time Firebase listeners | `src/features/{slice}/_queries.ts` |
 
 ---
 
 ## Allowed Imports
 
 ```ts
-import ... from "@/use-cases/..."   // ✅ view components, orchestration
-import ... from "@/lib/..."         // ✅ pure utilities, event-bus
-import ... from "@/server-commands/..."     // ✅ server actions (mutations + reads)
-import ... from "@/react-hooks/..."       // ✅ client-side hooks
-import ... from "@/react-providers/..."     // ✅ React context providers
-import ... from "@/shared/ui/..."   // ✅ shadcn components
-import ... from "@/domain-types/..."       // ✅ type definitions
+import ... from "@/features/{slice}"       // ✅ feature public API (index.ts only)
+import ... from "@/shared/ui/..."          // ✅ shadcn-ui, app-providers
+import ... from "@/shared/types"           // ✅ type definitions
+import ... from "@/shared/lib"             // ✅ pure utilities
 ```
 
 ## Forbidden

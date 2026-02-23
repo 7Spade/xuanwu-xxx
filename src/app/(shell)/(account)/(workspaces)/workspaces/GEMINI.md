@@ -30,7 +30,7 @@ All changes to workspace capabilities MUST respect these layer definitions.
 │  │  Responsibility: Product features & operational capabilities    │    │
 │  │                                                                 │    │
 │  │  • tasks          —  Task tracking & progress                   │    │
-│  │  • qa             —  Quality assurance & verification           │    │
+│  │  • quality-assurance  —  Quality assurance & verification           │    │
 │  │  • acceptance     —  Deliverable acceptance                     │    │
 │  │  • finance        —  Budget & disbursement tracking             │    │
 │  │  • issues         —  Issue & conflict management                │    │
@@ -136,7 +136,7 @@ The account-level components are consumed by `/dashboard/account/{audit,daily,sc
 ## Capability Event Flow
 
 ```
-Capability (tasks/qa/acceptance)
+Capability (tasks/quality-assurance/acceptance)
        │
        │ emit(event)
        │  ──> event payload
