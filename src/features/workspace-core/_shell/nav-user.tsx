@@ -36,17 +36,17 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
     router.push(ROUTES.LOGIN)
   }
 
-  const activeOrg = useMemo(() =>
+  const activeOrganization = useMemo(() =>
     activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
-  const currentUserRoleInOrg = useMemo(() => {
-    if (!activeOrg || !user) return null
-    if (activeOrg.ownerId === user.id) return t('sidebar.owner')
-    const member = activeOrg.members?.find((m) => m.id === user.id)
+  const currentUserRoleInOrganization = useMemo(() => {
+    if (!activeOrganization || !user) return null
+    if (activeOrganization.ownerId === user.id) return t('sidebar.owner')
+    const member = activeOrganization.members?.find((m) => m.id === user.id)
     return member?.role || t('sidebar.guest')
-  }, [activeOrg, user, t])
+  }, [activeOrganization, user, t])
 
   return (
     <SidebarMenu>
@@ -64,7 +64,7 @@ export function NavUser({ user, accounts, activeAccount, logout, t }: NavUserPro
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {activeAccount?.accountType === 'organization' ? currentUserRoleInOrg : user?.email}
+                  {activeAccount?.accountType === 'organization' ? currentUserRoleInOrganization : user?.email}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />

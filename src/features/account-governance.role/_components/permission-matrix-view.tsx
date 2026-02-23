@@ -19,14 +19,14 @@ export function PermissionMatrixView() {
 
   const workspacesArray = useMemo(() => Object.values(workspaces), [workspaces])
 
-  const activeOrg = useMemo(() =>
+  const activeOrganization = useMemo(() =>
     activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
   if (!mounted) return null
 
-  if (!activeOrg) {
+  if (!activeOrganization) {
     return (
       <div className="flex flex-col items-center gap-4 p-8 text-center">
         <AlertCircle className="size-10 text-muted-foreground" />
@@ -38,12 +38,12 @@ export function PermissionMatrixView() {
     )
   }
 
-  const teams = (activeOrg.teams || []).filter((t) => t.type === "internal")
-  const orgWorkspaces = workspacesArray.filter((w) => w.dimensionId === activeAccount?.id)
+  const teams = (activeOrganization.teams || []).filter((t) => t.type === "internal")
+  const organizationWorkspaces = workspacesArray.filter((w) => w.dimensionId === activeAccount?.id)
 
   const hasAccess = (teamId: string, workspaceId: string) => {
-    const ws = workspaces[workspaceId]
-    return ws?.teamIds?.includes(teamId) || false
+    const workspace = workspaces[workspaceId]
+    return workspace?.teamIds?.includes(teamId) || false
   }
 
   return (
@@ -65,9 +65,9 @@ export function PermissionMatrixView() {
               <TableHead className="w-[220px] p-6 text-[10px] font-bold uppercase tracking-widest">
                 Team / Workspace Node
               </TableHead>
-              {orgWorkspaces.map((ws) => (
-                <TableHead key={ws.id} className="min-w-[120px] text-center">
-                  <span className="text-[10px] font-bold uppercase tracking-tight text-primary">{ws.name}</span>
+              {organizationWorkspaces.map((workspace) => (
+                <TableHead key={workspace.id} className="min-w-[120px] text-center">
+                  <span className="text-[10px] font-bold uppercase tracking-tight text-primary">{workspace.name}</span>
                 </TableHead>
               ))}
             </TableRow>
@@ -88,10 +88,10 @@ export function PermissionMatrixView() {
                     </div>
                   </div>
                 </TableCell>
-                {orgWorkspaces.map((ws) => {
-                  const access = hasAccess(team.id, ws.id)
+                {organizationWorkspaces.map((workspace) => {
+                  const access = hasAccess(team.id, workspace.id)
                   return (
-                    <TableCell key={ws.id} className="p-0 text-center">
+                    <TableCell key={workspace.id} className="p-0 text-center">
                       <div className="flex h-full min-h-[80px] items-center justify-center">
                         {access ? (
                           <ShieldCheck className="size-5 text-green-500" />

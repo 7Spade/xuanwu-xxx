@@ -25,11 +25,11 @@ import { createConverter } from '../firestore.converter'
 import type { DailyLog, DailyLogComment } from '@/shared/types'
 
 export const toggleDailyLogLike = async (
-  orgId: string,
+  organizationId: string,
   logId: string,
   userId: string
 ): Promise<void> => {
-  const logRef = doc(db, `accounts/${orgId}/dailyLogs`, logId)
+  const logRef = doc(db, `accounts/${organizationId}/dailyLogs`, logId)
 
   await runTransaction(db, async (transaction) => {
     const logDoc = await transaction.get(logRef)
@@ -58,14 +58,14 @@ export const toggleDailyLogLike = async (
 }
 
 export const addDailyLogComment = async (
-  orgId: string,
+  organizationId: string,
   logId: string,
   author: { uid: string; name: string; avatarUrl?: string },
   content: string
 ): Promise<void> => {
-  const logRef = doc(db, `accounts/${orgId}/dailyLogs`, logId)
+  const logRef = doc(db, `accounts/${organizationId}/dailyLogs`, logId)
   const commentRef = doc(
-    collection(db, `accounts/${orgId}/dailyLogs/${logId}/comments`)
+    collection(db, `accounts/${organizationId}/dailyLogs/${logId}/comments`)
   )
 
   const newComment: Omit<DailyLogComment, 'id' | 'createdAt'> & {

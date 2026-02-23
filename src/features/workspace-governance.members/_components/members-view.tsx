@@ -8,7 +8,7 @@ import { toast } from "@/shared/utility-hooks/use-toast"
 import { useState, useEffect, useMemo } from "react"
 import { type MemberReference } from "@/shared/types"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { useMemberManagement } from "@/features/account-organization.member"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
@@ -17,20 +17,20 @@ export function MembersView() {
   const { t } = useI18n()
   const { state } = useApp()
   const { accounts, activeAccount } = state
-  const { recruitMember, dismissMember } = useAccountManagement()
+  const { recruitMember, dismissMember } = useMemberManagement()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
+  const activeOrganization = useMemo(() => 
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
   if (!mounted) return null
 
-  if (!activeOrg) {
+  if (!activeOrganization) {
     return (
         <div className="flex flex-col items-center gap-4 p-8 text-center">
             <AlertCircle className="size-10 text-muted-foreground" />
@@ -42,7 +42,7 @@ export function MembersView() {
       )
   }
 
-  const members = activeOrg.members || []
+  const members = activeOrganization.members || []
 
   const handleRecruitMember = async () => {
     const newId = `m-${Math.random().toString(36).slice(-4)}`
@@ -82,7 +82,7 @@ export function MembersView() {
     <div className="mx-auto max-w-7xl space-y-6 pb-20 duration-500 animate-in fade-in">
       <PageHeader 
         title={t('account.membersTitle')} 
-        description={t('account.membersDescription', { name: activeOrg.name })}
+        description={t('account.membersDescription', { name: activeOrganization.name })}
       >
         <Button className="flex h-10 items-center gap-2 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20" onClick={handleRecruitMember}>
           <UserPlus className="size-4" /> {t('account.recruitNewMember')}

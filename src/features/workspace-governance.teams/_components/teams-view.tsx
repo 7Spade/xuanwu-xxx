@@ -17,7 +17,7 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { useTeamManagement } from "@/features/account-organization.team"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import type { Team } from "@/shared/types"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
@@ -30,7 +30,7 @@ export function TeamsView() {
   const { t } = useI18n()
   const { state } = useApp()
   const { accounts, activeAccount } = state
-  const { createTeam } = useAccountManagement()
+  const { createTeam } = useTeamManagement()
   const [mounted, setMounted] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
@@ -39,14 +39,14 @@ export function TeamsView() {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
+  const activeOrganization = useMemo(() => 
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
   
   if (!mounted) return null
 
-  if (!activeOrg) {
+  if (!activeOrganization) {
     return (
         <div className="flex flex-col items-center gap-4 p-8 text-center">
             <AlertCircle className="size-10 text-muted-foreground" />
@@ -58,7 +58,7 @@ export function TeamsView() {
       )
   }
 
-  const teams = (activeOrg.teams || []).filter((team: Team) => team.type === 'internal')
+  const teams = (activeOrganization.teams || []).filter((team: Team) => team.type === 'internal')
 
   const handleCreateTeam = async () => {
     if (!newTeamName.trim()) return

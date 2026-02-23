@@ -38,16 +38,16 @@ export function WorkspaceMembers() {
   const { workspace, logAuditEvent, authorizeWorkspaceTeam, revokeWorkspaceTeam, grantIndividualWorkspaceAccess, revokeIndividualWorkspaceAccess } = useWorkspace();
   const { state } = useApp();
   const { accounts, activeAccount } = state;
-  const activeOrgId = activeAccount?.accountType === 'organization' ? activeAccount.id : null;
+  const activeOrganizationId = activeAccount?.accountType === 'organization' ? activeAccount.id : null;
 
   const [grantTarget, setGrantTarget] = useState<MemberReference | null>(null);
   const [selectedRole, setSelectedRole] = useState<WorkspaceRole>('Contributor');
   const [loadingTeamId, setLoadingTeamId] = useState<string | null>(null);
   const [loadingGrantId, setLoadingGrantId] = useState<string | null>(null);
 
-  const activeOrg = useMemo(() => 
-    activeOrgId ? accounts[activeOrgId] : null,
-    [accounts, activeOrgId]
+  const activeOrganization = useMemo(() => 
+    activeOrganizationId ? accounts[activeOrganizationId] : null,
+    [accounts, activeOrganizationId]
   );
 
   const handleToggleTeam = async (team: Team, isAuthorized: boolean) => {
@@ -100,7 +100,7 @@ export function WorkspaceMembers() {
     setLoadingGrantId(grantId);
     try {
       const grant = (workspace.grants || []).find(g => g.grantId === grantId);
-      const member = (activeOrg?.members || []).find(m => m.id === grant?.userId);
+      const member = (activeOrganization?.members || []).find(m => m.id === grant?.userId);
       
       await revokeIndividualWorkspaceAccess(grantId);
       
@@ -119,10 +119,10 @@ export function WorkspaceMembers() {
   };
 
 
-  if (!activeOrg) return null;
+  if (!activeOrganization) return null;
 
-  const internalTeams = (activeOrg.teams || []).filter(t => t.type === 'internal');
-  const partnerTeams = (activeOrg.teams || []).filter(t => t.type === 'external');
+  const internalTeams = (activeOrganization.teams || []).filter(t => t.type === 'internal');
+  const partnerTeams = (activeOrganization.teams || []).filter(t => t.type === 'external');
 
   const renderTeamCard = (team: Team, type: 'internal' | 'external') => {
     const isAuthorized = (workspace.teamIds || []).includes(team.id);
@@ -184,7 +184,7 @@ export function WorkspaceMembers() {
             Partner Teams ({partnerTeams.length})
           </TabsTrigger>
           <TabsTrigger value="individuals" className="px-6 text-[10px] font-bold uppercase tracking-widest">
-            Individuals ({(activeOrg.members || []).length})
+            Individuals ({(activeOrganization.members || []).length})
           </TabsTrigger>
         </TabsList>
 
@@ -197,9 +197,9 @@ export function WorkspaceMembers() {
         </TabsContent>
 
         <TabsContent value="individuals" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {(activeOrg.members || []).map(member => {
+          {(activeOrganization.members || []).map(member => {
             const directGrant = (workspace.grants || []).find(g => g.userId === member.id && g.status === 'active');
-            const hasInheritedAccess = (activeOrg.teams || [])
+            const hasInheritedAccess = (activeOrganization.teams || [])
               .some(t => (workspace.teamIds || []).includes(t.id) && t.memberIds.includes(member.id));
             
             const cardClass = cn('border-border/60', {

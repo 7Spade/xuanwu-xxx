@@ -7,7 +7,7 @@ import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { useTeamManagement } from "@/features/account-organization.team"
 import type { MemberReference, Team } from "@/shared/types"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
@@ -20,25 +20,25 @@ export function TeamDetailView() {
   
   const { state } = useApp()
   const { accounts, activeAccount } = state
-  const { updateTeamMembers } = useAccountManagement()
-  const activeOrgId = activeAccount?.id
+  const { updateTeamMembers } = useTeamManagement()
+  const activeOrganizationId = activeAccount?.id
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
-    activeOrgId ? accounts[activeOrgId] : null,
-    [accounts, activeOrgId]
+  const activeOrganization = useMemo(() => 
+    activeOrganizationId ? accounts[activeOrganizationId] : null,
+    [accounts, activeOrganizationId]
   )
   
-  const team = activeOrg?.teams?.find((team: Team) => team.id === id)
+  const team = activeOrganization?.teams?.find((team: Team) => team.id === id)
 
   if (!mounted) return null
-  if (!activeOrg || !team) return <div className="p-20 text-center">Team not found.</div>
+  if (!activeOrganization || !team) return <div className="p-20 text-center">Team not found.</div>
 
-  const allMembers = activeOrg.members || []
+  const allMembers = activeOrganization.members || []
   const teamMemberIds = team.memberIds || []
 
   const teamMembers = allMembers.filter((m: MemberReference) => teamMemberIds.includes(m.id))

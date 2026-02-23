@@ -67,7 +67,7 @@ export function filterVisibleWorkspaces(
 ): Workspace[] {
   // Filter to workspaces that belong to the active dimension
   const accountWorkspaces = workspaces.filter(
-    (ws) => ws.dimensionId === activeAccount.id
+    (workspace) => workspace.dimensionId === activeAccount.id
   )
 
   // Personal account: the user owns all of their own workspaces
@@ -77,15 +77,15 @@ export function filterVisibleWorkspaces(
 
   // Organization account: apply visibility + access rules
   if (activeAccount.accountType === "organization") {
-    const activeOrg = allAccounts[activeAccount.id]
-    if (!activeOrg) return []
+    const activeOrganization = allAccounts[activeAccount.id]
+    if (!activeOrganization) return []
 
     // Org owners see everything in their org
-    if (isOwner(activeOrg, userId)) {
+    if (isOwner(activeOrganization, userId)) {
       return accountWorkspaces
     }
 
-    const userTeamIds = getUserTeamIds(activeOrg, userId)
+    const userTeamIds = getUserTeamIds(activeOrganization, userId)
 
     return accountWorkspaces.filter((workspace) =>
       isWorkspaceVisibleToUser(workspace, userId, userTeamIds)

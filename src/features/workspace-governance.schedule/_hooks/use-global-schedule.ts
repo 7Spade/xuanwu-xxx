@@ -16,12 +16,12 @@ export function useGlobalSchedule() {
   const { workspaces, schedule_items } = accountState;
   const { accounts, activeAccount } = appState;
 
-  const activeOrg = useMemo(() =>
+  const activeOrganization = useMemo(() =>
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   );
 
-  const orgMembers = useMemo(() => activeOrg?.members || [], [activeOrg]);
+  const organizationMembers = useMemo(() => activeOrganization?.members || [], [activeOrganization]);
 
   const allItems = useMemo(() => {
     return Object.values(schedule_items || {}).map(item => ({
@@ -53,10 +53,10 @@ export function useGlobalSchedule() {
       )
       .map(item => ({
         ...item,
-        members: orgMembers,
+        members: organizationMembers,
       }))
       .sort((a,b) => (a.startDate?.seconds || 0) - (b.startDate?.seconds || 0));
-  }, [allItems, orgMembers]);
+  }, [allItems, organizationMembers]);
 
   const presentEvents = useMemo(() => {
     const today = new Date();
@@ -69,10 +69,10 @@ export function useGlobalSchedule() {
       })
       .map(item => ({
         ...item,
-        members: orgMembers,
+        members: organizationMembers,
       }))
       .sort((a,b) => (a.startDate?.seconds || 0) - (b.startDate?.seconds || 0));
-  }, [allItems, orgMembers]);
+  }, [allItems, organizationMembers]);
 
-  return { allItems, pendingProposals, decisionHistory, upcomingEvents, presentEvents, orgMembers };
+  return { allItems, pendingProposals, decisionHistory, upcomingEvents, presentEvents, organizationMembers };
 }

@@ -28,7 +28,8 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
 import { useApp } from "@/features/workspace-core"
-import { useAccount , useAccountManagement } from "@/features/account"
+import { useAccount } from "@/features/account"
+import { usePartnerManagement } from "@/features/account-organization.partner"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 /**
@@ -43,7 +44,7 @@ export function PartnerDetailView() {
   const { state: accountState } = useAccount()
   const { accounts, activeAccount } = appState
   const { invites } = accountState
-  const { sendPartnerInvite, dismissPartnerMember } = useAccountManagement()
+  const { sendPartnerInvite, dismissPartnerMember } = usePartnerManagement()
   
   const [mounted, setMounted] = useState(false)
   const [isInviteOpen, setIsInviteOpen] = useState(false)
@@ -53,14 +54,14 @@ export function PartnerDetailView() {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
+  const activeOrganization = useMemo(() => 
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
   const team = useMemo(() => 
-    activeOrg?.teams?.find((team: Team) => team.id === teamId && team.type === 'external'),
-    [activeOrg, teamId]
+    activeOrganization?.teams?.find((team: Team) => team.id === teamId && team.type === 'external'),
+    [activeOrganization, teamId]
   )
   
   const teamInvites = useMemo(() => 
@@ -68,9 +69,9 @@ export function PartnerDetailView() {
     [invites, teamId]
   )
 
-  if (!mounted || !team || !activeOrg) return null
+  if (!mounted || !team || !activeOrganization) return null
 
-  const teamMembers = (activeOrg.members || []).filter((m: MemberReference) => team.memberIds?.includes(m.id))
+  const teamMembers = (activeOrganization.members || []).filter((m: MemberReference) => team.memberIds?.includes(m.id))
 
   const handleSendInvite = async () => {
     if (!inviteEmail.trim()) return
@@ -91,7 +92,7 @@ export function PartnerDetailView() {
   }
   
   const handleDismissMember = async (member: MemberReference) => {
-    if (!activeOrg) return
+    if (!activeOrganization) return
 
     try {
       await dismissPartnerMember(team.id, member)

@@ -35,37 +35,37 @@ export function AccountCreateDialog({
   accounts,
   t,
 }: AccountCreateDialogProps) {
-  const [newOrgName, setNewOrgName] = useState("")
+  const [newOrganizationName, setNewOrganizationName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [pendingOrgId, setPendingOrgId] = useState<string | null>(null)
+  const [pendingOrganizationId, setPendingOrganizationId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) {
-      setNewOrgName("")
+      setNewOrganizationName("")
       setIsLoading(false)
-      setPendingOrgId(null)
+      setPendingOrganizationId(null)
     }
   }, [open])
 
   useEffect(() => {
-    if (pendingOrgId && accounts[pendingOrgId]) {
-      const org = accounts[pendingOrgId]
-      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { ...org, accountType: "organization" } })
-      setPendingOrgId(null)
+    if (pendingOrganizationId && accounts[pendingOrganizationId]) {
+      const organization = accounts[pendingOrganizationId]
+      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { ...organization, accountType: "organization" } })
+      setPendingOrganizationId(null)
     }
-  }, [pendingOrgId, accounts, dispatch])
+  }, [pendingOrganizationId, accounts, dispatch])
 
   const handleCreate = async () => {
-    if (!newOrgName.trim()) return
+    if (!newOrganizationName.trim()) return
     setIsLoading(true)
     try {
-      const newOrgId = await createOrganization(newOrgName)
-      setPendingOrgId(newOrgId)
+      const newOrganizationId = await createOrganization(newOrganizationName)
+      setPendingOrganizationId(newOrganizationId)
       onOpenChange(false)
       toast({ title: t('dimension.newDimensionCreated') })
     } catch (error: unknown) {
       toast({ variant: "destructive", title: t('dimension.failedToCreate'), description: error instanceof Error ? error.message : String(error) })
-      setPendingOrgId(null)
+      setPendingOrganizationId(null)
     } finally {
       setIsLoading(false)
     }
@@ -83,8 +83,8 @@ export function AccountCreateDialog({
             {t('dimension.dimensionName')}
           </Label>
           <Input
-            value={newOrgName}
-            onChange={(e) => setNewOrgName(e.target.value)}
+            value={newOrganizationName}
+            onChange={(e) => setNewOrganizationName(e.target.value)}
             placeholder={t('dimension.dimensionNamePlaceholder')}
             className="h-12 rounded-xl"
           />

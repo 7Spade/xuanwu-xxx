@@ -2,46 +2,54 @@
 
 ## Domain
 
-Organization (Account) management — CRUD, statistics, permission matrix, new org creation.
+Multi-account management shell — AccountProvider (realtime data context), AccountGrid, and StatCards. Pure presentation and context; all write operations live in their dedicated sub-slices.
 
 ## Responsibilities
 
-- Create / update / delete organization
-- Setup organization with initial team
-- Display account grid and stat cards
-- Permission matrix view
-- Account creation form (intercepted modal)
+- Provide `AccountProvider` + `useAccount` hook for real-time account-level data (workspaces, dailyLogs, auditLogs, invites, schedule_items)
+- Display account grid (`AccountGrid`) — list of organization accounts
+- Display stat cards (`StatCards`) — workspace consistency, activity pulse, capability load
 
 ## Internal Files
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_actions.ts` | `createOrg`, `updateOrg`, `deleteOrg`, `setupOrganizationWithTeam` |
-| `_queries.ts` | Firestore listeners for account data |
-| `_hooks/` | `useAccountManagement`, `useAccountAudit` |
-| `_components/` | `AccountGrid`, `AccountNewForm`, `PermissionMatrixView`, `PermissionTree`, `StatCards` |
-| `index.ts` | Public exports |
+| `_components/account-provider.tsx` | `AccountProvider` + `AccountContext` — real-time Firestore subscriptions |
+| `_components/stat-cards.tsx` | `StatCards` component — aggregate statistics (workspaces, audit logs, capabilities) |
+| `_hooks/use-account.ts` | `useAccount` — context consumer hook |
+| `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-export { AccountGrid } from "./_components/account-grid";
-export { AccountNewForm } from "./_components/account-new-form";
-export { PermissionMatrixView } from "./_components/permission-matrix-view";
-export { StatCards } from "./_components/stat-cards";
+export { AccountProvider, AccountContext } from './_components/account-provider'
+export { StatCards } from './_components/stat-cards'
+export { useAccount } from './_hooks/use-account'
 ```
+
+## Slice Boundaries (what moved out)
+
+| Capability | Now lives in |
+|-----------|-------------|
+| `AccountNewForm` (create org UI) | `account-organization.core` |
+| `AccountGrid` (org list UI) | `account-organization.core` |
+| `useOrgManagement` (org CRUD) | `account-organization.core` |
+| `useMemberManagement` (recruit/dismiss) | `account-organization.member` |
+| `useTeamManagement` (team ops) | `account-organization.team` |
+| `usePartnerManagement` (partner ops) | `account-organization.partner` |
+| `PermissionMatrixView`, `PermissionTree` | `account-governance.role` |
 
 ## Allowed Imports
 
 ```ts
 import ... from "@/shared/types";   // Account, Organization types
-import ... from "@/shared/lib";     // isOwner, setupOrganizationWithTeam rules
-import ... from "@/shared/infra";   // Firestore repositories
-import ... from "@/shared/ui/...";  // shadcn-ui components
+import ... from "@/shared/infra";   // Firestore utils
+import ... from "@/features/workspace-core";  // useApp
 ```
 
 ## Who Uses This Slice?
 
-- `app/dashboard/@modal/(.)account/new/page.tsx`
-- `app/dashboard/page.tsx`
-- `app/dashboard/account/matrix/page.tsx`
+- `app/(shell)/layout.tsx` — wraps shell with `AccountProvider`
+- `features/workspace-core/_components/dashboard-view.tsx` — `StatCards`, `AccountGrid`
+- `features/workspace-governance.*` — `useAccount` for account state
+- `features/workspace-business.*` — `useAccount` for dailyLogs, scheduleItems

@@ -8,9 +8,9 @@ import { AuditDetailSheet } from "./audit-detail-sheet";
 import { useAccountAudit } from "../_hooks/use-account-audit";
 
 export function AccountAuditComponent() {
-  const { logs, isOrgContext, selectedLog, setSelectedLog, clearSelection } = useAccountAudit();
+  const { logs, isOrganizationContext, selectedLog, setSelectedLog, clearSelection } = useAccountAudit();
 
-  if (!isOrgContext) {
+  if (!isOrganizationContext) {
     return (
       <div className="flex flex-col items-center gap-4 p-8 text-center">
         <AlertCircle className="size-10 text-muted-foreground" />

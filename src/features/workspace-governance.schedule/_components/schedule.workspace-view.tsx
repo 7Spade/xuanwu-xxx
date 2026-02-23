@@ -13,7 +13,7 @@ export function WorkspaceSchedule() {
   const { workspace } = useWorkspace();
   const {
     localItems,
-    orgMembers,
+    organizationMembers,
     currentDate,
     handleMonthChange,
     handleOpenAddDialog,
@@ -34,7 +34,7 @@ export function WorkspaceSchedule() {
       <div className="h-[calc(100vh-22rem)]">
         <UnifiedCalendarGrid
           items={localItems}
-          members={orgMembers}
+          members={organizationMembers}
           viewMode="workspace"
           currentDate={currentDate}
           onMonthChange={handleMonthChange}

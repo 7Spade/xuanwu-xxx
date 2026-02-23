@@ -36,7 +36,7 @@ export function AccountScheduleSection() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { allItems, pendingProposals, decisionHistory, upcomingEvents, presentEvents, orgMembers } = useGlobalSchedule();
+  const { allItems, pendingProposals, decisionHistory, upcomingEvents, presentEvents, organizationMembers } = useGlobalSchedule();
   const { assignMember, unassignMember, approveItem, rejectItem } = useScheduleActions();
 
   const handleAction = useCallback(async (item: ScheduleItem, newStatus: 'OFFICIAL' | 'REJECTED') => {
@@ -74,7 +74,7 @@ export function AccountScheduleSection() {
       <DropdownMenuContent className="w-60">
         <DropdownMenuLabel>Assign Member</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {orgMembers.map(member => (
+        {organizationMembers.map(member => (
           <DropdownMenuCheckboxItem
             key={member.id}
             checked={item.assigneeIds.includes(member.id)}
@@ -92,7 +92,7 @@ export function AccountScheduleSection() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  ), [orgMembers, assignMember, unassignMember]);
+  ), [organizationMembers, assignMember, unassignMember]);
 
   if (activeAccount?.accountType !== "organization") {
     return (
@@ -123,7 +123,7 @@ export function AccountScheduleSection() {
             <div className="relative flex-1 overflow-hidden">
               <UnifiedCalendarGrid
                 items={allItems}
-                members={orgMembers}
+                members={organizationMembers}
                 viewMode="organization"
                 currentDate={currentDate}
                 onMonthChange={handleMonthChange}

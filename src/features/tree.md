@@ -40,7 +40,6 @@
 |------|------|
 | ✅ | 已實作（exists） |
 | 🔧 | Stub / 部分實作，需擴充（partial） |
-| 🆕 | 架構中定義，尚未實作（planned） |
 
 ---
 
@@ -56,37 +55,37 @@ src/features/
 │   │
 │   │   ── 帳號共用 ──
 │   ├── account/                           ✅  多帳號 Provider · AccountGrid · 統計（跨組織管理 UI）
-│   ├── account-governance.role/           🆕  帳號角色管理 → CUSTOM_CLAIMS 簽發
-│   ├── account-governance.policy/         🆕  帳號政策管理
-│   └── account-governance.notification-router/ 🆕  通知路由器（FCM 第 2 層 · 依 TargetAccountID 分發）
+│   ├── account-governance.role/           🔧  帳號角色管理 → CUSTOM_CLAIMS 簽發
+│   ├── account-governance.policy/         🔧  帳號政策管理
+│   └── account-governance.notification-router/ 🔧  通知路由器（FCM 第 2 層 · 依 TargetAccountID 分發）
 │   │
 │   │   ── User sub-type ──
 │   ├── account-user.profile/              ✅  使用者個人資料 · 偏好設定 · FCM Token
-│   ├── account-user.wallet/               🔧  個人錢包 · 代幣積分（stub）
-│   └── account-user.notification/         🆕  個人推播通知（FCM 第 3 層）
+│   ├── account-user.wallet/               🔧  個人錢包 · 代幣積分
+│   └── account-user.notification/         🔧  個人推播通知（FCM 第 3 層）
 │   │
 │   │   ── Organization sub-type ──
-│   ├── account-organization.core/         🆕  組織聚合實體（aggregate）· binding
-│   ├── account-organization.event-bus/    🆕  組織事件總線
-│   ├── account-organization.member/       🔧  組織成員邀請／移除（stub，擴充為完整成員管理）
-│   ├── account-organization.team/         🆕  團隊管理（內部組視圖）
-│   ├── account-organization.partner/      🆕  合作夥伴管理（外部組視圖）
-│   ├── account-organization.policy/       🆕  組織政策管理
-│   ├── account-organization.skill-tag/    🆕  職能標籤庫（扁平化資源池）
-│   └── account-organization.schedule/     🆕  人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
+│   ├── account-organization.core/         🔧  組織聚合實體（aggregate）· binding
+│   ├── account-organization.event-bus/    🔧  組織事件總線
+│   ├── account-organization.member/       🔧  組織成員邀請／移除
+│   ├── account-organization.team/         🔧  團隊管理（內部組視圖）
+│   ├── account-organization.partner/      🔧  合作夥伴管理（外部組視圖）
+│   ├── account-organization.policy/       🔧  組織政策管理
+│   ├── account-organization.skill-tag/    🔧  職能標籤庫（扁平化資源池）
+│   └── account-organization.schedule/     🔧  人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
 │
 ├── ── Workspace Application Layer ────────────────────────────────
-│   └── workspace-application/             🆕  指令處理器 · Scope Guard · 政策引擎
+│   └── workspace-application/             🔧  指令處理器 · Scope Guard · 政策引擎
 │                                               · org-policy 防腐層快取 · 交易執行器 · Outbox
 │
 ├── ── Workspace Core ─────────────────────────────────────────────
 │   ├── workspace-core/                    ✅  Workspace CRUD · shell · provider · list · settings · aggregate
 │   ├── workspace-core.event-bus/          ✅  工作區事件總線
-│   └── workspace-core.event-store/        🆕  事件儲存（僅供重播／稽核，非 CRUD）
+│   └── workspace-core.event-store/        🔧  事件儲存（僅供重播／稽核，非 CRUD）
 │
 ├── ── Workspace Governance ───────────────────────────────────────
 │   ├── workspace-governance.members/      ✅  工作區成員存取管理
-│   ├── workspace-governance.role/         🆕  角色管理（從 members 拆分）
+│   ├── workspace-governance.role/         🔧  角色管理（從 members 拆分）
 │   ├── workspace-governance.teams/        ✅  團隊結構管理
 │   ├── workspace-governance.partners/     ✅  外部合作夥伴關係
 │   ├── workspace-governance.schedule/     ✅  排程提案 · 決策（工作區層）
@@ -94,7 +93,7 @@ src/features/
 │
 ├── ── Workspace Business · 輔助與靜態單元 ────────────────────────
 │   ├── workspace-business.daily/          ✅  手寫施工日誌 · 留言 · 書籤
-│   ├── workspace-business.schedule/       🆕  任務排程產生（由任務分配／時間變動觸發）
+│   ├── workspace-business.schedule/       🔧  任務排程產生（由任務分配／時間變動觸發）
 │   ├── workspace-business.files/          ✅  檔案上傳 · 管理
 │   └── workspace-business.document-parser/ ✅  AI 文件解析 · ParsingIntent（Digital Twin）
 │
@@ -108,33 +107,33 @@ src/features/
 │   └── workspace-business.issues/         ✅  問題追蹤單 · IssueResolved 事件（B 軌）
 │
 └── ── Projection Layer ───────────────────────────────────────────
-    ├── projection.workspace-view/          🆕  工作區讀模型（Workspace 投影視圖）
-    ├── projection.workspace-scope-guard/   🆕  Scope Guard 專用讀模型
-    ├── projection.account-view/            🆕  帳號讀模型 · 權限快照（authority-snapshot 合約）
-    ├── projection.account-audit/           🆕  帳號稽核投影
-    ├── projection.account-schedule/        🆕  帳號排程投影（過濾可用帳號）
-    ├── projection.organization-view/       🆕  組織讀模型
-    └── projection.registry/               🆕  事件串流偏移量 · 讀模型版本對照表
+    ├── projection.workspace-view/          🔧  工作區讀模型（Workspace 投影視圖）
+    ├── projection.workspace-scope-guard/   🔧  Scope Guard 專用讀模型
+    ├── projection.account-view/            🔧  帳號讀模型 · 權限快照（authority-snapshot 合約）
+    ├── projection.account-audit/           🔧  帳號稽核投影
+    ├── projection.account-schedule/        🔧  帳號排程投影（過濾可用帳號）
+    ├── projection.organization-view/       🔧  組織讀模型
+    └── projection.registry/               🔧  事件串流偏移量 · 讀模型版本對照表
 ```
 
 ---
 
 ## 切片計數
 
-| Bounded Context | ✅ 已實作 | 🔧 需擴充 | 🆕 規劃中 | 小計 |
-|-----------------|-----------|-----------|-----------|------|
-| Identity Layer | 1 | 0 | 0 | **1** |
-| Account Layer (共用 + governance) | 1 | 0 | 3 | **4** |
-| Account Layer (user sub-type) | 1 | 1 | 1 | **3** |
-| Account Layer (organization sub-type) | 0 | 1 | 7 | **8** |
-| Workspace Application | 0 | 0 | 1 | **1** |
-| Workspace Core | 2 | 0 | 1 | **3** |
-| Workspace Governance | 5 | 0 | 1 | **6** |
-| Workspace Business (support) | 3 | 0 | 1 | **4** |
-| Workspace Business (A-track) | 4 | 0 | 0 | **4** |
-| Workspace Business (B-track) | 1 | 0 | 0 | **1** |
-| Projection Layer | 0 | 0 | 7 | **7** |
-| **Total** | **18** | **2** | **22** | **42** |
+| Bounded Context | ✅ 已實作 | 🔧 需擴充 | 小計 |
+|-----------------|-----------|-----------|------|
+| Identity Layer | 1 | 0 | **1** |
+| Account Layer (共用 + governance) | 1 | 3 | **4** |
+| Account Layer (user sub-type) | 1 | 2 | **3** |
+| Account Layer (organization sub-type) | 0 | 8 | **8** |
+| Workspace Application | 0 | 1 | **1** |
+| Workspace Core | 2 | 1 | **3** |
+| Workspace Governance | 5 | 1 | **6** |
+| Workspace Business (support) | 3 | 1 | **4** |
+| Workspace Business (A-track) | 4 | 0 | **4** |
+| Workspace Business (B-track) | 1 | 0 | **1** |
+| Projection Layer | 0 | 7 | **7** |
+| **Total** | **18** | **24** | **42** |
 
 ---
 

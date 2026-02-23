@@ -8,7 +8,7 @@
  * - Read `auditLogs` record from AccountContext.
  * - Memoize conversion to array.
  * - Manage `selectedLog` detail-sheet state.
- * - Expose `isOrgContext` guard so the component stays dumb.
+ * - Expose `isOrganizationContext` guard so the component stays dumb.
  */
 "use client";
 
@@ -24,13 +24,13 @@ export function useAccountAudit() {
   const { auditLogs } = accountState;
 
   const logs = useMemo(() => Object.values(auditLogs) as AuditLog[], [auditLogs]);
-  const isOrgContext = activeAccount?.accountType === "organization";
+  const isOrganizationContext = activeAccount?.accountType === "organization";
 
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
   return {
     logs,
-    isOrgContext,
+    isOrganizationContext,
     selectedLog,
     setSelectedLog,
     clearSelection: () => setSelectedLog(null),

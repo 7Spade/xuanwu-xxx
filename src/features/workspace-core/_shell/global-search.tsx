@@ -20,8 +20,8 @@ interface GlobalSearchProps {
   organizations: Account[];
   workspaces: Workspace[];
   members: MemberReference[];
-  activeOrgId: string | null;
-  onSwitchOrg: (org: Account) => void;
+  activeOrganizationId: string | null;
+  onSwitchOrganization: (organization: Account) => void;
 }
 
 export function GlobalSearch({
@@ -30,8 +30,8 @@ export function GlobalSearch({
   organizations,
   workspaces,
   members,
-  activeOrgId,
-  onSwitchOrg,
+  activeOrganizationId,
+  onSwitchOrganization,
 }: GlobalSearchProps) {
   const router = useRouter();
 
@@ -46,20 +46,20 @@ export function GlobalSearch({
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Dimensions">
-          {organizations.map((org) => (
-            <CommandItem key={org.id} onSelect={() => handleSelect(() => onSwitchOrg(org))}>
+          {organizations.map((organization) => (
+            <CommandItem key={organization.id} onSelect={() => handleSelect(() => onSwitchOrganization(organization))}>
               <Globe className="mr-2 size-4 text-primary" />
-              <span>{org.name}</span>
-              {activeOrgId === org.id && <Badge variant="outline" className="ml-auto h-4 text-[8px]">Current</Badge>}
+              <span>{organization.name}</span>
+              {activeOrganizationId === organization.id && <Badge variant="outline" className="ml-auto h-4 text-[8px]">Current</Badge>}
             </CommandItem>
           ))}
         </CommandGroup>
         <CommandGroup heading="Spaces">
-          {workspaces.map((ws) => (
-            <CommandItem key={ws.id} onSelect={() => handleSelect(() => router.push(`${ROUTES.WORKSPACES}/${ws.id}`))}>
+          {workspaces.map((workspace) => (
+            <CommandItem key={workspace.id} onSelect={() => handleSelect(() => router.push(`${ROUTES.WORKSPACES}/${workspace.id}`))}>
               <Layers className="mr-2 size-4 text-primary" />
-              <span>{ws.name}</span>
-              <span className="ml-auto font-mono text-[9px] text-muted-foreground">{ws.id.toUpperCase()}</span>
+              <span>{workspace.name}</span>
+              <span className="ml-auto font-mono text-[9px] text-muted-foreground">{workspace.id.toUpperCase()}</span>
             </CommandItem>
           ))}
         </CommandGroup>
