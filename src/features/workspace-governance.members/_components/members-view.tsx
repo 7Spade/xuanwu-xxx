@@ -8,7 +8,7 @@ import { toast } from "@/shared/utility-hooks/use-toast"
 import { useState, useEffect, useMemo } from "react"
 import { type MemberReference } from "@/shared/types"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { useMemberManagement } from "@/features/account-organization.member"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
@@ -17,7 +17,7 @@ export function MembersView() {
   const { t } = useI18n()
   const { state } = useApp()
   const { accounts, activeAccount } = state
-  const { recruitMember, dismissMember } = useAccountManagement()
+  const { recruitMember, dismissMember } = useMemberManagement()
 
   useEffect(() => {
     setMounted(true)

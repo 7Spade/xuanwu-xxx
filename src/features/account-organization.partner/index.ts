@@ -1,2 +1,1 @@
-// account-organization.partner — Partner management (external group view)
-// Pre-created slice stub. Implementation deferred.
+export { usePartnerManagement } from './_hooks/use-partner-management'

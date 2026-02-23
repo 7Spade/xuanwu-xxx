@@ -7,7 +7,7 @@ import { Input } from "@/shared/shadcn-ui/input";
 import { Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { useAccountManagement } from "@/features/account";
+import { useOrgManagement } from "../_hooks/use-org-management";
 import { useApp } from "@/features/workspace-core";
 
 interface AccountNewFormProps {
@@ -17,7 +17,7 @@ interface AccountNewFormProps {
 
 export function AccountNewForm({ onSuccess, onCancel }: AccountNewFormProps) {
   const { t } = useI18n();
-  const { createOrganization } = useAccountManagement();
+  const { createOrganization } = useOrgManagement();
   const { state: appState, dispatch } = useApp();
   const { accounts } = appState;
 

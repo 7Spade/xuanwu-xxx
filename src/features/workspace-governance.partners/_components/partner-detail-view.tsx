@@ -28,7 +28,8 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
 import { useApp } from "@/features/workspace-core"
-import { useAccount , useAccountManagement } from "@/features/account"
+import { useAccount } from "@/features/account"
+import { usePartnerManagement } from "@/features/account-organization.partner"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
 /**
@@ -43,7 +44,7 @@ export function PartnerDetailView() {
   const { state: accountState } = useAccount()
   const { accounts, activeAccount } = appState
   const { invites } = accountState
-  const { sendPartnerInvite, dismissPartnerMember } = useAccountManagement()
+  const { sendPartnerInvite, dismissPartnerMember } = usePartnerManagement()
   
   const [mounted, setMounted] = useState(false)
   const [isInviteOpen, setIsInviteOpen] = useState(false)

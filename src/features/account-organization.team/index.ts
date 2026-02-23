@@ -1,2 +1,1 @@
-// account-organization.team — Team management (internal group view)
-// Pre-created slice stub. Implementation deferred.
+export { useTeamManagement } from './_hooks/use-team-management'

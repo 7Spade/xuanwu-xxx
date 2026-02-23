@@ -18,7 +18,7 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { useRouter } from "next/navigation"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { usePartnerManagement } from "@/features/account-organization.partner"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import type { Team } from "@/shared/types"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
@@ -31,7 +31,7 @@ export function PartnersView() {
   const { state } = useApp()
   const { t } = useI18n()
   const { accounts, activeAccount } = state
-  const { createTeam } = useAccountManagement()
+  const { createPartnerGroup } = usePartnerManagement()
   const [mounted, setMounted] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [newTeamName, setNewTeamName] = useState("")
@@ -66,7 +66,7 @@ export function PartnersView() {
     if (!newTeamName.trim()) return
     
     try {
-      await createTeam(newTeamName, 'external')
+      await createPartnerGroup(newTeamName)
       setNewTeamName("")
       setIsCreateOpen(false)
       toast({ title: "Partner Team created" })

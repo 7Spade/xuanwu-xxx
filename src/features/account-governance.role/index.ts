@@ -1,2 +1,2 @@
-// account-governance.role — Account role management → CUSTOM_CLAIMS signing
-// Pre-created slice stub. Implementation deferred.
+export { PermissionMatrixView } from './_components/permission-matrix-view'
+export { PermissionTree } from './_components/permission-tree'

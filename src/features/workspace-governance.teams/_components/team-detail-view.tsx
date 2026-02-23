@@ -7,7 +7,7 @@ import { ArrowLeft, UserPlus, Trash2, Users } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/features/workspace-core"
-import { useAccountManagement } from "@/features/account"
+import { useTeamManagement } from "@/features/account-organization.team"
 import type { MemberReference, Team } from "@/shared/types"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 
@@ -20,7 +20,7 @@ export function TeamDetailView() {
   
   const { state } = useApp()
   const { accounts, activeAccount } = state
-  const { updateTeamMembers } = useAccountManagement()
+  const { updateTeamMembers } = useTeamManagement()
   const activeOrgId = activeAccount?.id
   const [mounted, setMounted] = useState(false)
   
