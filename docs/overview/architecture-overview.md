@@ -7,13 +7,15 @@
 
 ## 一、logic-overview.v3.md 評估與改良說明
 
-| 項目 | 原始狀態 | 改良後 |
-|------|----------|--------|
-| `account.auth` 切片缺失 | v3 只有 Firebase Authentication 外部服務節點，缺少處理登入／註冊／重設密碼的 feature slice | 新增 `account.auth` 節點，位於 Firebase 與 Identity Layer 之間 |
-| `user-account.settings` 獨立節點 | v3 有 `user-account.settings` 獨立節點 | 合併至 `account-user.profile`（新設計將設定納入個人資料切片）|
-| `organization-account.aggregate` 缺失 | v3 只有 `organization-account` 與 `organization-account.settings` | 新增 `organization-account.aggregate` 節點，作為組織帳號的聚合根，並作為連接 Organization Layer 的入口 |
-| `workspace.settings` 命名 | v3 使用 `workspace.settings`（點記法） | 統一為 `workspace-settings`（與 features 資料夾命名一致）|
-| `ORGANIZATION_ACCOUNT --> ORGANIZATION_ENTITY` 邊 | 直接從 org account 到 org aggregate | 改為 `ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY`，反映聚合根的中介職責 |
+| # | 項目 | 原始狀態 | 改良後 | 理由 |
+|---|------|----------|--------|------|
+| 1 | `account.auth` 切片缺失 | 只有 Firebase Authentication 外部服務節點 | 新增 `account.auth` 節點，位於 Firebase 與 Identity Layer 之間 | 登入／註冊／重設密碼是一個完整業務切片 |
+| 2 | `user-account.settings` 獨立節點 | 有 `user-account.settings` 獨立節點 | 合併至 `account-user.profile` | 新設計將設定納入個人資料切片，避免碎片化 |
+| 3 | `organization-account.aggregate` 缺失 | 只有 `organization-account` 與 `.settings` | 新增 `organization-account.aggregate` 節點 | 作為組織帳號的聚合根並連接 Organization Layer |
+| 4 | `workspace-settings` 獨立於容器頂層 | `workspace-settings` 懸掛在容器外層 | 移入 `workspace-core` 成為 `workspace-core.settings` | 設定是聚合根的核心配置，屬於 Core 職責 |
+| 5 | `workspace-business.audit-log` 放在業務層 | `audit-log` 在 `workspace-business` 子圖中 | 移入 `workspace-governance` 成為 `workspace-governance.audit-log` | 工作區操作稽核是治理／合規職責，不是業務功能 |
+| 6 | 業務模組順序無結構 | 模組排列無明確流向 | tasks → quality-assurance → acceptance → finance → daily → document-parser → files → issues → schedule | 反映業務執行流向：任務產生 → 品質把關 → 驗收結案 → 財務結算 |
+| 7 | `issues` 模式未標注 | `issues` 作為普通業務模組 | 標注為 AB 雙軌問題單 | 任何問題（任務、品質、驗收等）都透過開問題單（issues）進行追蹤，採 AB 雙軌：A = 問題描述軌，B = 解決方案軌 |
 
 ---
 
@@ -71,32 +73,45 @@ src/
     │   └── organization-schedule/             ← 人力排程管理
     │
     └── workspace/                             ← 工作區容器（Workspace Container）
-        ├── workspace-settings/                ← 工作區設定
-        ├── workspace-application/             ← 應用層群組
-        │   ├── workspace-application.command-handler/   ← 指令處理器
-        │   ├── workspace-application.scope-guard/       ← 作用域守衛
-        │   ├── workspace-application.policy-engine/     ← 政策引擎
-        │   ├── workspace-application.transaction-runner/← 交易執行器
-        │   └── workspace-application.outbox/            ← 交易內發信箱
-        ├── workspace-core/                    ← 核心層群組
+        ├── workspace-application/             ← 應用層群組（請求管道）
+        │   ├── workspace-application.command-handler/    ← 指令處理器
+        │   ├── workspace-application.scope-guard/        ← 作用域守衛
+        │   ├── workspace-application.policy-engine/      ← 政策引擎
+        │   ├── workspace-application.transaction-runner/ ← 交易執行器
+        │   └── workspace-application.outbox/             ← 交易內發信箱
+        ├── workspace-core/                    ← 核心層群組（聚合根 + 設定）
+        │   ├── workspace-core.settings/       ← 工作區設定（屬於核心配置）
         │   ├── workspace-core.aggregate/      ← 核心聚合實體
         │   ├── workspace-core.event-bus/      ← 事件總線
         │   └── workspace-core.event-store/    ← 事件儲存（可選）
-        ├── workspace-governance/              ← 工作區治理群組
+        ├── workspace-governance/              ← 工作區治理群組（存取控制 + 稽核）
         │   ├── workspace-governance.member/   ← 工作區成員
-        │   └── workspace-governance.role/     ← 角色管理
-        └── workspace-business/                ← 業務層群組
-            ├── workspace-business.acceptance/     ← 業務受理
+        │   ├── workspace-governance.role/     ← 角色管理
+        │   └── workspace-governance.audit-log/ ← 工作區操作稽核（治理職責）
+        └── workspace-business/                ← 業務層群組（任務流水線 + 輔助功能）
+            ├── workspace-business.tasks/           ← 任務管理
+            ├── workspace-business.quality-assurance/ ← 品質保證
+            ├── workspace-business.acceptance/      ← 業務受理／驗收
+            ├── workspace-business.finance/         ← 財務處理
             ├── workspace-business.daily/           ← 日常作業
             ├── workspace-business.document-parser/ ← 文件解析
             ├── workspace-business.files/           ← 檔案管理
-            ├── workspace-business.finance/         ← 財務處理
-            ├── workspace-business.issues/          ← 問題追蹤
-            ├── workspace-business.quality-assurance/ ← 品質保證
-            ├── workspace-business.tasks/           ← 任務管理
-            ├── workspace-business.schedule/        ← 任務排程產生
-            └── workspace-business.audit-log/       ← 業務稽核紀錄
+            ├── workspace-business.issues/          ← 問題追蹤（AB 雙軌問題單，見下方說明）
+            └── workspace-business.schedule/        ← 任務排程產生
 ```
+
+### workspace-business.issues — AB 雙軌問題單
+
+> **任何問題都透過開問題單進行追蹤。**
+
+`issues` 是業務層的橫切關注點（cross-cutting concern）。無論任務、品質、驗收或財務環節發現問題，都使用同一個問題單系統記錄，採用 **AB 雙軌**：
+
+| 軌 | 職責 |
+|----|------|
+| A 軌（問題描述軌） | 記錄問題來源、現象、影響範圍、優先級 |
+| B 軌（解決方案軌） | 記錄解決方案、責任人、驗收標準、結案狀態 |
+
+業務模組（tasks / quality-assurance / acceptance）發現異常 → 建立 Issue（A 軌）→ 指派解決方案（B 軌）→ 驗收結案。
 
 ---
 
@@ -139,29 +154,46 @@ src/
 
 ### Workspace Container（工作區容器）
 
+#### workspace-core（核心層）
+
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-settings` | 工作區設定 | `WORKSPACE_SETTINGS` |
+| `workspace-core/workspace-core.settings` | 工作區設定（聚合根核心配置） | `WORKSPACE_SETTINGS` |
+| `workspace-core/workspace-core.aggregate` | 工作區聚合根 | `WORKSPACE_AGGREGATE` |
+| `workspace-core/workspace-core.event-bus` | 工作區事件總線 | `WORKSPACE_EVENT_BUS` |
+| `workspace-core/workspace-core.event-store` | 事件溯源儲存（可選） | `WORKSPACE_EVENT_STORE` |
+
+#### workspace-application（應用層）
+
+| Feature Slice | 領域職責 | logic-overview 節點 |
+|---------------|----------|---------------------|
 | `workspace-application/workspace-application.command-handler` | 接收業務指令，分派至 scope-guard | `WORKSPACE_COMMAND_HANDLER` |
 | `workspace-application/workspace-application.scope-guard` | 驗證 identity context + custom-claims | `WORKSPACE_SCOPE_GUARD` |
 | `workspace-application/workspace-application.policy-engine` | 評估業務政策規則 | `WORKSPACE_POLICY_ENGINE` |
 | `workspace-application/workspace-application.transaction-runner` | 執行聚合交易並協調 outbox | `WORKSPACE_TRANSACTION_RUNNER` |
 | `workspace-application/workspace-application.outbox` | Transactional Outbox，保證事件投遞 | `WORKSPACE_OUTBOX` |
-| `workspace-core/workspace-core.aggregate` | 工作區聚合根 | `WORKSPACE_AGGREGATE` |
-| `workspace-core/workspace-core.event-bus` | 工作區事件總線 | `WORKSPACE_EVENT_BUS` |
-| `workspace-core/workspace-core.event-store` | 事件溯源儲存（可選） | `WORKSPACE_EVENT_STORE` |
+
+#### workspace-governance（工作區治理）
+
+| Feature Slice | 領域職責 | logic-overview 節點 |
+|---------------|----------|---------------------|
 | `workspace-governance/workspace-governance.member` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
 | `workspace-governance/workspace-governance.role` | 工作區角色管理 | `WORKSPACE_ROLE` |
-| `workspace-business/workspace-business.acceptance` | 業務受理 | `WORKSPACE_BUSINESS_ACCEPTANCE` |
+| `workspace-governance/workspace-governance.audit-log` | 工作區操作稽核（治理職責） | `WORKSPACE_AUDIT_LOG` |
+
+#### workspace-business（業務層，按執行流向排序）
+
+| Feature Slice | 領域職責 | logic-overview 節點 |
+|---------------|----------|---------------------|
+| `workspace-business/workspace-business.tasks` | 任務管理 | `WORKSPACE_BUSINESS_TASKS` |
+| `workspace-business/workspace-business.quality-assurance` | 品質保證 | `WORKSPACE_BUSINESS_QUALITY_ASSURANCE` |
+| `workspace-business/workspace-business.acceptance` | 業務受理／驗收 | `WORKSPACE_BUSINESS_ACCEPTANCE` |
+| `workspace-business/workspace-business.finance` | 財務處理 | `WORKSPACE_BUSINESS_FINANCE` |
 | `workspace-business/workspace-business.daily` | 日常作業記錄 | `WORKSPACE_BUSINESS_DAILY` |
 | `workspace-business/workspace-business.document-parser` | AI 文件解析 | `WORKSPACE_BUSINESS_DOCUMENT_PARSER` |
 | `workspace-business/workspace-business.files` | 檔案管理 | `WORKSPACE_BUSINESS_FILES` |
-| `workspace-business/workspace-business.finance` | 財務處理 | `WORKSPACE_BUSINESS_FINANCE` |
-| `workspace-business/workspace-business.issues` | 問題追蹤 | `WORKSPACE_BUSINESS_ISSUES` |
-| `workspace-business/workspace-business.quality-assurance` | 品質保證 | `WORKSPACE_BUSINESS_QUALITY_ASSURANCE` |
-| `workspace-business/workspace-business.tasks` | 任務管理 | `WORKSPACE_BUSINESS_TASKS` |
+| `workspace-business/workspace-business.issues` | 問題追蹤（AB 雙軌問題單） | `WORKSPACE_BUSINESS_ISSUES` |
 | `workspace-business/workspace-business.schedule` | 任務排程產生 → 推送至 organization-schedule | `WORKSPACE_BUSINESS_SCHEDULE` |
-| `workspace-business/workspace-business.audit-log` | 業務稽核紀錄 | `WORKSPACE_BUSINESS_AUDIT_LOG` |
 
 ---
 
@@ -204,6 +236,8 @@ workspace-business  →  workspace-application  →  workspace-core
 organization-schedule  ←  workspace-business.schedule
          ↑
 organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）
+
+workspace-event-bus  →  workspace-governance.audit-log（操作稽核訂閱）
 ```
 
 ### 禁止規則

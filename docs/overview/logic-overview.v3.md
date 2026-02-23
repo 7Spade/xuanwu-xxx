@@ -89,8 +89,6 @@ ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
-    WORKSPACE_SETTINGS[workspace-settings（工作區設定）]
-
     subgraph WORKSPACE_APPLICATION[workspace-application（應用層）]
         WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
         WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
@@ -100,6 +98,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     end
 
     subgraph WORKSPACE_CORE[workspace-core（核心層）]
+        WORKSPACE_SETTINGS[workspace-core.settings（工作區設定）]
         WORKSPACE_AGGREGATE[workspace-core.aggregate（核心聚合實體）]
         WORKSPACE_EVENT_BUS[workspace-core.event-bus（事件總線）]
         WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，可選）"]
@@ -108,25 +107,24 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
         WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
+        WORKSPACE_AUDIT_LOG[workspace-governance.audit-log（工作區操作稽核）]
     end
 
     subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
-        WORKSPACE_BUSINESS_ACCEPTANCE[workspace-business.acceptance（業務受理）]
+        WORKSPACE_BUSINESS_TASKS[workspace-business.tasks（任務管理）]
+        WORKSPACE_BUSINESS_QUALITY_ASSURANCE[workspace-business.quality-assurance（品質保證）]
+        WORKSPACE_BUSINESS_ACCEPTANCE[workspace-business.acceptance（業務受理／驗收）]
+        WORKSPACE_BUSINESS_FINANCE[workspace-business.finance（財務處理）]
         WORKSPACE_BUSINESS_DAILY[workspace-business.daily（日常作業）]
         WORKSPACE_BUSINESS_DOCUMENT_PARSER[workspace-business.document-parser（文件解析）]
         WORKSPACE_BUSINESS_FILES[workspace-business.files（檔案管理）]
-        WORKSPACE_BUSINESS_FINANCE[workspace-business.finance（財務處理）]
-        WORKSPACE_BUSINESS_ISSUES[workspace-business.issues（問題追蹤）]
-        WORKSPACE_BUSINESS_QUALITY_ASSURANCE[workspace-business.quality-assurance（品質保證）]
-        WORKSPACE_BUSINESS_TASKS[workspace-business.tasks（任務管理）]
+        WORKSPACE_BUSINESS_ISSUES["workspace-business.issues（問題追蹤 ── AB 雙軌問題單）"]
         WORKSPACE_BUSINESS_SCHEDULE["workspace-business.schedule（任務排程產生）"]
-        WORKSPACE_BUSINESS_AUDIT_LOG[workspace-business.audit-log（業務稽核紀錄）]
     end
 
 end
 
 ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
-WORKSPACE_CONTAINER --> WORKSPACE_SETTINGS
 
 
 %% =================================================
@@ -150,6 +148,8 @@ WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
 WORKSPACE_BUSINESS_SCHEDULE --> ORGANIZATION_SCHEDULE
+
+WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG
 
 
 %% =================================================
