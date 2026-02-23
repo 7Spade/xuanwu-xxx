@@ -68,9 +68,10 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
 
     subgraph ORGANIZATION_GOVERNANCE[organization-governance（組織治理）]
         ORGANIZATION_MEMBER[organization-governance.member（組織成員）]
-        ORGANIZATION_TEAM[organization-governance.team（團隊管理）]
-        ORGANIZATION_PARTNER[organization-governance.partner（合作夥伴）]
+        ORGANIZATION_TEAM["organization-governance.team（團隊管理 · 內部組視圖）"]
+        ORGANIZATION_PARTNER["organization-governance.partner（合作夥伴 · 外部組視圖）"]
         ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
+        SKILL_TAG_POOL[(職能標籤庫（Skills / Certs）)]
     end
 
     ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
@@ -155,6 +156,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         %% 日誌與排程關聯
         TRACK_A_TASKS -.-> W_B_DAILY
         TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE
+        PARSING_INTENT -.->|提取職能需求標籤| W_B_SCHEDULE
 
     end
 
@@ -164,6 +166,15 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 end
 
 ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
+
+
+%% =================================================
+%% 職能標籤庫 — 扁平化資源池（Team/Partner 為組視圖）
+%% 所有帳號（內部/外部）統一擁有職能標籤；Team/Partner 為同一資源池的「組視圖」
+%% =================================================
+ORGANIZATION_MEMBER -.->|內部帳號擁有標籤| SKILL_TAG_POOL
+ORGANIZATION_PARTNER -.->|外部帳號擁有標籤| SKILL_TAG_POOL
+ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（內部組）| SKILL_TAG_POOL
 
 
 %% =================================================
@@ -196,6 +207,7 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
+W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
 
 
 %% =================================================
@@ -257,6 +269,7 @@ classDef trackA fill:#d1fae5,stroke:#6ee7b7,color:#000;
 classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
+classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -269,3 +282,4 @@ class TRACK_A_TASKS,TRACK_A_QA,TRACK_A_ACCEPTANCE,TRACK_A_FINANCE trackA;
 class TRACK_B_ISSUES trackB;
 class PARSING_INTENT parsingIntent;
 class SERVER_ACTION serverAction;
+class SKILL_TAG_POOL skillTagPool;

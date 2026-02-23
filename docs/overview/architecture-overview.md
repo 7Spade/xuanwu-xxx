@@ -29,6 +29,7 @@
 | 19 | `TRACK_B_ISSUES` 蜘蛛網直接回流 | `TRACK_B_ISSUES -.->|處理完成|` 各自連向 TASKS / QA / ACCEPTANCE / FINANCE / PARSING_INTENT（5 條邊），Issue 組件需知道所有外部流程 | 移除 5 條直接回流邊；改為 `TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS`，置於 WORKSPACE_BUSINESS 外、WORKSPACE_CONTAINER 內；各 A 軌節點訂閱事件後自行恢復進度 | Issue 組件不再依賴任何具體業務模組；連線從「蜘蛛網」變為「放射狀」；A 軌解鎖邏輯在各自切片內，符合單一職責 |
 | 20 | `TRACK_A_TASKS` 對 `PARSING_INTENT` 的寫回邊 | `TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT` 為實線（暗示任務寫回並修改合約） | 改為 `TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT` 虛線引用邊；`PARSING_INTENT` 成為唯讀出生證明；人工修正以 `Refinement 覆蓋層` 形式存於 `TRACK_A_TASKS`，不修改 Intent | 永遠可比對原始合約解析結果（Intent）與實際現場狀況（Task）；合約不可更改確保長期審計能力；`Refinement` 模式保持「原始解析」與「人為調整」的清晰對照 |
 | 21 | 各層 `AUDIT_LOG` 節點分散在業務容器內 | `ACCOUNT_AUDIT_LOG`、`ORGANIZATION_AUDIT_LOG`、`WORKSPACE_AUDIT_LOG` 分別位於各治理子圖；`WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG` 直接邊混入業務流 | 從邏輯圖移除 3 個 AUDIT_LOG 節點及相關邊；保留 PROJECTION_LAYER 中已有的 `ACCOUNT_PROJECTION_AUDIT`（`WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_AUDIT`）作為統一稽核讀取模型；各稽核切片仍作為事件訂閱者存在（程式碼中保留） | 「業務執行」與「歷史追蹤」徹底分離；避免業務容器內出現多個小型日誌節點；所有歷史軌跡統一由 PROJECTION_LAYER 處理，符合讀寫分離（CQRS）原則 |
+| 22 | `organization-governance` 成員模型：Team/Partner 獨立分層，成員能力無統一存取點 | `ORGANIZATION_TEAM`（內部）與 `ORGANIZATION_PARTNER`（外部）各自為獨立節點，排程模組無法按職能篩選資源 | 新增 `SKILL_TAG_POOL[(職能標籤庫（Skills/Certs）)]` 節點（cylinder，indigo）於 `ORGANIZATION_GOVERNANCE` 子圖；所有帳號（內部/外部）均擁有職能標籤；`ORGANIZATION_TEAM`／`ORGANIZATION_PARTNER` 成為同一扁平資源池的「組視圖（Group View）」；新增 `PARSING_INTENT -.->|提取職能需求標籤| W_B_SCHEDULE` 與 `W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL`，排程按職能篩選後產出 `ScheduleProposed` | 組織成員模型扁平化，消除 Team/Partner 職責模糊；排程模組根據職能標籤（技能／證照）精確分配；`PARSING_INTENT` 成為排程的技能需求來源，形成「文件 → 解析意圖 → 排程計算 → 職能篩選 → 建議排程」完整閉環 |
 
 ---
 
@@ -78,10 +79,11 @@ src/
     │   │   ├── organization-core.aggregate/   ← 組織聚合實體
     │   │   └── organization-core.event-bus/   ← 組織事件總線
     │   ├── organization-governance/           ← 組織治理群組
-    │   │   ├── organization-governance.member/  ← 組織成員
-    │   │   ├── organization-governance.team/    ← 團隊管理
-    │   │   ├── organization-governance.partner/ ← 合作夥伴
+    │   │   ├── organization-governance.member/  ← 組織成員（扁平化資源池）
+    │   │   ├── organization-governance.team/    ← 團隊管理（內部組視圖）
+    │   │   ├── organization-governance.partner/ ← 合作夥伴（外部組視圖）
     │   │   ├── organization-governance.policy/  ← 政策管理
+    │   │   ├── organization-governance.skill-tag/ ← 職能標籤庫（Skills / Certs）
     │   │   └── organization-governance.audit-log/ ← 稽核紀錄
     │   └── organization-schedule/             ← 人力排程管理
     │
@@ -126,6 +128,19 @@ src/
 
 業務模組（tasks / quality-assurance / acceptance）發現異常 → 建立 Issue（A 軌）→ 指派解決方案（B 軌）→ 驗收結案。
 
+### organization-governance — 扁平化資源池與職能標籤庫
+
+> **Team/Partner 是同一資源池的「組視圖」，而非兩個獨立的層級。**
+
+所有帳號（內部成員 `member` / 外部夥伴 `partner`）統一擁有**職能標籤（Skills / Certs）**，儲存於 `organization-governance.skill-tag`（職能標籤庫）：
+
+| 組視圖 | 帳號類型 | 標籤讀取方式 |
+|--------|----------|-------------|
+| `organization-governance.team`（內部組） | 內部帳號 | 聚合組內所有成員的職能標籤 |
+| `organization-governance.partner`（外部組） | 外部帳號 | 聚合組內所有夥伴的職能標籤 |
+
+**排程閉環：** `PARSING_INTENT` 提取文件中的職能需求 → `W_B_SCHEDULE` 向 `SKILL_TAG_POOL` 查詢符合標籤的帳號 → 產出 `ScheduleProposed` 事件。
+
 ---
 
 ## 四、Domain Layer → Feature Slice 對照表
@@ -158,10 +173,11 @@ src/
 |---------------|----------|---------------------|
 | `organization-core/organization-core.aggregate` | 組織聚合實體，擁有工作區 | `ORGANIZATION_ENTITY` |
 | `organization-core/organization-core.event-bus` | 組織領域事件總線 | `ORGANIZATION_EVENT_BUS` |
-| `organization-governance/organization-governance.member` | 組織成員管理 | `ORGANIZATION_MEMBER` |
-| `organization-governance/organization-governance.team` | 團隊結構管理 | `ORGANIZATION_TEAM` |
-| `organization-governance/organization-governance.partner` | 外部合作夥伴 | `ORGANIZATION_PARTNER` |
+| `organization-governance/organization-governance.member` | 組織成員管理（扁平化資源池） | `ORGANIZATION_MEMBER` |
+| `organization-governance/organization-governance.team` | 團隊結構管理（內部組視圖） | `ORGANIZATION_TEAM` |
+| `organization-governance/organization-governance.partner` | 外部合作夥伴（外部組視圖） | `ORGANIZATION_PARTNER` |
 | `organization-governance/organization-governance.policy` | 組織政策管理 | `ORGANIZATION_POLICY` |
+| `organization-governance/organization-governance.skill-tag` | 職能標籤庫（Skills / Certs）管理 | `SKILL_TAG_POOL` |
 | `organization-governance/organization-governance.audit-log` | 組織稽核紀錄 | `ORGANIZATION_AUDIT_LOG` |
 | `organization-schedule` | 人力排程管理 | `ORGANIZATION_SCHEDULE` |
 
