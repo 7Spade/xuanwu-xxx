@@ -8,19 +8,18 @@ These are page-level components that compose the administrative interface for th
 
 ## 2. Dependency Rules
 
-These are feature pages within the dashboard and can consume shared dashboard logic and components.
+These are page-level route files that compose feature views. Import only from feature slice public APIs and shared modules.
 
 ### Allowed Imports:
-- `src/types`
-- `src/lib`
-- `src/hooks`
-- `src/context`
-- `src/components` (Global UI Primitives)
-- `src/app/dashboard/_components` (Shared Dashboard Components)
+- `@/features/{slice}` (public API `index.ts` only)
+- `@/shared/types`
+- `@/shared/lib`
+- `@/shared/ui/...`
 
 ### Disallowed Imports:
+- `import ... from '@/features/{slice}/_...'` (private slice paths)
+- `import ... from '@/shared/infra/...'` (infra is for slice `_actions.ts` only)
 - `import ... from '@/app/login/...'`
-- `import ... from '@/app/dashboard/workspaces/...'` (Avoid coupling between distinct dashboard sections)
 
 ## 3. Who Depends on This Layer?
 

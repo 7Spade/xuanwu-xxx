@@ -1,5 +1,5 @@
 /**
- * @fileoverview domain-rules/task — Pure task domain rules.
+ * @fileoverview shared/lib/task — Pure task domain rules.
  * No async, no I/O, no React, no Firebase.
  */
 

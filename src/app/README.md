@@ -99,7 +99,7 @@ import { createWorkspace } from "@/features/workspace-core"
 import { db } from "@/shared/infra/firestore/firestore.client"
 ```
 
-Mutations and external API calls go through `src/actions/` or `app/api/` route handlers.
+Mutations and external API calls go through feature slice `_actions.ts` files or `app/api/` route handlers.
 
 ### 9. Route Groups are Self-Contained and Replaceable
 
