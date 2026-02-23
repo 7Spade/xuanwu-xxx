@@ -1,4 +1,4 @@
-// Views
+// Views (workspace-level only — AccountScheduleSection stays here until decoupled from sub-components)
 export { AccountScheduleSection } from './_components/schedule.account-view'
 export { WorkspaceSchedule } from './_components/schedule.workspace-view'
 export { GovernanceSidebar } from './_components/governance-sidebar'

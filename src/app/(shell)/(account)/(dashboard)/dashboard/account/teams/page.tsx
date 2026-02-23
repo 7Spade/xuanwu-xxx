@@ -1,4 +1,4 @@
-import { TeamsView } from "@/features/workspace-governance.teams"
+import { TeamsView } from "@/features/account-organization.team"
 
 /**
  * AccountTeamsPage - Manages the logical groupings of INTERNAL members within the dimension.
