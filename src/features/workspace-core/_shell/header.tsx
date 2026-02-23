@@ -57,8 +57,8 @@ export function Header() {
   const breadcrumbs = usePageBreadcrumbs(pathname);
 
   const organizationsArray: Account[] = Object.values(accounts).filter(a => a.accountType === 'organization')
-  const activeOrg = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null
-  const activeOrgMembers = activeOrg?.members ?? []
+  const activeOrganization = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null
+  const activeOrganizationMembers = activeOrganization?.members ?? []
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -71,8 +71,8 @@ export function Header() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const handleSwitchOrg = (org: Account) => {
-      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: org })
+  const handleSwitchOrganization = (organization: Account) => {
+      dispatch({ type: 'SET_ACTIVE_ACCOUNT', payload: organization })
   }
 
   return (
@@ -123,9 +123,9 @@ export function Header() {
         onOpenChange={setIsSearchOpen}
         organizations={organizationsArray}
         workspaces={visibleWorkspaces}
-        members={activeOrgMembers}
-        activeOrgId={activeOrg?.id || null}
-        onSwitchOrg={handleSwitchOrg}
+        members={activeOrganizationMembers}
+        activeOrganizationId={activeOrganization?.id || null}
+        onSwitchOrganization={handleSwitchOrganization}
       />
     </header>
   );

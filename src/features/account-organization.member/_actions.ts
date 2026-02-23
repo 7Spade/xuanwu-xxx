@@ -5,17 +5,17 @@ import {
 import type { MemberReference } from "@/shared/types"
 
 export async function recruitMember(
-  orgId: string,
+  organizationId: string,
   newId: string,
   name: string,
   email: string
 ): Promise<void> {
-  return recruitOrganizationMember(orgId, newId, name, email)
+  return recruitOrganizationMember(organizationId, newId, name, email)
 }
 
 export async function dismissMember(
-  orgId: string,
+  organizationId: string,
   member: MemberReference
 ): Promise<void> {
-  return dismissOrganizationMember(orgId, member)
+  return dismissOrganizationMember(organizationId, member)
 }

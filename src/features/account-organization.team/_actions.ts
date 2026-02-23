@@ -4,18 +4,18 @@ import {
 } from "@/shared/infra/firestore/firestore.facade"
 
 export async function createTeam(
-  orgId: string,
+  organizationId: string,
   teamName: string,
   type: "internal" | "external"
 ): Promise<void> {
-  return createTeamFacade(orgId, teamName, type)
+  return createTeamFacade(organizationId, teamName, type)
 }
 
 export async function updateTeamMembers(
-  orgId: string,
+  organizationId: string,
   teamId: string,
   memberId: string,
   action: "add" | "remove"
 ): Promise<void> {
-  return updateTeamMembersFacade(orgId, teamId, memberId, action)
+  return updateTeamMembersFacade(organizationId, teamId, memberId, action)
 }

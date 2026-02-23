@@ -28,18 +28,18 @@ export async function toggleLike(
 
 /**
  * Adds a comment to a daily log entry.
- * @param orgId The ID of the organization that owns the log.
+ * @param organizationId The ID of the organization that owns the log.
  * @param logId The ID of the daily log entry.
  * @param author The author information for the comment.
  * @param content The text content of the comment.
  */
 export async function addDailyLogComment(
-  orgId: string,
+  organizationId: string,
   logId: string,
   author: { uid: string; name: string; avatarUrl?: string },
   content: string
 ): Promise<void> {
-  await addDailyLogCommentFacade(orgId, logId, author, content)
+  await addDailyLogCommentFacade(organizationId, logId, author, content)
 }
 
 /**

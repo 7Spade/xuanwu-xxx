@@ -10,28 +10,28 @@ import {
 } from '../_actions';
 import type { ThemeConfig } from '@/shared/types';
 
-export function useOrgManagement() {
+export function useOrganizationManagement() {
   const { state: appState } = useApp();
   const { activeAccount } = appState;
   const { state: authState } = useAuth();
   const { user } = authState;
 
-  const orgId = activeAccount?.accountType === 'organization' ? activeAccount.id : null
+  const organizationId = activeAccount?.accountType === 'organization' ? activeAccount.id : null
 
-  const createOrganization = useCallback(async (orgName: string) => {
+  const createOrganization = useCallback(async (organizationName: string) => {
     if (!user) throw new Error("User must be authenticated to create an organization.");
-    return createOrganizationAction(orgName, user);
+    return createOrganizationAction(organizationName, user);
   }, [user]);
 
   const updateOrganizationSettings = useCallback(async (settings: { name?: string; description?: string; theme?: ThemeConfig | null; }) => {
-    if (!orgId) throw new Error('No active organization selected');
-    return updateOrganizationSettingsAction(orgId, settings);
-  }, [orgId]);
+    if (!organizationId) throw new Error('No active organization selected');
+    return updateOrganizationSettingsAction(organizationId, settings);
+  }, [organizationId]);
 
   const deleteOrganization = useCallback(async () => {
-    if (!orgId) throw new Error('No active organization selected');
-    return deleteOrganizationAction(orgId);
-  }, [orgId]);
+    if (!organizationId) throw new Error('No active organization selected');
+    return deleteOrganizationAction(organizationId);
+  }, [organizationId]);
 
   return {
     createOrganization,

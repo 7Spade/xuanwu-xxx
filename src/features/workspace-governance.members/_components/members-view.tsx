@@ -23,14 +23,14 @@ export function MembersView() {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
+  const activeOrganization = useMemo(() => 
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
   if (!mounted) return null
 
-  if (!activeOrg) {
+  if (!activeOrganization) {
     return (
         <div className="flex flex-col items-center gap-4 p-8 text-center">
             <AlertCircle className="size-10 text-muted-foreground" />
@@ -42,7 +42,7 @@ export function MembersView() {
       )
   }
 
-  const members = activeOrg.members || []
+  const members = activeOrganization.members || []
 
   const handleRecruitMember = async () => {
     const newId = `m-${Math.random().toString(36).slice(-4)}`
@@ -82,7 +82,7 @@ export function MembersView() {
     <div className="mx-auto max-w-7xl space-y-6 pb-20 duration-500 animate-in fade-in">
       <PageHeader 
         title={t('account.membersTitle')} 
-        description={t('account.membersDescription', { name: activeOrg.name })}
+        description={t('account.membersDescription', { name: activeOrganization.name })}
       >
         <Button className="flex h-10 items-center gap-2 px-6 text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20" onClick={handleRecruitMember}>
           <UserPlus className="size-4" /> {t('account.recruitNewMember')}

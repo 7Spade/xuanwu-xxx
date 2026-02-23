@@ -39,14 +39,14 @@ export function TeamsView() {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
+  const activeOrganization = useMemo(() => 
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
   
   if (!mounted) return null
 
-  if (!activeOrg) {
+  if (!activeOrganization) {
     return (
         <div className="flex flex-col items-center gap-4 p-8 text-center">
             <AlertCircle className="size-10 text-muted-foreground" />
@@ -58,7 +58,7 @@ export function TeamsView() {
       )
   }
 
-  const teams = (activeOrg.teams || []).filter((team: Team) => team.type === 'internal')
+  const teams = (activeOrganization.teams || []).filter((team: Team) => team.type === 'internal')
 
   const handleCreateTeam = async () => {
     if (!newTeamName.trim()) return

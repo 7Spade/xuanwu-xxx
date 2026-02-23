@@ -21,24 +21,24 @@ export function TeamDetailView() {
   const { state } = useApp()
   const { accounts, activeAccount } = state
   const { updateTeamMembers } = useTeamManagement()
-  const activeOrgId = activeAccount?.id
+  const activeOrganizationId = activeAccount?.id
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(() => 
-    activeOrgId ? accounts[activeOrgId] : null,
-    [accounts, activeOrgId]
+  const activeOrganization = useMemo(() => 
+    activeOrganizationId ? accounts[activeOrganizationId] : null,
+    [accounts, activeOrganizationId]
   )
   
-  const team = activeOrg?.teams?.find((team: Team) => team.id === id)
+  const team = activeOrganization?.teams?.find((team: Team) => team.id === id)
 
   if (!mounted) return null
-  if (!activeOrg || !team) return <div className="p-20 text-center">Team not found.</div>
+  if (!activeOrganization || !team) return <div className="p-20 text-center">Team not found.</div>
 
-  const allMembers = activeOrg.members || []
+  const allMembers = activeOrganization.members || []
   const teamMemberIds = team.memberIds || []
 
   const teamMembers = allMembers.filter((m: MemberReference) => teamMemberIds.includes(m.id))

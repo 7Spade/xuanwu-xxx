@@ -55,16 +55,16 @@ export async function createScheduleItem(
 
 /**
  * Updates the approval status of a schedule item.
- * @param orgId The ID of the organization that owns the schedule item.
+ * @param organizationId The ID of the organization that owns the schedule item.
  * @param itemId The ID of the schedule item.
  * @param newStatus The new status to set ('OFFICIAL' or 'REJECTED').
  */
 export async function updateScheduleItemStatus(
-  orgId: string,
+  organizationId: string,
   itemId: string,
   newStatus: "OFFICIAL" | "REJECTED"
 ): Promise<void> {
-  return updateScheduleItemStatusFacade(orgId, itemId, newStatus)
+  return updateScheduleItemStatusFacade(organizationId, itemId, newStatus)
 }
 
 /**

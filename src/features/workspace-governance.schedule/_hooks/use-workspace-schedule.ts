@@ -6,7 +6,7 @@
  *
  * @responsibility
  * - Derive `localItems` (workspace-filtered) from AccountContext.
- * - Derive `orgMembers` from AppContext active account.
+ * - Derive `organizationMembers` from AppContext active account.
  * - Handle `scheduleTaskRequest` cross-capability hint effect.
  * - Manage calendar navigation state: `currentDate`.
  */
@@ -39,12 +39,12 @@ export function useWorkspaceSchedule() {
     }
   }, [scheduleTaskRequest, workspace.id, appDispatch]);
 
-  const activeOrg = useMemo(() =>
+  const activeOrganization = useMemo(() =>
     activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   );
 
-  const orgMembers = useMemo(() => activeOrg?.members || [], [activeOrg]);
+  const organizationMembers = useMemo(() => activeOrganization?.members || [], [activeOrganization]);
 
   const localItems = useMemo(() =>
     Object.values(accountState.schedule_items || {}).filter(item => item.workspaceId === workspace.id),
@@ -61,7 +61,7 @@ export function useWorkspaceSchedule() {
 
   return {
     localItems,
-    orgMembers,
+    organizationMembers,
     currentDate,
     handleMonthChange,
     handleOpenAddDialog,

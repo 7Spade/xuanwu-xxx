@@ -41,33 +41,33 @@ export function DashboardView() {
     setMounted(true)
   }, [])
 
-  const activeOrg = useMemo(
+  const activeOrganization = useMemo(
     () => (activeAccount?.accountType === "organization" ? accounts[activeAccount.id] : null),
     [accounts, activeAccount]
   )
 
-  const currentUserRoleInOrg = useMemo(() => {
-    if (!activeOrg || !user) return "Guest"
-    if (activeOrg.ownerId === user.id) return "Owner"
-    const member = activeOrg.members?.find((m) => m.id === user.id)
+  const currentUserRoleInOrganization = useMemo(() => {
+    if (!activeOrganization || !user) return "Guest"
+    if (activeOrganization.ownerId === user.id) return "Owner"
+    const member = activeOrganization.members?.find((m) => m.id === user.id)
     return member?.role || "Guest"
-  }, [activeOrg, user])
+  }, [activeOrganization, user])
 
   if (!mounted || !activeAccount) return null
 
-  const isOrgContext = activeAccount.accountType === "organization" && activeOrg
+  const isOrganizationContext = activeAccount.accountType === "organization" && activeOrganization
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 pb-20 duration-700 animate-in fade-in">
       <PageHeader
         title={activeAccount.name}
         description={
-          isOrgContext
+          isOrganizationContext
             ? t("settings.dimensionManagementDescription")
             : t("settings.personalDimensionDescription")
         }
       >
-        {isOrgContext && (
+        {isOrganizationContext && (
           <div className="flex items-center gap-6 rounded-2xl border border-border/50 bg-muted/40 p-4 shadow-sm backdrop-blur-sm">
             <div className="border-r border-border/50 px-4 text-center">
               <p className="font-headline text-2xl font-bold">{dimensionWorkspaces.length}</p>
@@ -76,14 +76,14 @@ export function DashboardView() {
             <div className="px-4 text-center">
               <p className="mb-1 text-[10px] font-bold uppercase text-muted-foreground">Your Role</p>
               <Badge className="border-primary/20 bg-primary/10 font-headline text-primary">
-                {currentUserRoleInOrg}
+                {currentUserRoleInOrganization}
               </Badge>
             </div>
           </div>
         )}
       </PageHeader>
 
-      {!isOrgContext && (
+      {!isOrganizationContext && (
         <div className="flex flex-col items-center rounded-3xl border-2 border-dashed border-accent/20 bg-accent/5 p-8 text-center">
           <UserIcon className="mb-4 size-16 text-accent/50" />
           <h3 className="font-headline text-xl font-bold">Personal Dimension</h3>
@@ -94,16 +94,16 @@ export function DashboardView() {
         </div>
       )}
 
-      {isOrgContext && (
+      {isOrganizationContext && (
         <>
           <StatCards />
-          <AccountGrid accounts={organizationsArray.filter((o) => o.id !== activeOrg.id).slice(0, 3)} />
+          <AccountGrid accounts={organizationsArray.filter((o) => o.id !== activeOrganization.id).slice(0, 3)} />
         </>
       )}
 
-      <div className={`grid grid-cols-1 ${isOrgContext ? "lg:grid-cols-2" : ""} gap-8`}>
+      <div className={`grid grid-cols-1 ${isOrganizationContext ? "lg:grid-cols-2" : ""} gap-8`}>
         <WorkspaceList workspaces={dimensionWorkspaces} />
-        {isOrgContext && <PermissionTree currentRole={currentUserRoleInOrg} t={t} />}
+        {isOrganizationContext && <PermissionTree currentRole={currentUserRoleInOrganization} t={t} />}
       </div>
     </div>
   )

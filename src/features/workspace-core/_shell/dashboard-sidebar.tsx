@@ -39,7 +39,7 @@ import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useApp , useVisibleWorkspaces } from "@/features/workspace-core";
 import { useUser } from "@/features/account-user.profile";
-import { useOrgManagement } from "@/features/account-organization.core";
+import { useOrganizationManagement } from "@/features/account-organization.core";
 
 // ============================================================================
 // Sidebar Sub-components
@@ -66,7 +66,7 @@ export function DashboardSidebar() {
   const { state: appState, dispatch } = useApp()
   const { accounts, activeAccount } = appState
   const visibleWorkspaces = useVisibleWorkspaces()
-  const { createOrganization } = useOrgManagement()
+  const { createOrganization } = useOrganizationManagement()
 
   // Merge Firestore profile with auth user: profile has photoURL etc., user is always available
   const currentUser = profile ?? user

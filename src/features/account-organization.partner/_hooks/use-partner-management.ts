@@ -13,22 +13,22 @@ export function usePartnerManagement() {
   const { state: appState } = useApp();
   const { activeAccount } = appState;
 
-  const orgId = activeAccount?.accountType === 'organization' ? activeAccount.id : null
+  const organizationId = activeAccount?.accountType === 'organization' ? activeAccount.id : null
 
   const createPartnerGroup = useCallback(async (groupName: string) => {
-    if (!orgId) throw new Error('No active organization selected');
-    return createPartnerGroupAction(orgId, groupName);
-  }, [orgId]);
+    if (!organizationId) throw new Error('No active organization selected');
+    return createPartnerGroupAction(organizationId, groupName);
+  }, [organizationId]);
 
   const sendPartnerInvite = useCallback(async (teamId: string, email: string) => {
-    if (!orgId) throw new Error('No active organization selected');
-    return sendPartnerInviteAction(orgId, teamId, email);
-  }, [orgId]);
+    if (!organizationId) throw new Error('No active organization selected');
+    return sendPartnerInviteAction(organizationId, teamId, email);
+  }, [organizationId]);
 
   const dismissPartnerMember = useCallback(async (teamId: string, member: MemberReference) => {
-    if (!orgId) throw new Error('No active organization selected');
-    return dismissPartnerMemberAction(orgId, teamId, member);
-  }, [orgId]);
+    if (!organizationId) throw new Error('No active organization selected');
+    return dismissPartnerMemberAction(organizationId, teamId, member);
+  }, [organizationId]);
 
   return { createPartnerGroup, sendPartnerInvite, dismissPartnerMember };
 }

@@ -39,11 +39,11 @@ export const createScheduleItem = async (
 }
 
 export const updateScheduleItemStatus = async (
-  orgId: string,
+  organizationId: string,
   itemId: string,
   newStatus: 'OFFICIAL' | 'REJECTED'
 ): Promise<void> => {
-  const itemRef = doc(db, `accounts/${orgId}/schedule_items`, itemId)
+  const itemRef = doc(db, `accounts/${organizationId}/schedule_items`, itemId)
   return updateDoc(itemRef, { status: newStatus, updatedAt: serverTimestamp() })
 }
 

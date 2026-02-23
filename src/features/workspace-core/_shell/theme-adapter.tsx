@@ -14,16 +14,16 @@ export function ThemeAdapter({ children }: ThemeAdapterProps) {
   const { state: appState } = useApp();
   const { accounts, activeAccount } = appState;
 
-  const activeOrg = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null;
+  const activeOrganization = activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null;
 
   const [isAdapting, setIsAdapting] = useState(false);
   const adaptingId = useRef<string | null>(null);
 
   useEffect(() => {
     async function adaptTheme() {
-      if (!activeOrg || activeOrg.theme || adaptingId.current === activeOrg.id) return;
+      if (!activeOrganization || activeOrganization.theme || adaptingId.current === activeOrganization.id) return;
 
-      adaptingId.current = activeOrg.id;
+      adaptingId.current = activeOrganization.id;
       setIsAdapting(true);
       
       try {
@@ -38,20 +38,20 @@ export function ThemeAdapter({ children }: ThemeAdapterProps) {
     }
 
     adaptTheme();
-  }, [activeAccount, activeOrg]);
+  }, [activeAccount, activeOrganization]);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (activeOrg?.theme) {
-      root.style.setProperty('--primary', hexToHsl(activeOrg.theme.primary));
-      root.style.setProperty('--background', hexToHsl(activeOrg.theme.background));
-      root.style.setProperty('--accent', hexToHsl(activeOrg.theme.accent));
+    if (activeOrganization?.theme) {
+      root.style.setProperty('--primary', hexToHsl(activeOrganization.theme.primary));
+      root.style.setProperty('--background', hexToHsl(activeOrganization.theme.background));
+      root.style.setProperty('--accent', hexToHsl(activeOrganization.theme.accent));
     } else {
       root.style.removeProperty('--primary');
       root.style.removeProperty('--background');
       root.style.removeProperty('--accent');
     }
-  }, [activeOrg?.theme]);
+  }, [activeOrganization?.theme]);
   
   if (isAdapting) {
     return (

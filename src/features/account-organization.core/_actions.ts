@@ -7,30 +7,30 @@ import {
 import type { Account, ThemeConfig } from "@/shared/types"
 
 export async function createOrganization(
-  orgName: string,
+  organizationName: string,
   owner: Account
 ): Promise<string> {
-  return createOrganizationFacade(orgName, owner)
+  return createOrganizationFacade(organizationName, owner)
 }
 
 export async function updateOrganizationSettings(
-  orgId: string,
+  organizationId: string,
   settings: { name?: string; description?: string; theme?: ThemeConfig | null }
 ): Promise<void> {
-  return updateOrganizationSettingsFacade(orgId, settings)
+  return updateOrganizationSettingsFacade(organizationId, settings)
 }
 
-export async function deleteOrganization(orgId: string): Promise<void> {
-  return deleteOrganizationFacade(orgId)
+export async function deleteOrganization(organizationId: string): Promise<void> {
+  return deleteOrganizationFacade(organizationId)
 }
 
 export async function setupOrganizationWithTeam(
-  orgName: string,
+  organizationName: string,
   owner: Account,
   teamName: string,
   teamType: "internal" | "external" = "internal"
 ): Promise<string> {
-  const orgId = await createOrganization(orgName, owner)
-  await createTeamFacade(orgId, teamName, teamType)
-  return orgId
+  const organizationId = await createOrganization(organizationName, owner)
+  await createTeamFacade(organizationId, teamName, teamType)
+  return organizationId
 }

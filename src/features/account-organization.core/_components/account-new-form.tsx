@@ -7,7 +7,7 @@ import { Input } from "@/shared/shadcn-ui/input";
 import { Loader2 } from "lucide-react";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { useOrgManagement } from "../_hooks/use-org-management";
+import { useOrganizationManagement } from "../_hooks/use-organization-management";
 import { useApp } from "@/features/workspace-core";
 
 interface AccountNewFormProps {
@@ -17,29 +17,29 @@ interface AccountNewFormProps {
 
 export function AccountNewForm({ onSuccess, onCancel }: AccountNewFormProps) {
   const { t } = useI18n();
-  const { createOrganization } = useOrgManagement();
+  const { createOrganization } = useOrganizationManagement();
   const { state: appState, dispatch } = useApp();
   const { accounts } = appState;
 
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [pendingOrgId, setPendingOrgId] = useState<string | null>(null);
+  const [pendingOrganizationId, setPendingOrganizationId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (pendingOrgId && accounts[pendingOrgId]) {
-      const org = accounts[pendingOrgId];
-      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { ...org, accountType: "organization" } });
-      setPendingOrgId(null);
+    if (pendingOrganizationId && accounts[pendingOrganizationId]) {
+      const organization = accounts[pendingOrganizationId];
+      dispatch({ type: "SET_ACTIVE_ACCOUNT", payload: { ...organization, accountType: "organization" } });
+      setPendingOrganizationId(null);
       onSuccess();
     }
-  }, [pendingOrgId, accounts, dispatch, onSuccess]);
+  }, [pendingOrganizationId, accounts, dispatch, onSuccess]);
 
   const handleCreate = async () => {
     if (!name.trim()) return;
     setIsLoading(true);
     try {
-      const newOrgId = await createOrganization(name.trim());
-      setPendingOrgId(newOrgId);
+      const newOrganizationId = await createOrganization(name.trim());
+      setPendingOrganizationId(newOrganizationId);
       toast({ title: t("dimension.newDimensionCreated") });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Unknown error";

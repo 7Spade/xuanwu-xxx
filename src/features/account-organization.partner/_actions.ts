@@ -6,24 +6,24 @@ import {
 import type { MemberReference } from "@/shared/types"
 
 export async function createPartnerGroup(
-  orgId: string,
+  organizationId: string,
   groupName: string
 ): Promise<void> {
-  return createTeamFacade(orgId, groupName, "external")
+  return createTeamFacade(organizationId, groupName, "external")
 }
 
 export async function sendPartnerInvite(
-  orgId: string,
+  organizationId: string,
   teamId: string,
   email: string
 ): Promise<void> {
-  return sendPartnerInviteFacade(orgId, teamId, email)
+  return sendPartnerInviteFacade(organizationId, teamId, email)
 }
 
 export async function dismissPartnerMember(
-  orgId: string,
+  organizationId: string,
   teamId: string,
   member: MemberReference
 ): Promise<void> {
-  return dismissPartnerMemberFacade(orgId, teamId, member)
+  return dismissPartnerMemberFacade(organizationId, teamId, member)
 }
