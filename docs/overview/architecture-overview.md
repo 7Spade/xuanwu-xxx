@@ -19,6 +19,10 @@
 | 8 | `workspace-business` 內部流向不可見 | 業務模組為無邊的平鋪節點清單 | 細化為帶流向邊的 AB 雙軌圖：A 軌正常順位箭頭、異常箭頭指向 B 軌六角形節點、處理完成虛線回流、輔助模組虛線關聯 | 讓圖表直接表達業務邏輯流轉，不需額外文字說明 |
 | 9 | `document-parser` 孤立於業務流程之外 | `W_B_PARSER` 為無邊的輔助節點，與 A 軌脫鉤 | 引入 `ParsingIntent（解析意圖中繼聚合）` 節點：`W_B_FILES -.-> W_B_PARSER --> PARSING_INTENT`；PARSING_INTENT 依意圖類型路由至 `TRACK_A_TASKS`（任務批次草稿） 或 `TRACK_A_FINANCE`（財務指令），解析異常走 B 軌；`TRACK_B_ISSUES -.->|重新解析| PARSING_INTENT` 形成閉環 | Parser 只負責產出意圖，不直接依賴任何業務模組；路由邏輯集中在 ParsingIntent，符合單一職責；B 軌回流到 PARSING_INTENT 而非直接回 Parser，保持中繼聚合為唯一入口 |
 | 10 | `ParsingIntent →任務指令→ TRACK_A_TASKS` 與父子任務衝突 | 邊標籤為「任務指令」，暗示單筆任務派發；但 `WorkspaceTask.parentId` 是 Firestore 文件 ID，子任務在父任務建立前無法取得父 ID，導致批次解析→多次獨立 createTask 時 parentId 為空，父子關係斷裂 | 邊標籤改為「任務批次草稿（含層級結構）」；`ParsingIntent` 攜帶 `taskDrafts[]`，使用**相對索引（parentIndex）** 表示父子關係（不含 Firestore ID）；`TRACK_A_TASKS` 接收後發出單一 `CreateTaskTreeCommand`，由 `workspace-application.transaction-runner` 以**拓樸順序**原子化建立（先根節點取得 ID，再建子節點賦值 parentId），整棵樹在一個交易內完成 | 父子 ID 綁定完全在 tasks 切片內部（+交易執行器）解決，`ParsingIntent` 不感知 Firestore ID 的生成順序；B 軌異常（如樹建立失敗）透過 `TRACK_A_TASKS -->|異常| TRACK_B_ISSUES` 回報，不需特殊路徑；整體閉環無衝突 |
+| 11 | `WORKSPACE_BUSINESS --> WORKSPACE_COMMAND_HANDLER` 方向錯誤 | 業務層「主動呼叫」指令處理器，暗示 Domain 控制 Application，違反依賴倒置原則 | 移除該邊；新增 `SERVER_ACTION["_actions.ts（業務觸發入口）"] -->|發送 Command| WORKSPACE_COMMAND_HANDLER` 外部入口節點，橙色樣式；新增 `WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS` 顯示應用層呼叫領域層的正確方向 | Application Layer（command-handler → transaction-runner）呼叫 Domain Layer（business logic）；Server Action 是命令的觸發源，屬於 UI 邊界，不是 Domain 的一部分 |
+| 12 | `W_B_SCHEDULE` 排程觸發源不明 | 排程模組孤立，圖中無任何驅動源指向它 | 新增 `TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE`；任務分配或時程變動是排程重算的自然觸發源 | 排程是任務分配的下游產物；A 軌任務節點狀態變動時自動觸發排程重算，形成閉環 |
+| 13 | `W_B_SCHEDULE --> ORGANIZATION_SCHEDULE` 跨層直接耦合 | 工作區業務層直接同步寫入組織層狀態，破壞聚合邊界（Aggregate Boundary），多工作區並行修改時產生併發衝突 | 移除直接邊；改為事件驅動：工作區排程計算完成後更新 `WORKSPACE_AGGREGATE` 狀態，透過 `WORKSPACE_OUTBOX → WORKSPACE_EVENT_BUS -->|ScheduleProposed 事件| ORGANIZATION_SCHEDULE`，組織層訂閱後自主更新人力排程 | 達成 Workspace ↔ Organization 完全解耦；支援多工作區同時提案排程而不衝突；最終一致性由 Outbox 模式保證 |
+| 14 | `W_B_SCHEDULE` 同步更新導致工作區交易沉重 | 排程直接寫入組織狀態，ORGANIZATION_SCHEDULE 失敗會使整個工作區業務交易回滾，使用者體驗不佳 | 配合 #13 改為非同步事件投遞；`ScheduleProposed` 事件在工作區本地交易提交後投遞，組織層獨立處理排程更新，兩者互不影響 | Outbox 模式保證事件至少投遞一次；工作區業務操作成功不依賴組織排程更新是否完成，提升整體可靠性 |
 
 ---
 
@@ -196,7 +200,7 @@ src/
 | `workspace-business/workspace-business.document-parser` | AI 文件解析 | `WORKSPACE_BUSINESS_DOCUMENT_PARSER` |
 | `workspace-business/workspace-business.files` | 檔案管理 | `WORKSPACE_BUSINESS_FILES` |
 | `workspace-business/workspace-business.issues` | 問題追蹤（AB 雙軌問題單） | `WORKSPACE_BUSINESS_ISSUES` |
-| `workspace-business/workspace-business.schedule` | 任務排程產生 → 推送至 organization-schedule | `WORKSPACE_BUSINESS_SCHEDULE` |
+| `workspace-business/workspace-business.schedule` | 任務排程計算 → 發布 ScheduleProposed 事件至 workspace-event-bus | `W_B_SCHEDULE` |
 
 ---
 
@@ -235,8 +239,13 @@ app/  →  features/{domain}/{slice}/index.ts  →  shared/*
 
 ```
 workspace-business  →  workspace-application  →  workspace-core
-         ↓                      ↑
-organization-schedule  ←  workspace-business.schedule
+         ↑                                              |
+  _actions.ts (Server Action)                          ↓
+  SERVER_ACTION → command-handler → ... → transaction-runner
+                                              |
+                              -.-> 執行業務領域邏輯 -.-> workspace-business
+
+workspace-event-bus  →|ScheduleProposed|  organization-schedule
          ↑
 organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）
 
