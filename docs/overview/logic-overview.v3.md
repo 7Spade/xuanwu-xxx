@@ -124,6 +124,10 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
         WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
+        WORKSPACE_WG_TEAMS[workspace-governance.teams（團隊管理）]
+        WORKSPACE_WG_PARTNERS[workspace-governance.partners（合作夥伴）]
+        WORKSPACE_WG_SCHEDULE[workspace-governance.schedule（工作區人力排程 · 資源分配）]
+        WORKSPACE_WG_AUDIT[workspace-governance.audit（稽核日誌）]
     end
 
     %% --- AB 雙軌業務邏輯核心 ---
@@ -135,7 +139,8 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         W_B_PARSER[workspace-business.document-parser（文件解析）]
         PARSING_INTENT[(ParsingIntent（解析合約 · Digital Twin）)]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
-        W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
+        W_B_SCHEDULE[workspace-business.schedule（任務排程產生 · 甘特圖輔助）]
+        W_B_CAPABILITIES[workspace-business.capabilities（能力管理）]
 
         %% A 軌：主流程
         TRACK_A_TASKS[workspace-business.tasks（任務管理）]
@@ -169,8 +174,6 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
         TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
 
-        %% B 軌解鎖：統一發送 IssueResolved 事件，A 軌自行訂閱後恢復（不直接回流）
-
         %% 日誌與排程關聯
         TRACK_A_TASKS -.-> W_B_DAILY
         TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE
@@ -178,8 +181,17 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
     end
 
-    %% B 軌 IssueResolved 事件（A 軌訂閱後自行恢復進度）
+    %% B 軌 IssueResolved：發布至事件總線
     TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
+
+    %% A 軌明確訂閱 IssueResolved 事件後自行恢復進度（不直接回流）
+    WORKSPACE_EVENT_BUS -.->|IssueResolved · 恢復進度| TRACK_A_TASKS
+    WORKSPACE_EVENT_BUS -.->|IssueResolved · 恢復進度| TRACK_A_QA
+    WORKSPACE_EVENT_BUS -.->|IssueResolved · 恢復進度| TRACK_A_ACCEPTANCE
+    WORKSPACE_EVENT_BUS -.->|IssueResolved · 恢復進度| TRACK_A_FINANCE
+
+    %% workspace-governance.audit 訂閱工作區事件總線 — 稽核日誌捕獲
+    WORKSPACE_EVENT_BUS -.->|業務事件（稽核捕獲）| WORKSPACE_WG_AUDIT
 
 end
 
@@ -224,8 +236,8 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
 ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
-W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
+WORKSPACE_EVENT_BUS -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
+W_B_SCHEDULE -.->|根據標籤需求查詢可用帳號| ORGANIZATION_PROJECTION_VIEW
 
 
 %% =================================================
@@ -244,6 +256,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     ACCOUNT_PROJECTION_AUDIT[projection.account-audit（帳號稽核投影）]
     ACCOUNT_PROJECTION_SCHEDULE[projection.account-schedule（帳號排程投影）]
     ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
+    WORKSPACE_PROJECTION_AUDIT[projection.workspace-audit（工作區稽核投影）]
 
 end
 
@@ -257,6 +270,7 @@ EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
 EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_AUDIT
 
 PROJECTION_VERSION --> READ_MODEL_REGISTRY
 
@@ -347,3 +361,6 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
+class WORKSPACE_WG_TEAMS,WORKSPACE_WG_PARTNERS,WORKSPACE_WG_AUDIT,WORKSPACE_WG_SCHEDULE workspace;
+class W_B_CAPABILITIES workspace;
+class WORKSPACE_PROJECTION_AUDIT projection;
