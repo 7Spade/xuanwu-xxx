@@ -1,315 +1,231 @@
 flowchart TD
 
-%% =================================================
-%% AUTHENTICATION + IDENTITY（身份驗證與識別）
-%% =================================================
+%% 身份驗證
+FIREBASE_AUTH[Firebase Authentication]
+ACCOUNT_AUTH[account.auth]
 
-FIREBASE_AUTHENTICATION[Firebase Authentication（用戶驗證服務）]
-ACCOUNT_AUTH[account.auth（登入／註冊／重設密碼）]
-
-subgraph IDENTITY_LAYER[Identity Layer（身份層）]
-
-    AUTHENTICATED_IDENTITY[authenticated-identity（已驗證身份）]
-    ACCOUNT_IDENTITY_LINK["account-identity-link（firebaseUserId ↔ accountId 關聯）"]
-    ACTIVE_ACCOUNT_CONTEXT["active-account-context（組織／工作區作用中帳號上下文）"]
-    CUSTOM_CLAIMS[custom-claims（自訂權限宣告）]
-
+subgraph IDENTITY[Identity Layer]
+    AUTHED_ID[authenticated-identity]
+    ID_LINK["account-identity-link（firebaseUserId ↔ accountId）"]
+    ACTIVE_CTX[active-account-context]
+    CLAIMS[custom-claims]
 end
 
-FIREBASE_AUTHENTICATION --> ACCOUNT_AUTH
-ACCOUNT_AUTH --> AUTHENTICATED_IDENTITY
-AUTHENTICATED_IDENTITY --> ACCOUNT_IDENTITY_LINK
-ACCOUNT_IDENTITY_LINK --> ACTIVE_ACCOUNT_CONTEXT
-AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
+FIREBASE_AUTH --> ACCOUNT_AUTH
+ACCOUNT_AUTH --> AUTHED_ID
+AUTHED_ID --> ID_LINK
+ID_LINK --> ACTIVE_CTX
+AUTHED_ID --> CLAIMS
 
 
-%% =================================================
-%% SUBJECT CENTER（主體中心）
-%% 包含 Account Layer 與 Organization Layer
-%% 兩者共用 ACCOUNT_IDENTITY_LINK 身份根，同屬「主體」邊界（Who）
-%% Workspace Container = 「做什麼（What）」，在主體中心之外
-%% =================================================
+%% 帳號層（Account Layer）
+subgraph ACCOUNT[Account Layer]
 
-subgraph SUBJECT_CENTER[主體中心（Subject Center）]
+    USER_ACCOUNT[user-account]
+    USER_PROFILE[account-user.profile]
+    USER_WALLET[account-user.wallet]
+    USER_NOTIF[account-user.notification]
 
-%% -------------------------------------------------
-%% ACCOUNT LAYER（帳號層）
-%% -------------------------------------------------
+    ORG_ACCOUNT[organization-account]
+    ORG_SETTINGS[organization-account.settings]
+    ORG_AGG[organization-account.aggregate]
 
-subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
-
-    %% 個人用戶中心：與登入身份對應的個人資料、錢包、通知，DB 共置同一帳號文件集合
-    subgraph USER_PERSONAL_CENTER[個人用戶中心（User Personal Center）]
-        USER_ACCOUNT[user-account（個人帳號）]
-        USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定 · FCM Token）"]
-        USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
-        ACCOUNT_USER_NOTIFICATION[account-user.notification（個人推播通知）]
-    end
-
-    %% 組織帳號：與組織實體綁定的帳號視圖，同一 Account 邊界內
-    ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
-    ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
-    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.aggregate（組織帳號聚合實體）]
-
-    subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
-        ACCOUNT_ROLE[account-governance.role（帳號角色）]
-        ACCOUNT_POLICY[account-governance.policy（帳號政策）]
-        ACCOUNT_NOTIFICATION_ROUTER[account-governance.notification-router（通知路由器）]
+    subgraph ACC_GOV[account-governance]
+        ACC_ROLE[account-governance.role]
+        ACC_POLICY[account-governance.policy]
+        NOTIF_ROUTER[account-governance.notification-router]
     end
 
 end
 
-ACCOUNT_IDENTITY_LINK --> USER_ACCOUNT
-ACCOUNT_IDENTITY_LINK --> ORGANIZATION_ACCOUNT
-
-USER_ACCOUNT --> USER_ACCOUNT_PROFILE
-USER_ACCOUNT --> USER_ACCOUNT_WALLET
-
-ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
-ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
-ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
+ID_LINK --> USER_ACCOUNT
+ID_LINK --> ORG_ACCOUNT
+USER_ACCOUNT --> USER_PROFILE
+USER_ACCOUNT --> USER_WALLET
+ORG_ACCOUNT --> ORG_SETTINGS
+ORG_ACCOUNT --> ORG_AGG
+ORG_ACCOUNT --> ACC_GOV
 
 
-%% -------------------------------------------------
-%% ORGANIZATION LAYER（組織層）— 同屬主體中心
-%% -------------------------------------------------
+%% 組織層（Organization Layer）
+subgraph ORG[Organization Layer]
 
-subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
-
-    subgraph ORGANIZATION_CORE[organization-core（組織核心）]
-        ORGANIZATION_ENTITY[organization-core.aggregate（組織聚合實體）]
-        ORGANIZATION_EVENT_BUS[organization-core.event-bus（組織事件總線）]
+    subgraph ORG_CORE[organization-core]
+        ORG_ENTITY[organization-core.aggregate]
+        ORG_BUS[organization-core.event-bus]
     end
 
-    subgraph ORGANIZATION_GOVERNANCE[organization-governance（組織治理）]
-        ORGANIZATION_MEMBER[organization-governance.member（組織成員）]
-        ORGANIZATION_TEAM["organization-governance.team（團隊管理 · 內部組視圖）"]
-        ORGANIZATION_PARTNER["organization-governance.partner（合作夥伴 · 外部組視圖）"]
-        ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
-        SKILL_TAG_POOL[(職能標籤庫（Skills / Certs）)]
+    subgraph ORG_GOV[organization-governance]
+        ORG_MEMBER[organization-governance.member]
+        ORG_TEAM[organization-governance.team]
+        ORG_PARTNER[organization-governance.partner]
+        ORG_POLICY[organization-governance.policy]
+        SKILL_POOL[(職能標籤庫)]
     end
 
-    ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
+    ORG_SCHEDULE[organization.schedule]
 
 end
 
-%% end SUBJECT_CENTER
-end
-
-ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY
-ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
+ORG_AGG --> ORG_ENTITY
+ORG_ENTITY --> ORG_BUS
 
 
-%% =================================================
-%% WORKSPACE CONTAINER（工作區容器）
-%% =================================================
+%% 工作區容器（Workspace Container）
+subgraph WS[Workspace Container]
 
-subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
-
-    subgraph WORKSPACE_APPLICATION[workspace-application（應用層）]
-        WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
-        WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
-        WORKSPACE_POLICY_ENGINE[workspace-application.policy-engine（政策引擎）]
-        WORKSPACE_TRANSACTION_RUNNER[workspace-application.transaction-runner（交易執行器）]
-        WORKSPACE_OUTBOX["workspace-application.outbox（交易內發信箱）"]
+    subgraph WS_APP[workspace-application]
+        WS_CMD[workspace-application.command-handler]
+        WS_GUARD[workspace-application.scope-guard]
+        WS_POLICY[workspace-application.policy-engine]
+        WS_RUNNER[workspace-application.transaction-runner]
+        WS_OUTBOX["workspace-application.outbox（交易內）"]
     end
 
-    subgraph WORKSPACE_CORE[workspace-core（核心層）]
-        WORKSPACE_SETTINGS[workspace-core.settings（工作區設定）]
-        WORKSPACE_AGGREGATE[workspace-core.aggregate（核心聚合實體）]
-        WORKSPACE_EVENT_BUS[workspace-core.event-bus（事件總線）]
-        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，可選）"]
+    subgraph WS_CORE[workspace-core]
+        WS_SETTINGS[workspace-core.settings]
+        WS_AGG[workspace-core.aggregate]
+        WS_BUS[workspace-core.event-bus]
+        WS_STORE["workspace-core.event-store（可選）"]
     end
 
-    subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
-        WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
-        WORKSPACE_ROLE[workspace-governance.role（角色管理）]
+    subgraph WS_GOV[workspace-governance]
+        WS_MEMBER[workspace-governance.member]
+        WS_ROLE[workspace-governance.role]
     end
 
-    %% --- AB 雙軌業務邏輯核心 ---
-    subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
+    %% AB 雙軌業務邏輯
+    subgraph WS_BIZ[workspace-business]
         direction TB
 
-        %% 輔助與靜態單元
-        W_B_FILES[workspace-business.files（檔案管理）]
-        W_B_PARSER[workspace-business.document-parser（文件解析）]
-        PARSING_INTENT[(ParsingIntent（解析合約 · Digital Twin）)]
-        W_B_DAILY[workspace-business.daily（手寫施工日誌）]
-        W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
+        W_FILES[workspace-business.files]
+        W_PARSER[workspace-business.document-parser]
+        PARSE_INTENT[("ParsingIntent（Digital Twin）")]
+        W_DAILY[workspace-business.daily]
+        W_SCHED[workspace-business.schedule]
 
         %% A 軌：主流程
-        TRACK_A_TASKS[workspace-business.tasks（任務管理）]
-        TRACK_A_QA[workspace-business.quality-assurance（品質驗證）]
-        TRACK_A_ACCEPTANCE[workspace-business.acceptance（驗收）]
-        TRACK_A_FINANCE[workspace-business.finance（財務處理）]
+        A_TASKS[workspace-business.tasks]
+        A_QA[workspace-business.quality-assurance]
+        A_ACCEPT[workspace-business.acceptance]
+        A_FIN[workspace-business.finance]
 
-        %% B 軌：異常處理中心
-        TRACK_B_ISSUES{{workspace-business.issues（問題追蹤單）}}
+        %% B 軌：異常追蹤
+        B_ISSUES{{workspace-business.issues}}
 
-        %% 文件解析閉環（Files → Parser → ParsingIntent → A軌 / B軌）
-        W_B_FILES -.->|提供原始檔案| W_B_PARSER
-        W_B_PARSER -->|解析完成 · 產出新版本| PARSING_INTENT
-        PARSING_INTENT -->|任務批次草稿（含層級結構）| TRACK_A_TASKS
-        PARSING_INTENT -->|財務指令| TRACK_A_FINANCE
-        PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
+        W_FILES -.->|原始檔案| W_PARSER
+        W_PARSER -->|解析產出| PARSE_INTENT
+        PARSE_INTENT -->|任務批次| A_TASKS
+        PARSE_INTENT -->|財務指令| A_FIN
+        PARSE_INTENT -->|解析異常| B_ISSUES
+        A_TASKS -.->|SourcePointer| PARSE_INTENT
+        PARSE_INTENT -.->|版本差異| A_TASKS
 
-        %% Digital Twin：PARSING_INTENT 為唯讀合約；TRACK_A_TASKS 透過 SourcePointer 引用 IntentID
-        TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT
-        PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS
+        A_TASKS -->|異常| B_ISSUES
+        A_TASKS -->|正常| A_QA
+        A_QA -->|異常| B_ISSUES
+        A_QA -->|正常| A_ACCEPT
+        A_ACCEPT -->|異常| B_ISSUES
+        A_ACCEPT -->|正常| A_FIN
+        A_FIN -->|異常| B_ISSUES
 
-        %% A 軌流轉與異常判定（AB 雙軌交互）
-        TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
-        TRACK_A_TASKS -->|正常順位| TRACK_A_QA
-
-        TRACK_A_QA -->|異常| TRACK_B_ISSUES
-        TRACK_A_QA -->|正常順位| TRACK_A_ACCEPTANCE
-
-        TRACK_A_ACCEPTANCE -->|異常| TRACK_B_ISSUES
-        TRACK_A_ACCEPTANCE -->|正常順位| TRACK_A_FINANCE
-
-        TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
-
-        %% B 軌解鎖：統一發送 IssueResolved 事件，A 軌自行訂閱後恢復（不直接回流）
-
-        %% 日誌與排程關聯
-        TRACK_A_TASKS -.-> W_B_DAILY
-        TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE
-        PARSING_INTENT -.->|提取職能需求標籤| W_B_SCHEDULE
-
+        A_TASKS -.-> W_DAILY
+        A_TASKS -.->|任務分配| W_SCHED
+        PARSE_INTENT -.->|職能需求| W_SCHED
     end
 
-    %% B 軌 IssueResolved 事件（A 軌訂閱後自行恢復進度）
-    TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
+    %% B 軌 IssueResolved → A 軌自行訂閱恢復
+    B_ISSUES -->|IssueResolved| WS_BUS
 
 end
 
-ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
+ORG_ENTITY --> WS
 
 
-%% =================================================
-%% 職能標籤庫 — 扁平化資源池（Team/Partner 為組視圖）
-%% 所有帳號（內部/外部）統一擁有職能標籤；Team/Partner 為同一資源池的「組視圖」
-%% =================================================
-ORGANIZATION_MEMBER -.->|內部帳號擁有標籤| SKILL_TAG_POOL
-ORGANIZATION_PARTNER -.->|外部帳號擁有標籤| SKILL_TAG_POOL
-ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（內部組）| SKILL_TAG_POOL
+%% 請求流程（Request Flow）
+SERVER_ACTION["_actions.ts（Server Action）"]
+SERVER_ACTION -->|Command| WS_CMD
+WS_CMD --> WS_GUARD
+ACTIVE_CTX --> WS_GUARD
+CLAIMS --> WS_GUARD
+WS_GUARD --> WS_POLICY
+WS_POLICY --> WS_RUNNER
+WS_RUNNER -.->|業務邏輯| WS_BIZ
+WS_RUNNER --> WS_AGG
+WS_AGG --> WS_OUTBOX
+WS_AGG --> WS_STORE
+WS_RUNNER --> WS_OUTBOX
+WS_OUTBOX --> WS_BUS
 
 
-%% =================================================
-%% REQUEST FLOW（請求流程）
-%% =================================================
+%% 事件橋接（Event Bridge）
+ORG_BUS --> WS_GUARD
+ORG_BUS --> ORG_SCHEDULE
+WS_OUTBOX -->|ScheduleProposed| ORG_SCHEDULE
 
-SERVER_ACTION["_actions.ts（Server Action — 業務觸發入口）"]
-SERVER_ACTION -->|發送 Command| WORKSPACE_COMMAND_HANDLER
-WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
-
-WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
-ACTIVE_ACCOUNT_CONTEXT --> WORKSPACE_SCOPE_GUARD
-CUSTOM_CLAIMS --> WORKSPACE_SCOPE_GUARD
-
-WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
-WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
-
-WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_AGGREGATE
-WORKSPACE_AGGREGATE --> WORKSPACE_OUTBOX
-WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
-WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
-
-WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
+%% 職能標籤庫：扁平化資源池，Team/Partner 為同一池的組視圖
+ORG_MEMBER -.->|內部帳號| SKILL_POOL
+ORG_PARTNER -.->|外部帳號| SKILL_POOL
+ORG_TEAM -.->|聚合視圖（內部組）| SKILL_POOL
+W_SCHED -.->|標籤過濾| SKILL_POOL
 
 
-%% =================================================
-%% EVENT BRIDGE（事件橋接）
-%% =================================================
+%% 投影層（Projection Layer）
+subgraph PROJ[Projection Layer]
 
-ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
-ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
-W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
-
-
-%% =================================================
-%% PROJECTION LAYER（投影層）
-%% =================================================
-
-subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
-
-    EVENT_FUNNEL_INPUT[["事件漏斗（Event Funnel · 統一入口）"]]
-
-    PROJECTION_VERSION[projection.version（版本追蹤）]
-    READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
-
-    WORKSPACE_PROJECTION_VIEW[projection.workspace-view（工作區投影視圖）]
-    ACCOUNT_PROJECTION_VIEW[projection.account-view（帳號投影視圖）]
-    ACCOUNT_PROJECTION_AUDIT[projection.account-audit（帳號稽核投影）]
-    ACCOUNT_PROJECTION_SCHEDULE[projection.account-schedule（帳號排程投影）]
-    ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
+    FUNNEL[["事件漏斗（Event Funnel）"]]
+    PROJ_VER[projection.version]
+    PROJ_REG[projection.read-model-registry]
+    PROJ_WS[projection.workspace-view]
+    PROJ_ACC[projection.account-view]
+    PROJ_AUDIT[projection.account-audit]
+    PROJ_SCHED[projection.account-schedule]
+    PROJ_ORG[projection.organization-view]
 
 end
 
-%% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖
-WORKSPACE_EVENT_BUS -->|所有業務事件| EVENT_FUNNEL_INPUT
-ORGANIZATION_EVENT_BUS -->|所有組織事件| EVENT_FUNNEL_INPUT
-
-%% 漏斗內部路由（EVENT_FUNNEL_INPUT 為 PROJECTION_LAYER 唯一外部入口）
-EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW
-EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
-EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
-EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
-EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
-
-PROJECTION_VERSION --> READ_MODEL_REGISTRY
+WS_BUS -->|業務事件| FUNNEL
+ORG_BUS -->|組織事件| FUNNEL
+FUNNEL --> PROJ_WS
+FUNNEL --> PROJ_ACC
+FUNNEL --> PROJ_AUDIT
+FUNNEL --> PROJ_SCHED
+FUNNEL --> PROJ_ORG
+PROJ_VER --> PROJ_REG
 
 
-%% =================================================
-%% FCM NOTIFICATION — 三層通知架構
-%% 層一（觸發）：ORGANIZATION_SCHEDULE 宣告事實（ScheduleAssigned），不關心誰要收通知
-%% 層二（路由）：ACCOUNT_NOTIFICATION_ROUTER 依 TargetAccountID 分發至目標帳號
-%% 層三（交付）：ACCOUNT_USER_NOTIFICATION 依 internal/external 標籤過濾敏感內容後推播
-%% FCM Token 儲存於 account-user.profile；通知切片只讀取不寫入 profile
-%% =================================================
+%% FCM 三層通知
+%% 層一（觸發）：ORG_SCHEDULE 宣告事實，不關心誰收通知
+%% 層二（路由）：NOTIF_ROUTER 依 TargetAccountID 分發
+%% 層三（交付）：USER_NOTIF 依帳號標籤過濾後推播
+FCM[["Firebase Cloud Messaging"]]
+DEVICE[使用者裝置]
 
-FCM_GATEWAY[["Firebase Cloud Messaging（推播閘道）"]]
-USER_DEVICE[使用者裝置（手機／瀏覽器）]
-
-%% 層一：觸發層 — 宣告事實（不關心誰要收通知）
-ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
-
-%% 層二：路由層 — 依 TargetAccountID 分發至對應帳號
-ORGANIZATION_EVENT_BUS -->|ScheduleAssigned（含 TargetAccountID）| ACCOUNT_NOTIFICATION_ROUTER
-ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
-
-%% 層三：交付層 — 依帳號標籤過濾內容後推播
-USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
-ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤過濾內容（internal/external）| SKILL_TAG_POOL
-ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
-FCM_GATEWAY -.->|推播通知| USER_DEVICE
-
-%% 通知投影至個人中心（account-user.profile / account-user.notification 共享帳號文件集合，邏輯分離但 DB 同源）
-ACCOUNT_USER_NOTIFICATION -.->|通知投影至個人中心| ACCOUNT_PROJECTION_VIEW
+ORG_SCHEDULE -->|ScheduleAssigned| ORG_BUS
+ORG_BUS -->|ScheduleAssigned（含 TargetAccountID）| NOTIF_ROUTER
+NOTIF_ROUTER -->|路由至目標帳號| USER_NOTIF
+USER_PROFILE -.->|FCM Token| USER_NOTIF
+USER_NOTIF -.->|內外部標籤過濾| SKILL_POOL
+USER_NOTIF --> FCM
+FCM -.->|推播| DEVICE
+USER_NOTIF -.->|投影| PROJ_ACC
 
 
-%% =================================================
-%% OBSERVABILITY（可觀測性）
-%% =================================================
-
-subgraph OBSERVABILITY_LAYER[Observability Layer（可觀測性層）]
-    TRACE_IDENTIFIER["trace-identifier / correlation-identifier（追蹤／關聯識別碼）"]
-    DOMAIN_METRICS[domain-metrics（領域指標）]
-    DOMAIN_ERROR_LOG[domain-error-log（領域錯誤日誌）]
+%% 可觀測性（Observability）
+subgraph OBS[Observability Layer]
+    TRACE["trace-identifier / correlation-identifier"]
+    METRICS[domain-metrics]
+    ERR_LOG[domain-error-log]
 end
 
-WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER
-WORKSPACE_TRANSACTION_RUNNER --> TRACE_IDENTIFIER
-WORKSPACE_EVENT_BUS --> TRACE_IDENTIFIER
+WS_CMD --> TRACE
+WS_RUNNER --> TRACE
+WS_BUS --> TRACE
+WS_RUNNER --> ERR_LOG
+WS_BUS --> METRICS
 
-WORKSPACE_TRANSACTION_RUNNER --> DOMAIN_ERROR_LOG
-WORKSPACE_EVENT_BUS --> DOMAIN_METRICS
 
-
-%% =================================================
-%% STYLES（樣式）
-%% =================================================
+%% 樣式
 classDef identity fill:#dbeafe,stroke:#93c5fd,color:#000;
 classDef account fill:#dcfce7,stroke:#86efac,color:#000;
 classDef organization fill:#fff7ed,stroke:#fdba74,color:#000;
@@ -321,29 +237,23 @@ classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
-
-classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
-classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
-classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
+classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 
-class IDENTITY_LAYER identity;
+class IDENTITY identity;
 class ACCOUNT_AUTH identity;
-class ACCOUNT_LAYER account;
-class ORGANIZATION_LAYER organization;
-class WORKSPACE_CONTAINER workspace;
-class PROJECTION_LAYER projection;
-class OBSERVABILITY_LAYER observability;
-class TRACK_A_TASKS,TRACK_A_QA,TRACK_A_ACCEPTANCE,TRACK_A_FINANCE trackA;
-class TRACK_B_ISSUES trackB;
-class PARSING_INTENT parsingIntent;
+class ACCOUNT,ACC_GOV account;
+class USER_NOTIF,NOTIF_ROUTER account;
+class ORG,ORG_CORE,ORG_GOV organization;
+class WS,WS_APP,WS_CORE,WS_GOV workspace;
+class PROJ projection;
+class OBS observability;
+class A_TASKS,A_QA,A_ACCEPT,A_FIN trackA;
+class B_ISSUES trackB;
+class PARSE_INTENT parsingIntent;
 class SERVER_ACTION serverAction;
-class SKILL_TAG_POOL skillTagPool;
-class FCM_GATEWAY fcmGateway;
-class USER_DEVICE userDevice;
-class SUBJECT_CENTER subjectCenter;
-class EVENT_FUNNEL_INPUT eventFunnel;
-class ACCOUNT_USER_NOTIFICATION account;
-class ACCOUNT_NOTIFICATION_ROUTER account;
-class USER_PERSONAL_CENTER userPersonalCenter;
+class SKILL_POOL skillTagPool;
+class FUNNEL eventFunnel;
+class FCM fcmGateway;
+class DEVICE userDevice;
