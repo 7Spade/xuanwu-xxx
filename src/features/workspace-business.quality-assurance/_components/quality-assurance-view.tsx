@@ -17,7 +17,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
  * Determines if a task is qualified to enter the "Verified" stage.
  * ARCHITECTURE REFACTORED: Now stateful and fully event-driven.
  */
-export function WorkspaceQA() {
+export function WorkspaceQualityAssurance() {
   const { workspace, logAuditEvent, eventBus, updateTask } = useWorkspace();
   const { state: { user } } = useAuth();
   

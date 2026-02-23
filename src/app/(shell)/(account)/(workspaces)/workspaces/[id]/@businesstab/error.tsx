@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { Button } from "@/shared/shadcn-ui/button"
 import { AlertCircle } from "lucide-react"
 
-export default function CapabilityError({
+export default function BusinessTabError({
   error,
   reset,
 }: {

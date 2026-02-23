@@ -1,1 +1,1 @@
-export { WorkspaceAcceptance } from './_components/acceptance-plugin'
+export { WorkspaceAcceptance } from './_components/acceptance-view'
