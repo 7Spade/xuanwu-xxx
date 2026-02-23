@@ -1,0 +1,77 @@
+/**
+ * @fileoverview Workspace Business — Issues Repository.
+ *
+ * All Firestore read and write operations for the `issues` sub-collection
+ * under a workspace. Stored at: workspaces/{workspaceId}/issues/{issueId}
+ * Corresponds to the `workspace-business.issues` feature slice.
+ */
+
+import {
+  serverTimestamp,
+  arrayUnion,
+  collection,
+  query,
+  orderBy,
+  type FieldValue,
+} from 'firebase/firestore';
+import { db } from '../firestore.client';
+import {
+  updateDocument,
+  addDocument,
+} from '../firestore.write.adapter';
+import { getDocuments } from '../firestore.read.adapter';
+import { createConverter } from '../firestore.converter';
+import type { WorkspaceIssue, IssueComment } from '@/shared/types';
+
+/**
+ * Creates a new issue in a workspace (e.g., when a task is rejected).
+ */
+export const createIssue = async (
+  workspaceId: string,
+  title: string,
+  type: 'technical' | 'financial',
+  priority: 'high' | 'medium'
+): Promise<void> => {
+  const issueData: Omit<WorkspaceIssue, 'id' | 'createdAt'> & { createdAt: FieldValue } = {
+    title,
+    type,
+    priority,
+    issueState: 'open',
+    createdAt: serverTimestamp(),
+    comments: [],
+  };
+  await addDocument(`workspaces/${workspaceId}/issues`, issueData);
+};
+
+/**
+ * Adds a comment to a specific issue.
+ */
+export const addCommentToIssue = async (
+  workspaceId: string,
+  issueId: string,
+  author: string,
+  content: string
+): Promise<void> => {
+  const newComment: Omit<IssueComment, 'createdAt'> & { createdAt: FieldValue } = {
+    id: `comment-${Math.random().toString(36).substring(2, 11)}`,
+    author,
+    content,
+    createdAt: serverTimestamp(),
+  };
+
+  await updateDocument(`workspaces/${workspaceId}/issues/${issueId}`, {
+    comments: arrayUnion(newComment),
+  });
+};
+
+export const getWorkspaceIssues = async (
+  workspaceId: string
+): Promise<WorkspaceIssue[]> => {
+  const converter = createConverter<WorkspaceIssue>();
+  const colRef = collection(
+    db,
+    `workspaces/${workspaceId}/issues`
+  ).withConverter(converter);
+  const q = query(colRef, orderBy('createdAt', 'desc'));
+  return getDocuments(q);
+};

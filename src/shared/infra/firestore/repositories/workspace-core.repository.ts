@@ -1,8 +1,9 @@
 /**
- * @fileoverview Workspace Repository.
+ * @fileoverview Workspace Core Repository.
  *
- * All Firestore read and write operations for the `workspaces` collection
- * and its sub-collections (tasks, issues, files, grants).
+ * Firestore read and write operations for the `workspaces` top-level collection:
+ * workspace lifecycle, settings, capability management, member grants, and team access.
+ * Corresponds to the `workspace-core` feature slice.
  */
 
 import {
@@ -11,9 +12,6 @@ import {
   arrayRemove,
   doc,
   getDoc,
-  collection,
-  query,
-  orderBy,
   runTransaction,
   type FieldValue,
 } from 'firebase/firestore';
@@ -23,20 +21,15 @@ import {
   addDocument,
   deleteDocument,
 } from '../firestore.write.adapter';
-import { getDocuments } from '../firestore.read.adapter';
-import { createConverter } from '../firestore.converter';
 import type {
   Workspace,
   WorkspaceRole,
   WorkspaceGrant,
-  WorkspaceIssue,
-  IssueComment,
-  WorkspaceTask,
   WorkspaceFile,
   Capability,
   WorkspaceLifecycleState,
-  ParsingIntent,
- Account } from '@/shared/types'
+  Account,
+} from '@/shared/types';
 
 /**
  * Creates a new workspace with default values, based on the active account context.
@@ -59,7 +52,7 @@ export const createWorkspace = async (
     grants: [],
     teamIds: [],
     createdAt: serverTimestamp(),
-  }
+  };
 
   const docRef = await addDocument('workspaces', workspaceData);
   return docRef.id;
@@ -158,102 +151,6 @@ export const revokeIndividualWorkspaceAccess = async (
 };
 
 /**
- * Creates a new issue in a workspace (e.g., when a task is rejected).
- */
-export const createIssue = async (
-  workspaceId: string,
-  title: string,
-  type: 'technical' | 'financial',
-  priority: 'high' | 'medium'
-): Promise<void> => {
-  const issueData: Omit<WorkspaceIssue, 'id' | 'createdAt'> & { createdAt: FieldValue } = {
-    title,
-    type,
-    priority,
-    issueState: 'open',
-    createdAt: serverTimestamp(),
-    comments: [],
-  };
-  await addDocument(`workspaces/${workspaceId}/issues`, issueData);
-};
-
-/**
- * Adds a comment to a specific issue.
- */
-export const addCommentToIssue = async (
-  workspaceId: string,
-  issueId: string,
-  author: string,
-  content: string
-): Promise<void> => {
-  const newComment: Omit<IssueComment, 'createdAt'> & { createdAt: FieldValue } = {
-    id: `comment-${Math.random().toString(36).substring(2, 11)}`,
-    author,
-    content,
-    createdAt: serverTimestamp(),
-  };
-
-  await updateDocument(`workspaces/${workspaceId}/issues/${issueId}`, {
-    comments: arrayUnion(newComment),
-  });
-};
-
-/**
- * Creates a new task in a specific workspace.
- * @param workspaceId The ID of the workspace.
- * @param taskData The data for the new task.
- * @returns The ID of the newly created task.
- */
-export const createTask = async (
-  workspaceId: string,
-  taskData: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<string> => {
-  const dataWithTimestamp = {
-    ...taskData,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  };
-  const docRef = await addDocument(
-    `workspaces/${workspaceId}/tasks`,
-    dataWithTimestamp
-  );
-  return docRef.id;
-};
-
-/**
- * Updates an existing task in a workspace.
- * @param workspaceId The ID of the workspace.
- * @param taskId The ID of the task to update.
- * @param updates The fields to update on the task.
- */
-export const updateTask = async (
-  workspaceId: string,
-  taskId: string,
-  updates: Partial<WorkspaceTask>
-): Promise<void> => {
-  const dataWithTimestamp = {
-    ...updates,
-    updatedAt: serverTimestamp(),
-  };
-  return updateDocument(
-    `workspaces/${workspaceId}/tasks/${taskId}`,
-    dataWithTimestamp
-  );
-};
-
-/**
- * Deletes a task from a workspace.
- * @param workspaceId The ID of the workspace.
- * @param taskId The ID of the task to delete.
- */
-export const deleteTask = async (
-  workspaceId: string,
-  taskId: string
-): Promise<void> => {
-  return deleteDocument(`workspaces/${workspaceId}/tasks/${taskId}`);
-};
-
-/**
  * Mounts (adds) capabilities to a workspace.
  * @param workspaceId The ID of the workspace.
  * @param capabilities An array of capability objects to mount.
@@ -313,93 +210,22 @@ export const deleteWorkspace = async (workspaceId: string): Promise<void> => {
   return deleteDocument(`workspaces/${workspaceId}`);
 };
 
-// =================================================================
-// == Workspace Aggregate Reads
-// =================================================================
-
-export const getWorkspaceTasks = async (
-  workspaceId: string
-): Promise<WorkspaceTask[]> => {
-  const converter = createConverter<WorkspaceTask>()
-  const colRef = collection(
-    db,
-    `workspaces/${workspaceId}/tasks`
-  ).withConverter(converter)
-  const q = query(colRef, orderBy('createdAt', 'desc'))
-  return getDocuments(q)
-}
-
-export const getWorkspaceIssues = async (
-  workspaceId: string
-): Promise<WorkspaceIssue[]> => {
-  const converter = createConverter<WorkspaceIssue>()
-  const colRef = collection(
-    db,
-    `workspaces/${workspaceId}/issues`
-  ).withConverter(converter)
-  const q = query(colRef, orderBy('createdAt', 'desc'))
-  return getDocuments(q)
-}
-
 export const getWorkspaceFiles = async (
   workspaceId: string
 ): Promise<WorkspaceFile[]> => {
-  const wsRef = doc(db, 'workspaces', workspaceId)
-  const snap = await getDoc(wsRef)
-  if (!snap.exists()) return []
-  const data = snap.data() as Workspace
-  return Object.values(data.files ?? {})
-}
+  const wsRef = doc(db, 'workspaces', workspaceId);
+  const snap = await getDoc(wsRef);
+  if (!snap.exists()) return [];
+  const data = snap.data() as Workspace;
+  return Object.values(data.files ?? {});
+};
 
 export const getWorkspaceGrants = async (
   workspaceId: string
 ): Promise<WorkspaceGrant[]> => {
-  const wsRef = doc(db, 'workspaces', workspaceId)
-  const snap = await getDoc(wsRef)
-  if (!snap.exists()) return []
-  const data = snap.data() as Workspace
-  return data.grants ?? []
-}
-
-// =================================================================
-// == ParsingIntent Sub-Collection (workspace-business.document-parser)
-// 解析合約 · Digital Twin：由 document-parser 產出，tasks 透過 sourceIntentId 引用
-// =================================================================
-
-export const createParsingIntent = async (
-  workspaceId: string,
-  intentData: Omit<ParsingIntent, 'id' | 'createdAt'>
-): Promise<string> => {
-  const ref = await addDocument(
-    `workspaces/${workspaceId}/parsingIntents`,
-    { ...intentData, createdAt: serverTimestamp() }
-  )
-  return ref.id
-}
-
-export const updateParsingIntentStatus = async (
-  workspaceId: string,
-  intentId: string,
-  status: 'imported' | 'failed'
-): Promise<void> => {
-  const updates: Record<string, unknown> = { status }
-  if (status === 'imported') {
-    updates.importedAt = serverTimestamp()
-  }
-  return updateDocument(
-    `workspaces/${workspaceId}/parsingIntents/${intentId}`,
-    updates
-  )
-}
-
-export const getParsingIntents = async (
-  workspaceId: string
-): Promise<ParsingIntent[]> => {
-  const converter = createConverter<ParsingIntent>()
-  const colRef = collection(
-    db,
-    `workspaces/${workspaceId}/parsingIntents`
-  ).withConverter(converter)
-  const q = query(colRef, orderBy('createdAt', 'desc'))
-  return getDocuments(q)
-}
+  const wsRef = doc(db, 'workspaces', workspaceId);
+  const snap = await getDoc(wsRef);
+  if (!snap.exists()) return [];
+  const data = snap.data() as Workspace;
+  return data.grants ?? [];
+};
