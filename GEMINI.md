@@ -64,7 +64,7 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 | `features/workspace-business.files` | File upload, management |
 | `features/workspace-business.issues` | Issue tracking |
 | `features/workspace-business.finance` | Finance plugin |
-| `features/workspace-business.qa` | QA plugin |
+| `features/workspace-business.quality-assurance` | QA plugin |
 | `features/workspace-business.document-parser` | AI document parsing |
 | `features/workspace-business.acceptance` | Acceptance plugin |
 | `features/workspace-business.capabilities` | Capabilities plugin |

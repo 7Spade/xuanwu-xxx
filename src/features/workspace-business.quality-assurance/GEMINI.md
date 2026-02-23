@@ -1,4 +1,4 @@
-# Feature Slice: `workspace-business.qa`
+# Feature Slice: `workspace-business.quality-assurance`
 
 ## Domain
 
@@ -23,4 +23,4 @@ export { QaPlugin } from "./_components/qa-plugin";
 
 ## Who Uses This Slice?
 
-- `app/dashboard/workspaces/[id]/@plugin-tab/qa/page.tsx`
+- `app/dashboard/workspaces/[id]/@plugintab/qa/page.tsx`
