@@ -117,7 +117,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         %% 輔助與靜態單元
         W_B_FILES[workspace-business.files（檔案管理）]
         W_B_PARSER[workspace-business.document-parser（文件解析）]
-        PARSING_INTENT>ParsingIntent（解析意圖中繼聚合）]
+        PARSING_INTENT[(ParsingIntent（解析合約 · Digital Twin）)]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
         W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
 
@@ -132,10 +132,14 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
         %% 文件解析閉環（Files → Parser → ParsingIntent → A軌 / B軌）
         W_B_FILES -.->|提供原始檔案| W_B_PARSER
-        W_B_PARSER -->|解析完成| PARSING_INTENT
+        W_B_PARSER -->|解析完成 · 產出新版本| PARSING_INTENT
         PARSING_INTENT -->|任務批次草稿（含層級結構）| TRACK_A_TASKS
         PARSING_INTENT -->|財務指令| TRACK_A_FINANCE
         PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
+
+        %% Digital Twin 雙向同步（解析合約 ↔ 執行實體）
+        TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT
+        PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS
 
         %% A 軌流轉與異常判定（AB 雙軌交互）
         TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
@@ -198,7 +202,7 @@ WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG
 
 ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-WORKSPACE_EVENT_BUS -->|ScheduleProposed 事件| ORGANIZATION_SCHEDULE
+WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
 
 
 %% =================================================

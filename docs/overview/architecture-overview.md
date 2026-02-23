@@ -23,6 +23,10 @@
 | 12 | `W_B_SCHEDULE` 排程觸發源不明 | 排程模組孤立，圖中無任何驅動源指向它 | 新增 `TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE`；任務分配或時程變動是排程重算的自然觸發源 | 排程是任務分配的下游產物；A 軌任務節點狀態變動時自動觸發排程重算，形成閉環 |
 | 13 | `W_B_SCHEDULE --> ORGANIZATION_SCHEDULE` 跨層直接耦合 | 工作區業務層直接同步寫入組織層狀態，破壞聚合邊界（Aggregate Boundary），多工作區並行修改時產生併發衝突 | 移除直接邊；改為事件驅動：工作區排程計算完成後更新 `WORKSPACE_AGGREGATE` 狀態，透過 `WORKSPACE_OUTBOX → WORKSPACE_EVENT_BUS -->|ScheduleProposed 事件| ORGANIZATION_SCHEDULE`，組織層訂閱後自主更新人力排程 | 達成 Workspace ↔ Organization 完全解耦；支援多工作區同時提案排程而不衝突；最終一致性由 Outbox 模式保證 |
 | 14 | `W_B_SCHEDULE` 同步更新導致工作區交易沉重 | 排程直接寫入組織狀態，ORGANIZATION_SCHEDULE 失敗會使整個工作區業務交易回滾，使用者體驗不佳 | 配合 #13 改為非同步事件投遞；`ScheduleProposed` 事件在工作區本地交易提交後投遞，組織層獨立處理排程更新，兩者互不影響 | Outbox 模式保證事件至少投遞一次；工作區業務操作成功不依賴組織排程更新是否完成，提升整體可靠性 |
+| 15 | `PARSING_INTENT` 定位：暫存中繼 vs 長期存活 | `PARSING_INTENT` 使用非對稱旗型節點（`>`），解析後即消失，與 `TRACK_A_TASKS` 無生命週期同步 | 改為圓柱形節點 `[(...)]`（持久存活），代表長期存活的「解析合約 Digital Twin」；作為文件內容與業務執行之間永久的對照表 | 解析出的任務需要回溯到來源文件；財務審計需引用文件出處；Digital Twin 讓文件更新時系統能自動比對並「提議」修改 |
+| 16 | `TRACK_A_TASKS ↔ PARSING_INTENT` 缺乏回饋鏈 | 只有 `TRACK_B_ISSUES -.-> PARSING_INTENT` 單向回流（僅異常才回饋），人為修正路徑不存在 | 新增 `TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT` 實線邊；任務執行時的人為變動（延期、換人、拆分）需同步標記解析意圖版本 | 確保解析合約與執行狀態一致；無此邊時文件與任務的對應關係在首次人工修正後即永久失真 |
+| 17 | `PARSING_INTENT` 缺乏多版本差異比對機制 | 文件更新後新解析會直接覆蓋舊意圖，無法追蹤差異，也無法保護已執行中的任務 | Parser 每次解析產出新版本（`解析完成 · 產出新版本`）；新增 `PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS` 虛線邊（提議而非強制）；系統自動比對 V_n vs V_{n+1} 差異，讓使用者確認後才更新 | 建設工程場景中文件常多次修訂；強制覆蓋會丟失已執行進度；提議模式讓業務執行不被文件更新打斷 |
+| 18 | `WORKSPACE_EVENT_BUS` 職責過載（跨層事件混入） | `WORKSPACE_EVENT_BUS` 同時發送 Audit 訂閱、Projection 投影、`ScheduleProposed` 跨層通知，混合內部與跨層事件；Projection 延遲可能影響跨層排程通知時序 | 移除 `WORKSPACE_EVENT_BUS -->|ScheduleProposed|`；改為 `WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE`；`WORKSPACE_EVENT_BUS` 只負責工作區內部路由（audit-log、projection），`WORKSPACE_OUTBOX` 同時服務兩個通道 | 分離關注點：EVENT_BUS = 工作區內部廣播；Outbox = 跨層可靠投遞；避免因 Projection 延遲引發跨層排程的時序錯誤（Race Condition） |
 
 ---
 
@@ -245,11 +249,14 @@ workspace-business  →  workspace-application  →  workspace-core
                                               |
                               -.-> 執行業務領域邏輯 -.-> workspace-business
 
-workspace-event-bus  →|ScheduleProposed|  organization-schedule
-         ↑
-organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）
+TRACK_A_TASKS  ──人為修正回饋──▶  PARSING_INTENT（Digital Twin）
+PARSING_INTENT  -.->版本差異比對提議.->  TRACK_A_TASKS（非強制）
 
-workspace-event-bus  →  workspace-governance.audit-log（操作稽核訂閱）
+workspace-outbox  →|ScheduleProposed（跨層事件）|  organization-schedule
+workspace-event-bus  →  workspace-governance.audit-log（工作區內部稽核訂閱）
+workspace-event-bus  →  projection-layer（工作區內部投影）
+
+organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）
 ```
 
 ### 禁止規則
