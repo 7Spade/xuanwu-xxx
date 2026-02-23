@@ -12,7 +12,7 @@ subgraph IDENTITY_LAYER[Identity Layer（身份層）]
     AUTHENTICATED_IDENTITY[authenticated-identity（已驗證身份）]
     ACCOUNT_IDENTITY_LINK["account-identity-link（firebaseUserId ↔ accountId 關聯）"]
     ACTIVE_ACCOUNT_CONTEXT["active-account-context（組織／工作區作用中帳號上下文）"]
-    CUSTOM_CLAIMS[custom-claims（權限快取宣告，來源為帳號治理）]
+    CUSTOM_CLAIMS[custom-claims（權限快取聲明，來源為帳號治理）]
 
 end
 
@@ -49,7 +49,7 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     %% 組織帳號：與組織實體綁定的帳號視圖，同一 Account 邊界內
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
-    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.binding（組織帳號與組織主體綁定）]
+    ORGANIZATION_ACCOUNT_BINDING[organization-account.binding（組織帳號與組織主體綁定）]
 
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
@@ -66,7 +66,7 @@ USER_ACCOUNT --> USER_ACCOUNT_PROFILE
 USER_ACCOUNT --> USER_ACCOUNT_WALLET
 
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
-ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
+ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_BINDING
 ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
 ACCOUNT_ROLE --> CUSTOM_CLAIMS
 ACCOUNT_POLICY --> CUSTOM_CLAIMS
@@ -98,7 +98,7 @@ end
 %% end SUBJECT_CENTER
 end
 
-ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY
+ORGANIZATION_ACCOUNT_BINDING --> ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 
@@ -237,7 +237,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
     EVENT_FUNNEL_INPUT[["事件漏斗（Event Funnel · 統一入口）"]]
 
-    PROJECTION_VERSION[projection.version（事件位點與讀模型版本對照）]
+    PROJECTION_VERSION[projection.version（事件串流偏移量與讀模型版本對照）]
     READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
 
     WORKSPACE_PROJECTION_VIEW[projection.workspace-view（工作區投影視圖）]
