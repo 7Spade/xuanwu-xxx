@@ -7,7 +7,7 @@ import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";
 import { createIssue } from "@/features/workspace-business.issues";
-import { createScheduleItem } from "@/features/workspace-governance.schedule";
+import { createScheduleItem } from "@/features/workspace-business.schedule";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
 import { markParsingIntentImported } from "@/features/workspace-business.document-parser";
 import { Timestamp } from "firebase/firestore";

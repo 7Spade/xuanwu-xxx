@@ -32,7 +32,7 @@ import {
 } from '@/features/workspace-business.issues'
 import {
   createScheduleItem as createScheduleItemAction,
-} from '@/features/workspace-governance.schedule'
+} from '@/features/workspace-business.schedule'
 
 
 interface WorkspaceContextType {
