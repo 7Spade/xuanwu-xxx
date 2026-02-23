@@ -26,7 +26,9 @@
 | 15 | `PARSING_INTENT` 定位：暫存中繼 vs 長期存活 | `PARSING_INTENT` 使用非對稱旗型節點（`>`），解析後即消失，與 `TRACK_A_TASKS` 無生命週期同步 | 改為圓柱形節點 `[(...)]`（持久存活），代表長期存活的「解析合約 Digital Twin」；作為文件內容與業務執行之間永久的對照表 | 解析出的任務需要回溯到來源文件；財務審計需引用文件出處；Digital Twin 讓文件更新時系統能自動比對並「提議」修改 |
 | 16 | `TRACK_A_TASKS ↔ PARSING_INTENT` 缺乏回饋鏈 | 只有 `TRACK_B_ISSUES -.-> PARSING_INTENT` 單向回流（僅異常才回饋），人為修正路徑不存在 | 新增 `TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT` 實線邊；任務執行時的人為變動（延期、換人、拆分）需同步標記解析意圖版本 | 確保解析合約與執行狀態一致；無此邊時文件與任務的對應關係在首次人工修正後即永久失真 |
 | 17 | `PARSING_INTENT` 缺乏多版本差異比對機制 | 文件更新後新解析會直接覆蓋舊意圖，無法追蹤差異，也無法保護已執行中的任務 | Parser 每次解析產出新版本（`解析完成 · 產出新版本`）；新增 `PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS` 虛線邊（提議而非強制）；系統自動比對 V_n vs V_{n+1} 差異，讓使用者確認後才更新 | 建設工程場景中文件常多次修訂；強制覆蓋會丟失已執行進度；提議模式讓業務執行不被文件更新打斷 |
-| 18 | `WORKSPACE_EVENT_BUS` 職責過載（跨層事件混入） | `WORKSPACE_EVENT_BUS` 同時發送 Audit 訂閱、Projection 投影、`ScheduleProposed` 跨層通知，混合內部與跨層事件；Projection 延遲可能影響跨層排程通知時序 | 移除 `WORKSPACE_EVENT_BUS -->|ScheduleProposed|`；改為 `WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE`；`WORKSPACE_EVENT_BUS` 只負責工作區內部路由（audit-log、projection），`WORKSPACE_OUTBOX` 同時服務兩個通道 | 分離關注點：EVENT_BUS = 工作區內部廣播；Outbox = 跨層可靠投遞；避免因 Projection 延遲引發跨層排程的時序錯誤（Race Condition） |
+| 19 | `TRACK_B_ISSUES` 蜘蛛網直接回流 | `TRACK_B_ISSUES -.->|處理完成|` 各自連向 TASKS / QA / ACCEPTANCE / FINANCE / PARSING_INTENT（5 條邊），Issue 組件需知道所有外部流程 | 移除 5 條直接回流邊；改為 `TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS`，置於 WORKSPACE_BUSINESS 外、WORKSPACE_CONTAINER 內；各 A 軌節點訂閱事件後自行恢復進度 | Issue 組件不再依賴任何具體業務模組；連線從「蜘蛛網」變為「放射狀」；A 軌解鎖邏輯在各自切片內，符合單一職責 |
+| 20 | `TRACK_A_TASKS` 對 `PARSING_INTENT` 的寫回邊 | `TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT` 為實線（暗示任務寫回並修改合約） | 改為 `TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT` 虛線引用邊；`PARSING_INTENT` 成為唯讀出生證明；人工修正以 `Refinement 覆蓋層` 形式存於 `TRACK_A_TASKS`，不修改 Intent | 永遠可比對原始合約解析結果（Intent）與實際現場狀況（Task）；合約不可更改確保長期審計能力；`Refinement` 模式保持「原始解析」與「人為調整」的清晰對照 |
+| 21 | 各層 `AUDIT_LOG` 節點分散在業務容器內 | `ACCOUNT_AUDIT_LOG`、`ORGANIZATION_AUDIT_LOG`、`WORKSPACE_AUDIT_LOG` 分別位於各治理子圖；`WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG` 直接邊混入業務流 | 從邏輯圖移除 3 個 AUDIT_LOG 節點及相關邊；保留 PROJECTION_LAYER 中已有的 `ACCOUNT_PROJECTION_AUDIT`（`WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_AUDIT`）作為統一稽核讀取模型；各稽核切片仍作為事件訂閱者存在（程式碼中保留） | 「業務執行」與「歷史追蹤」徹底分離；避免業務容器內出現多個小型日誌節點；所有歷史軌跡統一由 PROJECTION_LAYER 處理，符合讀寫分離（CQRS）原則 |
 
 ---
 
@@ -190,7 +192,8 @@ src/
 |---------------|----------|---------------------|
 | `workspace-governance/workspace-governance.member` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
 | `workspace-governance/workspace-governance.role` | 工作區角色管理 | `WORKSPACE_ROLE` |
-| `workspace-governance/workspace-governance.audit-log` | 工作區操作稽核（治理職責） | `WORKSPACE_AUDIT_LOG` |
+
+> `workspace-governance.audit-log`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
 
 #### workspace-business（業務層，按執行流向排序）
 
@@ -249,11 +252,13 @@ workspace-business  →  workspace-application  →  workspace-core
                                               |
                               -.-> 執行業務領域邏輯 -.-> workspace-business
 
-TRACK_A_TASKS  ──人為修正回饋──▶  PARSING_INTENT（Digital Twin）
+TRACK_A_TASKS  -.->SourcePointer 引用（唯讀）.->  PARSING_INTENT（Digital Twin）
 PARSING_INTENT  -.->版本差異比對提議.->  TRACK_A_TASKS（非強制）
 
+TRACK_B_ISSUES  -->|IssueResolved 事件|  WORKSPACE_EVENT_BUS（A 軌訂閱後自行恢復）
+
 workspace-outbox  →|ScheduleProposed（跨層事件）|  organization-schedule
-workspace-event-bus  →  workspace-governance.audit-log（工作區內部稽核訂閱）
+workspace-event-bus  →  projection.account-audit（全域稽核流，統一讀取模型）
 workspace-event-bus  →  projection-layer（工作區內部投影）
 
 organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）

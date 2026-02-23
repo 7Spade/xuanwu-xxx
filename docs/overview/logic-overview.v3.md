@@ -40,7 +40,6 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
         ACCOUNT_POLICY[account-governance.policy（帳號政策）]
-        ACCOUNT_AUDIT_LOG[account-governance.audit-log（帳號稽核記錄）]
     end
 
 end
@@ -72,7 +71,6 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
         ORGANIZATION_TEAM[organization-governance.team（團隊管理）]
         ORGANIZATION_PARTNER[organization-governance.partner（合作夥伴）]
         ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
-        ORGANIZATION_AUDIT_LOG[organization-governance.audit-log（稽核紀錄）]
     end
 
     ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
@@ -107,7 +105,6 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
         WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
-        WORKSPACE_AUDIT_LOG[workspace-governance.audit-log（工作區操作稽核）]
     end
 
     %% --- AB 雙軌業務邏輯核心 ---
@@ -137,8 +134,8 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         PARSING_INTENT -->|財務指令| TRACK_A_FINANCE
         PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
 
-        %% Digital Twin 雙向同步（解析合約 ↔ 執行實體）
-        TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT
+        %% Digital Twin：PARSING_INTENT 為唯讀合約；TRACK_A_TASKS 透過 SourcePointer 引用 IntentID
+        TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT
         PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS
 
         %% A 軌流轉與異常判定（AB 雙軌交互）
@@ -153,18 +150,16 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
         TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
 
-        %% 處理後回流（從異常點繼續）
-        TRACK_B_ISSUES -.->|處理完成| TRACK_A_TASKS
-        TRACK_B_ISSUES -.->|處理完成| TRACK_A_QA
-        TRACK_B_ISSUES -.->|處理完成| TRACK_A_ACCEPTANCE
-        TRACK_B_ISSUES -.->|處理完成| TRACK_A_FINANCE
-        TRACK_B_ISSUES -.->|重新解析| PARSING_INTENT
+        %% B 軌解鎖：統一發送 IssueResolved 事件，A 軌自行訂閱後恢復（不直接回流）
 
         %% 日誌與排程關聯
         TRACK_A_TASKS -.-> W_B_DAILY
         TRACK_A_TASKS -.->|任務分配／時間變動觸發| W_B_SCHEDULE
 
     end
+
+    %% B 軌 IssueResolved 事件（A 軌訂閱後自行恢復進度）
+    TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
 
 end
 
@@ -192,8 +187,6 @@ WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
 WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
-
-WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG
 
 
 %% =================================================
