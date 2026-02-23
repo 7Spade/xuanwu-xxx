@@ -5,10 +5,6 @@
 Firebase infrastructure — SDK clients, adapters, facades, and domain repositories.
 The only layer that directly calls Firebase SDK.
 
-## Maps From (Legacy)
-
-`src/firebase/` — entire directory moves here.
-
 ## Contents
 
 ```

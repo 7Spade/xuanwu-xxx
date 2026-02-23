@@ -5,10 +5,6 @@
 UI primitives — shadcn/ui components, global providers (Firebase/Auth/i18n/Theme),
 i18n types, route constants, and utility hooks.
 
-## Maps From (Legacy)
-
-`src/shared/` (current) — entire directory becomes `src/shared/ui/`.
-
 ## Contents
 
 ```

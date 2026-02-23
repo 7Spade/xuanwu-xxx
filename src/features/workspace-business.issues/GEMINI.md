@@ -12,11 +12,6 @@ Issue tracking — create issues, add comments, track status.
 | `_components/` | `IssuesPlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/issue/` → `_actions.ts`
-- `src/view-modules/workspaces/plugins/issues/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

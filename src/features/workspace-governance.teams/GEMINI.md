@@ -12,11 +12,6 @@ Team management — create teams, manage team members and skills.
 | `_components/` | `TeamsView`, `TeamDetailView` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/account/` (team ops) → `_actions.ts`
-- `src/view-modules/teams/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

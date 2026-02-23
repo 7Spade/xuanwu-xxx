@@ -18,11 +18,6 @@ User personal settings — profile, preferences (language/theme), security (pass
 | `_components/` | `UserSettingsView`, `UserSettings`, `ProfileCard`, `PreferencesCard`, `SecurityCard` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/user/` → `_actions.ts`
-- `src/view-modules/user-settings/` → `_components/`  (formerly `user-settings` slice)
-
 ## Public API (`index.ts`)
 
 ```ts

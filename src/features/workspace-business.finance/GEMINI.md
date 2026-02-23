@@ -11,10 +11,6 @@ Finance workspace plugin — financial data within a workspace context.
 | `_components/` | `FinancePlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/view-modules/workspaces/plugins/finance/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

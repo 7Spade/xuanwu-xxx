@@ -13,12 +13,6 @@ Audit trail — record and display all account and workspace events chronologica
 | `_components/` | `AuditView`, `AuditAccountView`, `AuditWorkspaceView`, `AuditTimeline`, `AuditEventItem`, `AuditDetailSheet`, `AuditTypeIcon` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/react-hooks/state-hooks/use-account-audit.ts` → `_hooks/`
-- `src/react-hooks/state-hooks/use-workspace-audit.ts` → `_hooks/`
-- `src/view-modules/workspaces/plugins/audit/` → `_components/`
-
 ## Note
 
 Audit logs are **read-only** in the UI. Write operations happen automatically server-side

@@ -163,7 +163,7 @@
     "finance": "財務",
     "issues": "問題",
     "files": "檔案",
-    "qa": "品質保證",
+    "quality-assurance": "品質保證",
     "documentParser": "文件解析器"
   },
   "account": {

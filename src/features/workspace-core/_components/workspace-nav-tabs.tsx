@@ -16,7 +16,7 @@ const CAPABILITY_REGISTRY = {
   members: { label: "Members" },
   // Business (mountable)
   tasks: { label: "Tasks" },
-  qa: { label: "QA" },
+  'quality-assurance': { label: "QA" },
   acceptance: { label: "Acceptance" },
   finance: { label: "Finance" },
   issues: { label: "Issues" },

@@ -62,10 +62,6 @@ import { AccountScheduleSection } from "@/features/workspace-governance.schedule
 
 // ❌ Forbidden: other slice private paths
 import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
-
-// ❌ Forbidden: legacy layer paths
-import { createScheduleItem } from "@/server-commands/schedule";
-import { useWorkspaceSchedule } from "@/react-hooks/state-hooks/use-workspace-schedule";
 ```
 
 ## Who Depends on This Layer?

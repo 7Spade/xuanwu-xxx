@@ -11,10 +11,6 @@ Acceptance (驗收) workspace plugin — track acceptance status of deliverables
 | `_components/` | `AcceptancePlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/view-modules/workspaces/plugins/acceptance/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

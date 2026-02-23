@@ -23,17 +23,6 @@ Daily work logs — create posts, upload images, toggle likes, add comments, boo
 | `_components/` | `DailyView`, `DailyAccountView`, `DailyWorkspaceView`, `DailyLogCard`, `DailyLogDialog`, `Composer`, `ImageCarousel`, `LikeButton`, `BookmarkButton`, `CommentButton`, `ShareButton` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/daily/` → `_actions.ts`
-- `src/server-commands/bookmark/` → `_actions.ts`
-- `src/react-hooks/state-hooks/use-workspace-daily.ts` → `_hooks/`
-- `src/react-hooks/state-hooks/use-aggregated-logs.ts` → `_hooks/`
-- `src/react-hooks/command-hooks/use-daily-commands.ts` → `_hooks/`
-- `src/react-hooks/command-hooks/use-bookmark-commands.ts` → `_hooks/`
-- `src/react-hooks/service-hooks/use-daily-upload.ts` → `_hooks/`
-- `src/view-modules/workspaces/plugins/daily/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

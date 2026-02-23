@@ -11,10 +11,6 @@ QA (Quality Assurance) workspace plugin.
 | `_components/` | `WorkspaceQA` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/view-modules/workspaces/plugins/qa/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts
@@ -23,4 +19,4 @@ export { WorkspaceQA } from "./_components/qa-plugin";
 
 ## Who Uses This Slice?
 
-- `app/dashboard/workspaces/[id]/@plugintab/qa/page.tsx`
+- `app/(shell)/(account)/(workspaces)/workspaces/[id]/@plugintab/quality-assurance/page.tsx`
