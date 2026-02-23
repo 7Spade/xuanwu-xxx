@@ -7,13 +7,13 @@
 
 切片名稱遵循 **`{主體}-{子類型或次命名空間}.{功能}`** 格式：
 
-- **`-`（連字號）** 分隔主體與子類型／次命名空間（如 `account-user`、`workspace-core`）
-- **`.`（點）** 分隔子類型與具體功能（如 `account-user.profile`、`workspace-core.event-bus`）
-- 若一個次命名空間只有單一功能（無需再細分），則以 `{主體}-{次命名空間}` 命名，不加 `.`（如 `account-auth`）
+- **`-`（連字號）** 分隔主體與子類型／次命名空間（如 `identity-account`、`workspace-core`）
+- **`.`（點）** 分隔子類型與具體功能（如 `identity-account.auth`、`workspace-core.event-bus`）
+- 若一個次命名空間只有單一功能（無需再細分），則以 `{主體}-{次命名空間}` 命名，不加 `.`
 
 | 前綴 | 適用範圍 | 範例 |
 |------|----------|------|
-| `account-auth` | 身份驗證（Identity Layer，不屬於任何子類型） | `account-auth` |
+| `identity-*` | 身份驗證 BC（Identity Layer：auth 操作及身份狀態管理） | `identity-account.auth` |
 | `account-user.*` | 個人使用者功能（User 是 Account 的子類型） | `account-user.profile` |
 | `account-organization.*` | 組織功能（Organization 也是 Account 的子類型） | `account-organization.core` |
 | `account-governance.*` | 帳號層級的橫切治理（角色、政策、通知路由） | `account-governance.role` |
@@ -24,15 +24,15 @@
 > 是獨立的 Bounded Context。Organization 則位於 Subject Center **之內**，
 > 是 Account 的子類型，因此納入 `account-organization.*` 命名空間。
 
-> **為何 `account-auth` 不叫 `identity-account.auth`？**
-> 在架構圖中，`ACCOUNT_AUTH` 節點位於 `IDENTITY_LAYER` subgraph **之外**；
-> Identity Layer 是驗證**完成後產生的執行期狀態**（authenticated-identity、account-identity-link、
-> active-account-context、custom-claims），不是一個可切片的業務功能邊界（BC）。
-> `account-auth` 是 Account BC **發起**的操作（登入、註冊、重設密碼）；
-> 行為的**主體（owner）是 Account**，identity 是**結果（output）**，
-> 因此前綴用 `account-` 而非 `identity-`。
-> 此外，引入 `identity-*` 命名空間會在整個 features 樹中只有一個切片，
-> 違反 Occam's Razor（不引入不必要的複雜度）。
+> **為何是 `identity-account.auth`，而非 `account-auth`？**
+> 架構圖中的 `AUTHENTICATION + IDENTITY` 區塊是一個真實的 Bounded Context（有具名 subgraph `IDENTITY_LAYER`）。
+> `ACCOUNT_AUTH` 節點與 `IDENTITY_LAYER` 使用相同的 `identity` 樣式，
+> 且架構的流向是 `FIREBASE_AUTHENTICATION → ACCOUNT_AUTH → IDENTITY_LAYER`，
+> 表示 `ACCOUNT_AUTH` 是 **Identity BC 的應用層入口**。
+> Identity Layer 的 sub-node（`authenticated-identity`、`account-identity-link`、
+> `active-account-context`、`custom-claims`）均屬 Identity BC 的可擴充切片空間，
+> 因此 `identity-*` 並非單一切片命名空間，而是完整的 BC 前綴。
+> 命名為 `identity-account.auth` 表示：在 Identity BC 中，針對 Account 身份的驗證操作。
 
 ## 狀態說明
 
@@ -50,7 +50,7 @@
 src/features/
 │
 ├── ── Identity Layer ─────────────────────────────────────────────
-│   └── account-auth/                     ✅  登入 · 註冊 · 重設密碼（原名 account.auth）
+│   └── identity-account.auth/            ✅  登入 · 註冊 · 重設密碼（Firebase Auth 入口）
 │
 ├── ── Account Layer（含 Organization sub-type）───────────────────
 │   │
