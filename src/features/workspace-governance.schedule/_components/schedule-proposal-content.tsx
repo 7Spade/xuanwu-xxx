@@ -4,7 +4,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useWorkspace } from "@/features/workspace-core"
 import { toast } from "@/shared/utility-hooks/use-toast"
-import type { ScheduleItem, Location } from "@/shared/types"
+import type { ScheduleItem, Location, SkillRequirement } from "@/shared/types"
 import { parseISO } from "date-fns"
 import { ProposalDialog } from "./proposal-dialog"
 import { Timestamp } from "firebase/firestore"
@@ -28,6 +28,7 @@ export function ScheduleProposalContent({ fullPage = false }: ScheduleProposalCo
     startDate?: Date
     endDate?: Date
     location: Location
+    requiredSkills: SkillRequirement[]
   }) => {
     await createScheduleItem({
       accountId: workspace.dimensionId,
@@ -41,6 +42,7 @@ export function ScheduleProposalContent({ fullPage = false }: ScheduleProposalCo
       status: "PROPOSAL",
       originType: "MANUAL",
       assigneeIds: [],
+      requiredSkills: data.requiredSkills.length > 0 ? data.requiredSkills : undefined,
     } as Omit<ScheduleItem, "id" | "createdAt" | "updatedAt">)
     toast({
       title: "Schedule Proposal Sent",

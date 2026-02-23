@@ -3,6 +3,7 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { type MemberReference, type ScheduleItem } from "@/shared/types"
 import { Avatar, AvatarFallback } from "@/shared/shadcn-ui/avatar"
+import { Badge } from "@/shared/shadcn-ui/badge"
 import {
   Tooltip,
   TooltipContent,
@@ -12,8 +13,9 @@ import {
 import { format } from "date-fns"
 import { Button } from "@/shared/shadcn-ui/button"
 import { ArrowUpDown } from "lucide-react"
+import { SKILLS } from "@/shared/constants/skills"
 
-export type UpcomingEventItem = Pick<ScheduleItem, 'id' | 'title' | 'workspaceName' | 'startDate' | 'endDate' | 'assigneeIds'> & { members: MemberReference[] }
+export type UpcomingEventItem = Pick<ScheduleItem, 'id' | 'title' | 'workspaceName' | 'startDate' | 'endDate' | 'assigneeIds' | 'requiredSkills'> & { members: MemberReference[] }
 
 export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
   {
@@ -52,6 +54,28 @@ export const upcomingEventsColumns: ColumnDef<UpcomingEventItem>[] = [
           Event
           <ArrowUpDown className="ml-2 size-4" />
         </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "requiredSkills",
+    header: "Required Skills",
+    cell: ({ row }) => {
+      const requirements = row.original.requiredSkills
+      if (!requirements || requirements.length === 0) {
+        return <span className="text-[10px] italic text-muted-foreground/50">—</span>
+      }
+      return (
+        <div className="flex flex-wrap gap-1">
+          {requirements.map(req => {
+            const skillName = SKILLS.find(s => s.slug === req.tagSlug)?.name ?? req.tagSlug
+            return (
+              <Badge key={req.tagSlug} variant="outline" className="text-[9px]">
+                {skillName} · {req.minimumTier} · ×{req.quantity}
+              </Badge>
+            )
+          })}
+        </div>
       )
     },
   },

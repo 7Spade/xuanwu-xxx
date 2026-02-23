@@ -7,17 +7,15 @@ import { Button } from "@/shared/shadcn-ui/button";
 import { User, Loader2, Upload } from "lucide-react";
 import { Textarea } from "@/shared/shadcn-ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/shadcn-ui/avatar";
+import { Badge } from "@/shared/shadcn-ui/badge";
 import { Checkbox } from "@/shared/shadcn-ui/checkbox";
-import { type ExpertiseBadge, type Account } from "@/shared/types"
+import { type SkillGrant, type Account } from "@/shared/types"
+import { SKILLS, type SkillCategory } from "@/shared/constants/skills"
 import type React from "react"
 
-// A mock list of available expertise badges
-const AVAILABLE_BADGES: ExpertiseBadge[] = [
-    { id: 'react', name: 'React' },
-    { id: 'typescript', name: 'TypeScript' },
-    { id: 'nodejs', name: 'Node.js' },
-    { id: 'python', name: 'Python' },
-    { id: 'ai', name: 'GenAI' },
+const SKILL_CATEGORIES: SkillCategory[] = [
+  'Civil', 'Electrical', 'Mechanical', 'Finishing',
+  'HeavyEquipment', 'Safety', 'Engineering', 'Management',
 ]
 
 interface ProfileCardProps {
@@ -26,8 +24,8 @@ interface ProfileCardProps {
   setName: (name: string) => void
   bio: string
   setBio: (bio: string) => void
-  selectedBadges: ExpertiseBadge[]
-  handleBadgeToggle: (badge: ExpertiseBadge) => void
+  skillGrants: SkillGrant[]
+  onSkillToggle: (slug: string) => void
   handleSaveProfile: () => void
   handleAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
   isSaving: boolean
@@ -41,14 +39,17 @@ export function ProfileCard({
   setName,
   bio,
   setBio,
-  selectedBadges,
-  handleBadgeToggle,
+  skillGrants,
+  onSkillToggle,
   handleSaveProfile,
   handleAvatarUpload,
   isSaving,
   isUploading,
   avatarInputRef,
 }: ProfileCardProps) {
+  const grantedSlugs = new Set(skillGrants.map(g => g.tagSlug))
+  const grantsBySlug = new Map(skillGrants.map(g => [g.tagSlug, g]))
+
   return (
     <Card className="border-border/60 shadow-sm">
       <CardHeader>
@@ -57,7 +58,7 @@ export function ProfileCard({
           <span className="text-[10px] font-bold uppercase tracking-widest">Personal Identity</span>
         </div>
         <CardTitle className="font-headline">Profile</CardTitle>
-        <CardDescription>Manage your public identity and expertise.</CardDescription>
+        <CardDescription>Manage your public identity and skill portfolio.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center gap-6">
@@ -90,24 +91,42 @@ export function ProfileCard({
         </div>
 
         <div className="grid gap-2">
-          <Label>Expertise</Label>
-          <p className="text-sm text-muted-foreground">Select up to 5 areas of expertise to display on your profile.</p>
-          <div className="flex flex-wrap gap-4 pt-2">
-            {AVAILABLE_BADGES.map(badge => (
-              <div key={badge.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`badge-${badge.id}`}
-                  checked={selectedBadges.some(b => b.id === badge.id)}
-                  onCheckedChange={() => handleBadgeToggle(badge)}
-                />
-                <label
-                  htmlFor={`badge-${badge.id}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {badge.name}
-                </label>
-              </div>
-            ))}
+          <Label>Skills</Label>
+          <p className="text-sm text-muted-foreground">Select your skills. These are used for schedule staffing matching.</p>
+          <div className="space-y-4 pt-2">
+            {SKILL_CATEGORIES.map(category => {
+              const categorySkills = SKILLS.filter(s => s.category === category)
+              return (
+                <div key={category}>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{category}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {categorySkills.map(skill => {
+                      const granted = grantedSlugs.has(skill.slug)
+                      return (
+                        <div key={skill.slug} className="flex items-center gap-1.5">
+                          <Checkbox
+                            id={`skill-${skill.slug}`}
+                            checked={granted}
+                            onCheckedChange={() => onSkillToggle(skill.slug)}
+                          />
+                          <label
+                            htmlFor={`skill-${skill.slug}`}
+                            className="cursor-pointer text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {skill.name}
+                          </label>
+                          {granted && (
+                            <Badge variant="outline" className="h-4 px-1 text-[9px] font-semibold">
+                              {grantsBySlug.get(skill.slug)?.tier ?? 'apprentice'}
+                            </Badge>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
