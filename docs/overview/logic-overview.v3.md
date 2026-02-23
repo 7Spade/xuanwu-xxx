@@ -24,8 +24,17 @@ AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
 
 
 %% =================================================
-%% ACCOUNT LAYER（帳號層）
+%% SUBJECT CENTER（主體中心）
+%% 包含 Account Layer 與 Organization Layer
+%% 兩者共用 ACCOUNT_IDENTITY_LINK 身份根，同屬「主體」邊界（Who）
+%% Workspace Container = 「做什麼（What）」，在主體中心之外
 %% =================================================
+
+subgraph SUBJECT_CENTER[主體中心（Subject Center）]
+
+%% -------------------------------------------------
+%% ACCOUNT LAYER（帳號層）
+%% -------------------------------------------------
 
 subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
 
@@ -61,9 +70,9 @@ ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
 ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
 
 
-%% =================================================
-%% ORGANIZATION LAYER（組織層）
-%% =================================================
+%% -------------------------------------------------
+%% ORGANIZATION LAYER（組織層）— 同屬主體中心
+%% -------------------------------------------------
 
 subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
 
@@ -82,7 +91,9 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
 
     ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
 
-end
+end %% end ORGANIZATION_LAYER
+
+end %% end SUBJECT_CENTER
 
 ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
@@ -222,6 +233,8 @@ W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_PO
 
 subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
+    EVENT_FUNNEL_INPUT[["事件漏斗（Event Funnel · 統一入口）"]]
+
     PROJECTION_VERSION[projection.version（版本追蹤）]
     READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
 
@@ -233,13 +246,16 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
 end
 
-WORKSPACE_EVENT_BUS --> WORKSPACE_PROJECTION_VIEW
-WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_VIEW
-WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_AUDIT
-WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_SCHEDULE
-WORKSPACE_EVENT_BUS --> ORGANIZATION_PROJECTION_VIEW
+%% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖
+WORKSPACE_EVENT_BUS -->|所有業務事件| EVENT_FUNNEL_INPUT
+ORGANIZATION_EVENT_BUS -->|所有組織事件| EVENT_FUNNEL_INPUT
 
-ORGANIZATION_EVENT_BUS --> ORGANIZATION_PROJECTION_VIEW
+%% 漏斗內部路由（EVENT_FUNNEL_INPUT 為 PROJECTION_LAYER 唯一外部入口）
+EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
+EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
 
 PROJECTION_VERSION --> READ_MODEL_REGISTRY
 
@@ -306,6 +322,8 @@ classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
 
 classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
+classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
+classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
 
@@ -323,6 +341,8 @@ class SERVER_ACTION serverAction;
 class SKILL_TAG_POOL skillTagPool;
 class FCM_GATEWAY fcmGateway;
 class USER_DEVICE userDevice;
+class SUBJECT_CENTER subjectCenter;
+class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
