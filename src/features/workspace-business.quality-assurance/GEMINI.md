@@ -1,8 +1,8 @@
-# Feature Slice: `workspace-business.qa`
+# Feature Slice: `workspace-business.quality-assurance`
 
 ## Domain
 
-QA (Quality Assurance) workspace plugin.
+Quality Assurance (品質驗證) workspace plugin.
 
 ## Internal Files
 

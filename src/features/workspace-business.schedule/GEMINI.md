@@ -1,8 +1,8 @@
-# Feature Slice: `workspace-governance.schedule`
+# Feature Slice: `workspace-business.schedule`
 
 ## Domain
 
-Schedule management — schedule items, shift proposals, member assignment, governance (approve/reject).
+Schedule management（任務排程產生）— schedule items, shift proposals, member assignment, governance (approve/reject).
 
 ## Responsibilities
 

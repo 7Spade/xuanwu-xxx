@@ -186,17 +186,16 @@ src/features/
 ├── workspace-governance.members/        ← Workspace member access & roles
 ├── workspace-governance.teams/          ← Team structure management
 ├── workspace-governance.partners/       ← External partner relationships
-├── workspace-governance.schedule/       ← Schedule, proposals, decisions
 ├── workspace-governance.audit/          ← Audit trail, event timeline
 ├── workspace-business.daily/            ← Daily logs, comments, bookmarks
 ├── workspace-business.tasks/            ← Task tree, CRUD
+├── workspace-business.schedule/         ← Schedule, proposals, decisions
 ├── workspace-business.files/            ← File upload, management
 ├── workspace-business.issues/           ← Issue tracking
 ├── workspace-business.finance/          ← Finance plugin
-├── workspace-business.qa/               ← QA plugin
+├── workspace-business.quality-assurance/ ← QA / quality verification plugin
 ├── workspace-business.document-parser/  ← AI document parsing
-├── workspace-business.acceptance/       ← Acceptance plugin
-└── workspace-business.capabilities/     ← Capabilities plugin
+└── workspace-business.acceptance/       ← Acceptance plugin
 ```
 
 Each slice follows the standard layout:
