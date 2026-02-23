@@ -2,10 +2,16 @@ flowchart TD
 
 %% =================================================
 %% CONSISTENCY INVARIANTS（不變量）
-%% 1) 權限真實來源僅來自 ACCOUNT_ROLE / ACCOUNT_POLICY；CUSTOM_CLAIMS 只做簽發快取
-%% 2) OUTBOX 只由 WORKSPACE_TRANSACTION_RUNNER 寫入；AGGREGATE 不直接寫 OUTBOX
-%% 3) 跨 BC 一律透過 EVENT BUS / PROJECTION / 本地快取防腐層，不允許直接 runtime guard 耦合
-%% 4) PROJECTION_VERSION 必須維護事件串流偏移量與 READ_MODEL_REGISTRY 對應
+%% 1) 每個 BC 只能修改自己的 Aggregate，禁止跨 BC 直接寫入
+%% 2) 跨 BC 僅能透過 Event / Projection / 本地快取防腐層溝通，禁止直接讀取對方 Domain Model
+%% 3) Application Layer 只協調流程，不承載領域規則
+%% 4) Domain Event 僅由 Aggregate 產生；Transaction Runner 只彙整已產生事件並投遞 Outbox
+%% 5) Custom Claims 只做權限快照，不是權限真實來源
+%% 6) Notification 只能讀 Projection，不得依賴 Domain Core
+%% 7) Scope Guard 僅讀本 Context Read Model，不直接依賴外部 Event Bus
+%% 8) Shared Kernel 必須顯式標示；未標示的跨 BC 共用一律視為侵入
+%% 9) Event Store 若存在，Projection 必須可由事件完整重建；否則不得宣稱 Event Sourcing
+%% 10) 任一模組若需外部 Context 內部狀態，代表邊界設計錯誤
 %% =================================================
 
 %% =================================================
@@ -215,9 +221,8 @@ SERVER_ACTION -->|發送 Command| WORKSPACE_COMMAND_HANDLER
 WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 
 WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
-ACTIVE_ACCOUNT_CONTEXT --> WORKSPACE_SCOPE_GUARD
-ACCOUNT_ROLE --> WORKSPACE_SCOPE_GUARD
-ACCOUNT_POLICY --> WORKSPACE_SCOPE_GUARD
+ACTIVE_ACCOUNT_CONTEXT -->|查詢鍵| WORKSPACE_SCOPE_READ_MODEL
+WORKSPACE_SCOPE_READ_MODEL --> WORKSPACE_SCOPE_GUARD
 
 WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
@@ -235,7 +240,7 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
-WORKSPACE_ORG_POLICY_CACHE -->|本地政策快照| WORKSPACE_SCOPE_GUARD
+WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MODEL
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 
@@ -252,6 +257,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
 
     WORKSPACE_PROJECTION_VIEW[projection.workspace-view（工作區投影視圖）]
+    WORKSPACE_SCOPE_READ_MODEL[projection.workspace-scope-guard-view（Scope Guard 專用讀模型）]
     ACCOUNT_PROJECTION_VIEW[projection.account-view（帳號投影視圖）]
     ACCOUNT_PROJECTION_AUDIT[projection.account-audit（帳號稽核投影）]
     ACCOUNT_PROJECTION_SCHEDULE[projection.account-schedule（帳號排程投影）]
@@ -265,6 +271,7 @@ ORGANIZATION_EVENT_BUS -->|所有組織事件| EVENT_FUNNEL_INPUT
 
 %% 漏斗內部路由（EVENT_FUNNEL_INPUT 為 PROJECTION_LAYER 唯一外部入口）
 EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> WORKSPACE_SCOPE_READ_MODEL
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
@@ -272,6 +279,21 @@ EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
 
 EVENT_FUNNEL_INPUT -->|更新事件串流偏移量（stream offset）| PROJECTION_VERSION
 PROJECTION_VERSION -->|提供 read-model 對應版本| READ_MODEL_REGISTRY
+WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_INPUT
+
+
+%% =================================================
+%% SHARED KERNEL（共享核心，需顯式標示）
+%% =================================================
+subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
+    SK_EVENT_ENVELOPE["shared-kernel.event-envelope（事件信封契約）"]
+    SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（權限快照契約）"]
+end
+
+WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+ORGANIZATION_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+WORKSPACE_SCOPE_READ_MODEL -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
+ACCOUNT_PROJECTION_VIEW -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
 
 
 %% =================================================
@@ -340,6 +362,7 @@ classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
 classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
+classDef sharedKernel fill:#ecfeff,stroke:#22d3ee,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -348,6 +371,7 @@ class ORGANIZATION_LAYER organization;
 class WORKSPACE_CONTAINER workspace;
 class PROJECTION_LAYER projection;
 class OBSERVABILITY_LAYER observability;
+class SHARED_KERNEL sharedKernel;
 class TRACK_A_TASKS,TRACK_A_QA,TRACK_A_ACCEPTANCE,TRACK_A_FINANCE trackA;
 class TRACK_B_ISSUES trackB;
 class PARSING_INTENT parsingIntent;
@@ -361,3 +385,4 @@ class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
 class WORKSPACE_ORG_POLICY_CACHE workspace;
+class WORKSPACE_SCOPE_READ_MODEL projection;
