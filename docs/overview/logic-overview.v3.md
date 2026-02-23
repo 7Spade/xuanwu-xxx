@@ -264,6 +264,9 @@ ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤過濾內容（internal/external�
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
 
+%% 通知投影至個人中心（account-user.profile / account-user.notification 共享帳號文件集合，邏輯分離但 DB 同源）
+ACCOUNT_USER_NOTIFICATION -.->|通知投影至個人中心| ACCOUNT_PROJECTION_VIEW
+
 
 %% =================================================
 %% OBSERVABILITY（可觀測性）
