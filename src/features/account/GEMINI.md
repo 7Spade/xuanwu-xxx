@@ -15,8 +15,7 @@ Multi-account management shell — AccountProvider (realtime data context), Acco
 | File / Dir | Purpose |
 |-----------|---------|
 | `_components/account-provider.tsx` | `AccountProvider` + `AccountContext` — real-time Firestore subscriptions |
-| `_components/account-grid.tsx` | `AccountGrid` component |
-| `_components/stat-cards.tsx` | `StatCards` component |
+| `_components/stat-cards.tsx` | `StatCards` component — aggregate statistics (workspaces, audit logs, capabilities) |
 | `_hooks/use-account.ts` | `useAccount` — context consumer hook |
 | `index.ts` | Public API |
 
@@ -24,7 +23,6 @@ Multi-account management shell — AccountProvider (realtime data context), Acco
 
 ```ts
 export { AccountProvider, AccountContext } from './_components/account-provider'
-export { AccountGrid } from './_components/account-grid'
 export { StatCards } from './_components/stat-cards'
 export { useAccount } from './_hooks/use-account'
 ```
@@ -34,6 +32,7 @@ export { useAccount } from './_hooks/use-account'
 | Capability | Now lives in |
 |-----------|-------------|
 | `AccountNewForm` (create org UI) | `account-organization.core` |
+| `AccountGrid` (org list UI) | `account-organization.core` |
 | `useOrgManagement` (org CRUD) | `account-organization.core` |
 | `useMemberManagement` (recruit/dismiss) | `account-organization.member` |
 | `useTeamManagement` (team ops) | `account-organization.team` |

@@ -2,38 +2,41 @@
 
 ## Domain
 
-Organization core — the organization aggregate entity, its settings, and the binding between organization accounts and organization entities.
+Organization aggregate entity — its lifecycle (create, update, delete), the UI for creating/listing organizations, and the binding between organization accounts and organization entities.
 
 ## Responsibilities
 
-- Organization aggregate lifecycle (create, update, archive)
-- `organization-account.binding` — links an organization account to an organization entity
-- `organization-account.settings` — stores organization-level configuration
+- Organization aggregate lifecycle (create, update, delete)
+- Display organization list (`AccountGrid`) and create form (`AccountNewForm`)
+- `setupOrganizationWithTeam` — bootstraps a new org with an initial team
 - Publish organization domain events to `account-organization.event-bus`
 
 ## Internal Files
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_aggregate.ts` | Organization aggregate root |
-| `_actions.ts` | `createOrganization`, `updateOrgSettings`, `bindAccount` |
-| `_queries.ts` | Organization details subscription |
-| `_components/` | `OrgSettingsForm`, `OrgCard` |
-| `_hooks/` | `useOrganization` |
+| `_actions.ts` | `createOrganization`, `updateOrganizationSettings`, `deleteOrganization`, `setupOrganizationWithTeam` |
+| `_components/account-new-form.tsx` | Form UI for creating a new organization |
+| `_components/account-grid.tsx` | Grid UI listing organization accounts |
+| `_hooks/use-org-management.ts` | `useOrgManagement` — hook wrapping org CRUD actions |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+export { AccountNewForm } from './_components/account-new-form'
+export { AccountGrid } from './_components/account-grid'
+export { useOrgManagement } from './_hooks/use-org-management'
+export { setupOrganizationWithTeam } from './_actions'
 ```
 
 ## Dependencies
 
-- `@/shared/types` — `Organization`, `OrganizationAccount`
-- `@/shared/infra/firestore/` — Firestore reads/writes
+- `@/shared/types` — `Account`, `ThemeConfig`
+- `@/shared/infra/firestore/firestore.facade` — Firestore writes
+- `@/features/workspace-core` — `useApp` for active account context
 
 ## Architecture Note
 
 `logic-overview.v3.md`: `ORGANIZATION_ACCOUNT_BINDING → ORGANIZATION_ENTITY → ORGANIZATION_EVENT_BUS`.
-This slice owns the organization aggregate; all mutations must go through the aggregate root.
+This slice owns the organization aggregate; all mutations must go through the aggregate actions.
