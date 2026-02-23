@@ -12,7 +12,7 @@ subgraph IDENTITY_LAYER[Identity Layer（身份層）]
     AUTHENTICATED_IDENTITY[authenticated-identity（已驗證身份）]
     ACCOUNT_IDENTITY_LINK["account-identity-link（firebaseUserId ↔ accountId 關聯）"]
     ACTIVE_ACCOUNT_CONTEXT["active-account-context（組織／工作區作用中帳號上下文）"]
-    CUSTOM_CLAIMS[custom-claims（自訂權限宣告）]
+    CUSTOM_CLAIMS["custom-claims（自訂權限宣告 · 由 account-governance.role 單向同步）"]
 
 end
 
@@ -21,6 +21,7 @@ ACCOUNT_AUTH --> AUTHENTICATED_IDENTITY
 AUTHENTICATED_IDENTITY --> ACCOUNT_IDENTITY_LINK
 ACCOUNT_IDENTITY_LINK --> ACTIVE_ACCOUNT_CONTEXT
 AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
+ACCOUNT_ROLE -->|唯一權限真實來源| CUSTOM_CLAIMS
 
 
 %% =================================================
@@ -49,7 +50,7 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     %% 組織帳號：與組織實體綁定的帳號視圖，同一 Account 邊界內
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
-    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.aggregate（組織帳號聚合實體）]
+    ORGANIZATION_ACCOUNT_MEMBERSHIP["organization-account.membership（組織帳號成員身份綁定 · 非聚合根）"]
 
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
@@ -66,7 +67,7 @@ USER_ACCOUNT --> USER_ACCOUNT_PROFILE
 USER_ACCOUNT --> USER_ACCOUNT_WALLET
 
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
-ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
+ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_MEMBERSHIP
 ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
 
 
@@ -90,13 +91,14 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
     end
 
     ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
+    ORGANIZATION_QUERY_FACADE["organization.query-facade（組織查詢門面 · 供跨 BC 唯讀存取）"]
 
 end
 
 %% end SUBJECT_CENTER
 end
 
-ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY
+ORGANIZATION_ACCOUNT_MEMBERSHIP -->|身份綁定引用| ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 
@@ -111,6 +113,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
         WORKSPACE_POLICY_ENGINE[workspace-application.policy-engine（政策引擎）]
         WORKSPACE_TRANSACTION_RUNNER[workspace-application.transaction-runner（交易執行器）]
+        WORKSPACE_ORG_POLICY_CACHE["workspace-application.org-policy-cache（組織政策本地快取 · ACL 防腐層）"]
         WORKSPACE_OUTBOX["workspace-application.outbox（交易內發信箱）"]
     end
 
@@ -118,7 +121,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_SETTINGS[workspace-core.settings（工作區設定）]
         WORKSPACE_AGGREGATE[workspace-core.aggregate（核心聚合實體）]
         WORKSPACE_EVENT_BUS[workspace-core.event-bus（事件總線）]
-        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，可選）"]
+        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存 · 僅供重播／稽核，非投影必要來源）"]
     end
 
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
@@ -211,9 +214,8 @@ WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
 WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_AGGREGATE
-WORKSPACE_AGGREGATE --> WORKSPACE_OUTBOX
+WORKSPACE_AGGREGATE -->|聚合為唯一事件產生者| WORKSPACE_OUTBOX
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
-WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
@@ -222,10 +224,12 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% EVENT BRIDGE（事件橋接）
 %% =================================================
 
-ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
+ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
+WORKSPACE_ORG_POLICY_CACHE -->|本地政策快照| WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
-W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
+W_B_SCHEDULE -.->|查詢可用帳號標籤（透過門面）| ORGANIZATION_QUERY_FACADE
+ORGANIZATION_QUERY_FACADE -.->|唯讀查詢| SKILL_TAG_POOL
 
 
 %% =================================================
@@ -236,8 +240,8 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
     EVENT_FUNNEL_INPUT[["事件漏斗（Event Funnel · 統一入口）"]]
 
-    PROJECTION_VERSION[projection.version（版本追蹤）]
-    READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
+    PROJECTION_VERSION["projection.version（每投影事件位移追蹤 · per-projection offset）"]
+    READ_MODEL_REGISTRY["projection.read-model-registry（讀模型 schema 版本註冊 · schema-version binding）"]
 
     WORKSPACE_PROJECTION_VIEW[projection.workspace-view（工作區投影視圖）]
     ACCOUNT_PROJECTION_VIEW[projection.account-view（帳號投影視圖）]
@@ -258,14 +262,14 @@ EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
 EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
 
-PROJECTION_VERSION --> READ_MODEL_REGISTRY
+PROJECTION_VERSION -->|offset ↔ schema-version 綁定| READ_MODEL_REGISTRY
 
 
 %% =================================================
 %% FCM NOTIFICATION — 三層通知架構
 %% 層一（觸發）：ORGANIZATION_SCHEDULE 宣告事實（ScheduleAssigned），不關心誰要收通知
-%% 層二（路由）：ACCOUNT_NOTIFICATION_ROUTER 依 TargetAccountID 分發至目標帳號
-%% 層三（交付）：ACCOUNT_USER_NOTIFICATION 依 internal/external 標籤過濾敏感內容後推播
+%% 層二（路由）：ACCOUNT_NOTIFICATION_ROUTER 依 TargetAccountID 分發，並透過 ORGANIZATION_QUERY_FACADE 查詢標籤快照
+%% 層三（交付）：ACCOUNT_USER_NOTIFICATION 依路由層攜帶的標籤快照過濾敏感內容後推播（不直接查詢 SKILL_TAG_POOL）
 %% FCM Token 儲存於 account-user.profile；通知切片只讀取不寫入 profile
 %% =================================================
 
@@ -275,13 +279,13 @@ USER_DEVICE[使用者裝置（手機／瀏覽器）]
 %% 層一：觸發層 — 宣告事實（不關心誰要收通知）
 ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
 
-%% 層二：路由層 — 依 TargetAccountID 分發至對應帳號
+%% 層二：路由層 — 依 TargetAccountID 分發至對應帳號（查詢標籤快照後攜帶）
 ORGANIZATION_EVENT_BUS -->|ScheduleAssigned（含 TargetAccountID）| ACCOUNT_NOTIFICATION_ROUTER
-ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
+ACCOUNT_NOTIFICATION_ROUTER -.->|查詢帳號 internal/external 標籤| ORGANIZATION_QUERY_FACADE
+ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（攜帶 internal/external 標籤快照）| ACCOUNT_USER_NOTIFICATION
 
-%% 層三：交付層 — 依帳號標籤過濾內容後推播
+%% 層三：交付層 — 依路由層攜帶的標籤快照過濾內容後推播（不直接查詢 SKILL_TAG_POOL）
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
-ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤過濾內容（internal/external）| SKILL_TAG_POOL
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
 
@@ -347,3 +351,5 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
+class WORKSPACE_ORG_POLICY_CACHE workspace;
+class ORGANIZATION_QUERY_FACADE organization;
