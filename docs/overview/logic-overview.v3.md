@@ -4,7 +4,7 @@ flowchart TD
 %% CONSISTENCY INVARIANTS（不變量）
 %% 1) 權限真實來源僅來自 ACCOUNT_ROLE / ACCOUNT_POLICY；CUSTOM_CLAIMS 只做簽發快取
 %% 2) OUTBOX 只由 WORKSPACE_TRANSACTION_RUNNER 寫入；AGGREGATE 不直接寫 OUTBOX
-%% 3) 跨 BC 一律透過 EVENT BUS 或 PROJECTION，不允許直接 runtime guard 耦合
+%% 3) 跨 BC 一律透過 EVENT BUS / PROJECTION / 本地快取防腐層，不允許直接 runtime guard 耦合
 %% 4) PROJECTION_VERSION 必須維護事件串流偏移量與 READ_MODEL_REGISTRY 對應
 %% =================================================
 
@@ -120,6 +120,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
         WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
         WORKSPACE_POLICY_ENGINE[workspace-application.policy-engine（政策引擎）]
+        WORKSPACE_ORG_POLICY_CACHE["workspace-application.org-policy-cache（組織政策本地快取）"]
         WORKSPACE_TRANSACTION_RUNNER[workspace-application.transaction-runner（交易執行器）]
         WORKSPACE_OUTBOX["workspace-application.outbox（交易內發信箱）"]
     end
@@ -128,7 +129,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_SETTINGS[workspace-core.settings（工作區設定）]
         WORKSPACE_AGGREGATE[workspace-core.aggregate（核心聚合實體）]
         WORKSPACE_EVENT_BUS[workspace-core.event-bus（事件總線）]
-        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，Projection 必需）"]
+        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，僅供重播／稽核）"]
     end
 
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
@@ -233,6 +234,8 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% =================================================
 
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
+ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
+WORKSPACE_ORG_POLICY_CACHE -->|本地政策快照| WORKSPACE_SCOPE_GUARD
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 
@@ -357,3 +360,4 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
+class WORKSPACE_ORG_POLICY_CACHE workspace;
