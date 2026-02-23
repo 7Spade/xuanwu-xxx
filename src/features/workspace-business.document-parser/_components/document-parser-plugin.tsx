@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useTransition, useRef, useEffect } from 'react';
-import { Loader2, UploadCloud, File } from 'lucide-react';
+import { Loader2, UploadCloud, File as FileIcon } from 'lucide-react';
 import { useToast } from '@/shared/utility-hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/shadcn-ui/card';
 import { Button } from '@/shared/shadcn-ui/button';
@@ -9,6 +9,7 @@ import {
   extractDataFromDocument,
   type ActionState,
 } from '../_actions';
+import { saveParsingIntent } from '../_intent-actions';
 type WorkItem = { item: string; quantity: number; unitPrice: number; discount?: number; price: number };
 import { useWorkspace } from '@/features/workspace-core';
 
@@ -23,7 +24,7 @@ function WorkItemsTable({
   onImport,
 }: {
   initialData: WorkItem[];
-  onImport: () => void;
+  onImport: () => Promise<void>;
 }) {
   return (
     <div>
@@ -44,7 +45,7 @@ export function WorkspaceDocumentParser() {
     extractDataFromDocument,
     initialState
   );
-  const { eventBus, logAuditEvent } = useWorkspace();
+  const { eventBus, logAuditEvent, workspace } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -59,6 +60,37 @@ export function WorkspaceDocumentParser() {
       });
     }
   }, [state.error, toast]);
+
+  // Subscribe to files:sendToParser — files plugin provides raw files for parsing
+  useEffect(() => {
+    const unsubFiles = eventBus.subscribe(
+      'workspace:files:sendToParser',
+      async (payload) => {
+        try {
+          const response = await fetch(payload.downloadURL);
+          const blob = await response.blob();
+          const file = new File([blob], payload.fileName, {
+            type: payload.fileType || blob.type,
+          });
+          const formData = new FormData();
+          formData.append('file', file);
+          startTransition(() => formAction(formData));
+          toast({
+            title: 'File Loaded from Space',
+            description: `Parsing "${payload.fileName}" from workspace files…`,
+          });
+        } catch (error: unknown) {
+          console.error('Failed to load file from workspace for parsing:', error);
+          toast({
+            variant: 'destructive',
+            title: 'Failed to Load File',
+            description: 'Could not fetch the selected workspace file for parsing.',
+          });
+        }
+      }
+    );
+    return () => unsubFiles();
+  }, [eventBus, formAction, startTransition, toast]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -78,13 +110,36 @@ export function WorkspaceDocumentParser() {
     fileInputRef.current?.click();
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!state.data?.workItems) return;
-    
-    // Publish the event. The component's responsibility ends here.
-    // The WorkspaceEventHandler will listen for this and handle user confirmation.
+
+    let intentId: string;
+    try {
+      intentId = await saveParsingIntent(
+        workspace.id,
+        state.fileName || 'Unknown Document',
+        state.data.workItems.map((item) => ({
+          name: item.item,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discount: item.discount,
+          subtotal: item.price,
+        }))
+      );
+    } catch (error: unknown) {
+      console.error('Failed to save parsing intent:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to Save Parsing Record',
+        description: 'Could not persist the parsing intent. Import aborted.',
+      });
+      return;
+    }
+
+    // Publish event with intentId so tasks can reference the Digital Twin
     eventBus.publish('workspace:document-parser:itemsExtracted', {
         sourceDocument: state.fileName || 'Unknown Document',
+        intentId,
         items: state.data.workItems.map(item => ({
             name: item.item,
             quantity: item.quantity,
@@ -95,12 +150,6 @@ export function WorkspaceDocumentParser() {
     });
 
     logAuditEvent('Triggered Task Import', `From document: ${state.fileName}`, 'create');
-
-    // This toast is removed as it is misleading. The event handler will provide feedback.
-    // toast({
-    //     title: 'Import Triggered',
-    //     description: `${state.data.workItems.length} items have been sent to the Tasks capability.`,
-    // });
   }
 
   return (
@@ -162,7 +211,7 @@ export function WorkspaceDocumentParser() {
                     <div>
                     <CardTitle className="text-2xl">Extracted Items</CardTitle>
                     <CardDescription className="flex items-center gap-2 pt-2">
-                        <File className="size-4" />
+                        <FileIcon className="size-4" />
                         {state.fileName}
                     </CardDescription>
                     </div>

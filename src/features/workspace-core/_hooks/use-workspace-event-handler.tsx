@@ -9,10 +9,12 @@ import type { WorkspaceTask } from "@/shared/types";
 import { createIssue } from "@/features/workspace-business.issues";
 import { createScheduleItem } from "@/features/workspace-governance.schedule";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
+import { markParsingIntentImported } from "@/features/workspace-business.document-parser";
 import { Timestamp } from "firebase/firestore";
 
 type DocParserPayload = {
   sourceDocument: string;
+  intentId: string;
   items: Array<{
     name: string;
     quantity: number;
@@ -117,10 +119,14 @@ export function useWorkspaceEventHandler() {
             type: "Imported",
             priority: "medium",
             progressState: "todo",
+            sourceIntentId: payload.intentId,
           }));
 
         batchImportTasks(workspace.id, items)
-          .then(() => {
+          .then(async () => {
+            await markParsingIntentImported(workspace.id, payload.intentId).catch(
+              (err: unknown) => console.error("Failed to mark intent imported:", err)
+            );
             toast({
               title: "Import Successful",
               description: `${payload.items.length} tasks have been added.`,

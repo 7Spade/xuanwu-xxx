@@ -20,7 +20,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
-  Loader2
+  Loader2,
+  FileScan,
 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
@@ -62,7 +63,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
  * Features: Smart type detection, version history visualization, and instant sovereignty restoration.
  */
 export function WorkspaceFiles() {
-  const { workspace, logAuditEvent } = useWorkspace();
+  const { workspace, logAuditEvent, eventBus } = useWorkspace();
   const { state: { user } } = useAuth();
   const { db, storage } = useFirebase();
   
@@ -254,6 +255,21 @@ export function WorkspaceFiles() {
                       <DropdownMenuContent align="end" className="w-48 rounded-xl">
                          <DropdownMenuItem onClick={() => window.open(current?.downloadURL, '_blank')} disabled={!current?.downloadURL} className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase">
                           <Download className="size-3.5 text-primary" /> Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={!current?.downloadURL}
+                          onClick={() => {
+                            if (!current?.downloadURL) return;
+                            eventBus.publish('workspace:files:sendToParser', {
+                              fileName: file.name,
+                              downloadURL: current.downloadURL,
+                              fileType: file.type,
+                            });
+                            logAuditEvent('Sent File to Parser', file.name, 'update');
+                          }}
+                          className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase"
+                        >
+                          <FileScan className="size-3.5 text-primary" /> Parse with AI
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setHistoryFile(file)} className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase">
                           <History className="size-3.5 text-primary" /> Version History

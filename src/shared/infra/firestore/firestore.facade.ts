@@ -80,3 +80,8 @@ export const getWorkspaceTasks = repositories.getWorkspaceTasks
 export const getWorkspaceIssues = repositories.getWorkspaceIssues
 export const getWorkspaceFiles = repositories.getWorkspaceFiles
 export const getWorkspaceGrants = repositories.getWorkspaceGrants
+
+// ParsingIntent (document-parser Digital Twin)
+export const createParsingIntent = repositories.createParsingIntent
+export const updateParsingIntentStatus = repositories.updateParsingIntentStatus
+export const getParsingIntents = repositories.getParsingIntents

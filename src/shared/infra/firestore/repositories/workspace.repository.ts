@@ -35,6 +35,7 @@ import type {
   WorkspaceFile,
   Capability,
   WorkspaceLifecycleState,
+  ParsingIntent,
  Account } from '@/shared/types'
 
 /**
@@ -358,4 +359,47 @@ export const getWorkspaceGrants = async (
   if (!snap.exists()) return []
   const data = snap.data() as Workspace
   return data.grants ?? []
+}
+
+// =================================================================
+// == ParsingIntent Sub-Collection (workspace-business.document-parser)
+// 解析合約 · Digital Twin：由 document-parser 產出，tasks 透過 sourceIntentId 引用
+// =================================================================
+
+export const createParsingIntent = async (
+  workspaceId: string,
+  intentData: Omit<ParsingIntent, 'id' | 'createdAt'>
+): Promise<string> => {
+  const ref = await addDocument(
+    `workspaces/${workspaceId}/parsingIntents`,
+    { ...intentData, createdAt: serverTimestamp() }
+  )
+  return ref.id
+}
+
+export const updateParsingIntentStatus = async (
+  workspaceId: string,
+  intentId: string,
+  status: 'imported' | 'failed'
+): Promise<void> => {
+  const updates: Record<string, unknown> = { status }
+  if (status === 'imported') {
+    updates.importedAt = serverTimestamp()
+  }
+  return updateDocument(
+    `workspaces/${workspaceId}/parsingIntents/${intentId}`,
+    updates
+  )
+}
+
+export const getParsingIntents = async (
+  workspaceId: string
+): Promise<ParsingIntent[]> => {
+  const converter = createConverter<ParsingIntent>()
+  const colRef = collection(
+    db,
+    `workspaces/${workspaceId}/parsingIntents`
+  ).withConverter(converter)
+  const q = query(colRef, orderBy('createdAt', 'desc'))
+  return getDocuments(q)
 }

@@ -35,6 +35,7 @@ export interface WorkspaceAcceptancePassedPayload {
 
 export interface DocumentParserItemsExtractedPayload {
   sourceDocument: string
+  intentId: string
   items: Array<{
     name: string
     quantity: number
@@ -50,6 +51,12 @@ export interface DailyLogForwardRequestedPayload {
   action: "create"
 }
 
+export interface FileSendToParserPayload {
+  fileName: string
+  downloadURL: string
+  fileType: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -62,6 +69,7 @@ export type WorkspaceEventName =
   | "workspace:qa:approved"
   | "workspace:acceptance:passed"
   | "workspace:document-parser:itemsExtracted"
+  | "workspace:files:sendToParser"
   | "daily:log:forwardRequested"
 
 // =================================================================
@@ -76,6 +84,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:qa:approved": WorkspaceQAApprovedPayload
   "workspace:acceptance:passed": WorkspaceAcceptancePassedPayload
   "workspace:document-parser:itemsExtracted": DocumentParserItemsExtractedPayload
+  "workspace:files:sendToParser": FileSendToParserPayload
   "daily:log:forwardRequested": DailyLogForwardRequestedPayload
 }
 
