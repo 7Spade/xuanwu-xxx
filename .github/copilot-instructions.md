@@ -1,4 +1,4 @@
-# Copilot Instructions for `xuanwu-xxx`
+# Copilot Instructions for `7Spade/xuanwu-xxx`
 
 This repository is onboarding Copilot with a **minimal, architecture-first rule set**.
 
