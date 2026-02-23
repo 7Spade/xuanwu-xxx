@@ -12,7 +12,7 @@ subgraph IDENTITY_LAYER[Identity Layer（身份層）]
     AUTHENTICATED_IDENTITY[authenticated-identity（已驗證身份）]
     ACCOUNT_IDENTITY_LINK["account-identity-link（firebaseUserId ↔ accountId 關聯）"]
     ACTIVE_ACCOUNT_CONTEXT["active-account-context（組織／工作區作用中帳號上下文）"]
-    CUSTOM_CLAIMS[custom-claims（自訂權限宣告）]
+    CUSTOM_CLAIMS[custom-claims（權限快取宣告，來源為帳號治理）]
 
 end
 
@@ -49,7 +49,7 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     %% 組織帳號：與組織實體綁定的帳號視圖，同一 Account 邊界內
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
-    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.aggregate（組織帳號聚合實體）]
+    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.binding（組織帳號與組織主體綁定）]
 
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
@@ -68,6 +68,8 @@ USER_ACCOUNT --> USER_ACCOUNT_WALLET
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
 ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
+ACCOUNT_ROLE --> CUSTOM_CLAIMS
+ACCOUNT_POLICY --> CUSTOM_CLAIMS
 
 
 %% -------------------------------------------------
@@ -118,7 +120,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_SETTINGS[workspace-core.settings（工作區設定）]
         WORKSPACE_AGGREGATE[workspace-core.aggregate（核心聚合實體）]
         WORKSPACE_EVENT_BUS[workspace-core.event-bus（事件總線）]
-        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，可選）"]
+        WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，Projection 必需）"]
     end
 
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
@@ -205,15 +207,15 @@ WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 
 WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
 ACTIVE_ACCOUNT_CONTEXT --> WORKSPACE_SCOPE_GUARD
-CUSTOM_CLAIMS --> WORKSPACE_SCOPE_GUARD
+ACCOUNT_ROLE --> WORKSPACE_SCOPE_GUARD
+ACCOUNT_POLICY --> WORKSPACE_SCOPE_GUARD
 
 WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
 WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_AGGREGATE
-WORKSPACE_AGGREGATE --> WORKSPACE_OUTBOX
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
-WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
+WORKSPACE_TRANSACTION_RUNNER -->|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
@@ -222,10 +224,9 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% EVENT BRIDGE（事件橋接）
 %% =================================================
 
-ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
-W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
+W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 
 
 %% =================================================
@@ -236,7 +237,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
     EVENT_FUNNEL_INPUT[["事件漏斗（Event Funnel · 統一入口）"]]
 
-    PROJECTION_VERSION[projection.version（版本追蹤）]
+    PROJECTION_VERSION[projection.version（事件位點與讀模型版本對照）]
     READ_MODEL_REGISTRY[projection.read-model-registry（讀取模型註冊表）]
 
     WORKSPACE_PROJECTION_VIEW[projection.workspace-view（工作區投影視圖）]
@@ -258,7 +259,8 @@ EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
 EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
 
-PROJECTION_VERSION --> READ_MODEL_REGISTRY
+EVENT_FUNNEL_INPUT -->|更新事件位點（stream offset）| PROJECTION_VERSION
+PROJECTION_VERSION -->|提供 read-model 對應版本| READ_MODEL_REGISTRY
 
 
 %% =================================================
@@ -281,7 +283,7 @@ ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（TargetAccountID 匹配�
 
 %% 層三：交付層 — 依帳號標籤過濾內容後推播
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
-ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤過濾內容（internal/external）| SKILL_TAG_POOL
+ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤快照過濾內容（internal/external）| ACCOUNT_PROJECTION_VIEW
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
 
