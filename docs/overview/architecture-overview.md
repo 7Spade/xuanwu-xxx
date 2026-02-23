@@ -107,9 +107,11 @@ src/
         │   ├── workspace-core.event-bus/      ← 事件總線
         │   └── workspace-core.event-store/    ← 事件儲存（可選）
         ├── workspace-governance/              ← 工作區治理群組（存取控制 + 稽核）
-        │   ├── workspace-governance.member/   ← 工作區成員
-        │   ├── workspace-governance.role/     ← 角色管理
-        │   └── workspace-governance.audit-log/ ← 工作區操作稽核（治理職責）
+        │   ├── workspace-governance.members/  ← 工作區成員
+        │   ├── workspace-governance.teams/    ← 團隊管理
+        │   ├── workspace-governance.partners/ ← 合作夥伴
+        │   ├── workspace-governance.schedule/ ← 排程、提案、審核決策
+        │   └── workspace-governance.audit/    ← 工作區操作稽核（治理職責）
         └── workspace-business/                ← 業務層群組（任務流水線 + 輔助功能）
             ├── workspace-business.tasks/           ← 任務管理
             ├── workspace-business.quality-assurance/ ← 品質保證
@@ -215,10 +217,13 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-governance/workspace-governance.member` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
-| `workspace-governance/workspace-governance.role` | 工作區角色管理 | `WORKSPACE_ROLE` |
+| `workspace-governance/workspace-governance.members` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
+| `workspace-governance/workspace-governance.teams` | 工作區團隊管理 | `WORKSPACE_ROLE` |
+| `workspace-governance/workspace-governance.partners` | 合作夥伴關係 | — |
+| `workspace-governance/workspace-governance.schedule` | 排程、提案、審核決策 | — |
+| `workspace-governance/workspace-governance.audit` | 工作區操作稽核 | — |
 
-> `workspace-governance.audit-log`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
+> `workspace-governance.audit`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
 
 #### workspace-business（業務層，按執行流向排序）
 

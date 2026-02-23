@@ -38,8 +38,6 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_BUSINESS_QUALITY_ASSURANCE[workspace-business.quality-assurance（品質保證）]
         WORKSPACE_BUSINESS_TASKS[workspace-business.tasks（任務管理）]
         WORKSPACE_BUSINESS_SCHEDULE["workspace-business.schedule（任務排程產生）"]
-        WORKSPACE_BUSINESS_AUDIT_LOG[workspace-business.audit-log（業務稽核紀錄）]
-    end
 
 end
 
