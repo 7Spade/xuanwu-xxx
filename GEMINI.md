@@ -17,7 +17,7 @@ The project uses **Vertical Slice Architecture (VSA)**. Code is organized by **b
 ```
 src/
 ├── app/          ← Next.js routing ONLY (pure composition)
-├── features/     ← 22 vertical feature slices (one per business domain)
+├── features/     ← 20 vertical feature slices (one per business domain)
 └── shared/       ← 5 cross-cutting infrastructure modules
 ```
 
@@ -26,7 +26,7 @@ src/
 | Directory | Role | Count |
 |-----------|------|-------|
 | `app/` | Next.js App Router — routing & layout composition only | 1 |
-| `features/` | Self-contained business domain slices | 22 |
+| `features/` | Self-contained business domain slices | 20 |
 | `shared/` | Cross-cutting infrastructure (types, lib, infra, ai, ui) | 5 |
 
 ### Dependency Flow
@@ -67,7 +67,6 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 | `features/workspace-business.quality-assurance` | QA plugin |
 | `features/workspace-business.document-parser` | AI document parsing |
 | `features/workspace-business.acceptance` | Acceptance plugin |
-| `features/workspace-business.capabilities` | Capabilities plugin |
 
 ### Shared Module Index
 
