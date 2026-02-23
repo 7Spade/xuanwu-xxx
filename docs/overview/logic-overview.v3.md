@@ -30,8 +30,9 @@ AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
 subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
 
     USER_ACCOUNT[user-account（個人帳號）]
-    USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定）"]
+    USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定 · FCM Token）"]
     USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
+    ACCOUNT_USER_NOTIFICATION[account-user.notification（個人推播通知）]
 
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
@@ -239,6 +240,22 @@ PROJECTION_VERSION --> READ_MODEL_REGISTRY
 
 
 %% =================================================
+%% FCM NOTIFICATION（個人推播通知）
+%% 人力排程指派後，透過 ORGANIZATION_EVENT_BUS → account-user.notification → FCM 推播至裝置
+%% FCM Token 儲存於 account-user.profile；通知切片只讀取不寫入 profile
+%% =================================================
+
+FCM_GATEWAY[["Firebase Cloud Messaging（推播閘道）"]]
+USER_DEVICE[使用者裝置（手機／瀏覽器）]
+
+ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
+ORGANIZATION_EVENT_BUS -->|ScheduleAssigned| ACCOUNT_USER_NOTIFICATION
+USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
+ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
+FCM_GATEWAY -.->|推播通知| USER_DEVICE
+
+
+%% =================================================
 %% OBSERVABILITY（可觀測性）
 %% =================================================
 
@@ -271,6 +288,9 @@ classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
 
+classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
+classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
+
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
 class ACCOUNT_LAYER account;
@@ -283,3 +303,6 @@ class TRACK_B_ISSUES trackB;
 class PARSING_INTENT parsingIntent;
 class SERVER_ACTION serverAction;
 class SKILL_TAG_POOL skillTagPool;
+class FCM_GATEWAY fcmGateway;
+class USER_DEVICE userDevice;
+class ACCOUNT_USER_NOTIFICATION account;

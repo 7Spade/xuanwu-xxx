@@ -30,6 +30,7 @@
 | 20 | `TRACK_A_TASKS` 對 `PARSING_INTENT` 的寫回邊 | `TRACK_A_TASKS -->|人為修正回饋| PARSING_INTENT` 為實線（暗示任務寫回並修改合約） | 改為 `TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT` 虛線引用邊；`PARSING_INTENT` 成為唯讀出生證明；人工修正以 `Refinement 覆蓋層` 形式存於 `TRACK_A_TASKS`，不修改 Intent | 永遠可比對原始合約解析結果（Intent）與實際現場狀況（Task）；合約不可更改確保長期審計能力；`Refinement` 模式保持「原始解析」與「人為調整」的清晰對照 |
 | 21 | 各層 `AUDIT_LOG` 節點分散在業務容器內 | `ACCOUNT_AUDIT_LOG`、`ORGANIZATION_AUDIT_LOG`、`WORKSPACE_AUDIT_LOG` 分別位於各治理子圖；`WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG` 直接邊混入業務流 | 從邏輯圖移除 3 個 AUDIT_LOG 節點及相關邊；保留 PROJECTION_LAYER 中已有的 `ACCOUNT_PROJECTION_AUDIT`（`WORKSPACE_EVENT_BUS --> ACCOUNT_PROJECTION_AUDIT`）作為統一稽核讀取模型；各稽核切片仍作為事件訂閱者存在（程式碼中保留） | 「業務執行」與「歷史追蹤」徹底分離；避免業務容器內出現多個小型日誌節點；所有歷史軌跡統一由 PROJECTION_LAYER 處理，符合讀寫分離（CQRS）原則 |
 | 22 | `organization-governance` 成員模型：Team/Partner 獨立分層，成員能力無統一存取點 | `ORGANIZATION_TEAM`（內部）與 `ORGANIZATION_PARTNER`（外部）各自為獨立節點，排程模組無法按職能篩選資源 | 新增 `SKILL_TAG_POOL[(職能標籤庫（Skills/Certs）)]` 節點（cylinder，indigo）於 `ORGANIZATION_GOVERNANCE` 子圖；所有帳號（內部/外部）均擁有職能標籤；`ORGANIZATION_TEAM`／`ORGANIZATION_PARTNER` 成為同一扁平資源池的「組視圖（Group View）」；新增 `PARSING_INTENT -.->|提取職能需求標籤| W_B_SCHEDULE` 與 `W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL`，排程按職能篩選後產出 `ScheduleProposed` | 組織成員模型扁平化，消除 Team/Partner 職責模糊；排程模組根據職能標籤（技能／證照）精確分配；`PARSING_INTENT` 成為排程的技能需求來源，形成「文件 → 解析意圖 → 排程計算 → 職能篩選 → 建議排程」完整閉環 |
+| 23 | 人力排程指派後缺少個人推播通知機制 | `ScheduleAssigned` 事件無後續消費者，被指派的使用者無法即時收到通知 | 新增 `account-user.notification` 切片於 Account Layer；`ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS -->|ScheduleAssigned| ACCOUNT_USER_NOTIFICATION`；`USER_ACCOUNT_PROFILE` 持有 FCM Token（唯讀）；`ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY[Firebase Cloud Messaging] -.-> USER_DEVICE`；新增 `fcmGateway`（pink）與 `userDevice`（light blue）classDef | FCM Token 由 `account-user.profile` 統一管理，`account-user.notification` 只讀取不寫入；通知路徑全程非同步事件驅動（透過 ORGANIZATION_EVENT_BUS），不阻塞業務流程；支援未來擴展（任務分配通知、問題單更新通知等同路徑） |
 
 ---
 
@@ -64,8 +65,9 @@ src/
     │
     ├── account/                               ← 帳號層（Account Layer）
     │   ├── account.auth/                      ← 登入／註冊／重設密碼
-    │   ├── account-user.profile/              ← 使用者資料與設定
+    │   ├── account-user.profile/              ← 使用者資料、設定、FCM Token 儲存
     │   ├── account-user.wallet/               ← 錢包（代幣／積分，stub）
+    │   ├── account-user.notification/         ← 個人推播通知（FCM 閘道協調）
     │   ├── account-organization/              ← 組織帳號群組
     │   │   ├── organization-account.settings/ ← 組織設定
     │   │   └── organization-account.aggregate/← 組織帳號聚合根
@@ -159,8 +161,9 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `account-user.profile` | 使用者個人資料、偏好設定、安全設定 | `USER_ACCOUNT_PROFILE` |
+| `account-user.profile` | 使用者個人資料、偏好設定、安全設定、FCM Token 儲存 | `USER_ACCOUNT_PROFILE` |
 | `account-user.wallet` | 個人錢包（代幣／積分，stub） | `USER_ACCOUNT_WALLET` |
+| `account-user.notification` | 個人推播通知：訂閱 `ScheduleAssigned` 事件，讀取 FCM Token，呼叫 FCM 閘道 | `ACCOUNT_USER_NOTIFICATION` |
 | `account-organization/organization-account.settings` | 組織設定 CRUD | `ORGANIZATION_ACCOUNT_SETTINGS` |
 | `account-organization/organization-account.aggregate` | 組織帳號聚合根，連接 Organization Layer | `ORGANIZATION_ACCOUNT_AGGREGATE` |
 | `account-governance/account-governance.role` | 帳號層角色定義 | `ACCOUNT_ROLE` |
@@ -278,6 +281,10 @@ workspace-event-bus  →  projection.account-audit（全域稽核流，統一讀
 workspace-event-bus  →  projection-layer（工作區內部投影）
 
 organization-core.event-bus  →  workspace-application.scope-guard（事件橋接）
+
+organization-schedule  →|ScheduleAssigned 事件|  organization-core.event-bus
+  →  account-user.notification  →  FCM_GATEWAY  -.->  USER_DEVICE（推播通知）
+account-user.profile  -.->|提供 FCM Token（唯讀）|  account-user.notification
 ```
 
 ### 禁止規則
@@ -319,6 +326,8 @@ src/shared/
 | Workspace Container | `features/workspace/` |
 | Projection Layer | `shared/infra/` 讀取模型（不建切片） |
 | Observability Layer | `shared/infra/` 可觀測性（不建切片） |
+| Firebase Cloud Messaging (FCM_GATEWAY) | `shared/infra/` FCM 適配器（外部服務，不建切片） |
+| USER_DEVICE | 裝置端（不在 features，為推播終點） |
 
 > 詳細領域邏輯流程請參閱 [`logic-overview.v3.md`](./logic-overview.v3.md)。  
 > 請求執行流程請參閱 [`request-execution-overview.v3.md`](./request-execution-overview.v3.md)。  
