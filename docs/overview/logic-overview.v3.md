@@ -110,16 +110,46 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_AUDIT_LOG[workspace-governance.audit-log（工作區操作稽核）]
     end
 
+    %% --- AB 雙軌業務邏輯核心 ---
     subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
-        WORKSPACE_BUSINESS_TASKS[workspace-business.tasks（任務管理）]
-        WORKSPACE_BUSINESS_QUALITY_ASSURANCE[workspace-business.quality-assurance（品質保證）]
-        WORKSPACE_BUSINESS_ACCEPTANCE[workspace-business.acceptance（業務受理／驗收）]
-        WORKSPACE_BUSINESS_FINANCE[workspace-business.finance（財務處理）]
-        WORKSPACE_BUSINESS_DAILY[workspace-business.daily（日常作業）]
-        WORKSPACE_BUSINESS_DOCUMENT_PARSER[workspace-business.document-parser（文件解析）]
-        WORKSPACE_BUSINESS_FILES[workspace-business.files（檔案管理）]
-        WORKSPACE_BUSINESS_ISSUES["workspace-business.issues（問題追蹤 ── AB 雙軌問題單）"]
-        WORKSPACE_BUSINESS_SCHEDULE["workspace-business.schedule（任務排程產生）"]
+        direction TB
+
+        %% 輔助與靜態單元
+        W_B_FILES[workspace-business.files（檔案管理）]
+        W_B_PARSER[workspace-business.document-parser（文件解析）]
+        W_B_DAILY[workspace-business.daily（手寫施工日誌）]
+        W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
+
+        %% A 軌：主流程
+        TRACK_A_TASKS[workspace-business.tasks（任務管理）]
+        TRACK_A_QA[workspace-business.quality-assurance（品質驗證）]
+        TRACK_A_ACCEPTANCE[workspace-business.acceptance（驗收）]
+        TRACK_A_FINANCE[workspace-business.finance（財務處理）]
+
+        %% B 軌：異常處理中心
+        TRACK_B_ISSUES{{workspace-business.issues（問題追蹤單）}}
+
+        %% A 軌流轉與異常判定（AB 雙軌交互）
+        TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
+        TRACK_A_TASKS -->|正常順位| TRACK_A_QA
+
+        TRACK_A_QA -->|異常| TRACK_B_ISSUES
+        TRACK_A_QA -->|正常順位| TRACK_A_ACCEPTANCE
+
+        TRACK_A_ACCEPTANCE -->|異常| TRACK_B_ISSUES
+        TRACK_A_ACCEPTANCE -->|正常順位| TRACK_A_FINANCE
+
+        TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
+
+        %% 處理後回流（從異常點繼續）
+        TRACK_B_ISSUES -.->|處理完成| TRACK_A_TASKS
+        TRACK_B_ISSUES -.->|處理完成| TRACK_A_QA
+        TRACK_B_ISSUES -.->|處理完成| TRACK_A_ACCEPTANCE
+        TRACK_B_ISSUES -.->|處理完成| TRACK_A_FINANCE
+
+        %% 日誌與排程關聯
+        TRACK_A_TASKS -.-> W_B_DAILY
+
     end
 
 end
@@ -147,7 +177,7 @@ WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
-WORKSPACE_BUSINESS_SCHEDULE --> ORGANIZATION_SCHEDULE
+W_B_SCHEDULE --> ORGANIZATION_SCHEDULE
 
 WORKSPACE_EVENT_BUS --> WORKSPACE_AUDIT_LOG
 
@@ -215,6 +245,8 @@ classDef organization fill:#fff7ed,stroke:#fdba74,color:#000;
 classDef workspace fill:#ede9fe,stroke:#c4b5fd,color:#000;
 classDef projection fill:#fef9c3,stroke:#fde047,color:#000;
 classDef observability fill:#f3f4f6,stroke:#d1d5db,color:#000;
+classDef trackA fill:#d1fae5,stroke:#6ee7b7,color:#000;
+classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -223,3 +255,5 @@ class ORGANIZATION_LAYER organization;
 class WORKSPACE_CONTAINER workspace;
 class PROJECTION_LAYER projection;
 class OBSERVABILITY_LAYER observability;
+class TRACK_A_TASKS,TRACK_A_QA,TRACK_A_ACCEPTANCE,TRACK_A_FINANCE trackA;
+class TRACK_B_ISSUES trackB;
