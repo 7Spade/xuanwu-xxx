@@ -1,6 +1,14 @@
 flowchart TD
 
 %% =================================================
+%% CONSISTENCY INVARIANTS（不變量）
+%% 1) 權限真實來源僅來自 ACCOUNT_ROLE / ACCOUNT_POLICY；CUSTOM_CLAIMS 只做簽發快取
+%% 2) OUTBOX 只由 WORKSPACE_TRANSACTION_RUNNER 寫入；AGGREGATE 不直接寫 OUTBOX
+%% 3) 跨 BC 一律透過 EVENT BUS 或 PROJECTION，不允許直接 runtime guard 耦合
+%% 4) PROJECTION_VERSION 必須維護事件串流偏移量與 READ_MODEL_REGISTRY 對應
+%% =================================================
+
+%% =================================================
 %% AUTHENTICATION + IDENTITY（身份驗證與識別）
 %% =================================================
 
