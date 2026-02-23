@@ -5,6 +5,7 @@ flowchart TD
 %% =================================================
 
 FIREBASE_AUTHENTICATION[Firebase Authentication（用戶驗證服務）]
+ACCOUNT_AUTH[account.auth（登入／註冊／重設密碼）]
 
 subgraph IDENTITY_LAYER[Identity Layer（身份層）]
 
@@ -15,7 +16,8 @@ subgraph IDENTITY_LAYER[Identity Layer（身份層）]
 
 end
 
-FIREBASE_AUTHENTICATION --> AUTHENTICATED_IDENTITY
+FIREBASE_AUTHENTICATION --> ACCOUNT_AUTH
+ACCOUNT_AUTH --> AUTHENTICATED_IDENTITY
 AUTHENTICATED_IDENTITY --> ACCOUNT_IDENTITY_LINK
 ACCOUNT_IDENTITY_LINK --> ACTIVE_ACCOUNT_CONTEXT
 AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
@@ -28,12 +30,12 @@ AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
 subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
 
     USER_ACCOUNT[user-account（個人帳號）]
-    USER_ACCOUNT_PROFILE[user-account.profile（使用者資料）]
-    USER_ACCOUNT_SETTINGS[user-account.settings（帳號設定）]
-    USER_ACCOUNT_WALLET["user-account.wallet（錢包：代幣／積分）"]
+    USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定）"]
+    USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
 
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
+    ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.aggregate（組織帳號聚合實體）]
 
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
@@ -47,10 +49,10 @@ ACCOUNT_IDENTITY_LINK --> USER_ACCOUNT
 ACCOUNT_IDENTITY_LINK --> ORGANIZATION_ACCOUNT
 
 USER_ACCOUNT --> USER_ACCOUNT_PROFILE
-USER_ACCOUNT --> USER_ACCOUNT_SETTINGS
 USER_ACCOUNT --> USER_ACCOUNT_WALLET
 
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
+ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_AGGREGATE
 ORGANIZATION_ACCOUNT --> ACCOUNT_GOVERNANCE
 
 
@@ -77,7 +79,7 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
 
 end
 
-ORGANIZATION_ACCOUNT --> ORGANIZATION_ENTITY
+ORGANIZATION_ACCOUNT_AGGREGATE --> ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 
@@ -87,7 +89,7 @@ ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
-    WORKSPACE_SETTINGS[workspace.settings（工作區設定）]
+    WORKSPACE_SETTINGS[workspace-settings（工作區設定）]
 
     subgraph WORKSPACE_APPLICATION[workspace-application（應用層）]
         WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
@@ -215,6 +217,7 @@ classDef projection fill:#fef9c3,stroke:#fde047,color:#000;
 classDef observability fill:#f3f4f6,stroke:#d1d5db,color:#000;
 
 class IDENTITY_LAYER identity;
+class ACCOUNT_AUTH identity;
 class ACCOUNT_LAYER account;
 class ORGANIZATION_LAYER organization;
 class WORKSPACE_CONTAINER workspace;
