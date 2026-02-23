@@ -47,7 +47,7 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 
 | Slice | Domain |
 |-------|--------|
-| `features/account.auth` | Login, register, reset password |
+| `features/identity-account.auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
 | `features/account-user.profile` | User profile, preferences, security |
 | `features/account-user.wallet` | User personal wallet, balance (stub) |
