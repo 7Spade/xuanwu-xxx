@@ -54,7 +54,6 @@ src/features/
 ├── ── Account Layer（含 Organization sub-type）───────────────────
 │   │
 │   │   ── 帳號共用 ──
-│   ├── account/                           ✅  多帳號 Provider · AccountGrid · 統計（跨組織管理 UI）
 │   ├── account-governance.role/           🔧  帳號角色管理 → CUSTOM_CLAIMS 簽發
 │   ├── account-governance.policy/         🔧  帳號政策管理
 │   └── account-governance.notification-router/ 🔧  通知路由器（FCM 第 2 層 · 依 TargetAccountID 分發）
@@ -123,7 +122,7 @@ src/features/
 | Bounded Context | ✅ 已實作 | 🔧 需擴充 | 小計 |
 |-----------------|-----------|-----------|------|
 | Identity Layer | 1 | 0 | **1** |
-| Account Layer (共用 + governance) | 1 | 3 | **4** |
+| Account Layer (共用 + governance) | 0 | 3 | **3** |
 | Account Layer (user sub-type) | 1 | 2 | **3** |
 | Account Layer (organization sub-type) | 0 | 8 | **8** |
 | Workspace Application | 0 | 1 | **1** |
@@ -133,7 +132,7 @@ src/features/
 | Workspace Business (A-track) | 4 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | **1** |
 | Projection Layer | 0 | 7 | **7** |
-| **Total** | **18** | **24** | **42** |
+| **Total** | **17** | **24** | **41** |
 
 ---
 

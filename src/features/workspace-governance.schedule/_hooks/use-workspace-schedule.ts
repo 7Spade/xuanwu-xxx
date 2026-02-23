@@ -14,7 +14,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { useWorkspace , useApp } from "@/features/workspace-core";
-import { useAccount } from "@/features/account";
+import { useAccount } from "@/features/workspace-core";
 import { useRouter } from "next/navigation";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { addMonths, subMonths, format } from "date-fns";

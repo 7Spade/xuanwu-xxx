@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ShieldCheck, ShieldAlert, Users, AlertCircle } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { useApp } from "@/features/workspace-core"
-import { useAccount } from "@/features/account"
+import { useAccount } from "@/features/workspace-core"
 
 // DEPRECATED FOR WRITE: This permission matrix visualises mappings between internal teams and
 // workspaces. The WorkspaceMembersManagement component handles writes. This is read-only.

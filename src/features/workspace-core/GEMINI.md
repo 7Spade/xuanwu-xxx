@@ -18,8 +18,8 @@ Workspace management — CRUD, settings, navigation, dashboard shell (sidebar + 
 |-----------|---------|
 | `_actions.ts` | `createWorkspace`, `updateWorkspace`, `mountCapabilities` |
 | `_queries.ts` | Firestore listeners for workspace list |
-| `_hooks/` | `useVisibleWorkspaces`, `useApp` |
-| `_components/` | `WorkspacesView`, `WorkspaceCard`, `WorkspaceGridView`, `WorkspaceTableView`, `WorkspaceNavTabs`, `WorkspaceSettings`, `CreateWorkspaceDialog`, `WorkspaceListHeader`, `WorkspaceStatusBar`, `DashboardView`, `WorkspaceList` |
+| `_hooks/` | `useVisibleWorkspaces`, `useApp`, `useAccount` |
+| `_components/` | `WorkspacesView`, `WorkspaceCard`, `WorkspaceGridView`, `WorkspaceTableView`, `WorkspaceNavTabs`, `WorkspaceSettings`, `CreateWorkspaceDialog`, `WorkspaceListHeader`, `WorkspaceStatusBar`, `DashboardView`, `WorkspaceList`, `AccountProvider`, `StatCards` |
 | `_shell/` | Dashboard chrome: `DashboardSidebar`, `Header`, `AccountSwitcher`, `NavMain`, `NavUser`, `NavWorkspaces`, `GlobalSearch`, `NotificationCenter`, `ThemeAdapter`, `AccountCreateDialog` |
 | `index.ts` | Public exports |
 

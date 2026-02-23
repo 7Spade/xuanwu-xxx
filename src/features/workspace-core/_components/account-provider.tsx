@@ -1,4 +1,3 @@
-
 "use client";
 
 import {type ReactNode} from 'react';
@@ -7,7 +6,7 @@ import { createContext, useReducer, useEffect } from 'react';
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
 import { collection, query, where, onSnapshot, type QuerySnapshot, orderBy, limit } from "firebase/firestore";
 import { type Workspace, type DailyLog, type AuditLog, type PartnerInvite, type ScheduleItem } from '@/shared/types';
-import { useApp } from '@/features/workspace-core';
+import { useApp } from '../_hooks/use-app';
 import { snapshotToRecord } from '@/shared/infra/firestore/firestore.utils';
 
 // State and Action Types

@@ -28,7 +28,7 @@ import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
 import { useApp } from "@/features/workspace-core"
-import { useAccount } from "@/features/account"
+import { useAccount } from "@/features/workspace-core"
 import { usePartnerManagement } from "@/features/account-organization.partner"
 import { PageHeader } from "@/shared/shadcn-ui/page-header"
 

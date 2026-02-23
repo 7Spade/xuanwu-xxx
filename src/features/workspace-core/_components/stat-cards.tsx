@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useMemo } from "react";
-import { useAccount } from "@/features/account";
-import { useApp } from "@/features/workspace-core";
+import { useAccount } from "../_hooks/use-account";
+import { useApp } from "../_hooks/use-app";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/shadcn-ui/card";
 import { Progress } from "@/shared/shadcn-ui/progress";
 import { ShieldCheck, Activity, Layers, Zap } from "lucide-react";

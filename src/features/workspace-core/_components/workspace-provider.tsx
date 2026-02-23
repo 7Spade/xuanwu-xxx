@@ -6,7 +6,7 @@ import { createContext, useContext, useMemo, useCallback } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
 import { WorkspaceEventBus , WorkspaceEventContext } from '@/features/workspace-core.event-bus';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
-import { useAccount } from '@/features/account';
+import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { addDocument } from '@/shared/infra/firestore/firestore.write.adapter';
 import { useApp } from '../_hooks/use-app';
