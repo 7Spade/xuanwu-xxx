@@ -29,11 +29,15 @@ AUTHENTICATED_IDENTITY --> CUSTOM_CLAIMS
 
 subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
 
-    USER_ACCOUNT[user-account（個人帳號）]
-    USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定 · FCM Token）"]
-    USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
-    ACCOUNT_USER_NOTIFICATION[account-user.notification（個人推播通知）]
+    %% 個人用戶中心：與登入身份對應的個人資料、錢包、通知，DB 共置同一帳號文件集合
+    subgraph USER_PERSONAL_CENTER[個人用戶中心（User Personal Center）]
+        USER_ACCOUNT[user-account（個人帳號）]
+        USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定 · FCM Token）"]
+        USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
+        ACCOUNT_USER_NOTIFICATION[account-user.notification（個人推播通知）]
+    end
 
+    %% 組織帳號：與組織實體綁定的帳號視圖，同一 Account 邊界內
     ORGANIZATION_ACCOUNT[organization-account（組織帳號）]
     ORGANIZATION_ACCOUNT_SETTINGS[organization-account.settings（組織設定）]
     ORGANIZATION_ACCOUNT_AGGREGATE[organization-account.aggregate（組織帳號聚合實體）]
@@ -301,6 +305,7 @@ classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
 
+classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
 
@@ -320,3 +325,4 @@ class FCM_GATEWAY fcmGateway;
 class USER_DEVICE userDevice;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
+class USER_PERSONAL_CENTER userPersonalCenter;
