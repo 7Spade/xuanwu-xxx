@@ -117,6 +117,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         %% 輔助與靜態單元
         W_B_FILES[workspace-business.files（檔案管理）]
         W_B_PARSER[workspace-business.document-parser（文件解析）]
+        PARSING_INTENT>ParsingIntent（解析意圖中繼聚合）]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
         W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
 
@@ -128,6 +129,13 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
         %% B 軌：異常處理中心
         TRACK_B_ISSUES{{workspace-business.issues（問題追蹤單）}}
+
+        %% 文件解析閉環（Files → Parser → ParsingIntent → A軌 / B軌）
+        W_B_FILES -.->|提供原始檔案| W_B_PARSER
+        W_B_PARSER -->|解析完成| PARSING_INTENT
+        PARSING_INTENT -->|任務指令| TRACK_A_TASKS
+        PARSING_INTENT -->|財務指令| TRACK_A_FINANCE
+        PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
 
         %% A 軌流轉與異常判定（AB 雙軌交互）
         TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
@@ -146,6 +154,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         TRACK_B_ISSUES -.->|處理完成| TRACK_A_QA
         TRACK_B_ISSUES -.->|處理完成| TRACK_A_ACCEPTANCE
         TRACK_B_ISSUES -.->|處理完成| TRACK_A_FINANCE
+        TRACK_B_ISSUES -.->|重新解析| PARSING_INTENT
 
         %% 日誌與排程關聯
         TRACK_A_TASKS -.-> W_B_DAILY
@@ -247,6 +256,7 @@ classDef projection fill:#fef9c3,stroke:#fde047,color:#000;
 classDef observability fill:#f3f4f6,stroke:#d1d5db,color:#000;
 classDef trackA fill:#d1fae5,stroke:#6ee7b7,color:#000;
 classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
+classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -257,3 +267,4 @@ class PROJECTION_LAYER projection;
 class OBSERVABILITY_LAYER observability;
 class TRACK_A_TASKS,TRACK_A_QA,TRACK_A_ACCEPTANCE,TRACK_A_FINANCE trackA;
 class TRACK_B_ISSUES trackB;
+class PARSING_INTENT parsingIntent;
