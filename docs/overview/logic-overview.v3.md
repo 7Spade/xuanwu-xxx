@@ -122,8 +122,9 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     end
 
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
-        WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
+        WORKSPACE_MEMBER[workspace-governance.members（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
+        WORKSPACE_AUDIT[workspace-governance.audit（稽核追蹤 · 只讀）]
     end
 
     %% --- AB 雙軌業務邏輯核心 ---
@@ -135,7 +136,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         W_B_PARSER[workspace-business.document-parser（文件解析）]
         PARSING_INTENT[(ParsingIntent（解析合約 · Digital Twin）)]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
-        W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
+        W_B_SCHEDULE[workspace-governance.schedule（排程觸發）]
 
         %% A 軌：主流程
         TRACK_A_TASKS[workspace-business.tasks（任務管理）]
@@ -212,7 +213,7 @@ WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
 WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_AGGREGATE
 WORKSPACE_AGGREGATE --> WORKSPACE_OUTBOX
-WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
+WORKSPACE_AGGREGATE -.->|可選：持久化事件序列| WORKSPACE_EVENT_STORE
 WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
@@ -226,6 +227,10 @@ ORGANIZATION_EVENT_BUS --> WORKSPACE_SCOPE_GUARD
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據標籤過濾可用帳號（跨層讀取）| SKILL_TAG_POOL
+
+%% 稽核訂閱閉環：workspace-governance.audit 只讀訂閱事件，投影至稽核視圖
+WORKSPACE_EVENT_BUS -.->|訂閱稽核事件（只讀）| WORKSPACE_AUDIT
+WORKSPACE_AUDIT -.->|寫入稽核投影| ACCOUNT_PROJECTION_AUDIT
 
 
 %% =================================================
@@ -347,3 +352,4 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
+class WORKSPACE_AUDIT workspace;
