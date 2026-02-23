@@ -41,6 +41,7 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     subgraph ACCOUNT_GOVERNANCE[account-governance（帳號治理）]
         ACCOUNT_ROLE[account-governance.role（帳號角色）]
         ACCOUNT_POLICY[account-governance.policy（帳號政策）]
+        ACCOUNT_NOTIFICATION_ROUTER[account-governance.notification-router（通知路由器）]
     end
 
 end
@@ -240,17 +241,26 @@ PROJECTION_VERSION --> READ_MODEL_REGISTRY
 
 
 %% =================================================
-%% FCM NOTIFICATION（個人推播通知）
-%% 人力排程指派後，透過 ORGANIZATION_EVENT_BUS → account-user.notification → FCM 推播至裝置
+%% FCM NOTIFICATION — 三層通知架構
+%% 層一（觸發）：ORGANIZATION_SCHEDULE 宣告事實（ScheduleAssigned），不關心誰要收通知
+%% 層二（路由）：ACCOUNT_NOTIFICATION_ROUTER 依 TargetAccountID 分發至目標帳號
+%% 層三（交付）：ACCOUNT_USER_NOTIFICATION 依 internal/external 標籤過濾敏感內容後推播
 %% FCM Token 儲存於 account-user.profile；通知切片只讀取不寫入 profile
 %% =================================================
 
 FCM_GATEWAY[["Firebase Cloud Messaging（推播閘道）"]]
 USER_DEVICE[使用者裝置（手機／瀏覽器）]
 
+%% 層一：觸發層 — 宣告事實（不關心誰要收通知）
 ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
-ORGANIZATION_EVENT_BUS -->|ScheduleAssigned| ACCOUNT_USER_NOTIFICATION
+
+%% 層二：路由層 — 依 TargetAccountID 分發至對應帳號
+ORGANIZATION_EVENT_BUS -->|ScheduleAssigned（含 TargetAccountID）| ACCOUNT_NOTIFICATION_ROUTER
+ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
+
+%% 層三：交付層 — 依帳號標籤過濾內容後推播
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
+ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤過濾內容（internal/external）| SKILL_TAG_POOL
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
 
@@ -306,3 +316,4 @@ class SKILL_TAG_POOL skillTagPool;
 class FCM_GATEWAY fcmGateway;
 class USER_DEVICE userDevice;
 class ACCOUNT_USER_NOTIFICATION account;
+class ACCOUNT_NOTIFICATION_ROUTER account;
