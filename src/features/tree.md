@@ -3,6 +3,22 @@
 > 依據 `docs/overview/logic-overview.v3.md` 設計。
 > 本文件定義 `src/features/` 的**目標狀態**（target state）。
 
+## 命名規則
+
+切片名稱遵循 `{主體}-{子類型}.{功能}` 格式：
+
+| 主體前綴 | 適用範圍 | 範例 |
+|----------|----------|------|
+| `account-user.*` | 個人使用者功能（User 是 Account 的子類型） | `account-user.profile` |
+| `account-organization.*` | 組織功能（Organization 也是 Account 的子類型） | `account-organization.core` |
+| `account-governance.*` | 帳號層級的橫切治理（角色、政策、通知路由） | `account-governance.role` |
+| `workspace-*` | 工作區功能（位於 Subject Center 之外，獨立 BC） | `workspace-core` |
+
+> **為何 `workspace-*` 不用 `account-workspace.*`？**
+> Workspace 屬於 Workspace Container，在架構圖中位於 Subject Center **之外**，
+> 是獨立的 Bounded Context。Organization 則位於 Subject Center **之內**，
+> 是 Account 的子類型，因此納入 `account-organization.*` 命名空間。
+
 ## 狀態說明
 
 | 符號 | 狀態 |
@@ -21,25 +37,28 @@ src/features/
 ├── ── Identity Layer ─────────────────────────────────────────────
 │   └── account.auth/                     ✅  登入 · 註冊 · 重設密碼
 │
-├── ── Account Layer ──────────────────────────────────────────────
-│   ├── account/                           ✅  組織帳號 CRUD · settings · binding · 統計
-│   ├── account-user.profile/              ✅  使用者個人資料 · 偏好設定 · FCM Token
-│   ├── account-user.wallet/               ✅  個人錢包 · 代幣積分（stub）
-│   ├── account-user.notification/         🆕  個人推播通知（FCM 第 3 層）
-│   ├── account-organization.member/       🔧  組織成員邀請／移除（stub → 由 organization-governance.member 接管）
+├── ── Account Layer（含 Organization sub-type）───────────────────
+│   │
+│   │   ── 帳號共用 ──
+│   ├── account/                           ✅  多帳號 Provider · AccountGrid · 統計（跨組織管理 UI）
 │   ├── account-governance.role/           🆕  帳號角色管理 → CUSTOM_CLAIMS 簽發
 │   ├── account-governance.policy/         🆕  帳號政策管理
 │   └── account-governance.notification-router/ 🆕  通知路由器（FCM 第 2 層 · 依 TargetAccountID 分發）
-│
-├── ── Organization Layer ─────────────────────────────────────────
-│   ├── organization-core/                 🆕  組織聚合實體（aggregate）
-│   ├── organization-core.event-bus/       🆕  組織事件總線
-│   ├── organization-governance.member/    🆕  組織成員管理（內部帳號 · 接管 account-organization.member）
-│   ├── organization-governance.team/      🆕  團隊管理（內部組視圖）
-│   ├── organization-governance.partner/   🆕  合作夥伴管理（外部組視圖）
-│   ├── organization-governance.policy/    🆕  組織政策管理
-│   ├── organization-governance.skill-tag/ 🆕  職能標籤庫（扁平化資源池）
-│   └── organization.schedule/             🆕  人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
+│   │
+│   │   ── User sub-type ──
+│   ├── account-user.profile/              ✅  使用者個人資料 · 偏好設定 · FCM Token
+│   ├── account-user.wallet/               🔧  個人錢包 · 代幣積分（stub）
+│   └── account-user.notification/         🆕  個人推播通知（FCM 第 3 層）
+│   │
+│   │   ── Organization sub-type ──
+│   ├── account-organization.core/         🆕  組織聚合實體（aggregate）· binding
+│   ├── account-organization.event-bus/    🆕  組織事件總線
+│   ├── account-organization.member/       🔧  組織成員邀請／移除（stub，擴充為完整成員管理）
+│   ├── account-organization.team/         🆕  團隊管理（內部組視圖）
+│   ├── account-organization.partner/      🆕  合作夥伴管理（外部組視圖）
+│   ├── account-organization.policy/       🆕  組織政策管理
+│   ├── account-organization.skill-tag/    🆕  職能標籤庫（扁平化資源池）
+│   └── account-organization.schedule/     🆕  人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
 │
 ├── ── Workspace Application Layer ────────────────────────────────
 │   └── workspace-application/             🆕  指令處理器 · Scope Guard · 政策引擎
@@ -90,8 +109,9 @@ src/features/
 | Bounded Context | ✅ 已實作 | 🔧 需擴充 | 🆕 規劃中 | 小計 |
 |-----------------|-----------|-----------|-----------|------|
 | Identity Layer | 1 | 0 | 0 | **1** |
-| Account Layer | 3 | 1 | 4 | **8** |
-| Organization Layer | 0 | 0 | 8 | **8** |
+| Account Layer (共用 + governance) | 1 | 0 | 3 | **4** |
+| Account Layer (user sub-type) | 1 | 1 | 1 | **3** |
+| Account Layer (organization sub-type) | 0 | 1 | 7 | **8** |
 | Workspace Application | 0 | 0 | 1 | **1** |
 | Workspace Core | 2 | 0 | 1 | **3** |
 | Workspace Governance | 5 | 0 | 1 | **6** |
@@ -99,7 +119,7 @@ src/features/
 | Workspace Business (A-track) | 4 | 0 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | 0 | **1** |
 | Projection Layer | 0 | 0 | 7 | **7** |
-| **Total** | **19** | **1** | **23** | **43** |
+| **Total** | **18** | **2** | **22** | **42** |
 
 ---
 
@@ -168,7 +188,7 @@ src/shared/
 
 | 層級 | 職責 | 切片 |
 |------|------|------|
-| 第 1 層（觸發） | 宣告事實（ScheduleAssigned），不關心誰收通知 | `organization.schedule` |
+| 第 1 層（觸發） | 宣告事實（ScheduleAssigned），不關心誰收通知 | `account-organization.schedule` |
 | 第 2 層（路由） | 依 TargetAccountID 分發至目標帳號 | `account-governance.notification-router` |
 | 第 3 層（交付） | 依帳號標籤過濾敏感內容後推播 FCM | `account-user.notification` |
 
@@ -200,7 +220,7 @@ B 軌解鎖：workspace-business.issues 發送 IssueResolved → workspace-core.
 ## Scope Guard 讀模型依賴鏈
 
 ```
-organization-core.event-bus ──政策變更事件──► workspace-application (org-policy-cache)
+account-organization.event-bus ──政策變更事件──► workspace-application (org-policy-cache)
                                                           │
                                                           ↓ 更新本地 read model
                                               projection.workspace-scope-guard
