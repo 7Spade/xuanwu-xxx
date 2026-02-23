@@ -17,7 +17,8 @@
 | 6 | 業務模組順序無結構 | 模組排列無明確流向 | tasks → quality-assurance → acceptance → finance → daily → document-parser → files → issues → schedule | 反映業務執行流向：任務產生 → 品質把關 → 驗收結案 → 財務結算 |
 | 7 | `issues` 模式未標注 | `issues` 作為普通業務模組 | 標注為 AB 雙軌問題單 | 任何問題（任務、品質、驗收等）都透過開問題單（issues）進行追蹤，採 AB 雙軌：A = 問題描述軌，B = 解決方案軌 |
 | 8 | `workspace-business` 內部流向不可見 | 業務模組為無邊的平鋪節點清單 | 細化為帶流向邊的 AB 雙軌圖：A 軌正常順位箭頭、異常箭頭指向 B 軌六角形節點、處理完成虛線回流、輔助模組虛線關聯 | 讓圖表直接表達業務邏輯流轉，不需額外文字說明 |
-| 9 | `document-parser` 孤立於業務流程之外 | `W_B_PARSER` 為無邊的輔助節點，與 A 軌脫鉤 | 引入 `ParsingIntent（解析意圖中繼聚合）` 節點：`W_B_FILES -.-> W_B_PARSER --> PARSING_INTENT`；PARSING_INTENT 依意圖類型路由至 `TRACK_A_TASKS`（任務指令）或 `TRACK_A_FINANCE`（財務指令），解析異常走 B 軌；`TRACK_B_ISSUES -.->|重新解析| PARSING_INTENT` 形成閉環 | Parser 只負責產出意圖，不直接依賴任何業務模組；路由邏輯集中在 ParsingIntent，符合單一職責；B 軌回流到 PARSING_INTENT 而非直接回 Parser，保持中繼聚合為唯一入口 |
+| 9 | `document-parser` 孤立於業務流程之外 | `W_B_PARSER` 為無邊的輔助節點，與 A 軌脫鉤 | 引入 `ParsingIntent（解析意圖中繼聚合）` 節點：`W_B_FILES -.-> W_B_PARSER --> PARSING_INTENT`；PARSING_INTENT 依意圖類型路由至 `TRACK_A_TASKS`（任務批次草稿） 或 `TRACK_A_FINANCE`（財務指令），解析異常走 B 軌；`TRACK_B_ISSUES -.->|重新解析| PARSING_INTENT` 形成閉環 | Parser 只負責產出意圖，不直接依賴任何業務模組；路由邏輯集中在 ParsingIntent，符合單一職責；B 軌回流到 PARSING_INTENT 而非直接回 Parser，保持中繼聚合為唯一入口 |
+| 10 | `ParsingIntent →任務指令→ TRACK_A_TASKS` 與父子任務衝突 | 邊標籤為「任務指令」，暗示單筆任務派發；但 `WorkspaceTask.parentId` 是 Firestore 文件 ID，子任務在父任務建立前無法取得父 ID，導致批次解析→多次獨立 createTask 時 parentId 為空，父子關係斷裂 | 邊標籤改為「任務批次草稿（含層級結構）」；`ParsingIntent` 攜帶 `taskDrafts[]`，使用**相對索引（parentIndex）** 表示父子關係（不含 Firestore ID）；`TRACK_A_TASKS` 接收後發出單一 `CreateTaskTreeCommand`，由 `workspace-application.transaction-runner` 以**拓樸順序**原子化建立（先根節點取得 ID，再建子節點賦值 parentId），整棵樹在一個交易內完成 | 父子 ID 綁定完全在 tasks 切片內部（+交易執行器）解決，`ParsingIntent` 不感知 Firestore ID 的生成順序；B 軌異常（如樹建立失敗）透過 `TRACK_A_TASKS -->|異常| TRACK_B_ISSUES` 回報，不需特殊路徑；整體閉環無衝突 |
 
 ---
 

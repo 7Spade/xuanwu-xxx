@@ -133,7 +133,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         %% 文件解析閉環（Files → Parser → ParsingIntent → A軌 / B軌）
         W_B_FILES -.->|提供原始檔案| W_B_PARSER
         W_B_PARSER -->|解析完成| PARSING_INTENT
-        PARSING_INTENT -->|任務指令| TRACK_A_TASKS
+        PARSING_INTENT -->|任務批次草稿（含層級結構）| TRACK_A_TASKS
         PARSING_INTENT -->|財務指令| TRACK_A_FINANCE
         PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
 
