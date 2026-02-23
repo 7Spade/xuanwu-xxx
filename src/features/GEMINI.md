@@ -13,7 +13,7 @@ it owns types, server actions, queries, hooks, and UI components.
 
 | Slice | Domain |
 |-------|--------|
-| `account.auth/` | Login, register, reset password |
+| `identity-account.auth/` | Login, register, reset password |
 | `account/` | Organization CRUD, stats, permissions |
 | `account-user.profile/` | User profile, preferences, security |
 | `account-user.wallet/` | User personal wallet, balance (stub) |

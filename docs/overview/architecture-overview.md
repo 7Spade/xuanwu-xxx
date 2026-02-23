@@ -9,7 +9,7 @@
 
 | # | 項目 | 原始狀態 | 改良後 | 理由 |
 |---|------|----------|--------|------|
-| 1 | `account.auth` 切片缺失 | 只有 Firebase Authentication 外部服務節點 | 新增 `account.auth` 節點，位於 Firebase 與 Identity Layer 之間 | 登入／註冊／重設密碼是一個完整業務切片 |
+| 1 | `identity-account.auth` 切片缺失 | 只有 Firebase Authentication 外部服務節點 | 新增 `identity-account.auth` 節點，位於 Firebase 與 Identity Layer 之間 | 登入／註冊／重設密碼是一個完整業務切片 |
 | 2 | `user-account.settings` 獨立節點 | 有 `user-account.settings` 獨立節點 | 合併至 `account-user.profile` | 新設計將設定納入個人資料切片，避免碎片化 |
 | 3 | `organization-account.aggregate` 缺失 | 只有 `organization-account` 與 `.settings` | 新增 `organization-account.aggregate` 節點 | 作為組織帳號的聚合根並連接 Organization Layer |
 | 4 | `workspace-settings` 獨立於容器頂層 | `workspace-settings` 懸掛在容器外層 | 移入 `workspace-core` 成為 `workspace-core.settings` | 設定是聚合根的核心配置，屬於 Core 職責 |
@@ -68,7 +68,7 @@ src/
     │   └── custom-claims/                     ← 自訂權限宣告
     │
     ├── account/                               ← 帳號層（Account Layer）
-    │   ├── account.auth/                      ← 登入／註冊／重設密碼
+    │   ├── identity-account.auth/             ← 登入／註冊／重設密碼
     │   ├── account-user.profile/              ← 使用者資料、設定、FCM Token 儲存
     │   ├── account-user.wallet/               ← 錢包（代幣／積分，stub）
     │   ├── account-user.notification/         ← 個人推播通知（FCM 閘道協調）
@@ -158,7 +158,7 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `account.auth` | Firebase 登入／註冊／重設密碼的 UI 與 Server Action | `ACCOUNT_AUTH` |
+| `identity-account.auth` | Firebase 登入／註冊／重設密碼的 UI 與 Server Action | `ACCOUNT_AUTH` |
 | `identity/authenticated-identity` | 持有 Firebase User，提供已驗證狀態 | `AUTHENTICATED_IDENTITY` |
 | `identity/account-identity-link` | 維護 `firebaseUserId ↔ accountId` 映射 | `ACCOUNT_IDENTITY_LINK` |
 | `identity/active-account-context` | 組織／工作區的作用中帳號 Context | `ACTIVE_ACCOUNT_CONTEXT` |
