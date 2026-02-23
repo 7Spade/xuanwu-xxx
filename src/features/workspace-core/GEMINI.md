@@ -23,15 +23,6 @@ Workspace management — CRUD, settings, navigation, dashboard shell (sidebar + 
 | `_shell/` | Dashboard chrome: `DashboardSidebar`, `Header`, `AccountSwitcher`, `NavMain`, `NavUser`, `NavWorkspaces`, `GlobalSearch`, `NotificationCenter`, `ThemeAdapter`, `AccountCreateDialog` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/workspace/` → `_actions.ts`
-- `src/use-cases/workspace/` → `_actions.ts` (inline)
-- `src/react-hooks/state-hooks/use-visible-workspaces.ts` → `_hooks/`
-- `src/react-hooks/state-hooks/use-app.ts` → `_hooks/`
-- `src/view-modules/workspaces/` (non-plugin files) → `_components/`
-- `src/view-modules/dashboard/` → `_shell/` + `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

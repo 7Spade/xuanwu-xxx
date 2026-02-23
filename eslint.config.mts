@@ -28,6 +28,7 @@ export default tseslint.config(
       "build/**",
       "next-env.d.ts",
       "functions/**",
+      "src/shared/shadcn-ui/**",
     ],
   },
   {
@@ -135,16 +136,9 @@ export default tseslint.config(
     },
   },
 
-  // shadcn-ui generated files — conform to official shadcn code as-is, never modify.
-  // These rules produce false positives or conflict with shadcn's official code patterns:
-  //   • consistent-type-imports  — shadcn imports type + value from same source without `import type`
-  //   • no-unused-vars           — `const actionTypes = {} as const; type T = typeof actionTypes`
-  //   • no-explicit-any          — shadcn internals (chart, sidebar) use `any` intentionally
-  //   • react/no-unknown-property — `cmdk-input-wrapper=""` is a valid cmdk custom attribute
-  //   • jsx-a11y/*               — shadcn uses onClick delegation on group divs (input-group)
-  //   • heading/anchor-has-content — ForwardRef components spread content via `{...props}`
+  // utility-hooks generated files — official shadcn utility hooks, not to be modified.
   {
-    files: ["src/shared/shadcn-ui/**/*.{ts,tsx}", "src/shared/utility-hooks/**/*.{ts,tsx}"],
+    files: ["src/shared/utility-hooks/**/*.{ts,tsx}"],
     rules: {
       "@typescript-eslint/consistent-type-imports": "off",
       "@typescript-eslint/no-unused-vars": "off",

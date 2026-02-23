@@ -24,15 +24,6 @@ Schedule management — schedule items, shift proposals, member assignment, gove
 | `_components/` | `AccountScheduleSection`, `WorkspaceSchedule`, `GovernanceSidebar`, `ScheduleProposalContent`, `ScheduleDataTable`, `UnifiedCalendarGrid`, `ProposalDialog`, `DecisionHistoryColumns`, `UpcomingEventsColumns` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/schedule/` → `_actions.ts`
-- `src/use-cases/schedule/` → `_actions.ts` (inline approve/reject)
-- `src/react-hooks/state-hooks/use-global-schedule.ts` → `_hooks/`
-- `src/react-hooks/state-hooks/use-workspace-schedule.ts` → `_hooks/`
-- `src/react-hooks/command-hooks/use-schedule-commands.ts` → `_hooks/`
-- `src/view-modules/schedule/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

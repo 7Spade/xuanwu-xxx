@@ -1,4 +1,4 @@
-# Feature Slice: `account.auth`
+# Feature Slice: `identity-account.auth`
 
 ## Domain
 
@@ -18,11 +18,6 @@ Authentication — login, register, reset password.
 | `_types.ts` | `LoginFormValues`, `RegisterFormValues` |
 | `_components/` | `LoginView`, `LoginForm`, `RegisterForm`, `ResetPasswordDialog`, `ResetPasswordForm`, `AuthTabsRoot`, `AuthBackground` |
 | `index.ts` | Exports: `LoginView`, `ResetPasswordForm` |
-
-## Maps From (Legacy)
-
-- `src/server-commands/auth/` → `_actions.ts`
-- `src/view-modules/auth/` → `_components/`
 
 ## Public API (`index.ts`)
 

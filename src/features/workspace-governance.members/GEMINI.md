@@ -19,12 +19,6 @@ Member management — both account-level (org members) and workspace-level (plug
 | `_components/` | `MembersView`, `MembersPlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/members/` → `_actions.ts`
-- `src/view-modules/members/` → `_components/`
-- `src/view-modules/workspaces/plugins/members/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

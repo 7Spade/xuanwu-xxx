@@ -18,6 +18,6 @@ These are static data assets; they contain no code and have no dependencies.
 
 ## 3. Who Depends on This Layer?
 
-The application's internationalization system, specifically the `i18n.ts` configuration file and the `I18nProvider` in `src/context/i18n-context.tsx`, reads these files to load the appropriate messages.
+The application's internationalization system, specifically the `i18n.ts` configuration file and the `I18nProvider` in `src/shared/ui/app-providers/`, reads these files to load the appropriate messages.
 
 No other part of the application should ever import or read these JSON files directly. All access to translations MUST go through the `useI18n()` hook to ensure consistency and proper context management.

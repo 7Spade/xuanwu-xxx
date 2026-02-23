@@ -22,16 +22,6 @@ Organization (Account) management — CRUD, statistics, permission matrix, new o
 | `_components/` | `AccountGrid`, `AccountNewForm`, `PermissionMatrixView`, `PermissionTree`, `StatCards` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/account/` → `_actions.ts`
-- `src/use-cases/account/` → `_actions.ts` (inline)
-- `src/react-hooks/state-hooks/use-account-management.ts` → `_hooks/`
-- `src/view-modules/account/` → `_components/`
-- `src/view-modules/dashboard/account-grid.tsx` → `_components/`
-- `src/view-modules/dashboard/account-new-form.tsx` → `_components/`
-- `src/view-modules/dashboard/stat-cards.tsx` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

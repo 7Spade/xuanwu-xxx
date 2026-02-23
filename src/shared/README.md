@@ -1,62 +1,44 @@
 # `src/shared/` — Globally Shared Code
 
-Everything in this directory is used across multiple unrelated features and layers.  
-**No domain-specific logic. No single-feature code.**
+Everything in this directory is used across multiple unrelated features and `app/`.  
+**No feature-specific logic. No single-slice code.**
 
 ## Sub-directories
 
 | Directory | Contents | Import alias |
 |-----------|---------|-------------|
-| `shadcn-ui/` | shadcn/ui primitive components (Button, Dialog, Card, …) | `@/shared/shadcn-ui/` |
-| `hooks/` | `use-mobile.tsx`, `use-toast.ts` — framework-level UI hooks | `@/shared/utility-hooks/` |
-| `context/` | `theme-context`, `i18n-context`, `auth-context`, `firebase-context` — global providers | `@/shared/app-providers/` |
-| `utils/` | *(reserved)* additional shared pure helpers beyond `src/lib/` | `@/shared/utils/` |
-| `config/` | *(reserved)* shared app constants (name, version, feature flags) | `@/shared/config/` |
-| `constants/` | *(reserved)* shared domain-independent constants (route names, limits) | `@/shared/constants/` |
-| `types/` | *(reserved)* UI-layer shared type definitions (form schemas, display props) | `@/shared/i18n-types/` |
+| `types/` | TypeScript domain types — zero deps | `@/shared/types` |
+| `lib/` | Pure utilities and domain rules (no I/O, no React) | `@/shared/lib` |
+| `infra/` | Firebase SDK adapters, repositories, facades | `@/shared/infra` |
+| `ai/` | Genkit AI flows and schemas (server-only) | `@/shared/ai` |
+| `ui/` | shadcn/ui, app-providers, i18n, constants, utility hooks | `@/shared/ui` |
 
-## `shadcn-ui/` — shadcn/ui components
+## `ui/` — UI primitives and providers
 
-All shadcn primitive components live here. Install / update with:
+All shadcn primitive components, global providers, and i18n types live here. Install with:
 
 ```bash
-npx shadcn@latest add <component>   # components.json points to @/shared/shadcn-ui
+npx shadcn@latest add <component>   # components.json points to @/shared/ui/shadcn-ui
 ```
 
-✅ Import: `import { Button } from "@/shared/shadcn-ui/button"`  
-❌ Never import ui primitives from `@/app/_components/ui/` — that path no longer exists.
+✅ Import: `import { Button } from "@/shared/ui/shadcn-ui/button"`  
+❌ Never import ui primitives from paths outside `@/shared/ui/shadcn-ui/`.
 
-## `hooks/` — global UI hooks
+## `infra/` — Firebase SDK (only layer that touches Firebase directly)
 
 ```ts
-import { useIsMobile } from "@/shared/utility-hooks/use-mobile"
-import { useToast }    from "@/shared/utility-hooks/use-toast"
+import { scheduleRepository } from "@/shared/infra/firestore/repositories/schedule.repository"
+import { authAdapter } from "@/shared/infra/auth/auth.adapter"
 ```
 
-These are React-only, zero domain knowledge. Domain hooks belong in `src/react-hooks/`.
-
-## `context/` — global providers
-
-The four providers that wrap the entire app:
-
-| File | Hook | Purpose |
-|------|------|---------|
-| `theme-context.tsx` | `useTheme` | Dark / light mode |
-| `i18n-context.tsx` | `useI18n` | Translations |
-| `auth-context.tsx` | `useAuth` | Firebase Auth session |
-| `firebase-context.tsx` | `useFirebase` | Firebase SDK instances |
-
-Domain contexts (`app-context`, `account-context`, `workspace-context`) remain in `src/react-providers/`.
+Feature slices call infra from their `_actions.ts` or `_queries.ts`. Never call infra directly from `app/` or `_components/`.
 
 ## What does NOT belong here
 
-- Domain business logic → `src/server-commands/`
-- Domain-specific hooks → `src/react-hooks/`
-- Domain-specific contexts → `src/react-providers/`
-- Firebase SDK calls → `src/firebase/`
-- Simple one-liner utils → `src/lib/`
-- Domain type aliases → `src/domain-types/`
+- Feature-specific hooks → `features/{slice}/_hooks/`
+- Feature-specific actions → `features/{slice}/_actions.ts`
+- Feature-specific context → `features/{slice}/_hooks/` or via provider in `shared/ui/app-providers/`
 
 ## Who depends on this layer
 
-Every layer above `src/lib/`: `src/react-hooks/`, `src/react-providers/`, `src/actions/`, `src/app/`.
+All feature slices (`features/*/`) and `app/`.

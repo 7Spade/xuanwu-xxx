@@ -4,11 +4,6 @@
 
 Pure utilities and domain business rules. No React, no I/O, no async. Deterministic functions only.
 
-## Maps From (Legacy)
-
-- `src/domain-rules/` — all rule files move here
-- `src/shared/utils/` — utility helpers move here
-
 ## Contents
 
 | File | Exports |

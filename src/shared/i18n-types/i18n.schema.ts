@@ -114,7 +114,7 @@ export interface TranslationMessages {
     finance: string;
     issues: string;
     files: string;
-    qa: string;
+    'quality-assurance': string;
     documentParser: string;
   };
   account: {

@@ -13,12 +13,6 @@ Task management — task tree hierarchy, CRUD, batch import.
 | `_components/` | `TasksPlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/task/` → `_actions.ts`
-- `src/domain-rules/task/` → `@/shared/lib` (buildTaskTree)
-- `src/view-modules/workspaces/plugins/tasks/` → `_components/`
-
 ## Business Rules
 
 - `buildTaskTree(tasks)` → lives in `@/shared/lib` (pure, no side effects)

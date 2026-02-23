@@ -163,7 +163,7 @@
     "finance": "Finance",
     "issues": "Issues",
     "files": "Files",
-    "qa": "QA",
+    "quality-assurance": "QA",
     "documentParser": "Document Parser"
   },
   "account": {

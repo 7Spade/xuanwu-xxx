@@ -18,23 +18,22 @@ Types that are globally shared across client layers (UI, hooks, contexts).
 
 ## What does NOT belong here
 
-- Domain entity types → `src/domain-types/domain.ts` (used by infra/actions too)
-- Infrastructure types → `src/firebase/`
-- Action param types → co-locate with actions in `src/actions/{domain}/`
+- Domain entity types → `@/shared/types` (used by infra and features)
+- Infrastructure types → `@/shared/infra/`
+- Feature-specific types → `features/{slice}/_types.ts`
 
 ## Dependency rule
 
 ```ts
 import ... from '@/shared/i18n-types/...'  // ✅ allowed by any layer
-import ... from '@/domain-types/...'         // ✅ also still valid for domain types
+import ... from '@/shared/types'            // ✅ domain types
 ```
 
 ## Forbidden imports
 
 ```ts
-import ... from '@/firebase/...'    // ❌
-import ... from '@/react-hooks/...'    // ❌
-import ... from '@/react-providers/...'  // ❌
-import ... from '@/server-commands/...'  // ❌
-import ... from '@/app/...'      // ❌
+import ... from '@/features/...'        // ❌
+import ... from '@/shared/infra/...'    // ❌
+import ... from '@/shared/ai/...'       // ❌
+import ... from '@/app/...'             // ❌
 ```

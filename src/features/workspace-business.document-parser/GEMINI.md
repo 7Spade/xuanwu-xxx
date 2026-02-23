@@ -19,12 +19,6 @@ using Genkit + Gemini.
 | `_components/` | `DocumentParserPlugin` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/document-parser/` → `_actions.ts`
-- `src/genkit-flows/flows/extract-invoice-items.ts` → `@/shared/ai` (stays in shared)
-- `src/view-modules/workspaces/plugins/document-parser/` → `_components/`
-
 ## Note
 
 The Genkit flow itself stays in `@/shared/ai/`. This slice's `_actions.ts` calls

@@ -35,7 +35,7 @@ export type SkillTier =
   | 'legendary'     // Tier 6 — 375–450 XP
   | 'titan';        // Tier 7 — 450–525 XP
 
-/** Static metadata for a single tier. Used by UI and domain-rules. */
+/** Static metadata for a single tier. Used by UI and shared/lib. */
 export interface TierDefinition {
   tier: SkillTier;
   rank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -98,7 +98,7 @@ export interface SkillGrant {
   tagId?: string;
   /**
    * Proficiency tier — set manually by an admin or derived from `xp` via
-   * resolveSkillTier() in domain-rules/skill.
+   * resolveSkillTier() in shared/lib/skill.
    */
   tier: SkillTier;
   /**

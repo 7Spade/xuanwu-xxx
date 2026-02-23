@@ -4,10 +4,6 @@
 
 Global TypeScript domain types. The ubiquitous language of the system. Zero dependencies.
 
-## Maps From (Legacy)
-
-`src/domain-types/` — all files move here.
-
 ## Contents
 
 | File | Types |

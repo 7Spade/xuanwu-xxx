@@ -1,5 +1,5 @@
 /**
- * @fileoverview domain-rules/skill — Pure skill-tier domain rules.
+ * @fileoverview shared/lib/skill — Pure skill-tier domain rules.
  * No async, no I/O, no React, no Firebase.
  */
 

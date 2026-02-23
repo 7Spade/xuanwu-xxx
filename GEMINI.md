@@ -17,7 +17,7 @@ The project uses **Vertical Slice Architecture (VSA)**. Code is organized by **b
 ```
 src/
 ├── app/          ← Next.js routing ONLY (pure composition)
-├── features/     ← 22 vertical feature slices (one per business domain)
+├── features/     ← 20 vertical feature slices (one per business domain)
 └── shared/       ← 5 cross-cutting infrastructure modules
 ```
 
@@ -26,7 +26,7 @@ src/
 | Directory | Role | Count |
 |-----------|------|-------|
 | `app/` | Next.js App Router — routing & layout composition only | 1 |
-| `features/` | Self-contained business domain slices | 22 |
+| `features/` | Self-contained business domain slices | 20 |
 | `shared/` | Cross-cutting infrastructure (types, lib, infra, ai, ui) | 5 |
 
 ### Dependency Flow
@@ -47,7 +47,7 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 
 | Slice | Domain |
 |-------|--------|
-| `features/account.auth` | Login, register, reset password |
+| `features/identity-account.auth` | Login, register, reset password |
 | `features/account` | Organization CRUD, stats, permissions |
 | `features/account-user.profile` | User profile, preferences, security |
 | `features/account-user.wallet` | User personal wallet, balance (stub) |
@@ -64,10 +64,9 @@ Account slices use dot-namespace: `account-user.*` for personal user features, `
 | `features/workspace-business.files` | File upload, management |
 | `features/workspace-business.issues` | Issue tracking |
 | `features/workspace-business.finance` | Finance plugin |
-| `features/workspace-business.qa` | QA plugin |
+| `features/workspace-business.quality-assurance` | QA plugin |
 | `features/workspace-business.document-parser` | AI document parsing |
 | `features/workspace-business.acceptance` | Acceptance plugin |
-| `features/workspace-business.capabilities` | Capabilities plugin |
 
 ### Shared Module Index
 

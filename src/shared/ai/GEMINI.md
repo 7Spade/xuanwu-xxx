@@ -4,10 +4,6 @@
 
 Generative AI — Genkit flows and schemas for LLM-powered operations. Server-only.
 
-## Maps From (Legacy)
-
-`src/genkit-flows/` — entire directory moves here.
-
 ## Contents
 
 ```

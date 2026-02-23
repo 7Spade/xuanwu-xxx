@@ -12,11 +12,6 @@ Partner (協力廠商) management — create, view, and manage external partners
 | `_components/` | `PartnersView`, `PartnerDetailView` |
 | `index.ts` | Public exports |
 
-## Maps From (Legacy)
-
-- `src/server-commands/account/` (partner ops) → `_actions.ts`
-- `src/view-modules/partners/` → `_components/`
-
 ## Public API (`index.ts`)
 
 ```ts

@@ -41,7 +41,7 @@ const initialState: AppState = {
     { id: 'members', name: 'Members', type: 'governance', status: 'stable', description: 'Manages granular, grant-based authorization for teams and individuals.' },
     { id: 'audit', name: 'Audit', type: 'monitoring', status: 'stable', description: 'Provides a real-time event stream for all significant state changes.' },
     { id: 'tasks', name: 'Tasks', type: 'ui', status: 'stable', description: 'Track concrete action items within the workspace node.' },
-    { id: 'qa', name: 'QA', type: 'ui', status: 'stable', description: 'Governance unit for verifying the quality of atomic data execution.' },
+    { id: 'quality-assurance', name: 'QA', type: 'ui', status: 'stable', description: 'Governance unit for verifying the quality of atomic data execution.' },
     { id: 'acceptance', name: 'Acceptance', type: 'ui', status: 'stable', description: 'Accept workspace deliverables and terminate A-Track resonance.' },
     { id: 'finance', name: 'Finance', type: 'ui', status: 'beta', description: 'Track dimension budgets and post-acceptance fund disbursement.' },
     { id: 'issues', name: 'Issues', type: 'ui', status: 'stable', description: 'Governance module for handling technical conflicts and B-Track anomalies.' },

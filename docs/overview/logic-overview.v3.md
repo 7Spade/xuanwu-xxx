@@ -19,7 +19,7 @@ flowchart TD
 %% =================================================
 
 FIREBASE_AUTHENTICATION[Firebase Authentication（用戶驗證服務）]
-ACCOUNT_AUTH[account.auth（登入／註冊／重設密碼）]
+ACCOUNT_AUTH[identity-account.auth（登入／註冊／重設密碼）]
 
 subgraph IDENTITY_LAYER[Identity Layer（身份層）]
 
@@ -139,7 +139,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
     end
 
     subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
-        WORKSPACE_MEMBER[workspace-governance.member（工作區成員）]
+        WORKSPACE_MEMBER[workspace-governance.members（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
     end
 

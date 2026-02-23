@@ -160,7 +160,7 @@ export function WorkspaceCapabilities() {
       case 'audit': return <Activity className="size-5" />;
       case 'files': return <FileText className="size-5" />;
       case 'tasks': return <ListTodo className="size-5" />;
-      case 'qa': return <ShieldCheck className="size-5" />;
+      case 'quality-assurance': return <ShieldCheck className="size-5" />;
       case 'acceptance': return <Trophy className="size-5" />;
       case 'finance': return <Landmark className="size-5" />;
       case 'issues': return <AlertCircle className="size-5" />;

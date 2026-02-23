@@ -9,7 +9,7 @@
 
 | # | 項目 | 原始狀態 | 改良後 | 理由 |
 |---|------|----------|--------|------|
-| 1 | `account.auth` 切片缺失 | 只有 Firebase Authentication 外部服務節點 | 新增 `account.auth` 節點，位於 Firebase 與 Identity Layer 之間 | 登入／註冊／重設密碼是一個完整業務切片 |
+| 1 | `identity-account.auth` 切片缺失 | 只有 Firebase Authentication 外部服務節點 | 新增 `identity-account.auth` 節點，位於 Firebase 與 Identity Layer 之間 | 登入／註冊／重設密碼是一個完整業務切片 |
 | 2 | `user-account.settings` 獨立節點 | 有 `user-account.settings` 獨立節點 | 合併至 `account-user.profile` | 新設計將設定納入個人資料切片，避免碎片化 |
 | 3 | `organization-account.aggregate` 缺失 | 只有 `organization-account` 與 `.settings` | 新增 `organization-account.aggregate` 節點 | 作為組織帳號的聚合根並連接 Organization Layer |
 | 4 | `workspace-settings` 獨立於容器頂層 | `workspace-settings` 懸掛在容器外層 | 移入 `workspace-core` 成為 `workspace-core.settings` | 設定是聚合根的核心配置，屬於 Core 職責 |
@@ -68,7 +68,7 @@ src/
     │   └── custom-claims/                     ← 自訂權限宣告
     │
     ├── account/                               ← 帳號層（Account Layer）
-    │   ├── account.auth/                      ← 登入／註冊／重設密碼
+    │   ├── identity-account.auth/             ← 登入／註冊／重設密碼
     │   ├── account-user.profile/              ← 使用者資料、設定、FCM Token 儲存
     │   ├── account-user.wallet/               ← 錢包（代幣／積分，stub）
     │   ├── account-user.notification/         ← 個人推播通知（FCM 閘道協調）
@@ -107,9 +107,11 @@ src/
         │   ├── workspace-core.event-bus/      ← 事件總線
         │   └── workspace-core.event-store/    ← 事件儲存（可選）
         ├── workspace-governance/              ← 工作區治理群組（存取控制 + 稽核）
-        │   ├── workspace-governance.member/   ← 工作區成員
-        │   ├── workspace-governance.role/     ← 角色管理
-        │   └── workspace-governance.audit-log/ ← 工作區操作稽核（治理職責）
+        │   ├── workspace-governance.members/  ← 工作區成員
+        │   ├── workspace-governance.teams/    ← 團隊管理
+        │   ├── workspace-governance.partners/ ← 合作夥伴
+        │   ├── workspace-governance.schedule/ ← 排程、提案、審核決策
+        │   └── workspace-governance.audit/    ← 工作區操作稽核（治理職責）
         └── workspace-business/                ← 業務層群組（任務流水線 + 輔助功能）
             ├── workspace-business.tasks/           ← 任務管理
             ├── workspace-business.quality-assurance/ ← 品質保證
@@ -156,7 +158,7 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `account.auth` | Firebase 登入／註冊／重設密碼的 UI 與 Server Action | `ACCOUNT_AUTH` |
+| `identity-account.auth` | Firebase 登入／註冊／重設密碼的 UI 與 Server Action | `ACCOUNT_AUTH` |
 | `identity/authenticated-identity` | 持有 Firebase User，提供已驗證狀態 | `AUTHENTICATED_IDENTITY` |
 | `identity/account-identity-link` | 維護 `firebaseUserId ↔ accountId` 映射 | `ACCOUNT_IDENTITY_LINK` |
 | `identity/active-account-context` | 組織／工作區的作用中帳號 Context | `ACTIVE_ACCOUNT_CONTEXT` |
@@ -215,10 +217,13 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-governance/workspace-governance.member` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
-| `workspace-governance/workspace-governance.role` | 工作區角色管理 | `WORKSPACE_ROLE` |
+| `workspace-governance/workspace-governance.members` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
+| `workspace-governance/workspace-governance.teams` | 工作區團隊管理 | `WORKSPACE_ROLE` |
+| `workspace-governance/workspace-governance.partners` | 合作夥伴關係 | — |
+| `workspace-governance/workspace-governance.schedule` | 排程、提案、審核決策 | — |
+| `workspace-governance/workspace-governance.audit` | 工作區操作稽核 | — |
 
-> `workspace-governance.audit-log`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
+> `workspace-governance.audit`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
 
 #### workspace-business（業務層，按執行流向排序）
 
