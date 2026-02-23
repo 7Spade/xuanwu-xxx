@@ -1,4 +1,4 @@
-# Feature Slice: `account.auth`
+# Feature Slice: `identity-account.auth`
 
 ## Domain
 
