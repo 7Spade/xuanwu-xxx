@@ -42,7 +42,7 @@ export { ScheduleProposalContent } from "./_components/schedule-proposal-content
 ## Who Uses This Slice?
 
 - `app/dashboard/account/schedule/page.tsx`
-- `app/dashboard/workspaces/[id]/@plugin-tab/schedule/page.tsx`
+- `app/dashboard/workspaces/[id]/@businesstab/schedule/page.tsx`
 - `app/dashboard/workspaces/[id]/@modal/(.)schedule-proposal/page.tsx`
 - `app/dashboard/workspaces/[id]/@panel/(.)governance/page.tsx`
 - `app/dashboard/workspaces/[id]/schedule-proposal/page.tsx`

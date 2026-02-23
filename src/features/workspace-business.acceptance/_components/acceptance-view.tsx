@@ -36,7 +36,7 @@ export function WorkspaceAcceptance() {
   useEffect(() => {
     // A task enters this queue when QA approves it.
     const unsubApprove = eventBus.subscribe(
-      'workspace:qa:approved',
+      'workspace:quality-assurance:approved',
       (payload) => {
         setVerifiedTasks(prev => {
             if (prev.some(t => t.id === payload.task.id)) return prev;

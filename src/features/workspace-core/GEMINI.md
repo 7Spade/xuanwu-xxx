@@ -7,7 +7,7 @@ Workspace management — CRUD, settings, navigation, dashboard shell (sidebar + 
 ## Responsibilities
 
 - Create / update workspace
-- Mount / unmount capabilities (plugins)
+- Mount / unmount capabilities
 - Workspace grid and table views
 - Workspace navigation tabs
 - Dashboard shell: sidebar, account switcher, header, global search, notifications

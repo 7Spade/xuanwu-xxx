@@ -1,4 +1,3 @@
-// @/app/dashboard/workspaces/[id]/plugins/schedule/_route-components/governance-sidebar.tsx
 "use client";
 
 import { type ScheduleItem } from "@/shared/types";

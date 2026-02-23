@@ -13,7 +13,7 @@ export interface WorkspaceTaskScheduleRequestedPayload {
   taskName: string
 }
 
-export interface QARejectedPayload {
+export interface QualityAssuranceRejectedPayload {
   task: WorkspaceTask
   rejectedBy: string
 }
@@ -23,7 +23,7 @@ export interface WorkspaceAcceptanceFailedPayload {
   rejectedBy: string
 }
 
-export interface WorkspaceQAApprovedPayload {
+export interface WorkspaceQualityAssuranceApprovedPayload {
   task: WorkspaceTask
   approvedBy: string
 }
@@ -64,9 +64,9 @@ export interface FileSendToParserPayload {
 export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
-  | "workspace:qa:rejected"
+  | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
-  | "workspace:qa:approved"
+  | "workspace:quality-assurance:approved"
   | "workspace:acceptance:passed"
   | "workspace:document-parser:itemsExtracted"
   | "workspace:files:sendToParser"
@@ -79,9 +79,9 @@ export type WorkspaceEventName =
 export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
-  "workspace:qa:rejected": QARejectedPayload
+  "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
-  "workspace:qa:approved": WorkspaceQAApprovedPayload
+  "workspace:quality-assurance:approved": WorkspaceQualityAssuranceApprovedPayload
   "workspace:acceptance:passed": WorkspaceAcceptancePassedPayload
   "workspace:document-parser:itemsExtracted": DocumentParserItemsExtractedPayload
   "workspace:files:sendToParser": FileSendToParserPayload

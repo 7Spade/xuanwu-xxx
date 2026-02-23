@@ -9,7 +9,7 @@ Organization-level member management — who belongs to the organization/account
 | Slice | Scope | Context |
 |-------|-------|---------|
 | `account-organization.member` | **Org-level** — who is in the organization | `/dashboard/account/members` |
-| `workspace-governance.members` | **Workspace-level** — who has access to a specific workspace | `/workspaces/[id]/@plugin-tab/members` |
+| `workspace-governance.members` | **Workspace-level** — who has access to a specific workspace | `/workspaces/[id]/@businesstab/members` |
 
 ## Responsibilities
 

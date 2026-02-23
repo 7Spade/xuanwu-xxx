@@ -28,4 +28,4 @@ export { AuditAccountView } from "./_components/audit.account-view";
 ## Who Uses This Slice?
 
 - `app/dashboard/account/audit/page.tsx`
-- `app/dashboard/workspaces/[id]/@plugin-tab/audit/page.tsx`
+- `app/dashboard/workspaces/[id]/@businesstab/audit/page.tsx`

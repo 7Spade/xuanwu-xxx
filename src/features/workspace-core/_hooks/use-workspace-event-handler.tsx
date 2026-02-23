@@ -46,7 +46,7 @@ export function useWorkspaceEventHandler() {
     };
 
     const unsubQAApproved = eventBus.subscribe(
-      "workspace:qa:approved",
+      "workspace:quality-assurance:approved",
       (payload) => {
         pushNotification(
           "QA Approved",
@@ -67,8 +67,8 @@ export function useWorkspaceEventHandler() {
       }
     );
 
-    const unsubQARejected = eventBus.subscribe(
-      "workspace:qa:rejected",
+    const unsubQualityAssuranceRejected = eventBus.subscribe(
+      "workspace:quality-assurance:rejected",
       async (payload) => {
         await createIssue(
           workspace.id,
@@ -232,7 +232,7 @@ export function useWorkspaceEventHandler() {
     return () => {
       unsubQAApproved();
       unsubAcceptancePassed();
-      unsubQARejected();
+      unsubQualityAssuranceRejected();
       unsubAcceptanceFailed();
       unsubDocParse();
       unsubScheduleRequest();

@@ -2,21 +2,21 @@
 
 ## Domain
 
-Acceptance (驗收) workspace plugin — track acceptance status of deliverables.
+Acceptance (驗收) — A-track business view that tracks acceptance status of deliverables.
 
 ## Internal Files
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_components/` | `AcceptancePlugin` |
+| `_components/` | `WorkspaceAcceptance` |
 | `index.ts` | Public exports |
 
 ## Public API (`index.ts`)
 
 ```ts
-export { AcceptancePlugin } from "./_components/acceptance-plugin";
+export { WorkspaceAcceptance } from "./_components/acceptance-view";
 ```
 
 ## Who Uses This Slice?
 
-- `app/dashboard/workspaces/[id]/@plugin-tab/acceptance/page.tsx`
+- `app/(shell)/(account)/(workspaces)/workspaces/[id]/@businesstab/acceptance/page.tsx`

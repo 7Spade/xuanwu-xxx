@@ -1,4 +1,3 @@
-// @/app/dashboard/workspaces/[id]/plugins/schedule/_route-components/proposal-dialog.tsx
 "use client";
 
 import { useState, useEffect } from "react";

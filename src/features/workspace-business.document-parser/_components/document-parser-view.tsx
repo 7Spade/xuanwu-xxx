@@ -61,7 +61,7 @@ export function WorkspaceDocumentParser() {
     }
   }, [state.error, toast]);
 
-  // Subscribe to files:sendToParser — files plugin provides raw files for parsing
+  // Subscribe to files:sendToParser — files view provides raw files for parsing
   useEffect(() => {
     const unsubFiles = eventBus.subscribe(
       'workspace:files:sendToParser',

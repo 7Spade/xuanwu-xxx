@@ -87,7 +87,7 @@ it owns types, server actions, queries, hooks, and UI components.
 |-------|--------|--------|
 | `workspace-business.tasks/` | Task tree, CRUD (A-track start) | ✅ |
 | `workspace-business.quality-assurance/` | Quality assurance (A-track) | ✅ |
-| `workspace-business.acceptance/` | Acceptance plugin (A-track) | ✅ |
+| `workspace-business.acceptance/` | Acceptance view (A-track) | ✅ |
 | `workspace-business.finance/` | Finance processing (A-track end) | ✅ |
 
 ### Workspace Business — B-Track (Exception Center)

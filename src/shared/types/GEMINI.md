@@ -9,7 +9,7 @@ Global TypeScript domain types. The ubiquitous language of the system. Zero depe
 | File | Types |
 |------|-------|
 | `account.types.ts` | `Account`, `Organization`, `MemberReference`, `Wallet`, `SkillGrant` |
-| `workspace.types.ts` | `Workspace`, `Capability`, `PluginSettings` |
+| `workspace.types.ts` | `Workspace`, `Capability`, `CapabilitySettings` |
 | `schedule.types.ts` | `ScheduleItem`, `ScheduleStatus`, `ScheduleProposal` |
 | `task.types.ts` | `WorkspaceTask`, `TaskTree` |
 | `daily.types.ts` | `DailyLog`, `DailyComment` |

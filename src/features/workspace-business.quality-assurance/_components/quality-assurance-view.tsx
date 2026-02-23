@@ -13,7 +13,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 /**
- * WorkspaceQA - A-Track quality threshold.
+ * WorkspaceQualityAssurance - A-Track quality threshold.
  * Determines if a task is qualified to enter the "Verified" stage.
  * ARCHITECTURE REFACTORED: Now stateful and fully event-driven.
  */
@@ -47,7 +47,7 @@ export function WorkspaceQualityAssurance() {
 
     // When a task is approved in QA, remove it from our queue.
     const unsubApprove = eventBus.subscribe(
-      'workspace:qa:approved',
+      'workspace:quality-assurance:approved',
       (payload) => {
         setQaTasks(prev => prev.filter(t => t.id !== payload.task.id));
       }
@@ -55,7 +55,7 @@ export function WorkspaceQualityAssurance() {
 
     // When a task is rejected in QA, remove it from our queue.
     const unsubReject = eventBus.subscribe(
-      'workspace:qa:rejected',
+      'workspace:quality-assurance:rejected',
       (payload) => {
         setQaTasks(prev => prev.filter(t => t.id !== payload.task.id));
       }
@@ -75,7 +75,7 @@ export function WorkspaceQualityAssurance() {
     
     try {
       await updateTask(task.id, updates);
-      eventBus.publish('workspace:qa:approved', {
+      eventBus.publish('workspace:quality-assurance:approved', {
           task: {...task, ...updates},
           approvedBy: user?.name || "System"
       });
@@ -97,7 +97,7 @@ export function WorkspaceQualityAssurance() {
     try {
       await updateTask(task.id, updates);
       // Step 1: Publish an event. Decouples QA from Issue creation.
-      eventBus.publish('workspace:qa:rejected', {
+      eventBus.publish('workspace:quality-assurance:rejected', {
           task: {...task, ...updates},
           rejectedBy: user?.name || 'System'
       });
