@@ -8,7 +8,7 @@ QA (Quality Assurance) workspace plugin.
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_components/` | `QaPlugin` |
+| `_components/` | `WorkspaceQA` |
 | `index.ts` | Public exports |
 
 ## Maps From (Legacy)
@@ -18,7 +18,7 @@ QA (Quality Assurance) workspace plugin.
 ## Public API (`index.ts`)
 
 ```ts
-export { QaPlugin } from "./_components/qa-plugin";
+export { WorkspaceQA } from "./_components/qa-plugin";
 ```
 
 ## Who Uses This Slice?
