@@ -285,6 +285,7 @@ WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_
 %% =================================================
 %% SHARED KERNEL（共享核心，需顯式標示）
 %% =================================================
+%% Shared Kernel 區塊的虛線表示「契約遵循（implements contract）」而非跨 BC 讀寫依賴
 subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
     SK_EVENT_ENVELOPE["shared-kernel.event-envelope（事件信封契約）"]
     SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（權限快照契約）"]
