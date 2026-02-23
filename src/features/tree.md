@@ -24,6 +24,16 @@
 > 是獨立的 Bounded Context。Organization 則位於 Subject Center **之內**，
 > 是 Account 的子類型，因此納入 `account-organization.*` 命名空間。
 
+> **為何 `account-auth` 不叫 `identity-account.auth`？**
+> 在架構圖中，`ACCOUNT_AUTH` 節點位於 `IDENTITY_LAYER` subgraph **之外**；
+> Identity Layer 是驗證**完成後產生的執行期狀態**（authenticated-identity、account-identity-link、
+> active-account-context、custom-claims），不是一個可切片的業務功能邊界（BC）。
+> `account-auth` 是 Account BC **發起**的操作（登入、註冊、重設密碼）；
+> 行為的**主體（owner）是 Account**，identity 是**結果（output）**，
+> 因此前綴用 `account-` 而非 `identity-`。
+> 此外，引入 `identity-*` 命名空間會在整個 features 樹中只有一個切片，
+> 違反 Occam's Razor（不引入不必要的複雜度）。
+
 ## 狀態說明
 
 | 符號 | 狀態 |
