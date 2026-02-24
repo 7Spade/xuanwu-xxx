@@ -9,22 +9,30 @@ import {
   createParsingIntent as createParsingIntentFacade,
   updateParsingIntentStatus as updateParsingIntentStatusFacade,
 } from '@/shared/infra/firestore/firestore.facade'
-import type { ParsedLineItem } from '@/shared/types'
+import type { ParsedLineItem, IntentID, SourcePointer } from '@/shared/types'
+import type { SkillRequirement } from '@/shared/types'
 
 export async function saveParsingIntent(
   workspaceId: string,
   sourceFileName: string,
   lineItems: ParsedLineItem[],
-  sourceFileDownloadURL?: string
-): Promise<string> {
-  return createParsingIntentFacade(workspaceId, {
+  options?: {
+    sourceFileDownloadURL?: SourcePointer
+    sourceFileId?: string
+    skillRequirements?: SkillRequirement[]
+  }
+): Promise<IntentID> {
+  const id = await createParsingIntentFacade(workspaceId, {
     workspaceId,
     sourceFileName,
-    sourceFileDownloadURL,
+    sourceFileDownloadURL: options?.sourceFileDownloadURL,
+    sourceFileId: options?.sourceFileId,
     intentVersion: 1,
     lineItems,
+    skillRequirements: options?.skillRequirements,
     status: 'pending',
   })
+  return id as IntentID
 }
 
 export async function markParsingIntentImported(

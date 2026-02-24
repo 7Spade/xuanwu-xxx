@@ -26,7 +26,6 @@ import {
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useFirebase } from "@/shared/app-providers/firebase-provider";
 import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion, type FieldValue , type Timestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useMemo, useState, useRef } from "react";
 import { 
   Sheet, 
@@ -53,6 +52,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/shadcn-ui/table";
+import { uploadRawFile } from '../_storage-actions';
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -65,7 +65,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
 export function WorkspaceFiles() {
   const { workspace, logAuditEvent, eventBus } = useWorkspace();
   const { state: { user } } = useAuth();
-  const { db, storage } = useFirebase();
+  const { db } = useFirebase();
   
   const [historyFile, setHistoryFile] = useState<WorkspaceFile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -104,11 +104,9 @@ export function WorkspaceFiles() {
         // --- Versioning Logic ---
         const nextVer = (existingFile.versions?.length || 0) + 1;
         const versionId = Math.random().toString(36).slice(-6);
-        const storagePath = `files-plugin/${workspace.id}/${existingFile.id}/${versionId}/${file.name}`;
-        const storageRef = ref(storage, storagePath);
-        
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
+
+        // Delegate Firebase Storage upload to the actions layer (boundary fix)
+        const downloadURL = await uploadRawFile(workspace.id, existingFile.id, versionId, file);
 
         const newVersion: WorkspaceFileVersion = {
           versionId: versionId,
@@ -134,11 +132,9 @@ export function WorkspaceFiles() {
         // --- New File Logic ---
         const fileId = Math.random().toString(36).slice(2, 11);
         const versionId = Math.random().toString(36).slice(-6);
-        const storagePath = `files-plugin/${workspace.id}/${fileId}/${versionId}/${file.name}`;
-        const storageRef = ref(storage, storagePath);
 
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
+        // Delegate Firebase Storage upload to the actions layer (boundary fix)
+        const downloadURL = await uploadRawFile(workspace.id, fileId, versionId, file);
 
         const newFileData: Omit<WorkspaceFile, 'id' | 'updatedAt'> & { updatedAt: FieldValue } = {
           name: file.name,
@@ -264,6 +260,7 @@ export function WorkspaceFiles() {
                               fileName: file.name,
                               downloadURL: current.downloadURL,
                               fileType: file.type,
+                              fileId: file.id,
                             });
                             logAuditEvent('Sent File to Parser', file.name, 'update');
                           }}

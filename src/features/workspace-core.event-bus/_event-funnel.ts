@@ -29,6 +29,7 @@ import { appendAuditEntry } from '@/features/projection.account-audit';
 import { applyScheduleAssigned } from '@/features/projection.account-schedule';
 import { onOrgEvent } from '@/features/account-organization.event-bus';
 import { applyMemberJoined, applyMemberLeft } from '@/features/projection.organization-view';
+import { handleScheduleProposed } from '@/features/account-organization.schedule';
 
 /**
  * Registers workspace event handlers on the event bus to keep projections in sync.
@@ -64,6 +65,14 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
         summary: `Issue "${payload.issueTitle}" resolved`,
       });
       await upsertProjectionVersion('account-audit', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // WORKSPACE_OUTBOX →|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
+  unsubscribers.push(
+    bus.subscribe('workspace:schedule:proposed', async (payload) => {
+      await handleScheduleProposed(payload);
+      await upsertProjectionVersion('org-schedule-proposals', Date.now(), new Date().toISOString());
     })
   );
 
