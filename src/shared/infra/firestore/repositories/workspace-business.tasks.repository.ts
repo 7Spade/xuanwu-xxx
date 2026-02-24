@@ -11,6 +11,8 @@ import {
   collection,
   query,
   orderBy,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '../firestore.client';
 import {
@@ -87,4 +89,14 @@ export const getWorkspaceTasks = async (
   ).withConverter(converter);
   const q = query(colRef, orderBy('createdAt', 'desc'));
   return getDocuments(q);
+};
+
+export const getWorkspaceTask = async (
+  workspaceId: string,
+  taskId: string
+): Promise<WorkspaceTask | null> => {
+  const converter = createConverter<WorkspaceTask>();
+  const docRef = doc(db, `workspaces/${workspaceId}/tasks/${taskId}`).withConverter(converter);
+  const snap = await getDoc(docRef);
+  return snap.exists() ? snap.data() : null;
 };
