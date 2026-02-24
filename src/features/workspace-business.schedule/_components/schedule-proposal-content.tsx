@@ -35,14 +35,15 @@ export function ScheduleProposalContent({ fullPage = false }: ScheduleProposalCo
       workspaceId: workspace.id,
       workspaceName: workspace.name,
       title: data.title.trim(),
-      description: data.description?.trim(),
       startDate: data.startDate ? Timestamp.fromDate(data.startDate) : Timestamp.now(),
       endDate: data.endDate ? Timestamp.fromDate(data.endDate) : Timestamp.now(),
       location: data.location,
       status: "PROPOSAL",
       originType: "MANUAL",
       assigneeIds: [],
-      requiredSkills: data.requiredSkills.length > 0 ? data.requiredSkills : undefined,
+      // Omit optional fields rather than passing undefined — Firestore rejects undefined values.
+      ...(data.description?.trim() ? { description: data.description.trim() } : {}),
+      ...(data.requiredSkills.length > 0 ? { requiredSkills: data.requiredSkills } : {}),
     } as Omit<ScheduleItem, "id" | "createdAt" | "updatedAt">)
     toast({
       title: "Schedule Proposal Sent",

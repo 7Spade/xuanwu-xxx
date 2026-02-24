@@ -7,7 +7,7 @@ export * from "./task.rules";
 export * from "./user.rules";
 
 // Utilities
-export { cn, hexToHsl } from "./utils";
+export { cn, hexToHsl, firestoreTimestampToISO } from "./utils";
 export { formatBytes } from "./format-bytes";
 export {
   i18nConfig,
