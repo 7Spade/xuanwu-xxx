@@ -7,8 +7,8 @@ import { useAuth } from '@/shared/app-providers/auth-provider'
 import { useFirebase } from '@/shared/app-providers/firebase-provider'
 import {
   updateUserProfile as updateUserProfileAction,
-  getUserProfile as getUserProfileAction,
 } from '../_actions'
+import { getUserProfile as getUserProfileQuery } from '../_queries'
 import { uploadProfilePicture } from '@/shared/infra/storage/storage.facade'
 import type { Account } from '@/shared/types'
 
@@ -38,7 +38,7 @@ export function useUser() {
         setProfile({ id: doc.id, ...doc.data() } as Account)
       } else {
         // If profile doesn't exist, create a default one.
-        getUserProfileAction(user.id).then(setProfile)
+        getUserProfileQuery(user.id).then(setProfile)
       }
       setLoading(false)
     })

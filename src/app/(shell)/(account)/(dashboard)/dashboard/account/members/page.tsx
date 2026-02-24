@@ -1,4 +1,4 @@
-import { MembersView } from "@/features/workspace-governance.members"
+import { MembersView } from "@/features/account-organization.member"
 
 export default function AccountMembersPage() {
   return <MembersView />
