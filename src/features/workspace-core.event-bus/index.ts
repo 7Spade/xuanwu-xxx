@@ -24,3 +24,5 @@ export type {
 // Context and hook for consuming the event bus
 export { WorkspaceEventContext, useWorkspaceEvents } from './_context'
 export type { WorkspaceEventContextType } from './_context'
+// Event Funnel — routes events from both buses to the Projection Layer
+export { registerWorkspaceFunnel, registerOrganizationFunnel, replayWorkspaceProjections } from './_event-funnel'

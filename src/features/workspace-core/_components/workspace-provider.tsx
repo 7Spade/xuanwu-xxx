@@ -2,9 +2,9 @@
 "use client";
 
 import type React from 'react';
-import { createContext, useContext, useMemo, useCallback } from 'react';
+import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
-import { WorkspaceEventBus , WorkspaceEventContext } from '@/features/workspace-core.event-bus';
+import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel } from '@/features/workspace-core.event-bus';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
@@ -78,6 +78,16 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const workspace = workspaces[workspaceId];
 
   const eventBus = useMemo(() => new WorkspaceEventBus(), [workspaceId]);
+
+  // Register Event Funnel — routes events from both buses to the Projection Layer
+  useEffect(() => {
+    const unsubWorkspace = registerWorkspaceFunnel(eventBus);
+    const unsubOrg = registerOrganizationFunnel();
+    return () => {
+      unsubWorkspace();
+      unsubOrg();
+    };
+  }, [eventBus]);
 
   const localAuditLogs = useMemo(() => {
     if (!auditLogs || !workspaceId) return [];
