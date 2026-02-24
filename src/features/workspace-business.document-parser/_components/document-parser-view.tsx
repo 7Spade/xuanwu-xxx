@@ -160,7 +160,8 @@ export function WorkspaceDocumentParser() {
       name: item.item,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      discount: item.discount,
+      // Omit discount entirely when undefined to avoid Firestore "Unsupported field value: undefined"
+      ...(item.discount !== undefined ? { discount: item.discount } : {}),
       subtotal: item.price,
     }));
 

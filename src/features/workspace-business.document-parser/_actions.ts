@@ -43,7 +43,32 @@ export async function extractDataFromDocument(
       };
     }
 
-    return { data: result, fileName: file.name };
+    // Sanitize AI output: coerce numeric strings to numbers and drop rows where
+    // required fields are still missing after coercion. This prevents TypeError
+    // in the UI (undefined.toLocaleString) and Firestore rejections (undefined).
+    const toNum = (v: unknown, fallback: number): number => {
+      const n = Number(v);
+      return isNaN(n) ? fallback : n;
+    };
+    const sanitizedItems: WorkItem[] = result.workItems
+      .filter((item) => item != null && typeof item.item === 'string' && item.item.trim() !== '')
+      .map((item) => ({
+        item: item.item,
+        // quantity 0 is invalid for an invoice line — default to 1
+        quantity: toNum(item.quantity, 1) || 1,
+        // 0 is a valid price (e.g. free/fully-discounted) — only fall back when null/undefined
+        unitPrice: item.unitPrice != null ? toNum(item.unitPrice, 0) : 0,
+        ...(item.discount != null ? { discount: toNum(item.discount, 0) } : {}),
+        price: item.price != null ? toNum(item.price, 0) : 0,
+      }));
+
+    if (sanitizedItems.length === 0) {
+      return {
+        error: 'No valid line items could be extracted from this document.',
+      };
+    }
+
+    return { data: { workItems: sanitizedItems }, fileName: file.name };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
