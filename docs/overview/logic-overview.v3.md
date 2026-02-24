@@ -12,6 +12,10 @@ flowchart TD
 %% 8) Shared Kernel 必須顯式標示；未標示的跨 BC 共用一律視為侵入
 %% 9) Event Store 若存在，Projection 必須可由事件完整重建；否則不得宣稱 Event Sourcing
 %% 10) 任一模組若需外部 Context 內部狀態，代表邊界設計錯誤
+%% 11) XP 屬於 Account BC，不屬於 Organization BC；Organization 只能承認或設定門檻，不能修改 XP
+%% 12) Tier 永遠是推導值（純函式 getTier(xp)），不得存入任何 DB 欄位
+%% 13) XP 任何異動必須產生 Ledger 記錄（account-skill-xp-ledger）；不可直接 update xp 欄位
+%% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
 %% =================================================
 
 %% =================================================
@@ -71,6 +75,11 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
         ACCOUNT_NOTIFICATION_ROUTER[account-governance.notification-router（通知路由器）]
     end
 
+    subgraph ACCOUNT_SKILL_LAYER[Account Skill Layer（帳號能力成長主權）]
+        ACCOUNT_SKILL_AGGREGATE["account-skill.aggregate（accountId / skillId / xp / version）"]
+        ACCOUNT_SKILL_XP_LEDGER[("account-skill-xp-ledger（XP 審計帳本 · entryId / delta / reason / sourceId / timestamp）")]
+    end
+
 end
 
 ACCOUNT_IDENTITY_LINK --> USER_ACCOUNT
@@ -103,6 +112,7 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
         ORGANIZATION_PARTNER["organization-governance.partner（合作夥伴 · 外部組視圖）"]
         ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
         SKILL_TAG_POOL[(職能標籤庫（Skills / Certs）)]
+        ORG_SKILL_RECOGNITION["organization-skill-recognition.aggregate（organizationId / accountId / skillId / minXpRequired / status）"]
     end
 
     ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
@@ -114,6 +124,20 @@ end
 
 ORGANIZATION_ACCOUNT_BINDING --> ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
+
+
+%% =================================================
+%% CAPABILITY BC（能力定義邊界）
+%% 只負責「能力是什麼」— 不處理成長、歸屬、組織
+%% =================================================
+
+subgraph CAPABILITY_BC[Capability BC（能力定義邊界）]
+    SKILL_DEFINITION_AGGREGATE["skill-definition.aggregate（skillId / name / maxXp=525 / tierConfig）"]
+end
+
+SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId / tierConfig · 唯讀）| ACCOUNT_SKILL_AGGREGATE
+SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId · 唯讀）| ORG_SKILL_RECOGNITION
+SKILL_TAG_POOL -.->|職能標籤參照自| SKILL_DEFINITION_AGGREGATE
 
 
 %% =================================================
@@ -243,6 +267,20 @@ ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
 WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MODEL
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
+W_B_SCHEDULE -.->|查詢可用帳號（eligible=true · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
+
+
+%% =================================================
+%% SKILL XP COMMAND FLOW（技能 XP 指令流程）
+%% Server Action → Aggregate → Ledger → Event → Projection
+%% 不可跨越 Ledger 直接更新 xp；不可跨 BC 直接寫入
+%% =================================================
+
+SERVER_ACTION_SKILL["_actions.ts（Skill Server Action — addXp / deductXp）"]
+SERVER_ACTION_SKILL -->|addXp / deductXp Command| ACCOUNT_SKILL_AGGREGATE
+ACCOUNT_SKILL_AGGREGATE -->|addXp(amount, reason) · clamp(0, 525) · 寫入 Ledger| ACCOUNT_SKILL_XP_LEDGER
+ACCOUNT_SKILL_AGGREGATE -->|SkillXpAdded / SkillXpDeducted| ORGANIZATION_EVENT_BUS
+ORG_SKILL_RECOGNITION -->|SkillRecognitionGranted / SkillRecognitionRevoked| ORGANIZATION_EVENT_BUS
 
 
 %% =================================================
@@ -263,6 +301,10 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     ACCOUNT_PROJECTION_SCHEDULE[projection.account-schedule（帳號排程投影）]
     ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
 
+    ACCOUNT_SKILL_VIEW["projection.account-skill-view（accountId / skillId / xp / tier · 來源: SkillXpAdded/Deducted）"]
+    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（orgId / accountId / skillId / xp / tier / eligible · 排程專用）"]
+    SKILL_TIER_FUNCTION[["getTier(xp) → Tier（純函式 · Apprentice/Journeyman/Expert/Artisan/Grandmaster/Legendary/Titan · 不存 DB）"]]
+
 end
 
 %% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖
@@ -276,6 +318,11 @@ EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
 EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
 EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> ACCOUNT_SKILL_VIEW
+EVENT_FUNNEL_INPUT --> ORG_ELIGIBLE_MEMBER_VIEW
+
+ACCOUNT_SKILL_VIEW -.->|tier 由 getTier(xp) 計算（不存 DB）| SKILL_TIER_FUNCTION
+ORG_ELIGIBLE_MEMBER_VIEW -.->|tier 由 getTier(xp) 計算（不存 DB）| SKILL_TIER_FUNCTION
 
 EVENT_FUNNEL_INPUT -->|更新事件串流偏移量（stream offset）| PROJECTION_VERSION
 PROJECTION_VERSION -->|提供 read-model 對應版本| READ_MODEL_REGISTRY
@@ -357,6 +404,10 @@ classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
+classDef capabilityBc fill:#f0e6ff,stroke:#9333ea,color:#000;
+classDef accountSkill fill:#bbf7d0,stroke:#22c55e,color:#000;
+classDef tierFunction fill:#fdf4ff,stroke:#c084fc,color:#000;
+classDef skillProjection fill:#fefce8,stroke:#eab308,color:#000;
 
 classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
 classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
@@ -387,3 +438,11 @@ class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
 class WORKSPACE_ORG_POLICY_CACHE workspace;
 class WORKSPACE_SCOPE_READ_MODEL projection;
+class CAPABILITY_BC capabilityBc;
+class SKILL_DEFINITION_AGGREGATE capabilityBc;
+class ACCOUNT_SKILL_LAYER accountSkill;
+class ACCOUNT_SKILL_AGGREGATE,ACCOUNT_SKILL_XP_LEDGER accountSkill;
+class ORG_SKILL_RECOGNITION organization;
+class SKILL_TIER_FUNCTION tierFunction;
+class ACCOUNT_SKILL_VIEW,ORG_ELIGIBLE_MEMBER_VIEW skillProjection;
+class SERVER_ACTION_SKILL serverAction;
