@@ -31,8 +31,20 @@ export function useScheduleEventHandler() {
       }
     );
 
+    // Schedule trigger chain: task assignment may require schedule availability validation
+    const unsubTaskAssigned = eventBus.subscribe(
+      "workspace:tasks:assigned",
+      (payload) => {
+        toast({
+          title: "Task Assignment Detected",
+          description: `Task "${payload.task.name}" has been assigned. Review schedule availability for the assignee.`,
+        });
+      }
+    );
+
     return () => {
       unsubIssueResolved();
+      unsubTaskAssigned();
     };
   }, [eventBus]);
 }

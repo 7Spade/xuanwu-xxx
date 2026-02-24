@@ -20,6 +20,7 @@ export type {
   WorkspaceIssueResolvedPayload,
   WorkspaceFinanceDisbursementFailedPayload,
   WorkspaceTaskBlockedPayload,
+  WorkspaceTaskAssignedPayload,
   WorkspaceScheduleProposedPayload,
 } from './_events'
 // Context and hook for consuming the event bus

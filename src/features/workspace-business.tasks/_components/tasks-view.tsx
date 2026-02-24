@@ -263,6 +263,12 @@ export function WorkspaceTasks() {
         if (finalData.progressState === 'completed') {
           eventBus.publish('workspace:tasks:completed', { task: updatedTaskForEvent });
         }
+
+        // SourcePointer schedule trigger chain: publish assigned event when assigneeId changes
+        const prevAssigneeId = workspace.tasks?.[editingTask.id]?.assigneeId;
+        if (finalData.assigneeId && finalData.assigneeId !== prevAssigneeId) {
+          eventBus.publish('workspace:tasks:assigned', { task: updatedTaskForEvent });
+        }
       } else {
         const taskToCreate: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'> = {
             ...finalData,

@@ -21,7 +21,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 export function WorkspaceIssues() {
-  const { workspace, logAuditEvent, protocol, createIssue, addCommentToIssue, resolveIssue, eventBus } = useWorkspace();
+  const { workspace, logAuditEvent, protocol, createIssue, addCommentToIssue, resolveIssue } = useWorkspace();
   const { state: authState } = useAuth();
   
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -69,15 +69,8 @@ export function WorkspaceIssues() {
   const handleResolveIssue = async (issue: WorkspaceIssue) => {
     if (!authState.user) return;
     try {
-      await resolveIssue(issue.id);
-      // B 軌宣告事實（Discrete Recovery Principle）：
-      // B-track publishes IssueResolved with sourceTaskId so A-track can self-recover.
-      eventBus.publish('workspace:issues:resolved', {
-        issueId: issue.id,
-        issueTitle: issue.title,
-        resolvedBy: authState.user.name,
-        sourceTaskId: issue.sourceTaskId,
-      });
+      // Transaction Runner + Outbox: event publishing is handled inside resolveIssue context
+      await resolveIssue(issue.id, issue.title, authState.user.name, issue.sourceTaskId);
       logAuditEvent("B-Track Resolved", `Issue Closed: ${issue.title}`, 'update');
       setSelectedIssue(null);
       toast({ title: "Issue Resolved", description: `"${issue.title}" has been closed. A-Track may now resume.` });

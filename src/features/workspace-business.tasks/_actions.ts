@@ -25,7 +25,9 @@ export async function updateTask(
   taskId: string,
   updates: Partial<WorkspaceTask>
 ): Promise<void> {
-  return updateTaskFacade(workspaceId, taskId, updates)
+  // SourcePointer contract: sourceIntentId is read-only once set (Digital Twin invariant)
+  const { sourceIntentId: _sourceIntentId, ...safeUpdates } = updates
+  return updateTaskFacade(workspaceId, taskId, safeUpdates)
 }
 
 export async function deleteTask(

@@ -6,7 +6,7 @@ import { createContext, useContext, useMemo, useCallback, useEffect } from 'reac
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
 import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel } from '@/features/workspace-core.event-bus';
 import { registerNotificationRouter } from '@/features/account-governance.notification-router';
-import { registerOrgPolicyCache } from '@/features/workspace-application';
+import { registerOrgPolicyCache, runTransaction } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
@@ -64,7 +64,7 @@ interface WorkspaceContextType {
   // Issue Management
   createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => Promise<void>;
   addCommentToIssue: (issueId: string, author: string, content: string) => Promise<void>;
-  resolveIssue: (issueId: string) => Promise<void>;
+  resolveIssue: (issueId: string, issueTitle: string, resolvedBy: string, sourceTaskId?: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
 }
@@ -87,7 +87,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     const unsubWorkspace = registerWorkspaceFunnel(eventBus);
     const unsubOrg = registerOrganizationFunnel();
     const { unsubscribe: unsubNotif } = registerNotificationRouter();
-    const unsubPolicy = registerOrgPolicyCache();
+    const unsubPolicy = registerOrgPolicyCache(workspaceId);
     return () => {
       unsubWorkspace();
       unsubOrg();
@@ -132,7 +132,27 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => createIssueAction(workspaceId, title, type, priority, sourceTaskId), [workspaceId]);
   const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
-  const resolveIssue = useCallback(async (issueId: string) => resolveIssueAction(workspaceId, issueId), [workspaceId]);
+  const resolveIssue = useCallback(async (
+    issueId: string,
+    issueTitle: string,
+    resolvedBy: string,
+    sourceTaskId?: string
+  ) => {
+    const { events } = await runTransaction(workspaceId, resolvedBy, async (ctx) => {
+      await resolveIssueAction(workspaceId, issueId);
+      ctx.outbox.collect('workspace:issues:resolved', {
+        issueId,
+        issueTitle,
+        resolvedBy,
+        sourceTaskId,
+      });
+    });
+    // Flush Outbox events to the workspace event bus (Discrete Recovery trigger)
+    for (const event of events) {
+      // OutboxEvent is a discriminated union with correctly paired type+payload at construction.
+      (eventBus.publish as (type: string, payload: unknown) => void)(event.type, event.payload);
+    }
+  }, [workspaceId, eventBus]);
 
   const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
 
