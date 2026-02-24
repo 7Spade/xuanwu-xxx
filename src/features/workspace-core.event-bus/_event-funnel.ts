@@ -145,6 +145,31 @@ export function registerOrganizationFunnel(): () => void {
     })
   );
 
+  // SkillRecognitionGranted / Revoked → update projection version (audit trail)
+  // Recognition state is owned by ORG_SKILL_RECOGNITION aggregate (separate from
+  // org-eligible-member-view). These events don't change XP or eligibility — they
+  // record the org's acknowledgment. We track the event stream offset for replay
+  // consistency (Invariant A7) under the recognition projection namespace.
+  unsubscribers.push(
+    onOrgEvent('organization:skill:recognitionGranted', async (payload) => {
+      await upsertProjectionVersion(
+        `org-skill-recognition-${payload.organizationId}`,
+        Date.now(),
+        new Date().toISOString()
+      );
+    })
+  );
+
+  unsubscribers.push(
+    onOrgEvent('organization:skill:recognitionRevoked', async (payload) => {
+      await upsertProjectionVersion(
+        `org-skill-recognition-${payload.organizationId}`,
+        Date.now(),
+        new Date().toISOString()
+      );
+    })
+  );
+
   return () => unsubscribers.forEach((u) => u());
 }
 

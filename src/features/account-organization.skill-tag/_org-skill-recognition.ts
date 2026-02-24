@@ -33,6 +33,7 @@ import {
 } from '@/shared/infra/firestore/firestore.write.adapter';
 import { getDocument } from '@/shared/infra/firestore/firestore.read.adapter';
 import { publishOrgEvent } from '@/features/account-organization.event-bus';
+import { findSkill } from '@/shared/constants/skills';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,9 +76,15 @@ export interface OrgSkillRecognitionRecord {
 /**
  * Grants skill recognition to an account within an organization.
  *
+ * Read-only reference to SKILL_DEFINITION_AGGREGATE (Capability BC):
+ *   Validates `skillId` against the static global skill library via findSkill().
+ *   This enforces the Capability BC boundary — only skills that exist in the
+ *   canonical definition library can be recognised.
+ *
  * Publishes `organization:skill:recognitionGranted` event.
  *
  * @param minXpRequired  Org-controlled XP gate (0 = no threshold; max 525).
+ * @throws Error when `skillId` is not a known skill in the global library.
  */
 export async function grantSkillRecognition(
   organizationId: string,
@@ -86,6 +93,14 @@ export async function grantSkillRecognition(
   grantedBy: string,
   minXpRequired = 0
 ): Promise<void> {
+  // Read-only reference to SKILL_DEFINITION_AGGREGATE (Capability BC — Invariant #8)
+  const skillDefinition = findSkill(skillId);
+  if (!skillDefinition) {
+    throw new Error(
+      `Cannot grant recognition for unknown skill "${skillId}". ` +
+        `Only skills from the global skill library can be recognised.`
+    );
+  }
   const path = `orgSkillRecognition/${organizationId}/members/${accountId}/skills/${skillId}`;
   const record: OrgSkillRecognitionRecord = {
     organizationId,
