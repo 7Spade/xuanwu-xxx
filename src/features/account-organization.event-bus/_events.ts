@@ -52,16 +52,91 @@ export interface OrgTeamUpdatedPayload {
   updatedBy: string;
 }
 
+/**
+ * Fired when XP is added to a member's skill (ACCOUNT_SKILL_AGGREGATE).
+ * Used by projection.account-skill-view and projection.org-eligible-member-view.
+ * Per invariant #11: XP belongs to Account BC; Organization only receives the event.
+ */
+export interface SkillXpAddedPayload {
+  accountId: string;
+  orgId: string;
+  /** tagSlug — portable skill identifier (matches SkillGrant.tagSlug) */
+  skillId: string;
+  xpDelta: number;
+  /** New clamped XP value (0–525). Stored; tier must be derived via resolveSkillTier(xp). */
+  newXp: number;
+  reason?: string;
+}
+
+/**
+ * Fired when XP is deducted from a member's skill.
+ * Mirror of SkillXpAddedPayload — same projection targets.
+ */
+export interface SkillXpDeductedPayload {
+  accountId: string;
+  orgId: string;
+  skillId: string;
+  xpDelta: number;
+  newXp: number;
+  reason?: string;
+}
+
+/**
+ * Compensating event (Invariant A5) — published when a schedule assignment is
+ * rejected because the target member does not meet skill tier requirements.
+ * Discrete Recovery: does NOT directly revert A-track tasks; consumers decide.
+ */
+export interface ScheduleAssignRejectedPayload {
+  scheduleItemId: string;
+  orgId: string;
+  workspaceId: string;
+  targetAccountId: string;
+  /** Human-readable reason for rejection (e.g. skill tier insufficient). */
+  reason: string;
+  rejectedAt: string;
+}
+
+/**
+ * Fired by ORG_SKILL_RECOGNITION when an organization grants skill recognition
+ * to a member.  Per logic-overview.v3.md:
+ *   ORG_SKILL_RECOGNITION →|SkillRecognitionGranted| ORGANIZATION_EVENT_BUS
+ */
+export interface SkillRecognitionGrantedPayload {
+  organizationId: string;
+  accountId: string;
+  skillId: string;
+  /** Org-controlled XP threshold (0 = no gate). */
+  minXpRequired: number;
+  grantedBy: string;
+}
+
+/**
+ * Fired by ORG_SKILL_RECOGNITION when an organization revokes a skill recognition.
+ * Per logic-overview.v3.md:
+ *   ORG_SKILL_RECOGNITION →|SkillRecognitionRevoked| ORGANIZATION_EVENT_BUS
+ */
+export interface SkillRecognitionRevokedPayload {
+  organizationId: string;
+  accountId: string;
+  skillId: string;
+  revokedBy: string;
+}
+
 // =================================================================
 // == Event Key Map
 // =================================================================
 
 export interface OrganizationEventPayloadMap {
   'organization:schedule:assigned': ScheduleAssignedPayload;
+  'organization:schedule:assignRejected': ScheduleAssignRejectedPayload;
   'organization:policy:changed': OrgPolicyChangedPayload;
   'organization:member:joined': OrgMemberJoinedPayload;
   'organization:member:left': OrgMemberLeftPayload;
   'organization:team:updated': OrgTeamUpdatedPayload;
+  'organization:skill:xpAdded': SkillXpAddedPayload;
+  'organization:skill:xpDeducted': SkillXpDeductedPayload;
+  'organization:skill:recognitionGranted': SkillRecognitionGrantedPayload;
+  'organization:skill:recognitionRevoked': SkillRecognitionRevokedPayload;
 }
 
 export type OrganizationEventKey = keyof OrganizationEventPayloadMap;

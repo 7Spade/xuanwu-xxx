@@ -4,9 +4,9 @@
 import type React from 'react';
 import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
-import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel } from '@/features/workspace-core.event-bus';
+import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName } from '@/features/workspace-core.event-bus';
 import { registerNotificationRouter } from '@/features/account-governance.notification-router';
-import { registerOrgPolicyCache } from '@/features/workspace-application';
+import { registerOrgPolicyCache, runTransaction } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
@@ -64,7 +64,8 @@ interface WorkspaceContextType {
   // Issue Management
   createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => Promise<void>;
   addCommentToIssue: (issueId: string, author: string, content: string) => Promise<void>;
-  resolveIssue: (issueId: string) => Promise<void>;
+  /** Resolves a B-track issue via the Transaction Runner + Outbox pipeline. */
+  resolveIssue: (issueId: string, issueTitle: string, resolvedBy: string, sourceTaskId?: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
 }
@@ -116,7 +117,22 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   }, [activeAccount, db, workspaceId]);
 
   const createTask = useCallback(async (task: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>) => createTaskAction(workspaceId, task), [workspaceId]);
-  const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => updateTaskAction(workspaceId, taskId, updates), [workspaceId]);
+  const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => {
+    // Capture task data before write so the event payload reflects the stable name.
+    const taskData = workspace.tasks?.[taskId];
+    await updateTaskAction(workspaceId, taskId, updates);
+    // Schedule trigger chain: task assignment change → workspace:tasks:assigned → W_B_SCHEDULE.
+    // Only publish when a non-empty assigneeId is provided (assignment, not un-assignment).
+    if (updates.assigneeId) {
+      eventBus.publish('workspace:tasks:assigned', {
+        taskId,
+        taskName: taskData?.name ?? taskId,
+        assigneeId: updates.assigneeId,
+        workspaceId,
+        sourceIntentId: taskData?.sourceIntentId,
+      });
+    }
+  }, [workspaceId, workspace.tasks, eventBus]);
   const deleteTask = useCallback(async (taskId: string) => deleteTaskAction(workspaceId, taskId), [workspaceId]);
   
   const authorizeWorkspaceTeam = useCallback(async (teamId: string) => authorizeWorkspaceTeamAction(workspaceId, teamId), [workspaceId]);
@@ -132,7 +148,17 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => createIssueAction(workspaceId, title, type, priority, sourceTaskId), [workspaceId]);
   const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
-  const resolveIssue = useCallback(async (issueId: string) => resolveIssueAction(workspaceId, issueId), [workspaceId]);
+  // Outbox-encapsulated resolve: Firestore write + event collection happen inside
+  // Transaction Runner; events are flushed to the Event Bus only after the write commits.
+  const resolveIssue = useCallback(async (issueId: string, issueTitle: string, resolvedBy: string, sourceTaskId?: string) => {
+    const { events } = await runTransaction(workspaceId, resolvedBy, async (ctx) => {
+      await resolveIssueAction(workspaceId, issueId);
+      ctx.outbox.collect('workspace:issues:resolved', { issueId, issueTitle, resolvedBy, sourceTaskId });
+    });
+    for (const event of events) {
+      eventBus.publish(event.type as WorkspaceEventName, event.payload as never);
+    }
+  }, [workspaceId, eventBus]);
 
   const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
 

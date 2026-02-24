@@ -17,6 +17,7 @@
 
 import type { OrgPolicyChangedPayload } from '@/features/account-organization.event-bus';
 import { onOrgEvent } from '@/features/account-organization.event-bus';
+import { upsertProjectionVersion } from '@/features/projection.registry';
 
 export interface OrgPolicyEntry {
   policyId: string;
@@ -64,6 +65,16 @@ export function registerOrgPolicyCache(): () => void {
           cachedAt: new Date().toISOString(),
         });
       }
+      // Signal to the Workspace Scope Read Model that org policies have changed.
+      // Invariant #7: Scope Guard reads only the local read model, so we bump
+      // the projection version so any cache layer knows to re-evaluate access.
+      upsertProjectionVersion(
+        `workspace-scope-guard:org:${payload.orgId}`,
+        Date.now(),
+        new Date().toISOString(),
+      ).catch((err: unknown) =>
+        console.error(`[workspace-application] Failed to bump scope guard version for org ${payload.orgId}:`, err)
+      );
     }
   );
 

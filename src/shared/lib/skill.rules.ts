@@ -53,6 +53,17 @@ export function resolveSkillTier(xp: number): SkillTier {
 }
 
 /**
+ * Alias for resolveSkillTier — canonical name used in logic-overview.v3.md.
+ *
+ * Pure function: no side effects, no I/O, no React.
+ * Used by: projection.account-skill-view, projection.org-eligible-member-view,
+ *          account-organization.schedule (skill validation).
+ *
+ * Invariant #12: tier is NEVER stored in DB — always computed at runtime.
+ */
+export const getTier = resolveSkillTier;
+
+/**
  * Returns the numeric rank for a tier (1 = lowest, 7 = highest).
  * Useful for comparison operations.
  */
