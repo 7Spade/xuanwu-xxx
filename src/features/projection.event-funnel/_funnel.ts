@@ -84,6 +84,20 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
     })
   );
 
+  // workspace:document-parser:itemsExtracted → PROJECTION_VERSION (stream offset)
+  // ParsingIntent creates Firestore documents via direct writes; the funnel records
+  // the stream offset so the projection registry stays consistent.
+  // Per logic-overview.v3.md: EVENT_FUNNEL_INPUT →|更新事件串流偏移量| PROJECTION_VERSION
+  unsubscribers.push(
+    bus.subscribe('workspace:document-parser:itemsExtracted', async (payload) => {
+      await upsertProjectionVersion(
+        `parsing-intent-${payload.intentId}`,
+        Date.now(),
+        new Date().toISOString()
+      );
+    })
+  );
+
   return () => unsubscribers.forEach((u) => u());
 }
 
