@@ -33,6 +33,7 @@ it owns types, server actions, queries, hooks, and UI components.
 | `account-user.profile/` | User profile, preferences, FCM token | ✅ |
 | `account-user.wallet/` | User personal wallet, balance (stub) | 🔧 |
 | `account-user.notification/` | Personal push notification (FCM Layer 3) | 🆕 |
+| `account-user.skill/` | Personal skill XP growth · Ledger · Tier derivation (Invariants #11-13) | 🆕 |
 
 ### Account Layer — Organization Sub-type
 
@@ -106,6 +107,8 @@ it owns types, server actions, queries, hooks, and UI components.
 | `projection.account-audit/` | Account audit projection | 🆕 |
 | `projection.account-schedule/` | Account schedule projection (filter available accounts) | 🆕 |
 | `projection.organization-view/` | Organization read model | 🆕 |
+| `projection.account-skill-view/` | Account skill read model (accountId / skillId / xp · tier derived, not stored) | 🆕 |
+| `projection.org-eligible-member-view/` | Schedule eligibility read model (orgId / accountId / eligible · Invariant #14) | 🆕 |
 | `projection.registry/` | Event stream offset · read model version table | 🆕 |
 
 > **Status legend:** ✅ implemented · 🔧 partial stub (structure created, implementation deferred)

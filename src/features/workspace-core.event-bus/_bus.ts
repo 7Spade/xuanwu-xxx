@@ -1,4 +1,5 @@
 // [職責] 事件發布/訂閱引擎 (The Bus)
+// Per logic-overview.v3.md: WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
 import type {
   WorkspaceEventName,
   WorkspaceEventHandler,
@@ -6,6 +7,7 @@ import type {
   SubscribeFn,
   WorkspaceEventPayloadMap,
 } from "./_events"
+import type { ImplementsEventEnvelopeContract } from "@/shared/kernel/event-envelope"
 
 // A map where keys are event names (strings) and values are arrays of handler functions (Observers).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,8 +16,13 @@ type HandlerRegistry = Map<WorkspaceEventName, WorkspaceEventHandler<any>[]>
 /**
  * The Subject in the Observer pattern. It maintains a list of Observers (handlers)
  * and notifies them when an event occurs.
+ *
+ * Implements shared-kernel.event-envelope contract (Invariant #8).
  */
-export class WorkspaceEventBus {
+export class WorkspaceEventBus implements ImplementsEventEnvelopeContract {
+  /** Marker: this bus implements the shared-kernel.event-envelope contract. */
+  readonly implementsEventEnvelope = true as const;
+
   private handlers: HandlerRegistry
 
   constructor() {
