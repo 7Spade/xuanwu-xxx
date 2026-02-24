@@ -70,6 +70,11 @@ export interface WorkspaceFinanceDisbursementFailedPayload {
   reason: string
 }
 
+export interface WorkspaceTaskBlockedPayload {
+  task: WorkspaceTask
+  reason?: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -77,6 +82,7 @@ export interface WorkspaceFinanceDisbursementFailedPayload {
 export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
+  | "workspace:tasks:blocked"
   | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
   | "workspace:quality-assurance:approved"
@@ -94,6 +100,7 @@ export type WorkspaceEventName =
 export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
+  "workspace:tasks:blocked": WorkspaceTaskBlockedPayload
   "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
   "workspace:quality-assurance:approved": WorkspaceQualityAssuranceApprovedPayload

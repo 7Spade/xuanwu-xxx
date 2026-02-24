@@ -16,6 +16,10 @@ export type {
   WorkspaceAcceptancePassedPayload,
   DocumentParserItemsExtractedPayload,
   DailyLogForwardRequestedPayload,
+  FileSendToParserPayload,
+  WorkspaceIssueResolvedPayload,
+  WorkspaceFinanceDisbursementFailedPayload,
+  WorkspaceTaskBlockedPayload,
 } from './_events'
 // Context and hook for consuming the event bus
 export { WorkspaceEventContext, useWorkspaceEvents } from './_context'

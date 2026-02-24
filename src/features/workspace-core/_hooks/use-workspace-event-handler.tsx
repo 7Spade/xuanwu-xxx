@@ -258,6 +258,24 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    // TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
+    const unsubTaskBlocked = eventBus.subscribe(
+      "workspace:tasks:blocked",
+      async (payload) => {
+        await createIssue(
+          workspace.id,
+          `Task Blocked: ${payload.task.name}`,
+          "technical",
+          "high"
+        );
+        pushNotification(
+          "Task Blocked & Issue Logged",
+          `Task "${payload.task.name}" is blocked. A B-track issue has been created.`,
+          "alert"
+        );
+      }
+    );
+
     return () => {
       unsubQAApproved();
       unsubAcceptancePassed();
@@ -269,6 +287,7 @@ export function useWorkspaceEventHandler() {
       unsubForwardRequested();
       unsubIssueResolved();
       unsubFinanceFailed();
+      unsubTaskBlocked();
     };
   }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 }

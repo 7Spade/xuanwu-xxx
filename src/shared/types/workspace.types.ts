@@ -66,7 +66,7 @@ export interface WorkspaceTask {
   id: string;
   name: string;
   description?: string;
-  progressState: 'todo' | 'doing' | 'completed' | 'verified' | 'accepted';
+  progressState: 'todo' | 'doing' | 'blocked' | 'completed' | 'verified' | 'accepted';
   priority: 'low' | 'medium' | 'high';
   type?: string;
   progress?: number;

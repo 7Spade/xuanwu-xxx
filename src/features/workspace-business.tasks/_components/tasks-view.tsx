@@ -17,6 +17,7 @@ import {
   BarChart3,
   CalendarPlus,
   ClipboardPlus,
+  OctagonX,
   Send,
   UploadCloud,
   X,
@@ -354,6 +355,19 @@ export function WorkspaceTasks() {
     });
   };
 
+  const handleMarkBlocked = async (task: TaskWithChildren) => {
+    if (!['todo', 'doing'].includes(task.progressState)) return;
+    try {
+      await updateTask(task.id, { progressState: 'blocked' as const });
+      const updatedTask: WorkspaceTask = { ...task, progressState: 'blocked' as WorkspaceTask['progressState'] };
+      eventBus.publish('workspace:tasks:blocked', { task: updatedTask });
+      logAuditEvent('Task Blocked', task.name, 'update');
+      toast({ title: 'Task Blocked', description: `"${task.name}" is blocked. A B-track issue will be created.` });
+    } catch (error: unknown) {
+      toast({ variant: 'destructive', title: 'Failed to Block Task', description: getErrorMessage(error, 'Unknown error.') });
+    }
+  };
+
   const toggleColumn = (key: string) => {
     const next = new Set(visibleColumns);
     if (next.has(key)) next.delete(key);
@@ -522,6 +536,8 @@ export function WorkspaceTasks() {
                           ? 'bg-purple-500'
                           : node.progressState === 'accepted'
                           ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]'
+                          : node.progressState === 'blocked'
+                          ? 'bg-red-500'
                           : 'bg-amber-500'
                       )}
                     />
@@ -550,6 +566,17 @@ export function WorkspaceTasks() {
             >
                 <CalendarPlus className="size-3.5" />
             </Button>
+            {['todo', 'doing'].includes(node.progressState) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 rounded-lg text-destructive"
+                onClick={() => handleMarkBlocked(node)}
+                title="Mark as Blocked (B-Track)"
+              >
+                <OctagonX className="size-3.5" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -872,6 +899,7 @@ export function WorkspaceTasks() {
                 <SelectContent>
                   <SelectItem value="todo">To-do</SelectItem>
                   <SelectItem value="doing">Doing</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="verified">Verified</SelectItem>
                   <SelectItem value="accepted">Accepted</SelectItem>
