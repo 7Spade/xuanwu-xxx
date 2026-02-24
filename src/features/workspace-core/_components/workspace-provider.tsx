@@ -2,9 +2,10 @@
 "use client";
 
 import type React from 'react';
-import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
+import { createContext, useContext, useMemo, useCallback, useEffect, useState } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
 import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName } from '@/features/workspace-core.event-bus';
+import type { FileSendToParserPayload } from '@/features/workspace-core.event-bus';
 import { registerNotificationRouter } from '@/features/account-governance.notification-router';
 import { registerOrgPolicyCache, runTransaction } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
@@ -68,6 +69,10 @@ interface WorkspaceContextType {
   resolveIssue: (issueId: string, issueTitle: string, resolvedBy: string, sourceTaskId?: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
+  // Pending parse file — set by files-view when "Parse with AI" is clicked;
+  // read by document-parser on mount to auto-trigger parsing cross-tab.
+  pendingParseFile: FileSendToParserPayload | null;
+  setPendingParseFile: (payload: FileSendToParserPayload | null) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
@@ -81,6 +86,10 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const workspace = workspaces[workspaceId];
 
   const eventBus = useMemo(() => new WorkspaceEventBus(), [workspaceId]);
+
+  // Pending parse file — bridges the cross-tab gap between files-view (publisher)
+  // and document-parser-view (subscriber), which are on separate @businesstab slots.
+  const [pendingParseFile, setPendingParseFile] = useState<FileSendToParserPayload | null>(null);
 
   // Register Event Funnel — routes events from both buses to the Projection Layer
   // Also register Notification Router (FCM Layer 2) and Org Policy Cache
@@ -197,6 +206,8 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     addCommentToIssue,
     resolveIssue,
     createScheduleItem,
+    pendingParseFile,
+    setPendingParseFile,
   };
 
     return (

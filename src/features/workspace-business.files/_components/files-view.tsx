@@ -26,6 +26,7 @@ import {
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { serverTimestamp, type FieldValue } from "firebase/firestore";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { subscribeToWorkspaceFiles } from '../_queries';
 import {
   createWorkspaceFile,
@@ -58,6 +59,7 @@ import {
   TableRow,
 } from "@/shared/shadcn-ui/table";
 import { uploadRawFile } from '../_storage-actions';
+import { ROUTES } from "@/shared/constants/routes";
 
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -68,8 +70,9 @@ const getErrorMessage = (error: unknown, fallback: string) =>
  * Features: Smart type detection, version history visualization, and instant sovereignty restoration.
  */
 export function WorkspaceFiles() {
-  const { workspace, logAuditEvent, eventBus } = useWorkspace();
+  const { workspace, logAuditEvent, setPendingParseFile } = useWorkspace();
   const { state: { user } } = useAuth();
+  const router = useRouter();
   
   const [historyFile, setHistoryFile] = useState<WorkspaceFile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -252,13 +255,18 @@ export function WorkspaceFiles() {
                           disabled={!current?.downloadURL}
                           onClick={() => {
                             if (!current?.downloadURL) return;
-                            eventBus.publish('workspace:files:sendToParser', {
+                            // Store the file payload in WorkspaceProvider context so the
+                            // document-parser tab can pick it up on mount.  The event bus
+                            // subscriber only exists when document-parser is already rendered
+                            // (same @businesstab slot), so we bridge the gap via context state.
+                            setPendingParseFile({
                               fileName: file.name,
                               downloadURL: current.downloadURL,
                               fileType: file.type,
                               fileId: file.id,
                             });
                             logAuditEvent('Sent File to Parser', file.name, 'update');
+                            router.push(`${ROUTES.WORKSPACE(workspace.id)}/document-parser`);
                           }}
                           className="cursor-pointer gap-2 py-2.5 text-[10px] font-bold uppercase"
                         >

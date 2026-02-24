@@ -1,16 +1,18 @@
 'use client';
 
-import { useActionState, useTransition, useRef, useEffect } from 'react';
-import { Loader2, UploadCloud, File as FileIcon } from 'lucide-react';
+import { useActionState, useTransition, useRef, useEffect, useCallback, useState } from 'react';
+import { Loader2, UploadCloud, File as FileIcon, ClipboardList, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/shared/utility-hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/shadcn-ui/card';
+import { Badge } from '@/shared/shadcn-ui/badge';
 import { Button } from '@/shared/shadcn-ui/button';
 import {
   extractDataFromDocument,
   type ActionState,
 } from '../_actions';
 import { saveParsingIntent } from '../_intent-actions';
-import type { SourcePointer } from '@/shared/types';
+import { subscribeToParsingIntents } from '../_queries';
+import type { SourcePointer, ParsingIntent } from '@/shared/types';
 type WorkItem = { item: string; quantity: number; unitPrice: number; discount?: number; price: number };
 import { useWorkspace } from '@/features/workspace-core';
 
@@ -74,7 +76,7 @@ export function WorkspaceDocumentParser() {
     extractDataFromDocument,
     initialState
   );
-  const { eventBus, logAuditEvent, workspace, createIssue } = useWorkspace();
+  const { eventBus, logAuditEvent, workspace, createIssue, pendingParseFile, setPendingParseFile } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -83,6 +85,53 @@ export function WorkspaceDocumentParser() {
   const sourceFileIdRef = useRef<string | undefined>(undefined);
   // Tracks the original download URL (SourcePointer) for the Digital Twin ParsingIntent
   const sourceFileDownloadURLRef = useRef<string | undefined>(undefined);
+
+  // Real-time ParsingIntent history (Digital Twin 解析合約 list)
+  const [parsingIntents, setParsingIntents] = useState<ParsingIntent[]>([]);
+  useEffect(() => {
+    const unsub = subscribeToParsingIntents(workspace.id, setParsingIntents);
+    return () => unsub();
+  }, [workspace.id]);
+
+  // Helper: fetch a file from a URL and trigger the AI extraction pipeline
+  const triggerParseFromURL = useCallback(async (payload: { fileName: string; downloadURL: string; fileType: string; fileId?: string }) => {
+    try {
+      sourceFileIdRef.current = payload.fileId;
+      sourceFileDownloadURLRef.current = payload.downloadURL;
+      const response = await fetch(payload.downloadURL);
+      const blob = await response.blob();
+      const file = new File([blob], payload.fileName, {
+        type: payload.fileType || blob.type,
+      });
+      const formData = new FormData();
+      formData.append('file', file);
+      startTransition(() => formAction(formData));
+      toast({
+        title: 'File Loaded from Space',
+        description: `Parsing "${payload.fileName}" from workspace files…`,
+      });
+    } catch (error: unknown) {
+      console.error('Failed to load file from workspace for parsing:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to Load File',
+        description: 'Could not fetch the selected workspace file for parsing.',
+      });
+    }
+  }, [formAction, startTransition, toast]);
+
+  // On mount: if files-view queued a file via WorkspaceProvider context, auto-trigger.
+  // This bridges the cross-tab gap — subscriber only exists when this component is mounted.
+  // Deps intentionally empty: pendingParseFile/setPendingParseFile are stable React state
+  // references, triggerParseFromURL is stable via useCallback, and we only want to run once
+  // on mount (not re-run whenever pendingParseFile changes later).
+  useEffect(() => {
+    if (pendingParseFile) {
+      setPendingParseFile(null);
+      triggerParseFromURL(pendingParseFile);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (state.error) {
@@ -101,39 +150,16 @@ export function WorkspaceDocumentParser() {
     }
   }, [state.error, state.fileName, toast, createIssue, logAuditEvent]);
 
-  // Subscribe to files:sendToParser — files view provides raw files for parsing
+  // Subscribe to files:sendToParser — handles same-tab publishes (edge case fallback).
+  // The primary cross-tab path uses WorkspaceProvider pendingParseFile state.
+  // triggerParseFromURL already has a try/catch; the void discard is safe.
   useEffect(() => {
     const unsubFiles = eventBus.subscribe(
       'workspace:files:sendToParser',
-      async (payload) => {
-        try {
-          // Capture the source file ID and download URL for ParsingIntent traceability (SourcePointer)
-          sourceFileIdRef.current = payload.fileId;
-          sourceFileDownloadURLRef.current = payload.downloadURL;
-          const response = await fetch(payload.downloadURL);
-          const blob = await response.blob();
-          const file = new File([blob], payload.fileName, {
-            type: payload.fileType || blob.type,
-          });
-          const formData = new FormData();
-          formData.append('file', file);
-          startTransition(() => formAction(formData));
-          toast({
-            title: 'File Loaded from Space',
-            description: `Parsing "${payload.fileName}" from workspace files…`,
-          });
-        } catch (error: unknown) {
-          console.error('Failed to load file from workspace for parsing:', error);
-          toast({
-            variant: 'destructive',
-            title: 'Failed to Load File',
-            description: 'Could not fetch the selected workspace file for parsing.',
-          });
-        }
-      }
+      (payload) => { void triggerParseFromURL(payload); }
     );
     return () => unsubFiles();
-  }, [eventBus, formAction, startTransition, toast]);
+  }, [eventBus, triggerParseFromURL]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -272,6 +298,42 @@ export function WorkspaceDocumentParser() {
                 </CardContent>
             </Card>
         </div>
+      )}
+
+      {/* ParsingIntent History — Digital Twin 解析合約 */}
+      {parsingIntents.length > 0 && (
+        <Card className="mt-8 bg-card/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest">
+              <ClipboardList className="size-4" /> Parsing Intent History
+            </CardTitle>
+            <CardDescription>Digital Twin records — each entry anchors tasks via SourcePointer.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {parsingIntents.map((intent) => (
+                <div key={intent.id} className="flex items-center justify-between rounded-lg border px-4 py-3 text-xs">
+                  <div className="flex items-center gap-3">
+                    {intent.status === 'imported' ? (
+                      <CheckCircle2 className="size-4 shrink-0 text-green-500" />
+                    ) : intent.status === 'failed' ? (
+                      <AlertCircle className="size-4 shrink-0 text-destructive" />
+                    ) : (
+                      <Clock className="size-4 shrink-0 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-semibold">{intent.sourceFileName}</p>
+                      <p className="text-muted-foreground">{intent.lineItems.length} line item(s)</p>
+                    </div>
+                  </div>
+                  <Badge variant={intent.status === 'imported' ? 'default' : intent.status === 'failed' ? 'destructive' : 'secondary'} className="text-[10px] uppercase">
+                    {intent.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
