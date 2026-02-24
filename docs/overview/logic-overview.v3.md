@@ -1,6 +1,23 @@
 flowchart TD
 
 %% =================================================
+%% STRUCTURE INDEX（閱讀順序）
+%% S0) Glossary + Boundary Definitions（術語與邊界定義）
+%% S1) Domain Model Architecture（業務不變量 / 聚合）
+%% S2) Application Coordination Layer（流程協調 / 技術構件）
+%% S3) Projection & View Model Architecture（讀模型）
+%% S4) Integration Contracts（共享契約 / 通知整合）
+%% =================================================
+
+%% =================================================
+%% GLOSSARY + BOUNDARY DEFINITIONS（權威定義段）
+%% Aggregate: 承載「必須同成敗」不變量的唯一原子邊界
+%% Module: 功能切片／技術封裝，不等於原子邊界
+%% Projection/View: 由事件衍生的讀模型，預設最終一致，不回推 Domain 寫入
+%% Application Coordinator: 指令協調與流程編排（Scope Guard / Policy Engine / Transaction Runner / Event Funnel）
+%% =================================================
+
+%% =================================================
 %% CONSISTENCY INVARIANTS（不變量）
 %% 1) 每個 BC 只能修改自己的 Aggregate，禁止跨 BC 直接寫入
 %% 2) 跨 BC 僅能透過 Event / Projection / 本地快取防腐層溝通，禁止直接讀取對方 Domain Model
@@ -30,6 +47,10 @@ flowchart TD
 %% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
 %% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
 %% A10) Notification Router 僅做無狀態路由；跨 BC 業務決策需留在來源 BC 或 projection 層
+%% =================================================
+
+%% =================================================
+%% S1) DOMAIN MODEL ARCHITECTURE（業務不變量 / 聚合）
 %% =================================================
 
 %% =================================================
@@ -260,7 +281,13 @@ ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（唯讀）| SKILL_TAG_POO
 
 
 %% =================================================
-%% REQUEST FLOW（請求流程）
+%% S2) APPLICATION COORDINATION LAYER（流程協調 / 技術構件）
+%% =================================================
+%% 下列區塊描述的是協調器與流程編排，不是 Domain Aggregate 本體
+%% =================================================
+
+%% =================================================
+%% REQUEST FLOW（請求流程編排）
 %% =================================================
 
 SERVER_ACTION["_actions.ts（Server Action — 業務觸發入口）"]
@@ -308,6 +335,12 @@ ORG_SKILL_RECOGNITION -->|SkillRecognitionGranted / SkillRecognitionRevoked| ORG
 
 
 %% =================================================
+%% S3) PROJECTION & VIEW MODEL ARCHITECTURE（讀模型架構）
+%% =================================================
+%% 讀模型章節：明確區分來源事件、最終一致、不可回推 Domain 寫入
+%% =================================================
+
+%% =================================================
 %% PROJECTION LAYER（投影層）
 %% =================================================
 
@@ -352,6 +385,10 @@ EVENT_FUNNEL_INPUT -->|更新事件串流偏移量（stream offset）| PROJECTIO
 PROJECTION_VERSION -->|提供 read-model 對應版本| READ_MODEL_REGISTRY
 WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_INPUT
 
+
+%% =================================================
+%% S4) INTEGRATION CONTRACTS（共享契約 / 整合）
+%% =================================================
 
 %% =================================================
 %% SHARED KERNEL（共享核心，需顯式標示）
