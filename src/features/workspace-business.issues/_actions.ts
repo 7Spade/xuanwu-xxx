@@ -15,9 +15,10 @@ export async function createIssue(
   workspaceId: string,
   title: string,
   type: "technical" | "financial",
-  priority: "high" | "medium"
+  priority: "high" | "medium",
+  sourceTaskId?: string
 ): Promise<void> {
-  return createIssueFacade(workspaceId, title, type, priority)
+  return createIssueFacade(workspaceId, title, type, priority, sourceTaskId)
 }
 
 export async function addCommentToIssue(

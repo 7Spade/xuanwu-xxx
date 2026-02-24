@@ -100,6 +100,8 @@ export interface WorkspaceIssue {
   type: 'technical' | 'financial';
   priority: 'high' | 'medium';
   issueState: 'open' | 'closed';
+  /** SourcePointer to the A-track task that triggered this B-track issue. */
+  sourceTaskId?: string;
   createdAt: Timestamp; // FirestoreTimestamp
   comments?: IssueComment[];
 }

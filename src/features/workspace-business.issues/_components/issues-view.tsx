@@ -70,10 +70,13 @@ export function WorkspaceIssues() {
     if (!authState.user) return;
     try {
       await resolveIssue(issue.id);
+      // B 軌宣告事實（Discrete Recovery Principle）：
+      // B-track publishes IssueResolved with sourceTaskId so A-track can self-recover.
       eventBus.publish('workspace:issues:resolved', {
         issueId: issue.id,
         issueTitle: issue.title,
         resolvedBy: authState.user.name,
+        sourceTaskId: issue.sourceTaskId,
       });
       logAuditEvent("B-Track Resolved", `Issue Closed: ${issue.title}`, 'update');
       setSelectedIssue(null);

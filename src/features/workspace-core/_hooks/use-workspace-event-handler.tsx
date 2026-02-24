@@ -30,7 +30,7 @@ type DocParserPayload = {
  * Subscribes to workspace-level events and orchestrates cross-capability reactions.
  */
 export function useWorkspaceEventHandler() {
-  const { eventBus, workspace, logAuditEvent } = useWorkspace();
+  const { eventBus, workspace, logAuditEvent, updateTask } = useWorkspace();
   const { dispatch } = useApp();
 
   useEffect(() => {
@@ -74,7 +74,8 @@ export function useWorkspaceEventHandler() {
           workspace.id,
           `QA Rejected: ${payload.task.name}`,
           "technical",
-          "high"
+          "high",
+          payload.task.id
         );
         pushNotification(
           "QA Rejected & Issue Logged",
@@ -91,7 +92,8 @@ export function useWorkspaceEventHandler() {
           workspace.id,
           `Acceptance Failed: ${payload.task.name}`,
           "technical",
-          "high"
+          "high",
+          payload.task.id
         );
         pushNotification(
           "Acceptance Failed & Issue Logged",
@@ -229,9 +231,17 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    // B 軌 IssueResolved → A 軌自行恢復（Discrete Recovery Principle）
+    // B-track announces fact via event bus; A-track subscribes and self-recovers.
     const unsubIssueResolved = eventBus.subscribe(
       "workspace:issues:resolved",
-      (payload) => {
+      async (payload) => {
+        // Discrete Recovery: if the issue has a sourceTaskId, auto-unblock the A-track task
+        if (payload.sourceTaskId !== undefined) {
+          await updateTask(payload.sourceTaskId, { progressState: 'todo' }).catch(
+            (err: unknown) => console.error('[A-Track Recovery] Failed to unblock task:', err)
+          );
+        }
         pushNotification(
           "B-Track Issue Resolved",
           `Issue "${payload.issueTitle}" closed by ${payload.resolvedBy}. A-Track may now resume.`,
@@ -248,7 +258,8 @@ export function useWorkspaceEventHandler() {
           workspace.id,
           `Disbursement Failed: ${payload.taskTitle}`,
           "financial",
-          "high"
+          "high",
+          payload.taskId
         );
         pushNotification(
           "Finance Failure & Issue Logged",
@@ -266,7 +277,8 @@ export function useWorkspaceEventHandler() {
           workspace.id,
           `Task Blocked: ${payload.task.name}`,
           "technical",
-          "high"
+          "high",
+          payload.task.id
         );
         pushNotification(
           "Task Blocked & Issue Logged",
@@ -289,5 +301,5 @@ export function useWorkspaceEventHandler() {
       unsubFinanceFailed();
       unsubTaskBlocked();
     };
-  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
+  }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent, updateTask]);
 }

@@ -61,6 +61,8 @@ export interface WorkspaceIssueResolvedPayload {
   issueId: string
   issueTitle: string
   resolvedBy: string
+  /** SourcePointer: ID of the A-track task to unblock after resolution (Discrete Recovery). */
+  sourceTaskId?: string
 }
 
 export interface WorkspaceFinanceDisbursementFailedPayload {

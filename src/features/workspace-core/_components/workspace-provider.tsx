@@ -62,7 +62,7 @@ interface WorkspaceContextType {
   updateWorkspaceSettings: (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState }) => Promise<void>;
   deleteWorkspace: () => Promise<void>;
   // Issue Management
-  createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => Promise<void>;
+  createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => Promise<void>;
   addCommentToIssue: (issueId: string, author: string, content: string) => Promise<void>;
   resolveIssue: (issueId: string) => Promise<void>;
   // Schedule Management
@@ -130,7 +130,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const updateWorkspaceSettings = useCallback(async (settings: { name: string; visibility: 'visible' | 'hidden'; lifecycleState: WorkspaceLifecycleState }) => updateWorkspaceSettingsAction(workspaceId, settings), [workspaceId]);
   const deleteWorkspace = useCallback(async () => deleteWorkspaceAction(workspaceId), [workspaceId]);
 
-  const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => createIssueAction(workspaceId, title, type, priority), [workspaceId]);
+  const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium', sourceTaskId?: string) => createIssueAction(workspaceId, title, type, priority, sourceTaskId), [workspaceId]);
   const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
   const resolveIssue = useCallback(async (issueId: string) => resolveIssueAction(workspaceId, issueId), [workspaceId]);
 
