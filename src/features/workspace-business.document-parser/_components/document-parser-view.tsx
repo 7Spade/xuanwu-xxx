@@ -10,6 +10,7 @@ import {
   type ActionState,
 } from '../_actions';
 import { saveParsingIntent } from '../_intent-actions';
+import type { SourcePointer } from '@/shared/types';
 type WorkItem = { item: string; quantity: number; unitPrice: number; discount?: number; price: number };
 import { useWorkspace } from '@/features/workspace-core';
 
@@ -26,10 +27,38 @@ function WorkItemsTable({
   initialData: WorkItem[];
   onImport: () => Promise<void>;
 }) {
+  const total = initialData.reduce((sum, item) => sum + item.price, 0);
   return (
     <div>
       <div className="overflow-x-auto rounded-md border">
-         <pre className="rounded-lg bg-muted/50 p-4 text-xs">{JSON.stringify(initialData, null, 2)}</pre>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="px-4 py-2 text-left font-bold uppercase tracking-widest text-muted-foreground">Item</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Qty</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Unit Price</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Discount</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {initialData.map((item, idx) => (
+              <tr key={idx} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-4 py-2">{item.item}</td>
+                <td className="px-4 py-2 text-right">{item.quantity}</td>
+                <td className="px-4 py-2 text-right">{item.unitPrice.toLocaleString()}</td>
+                <td className="px-4 py-2 text-right">{item.discount !== undefined ? `${item.discount}%` : '—'}</td>
+                <td className="px-4 py-2 text-right font-medium">{item.price.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="border-t bg-muted/50">
+              <td colSpan={4} className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Total</td>
+              <td className="px-4 py-2 text-right font-bold">{total.toLocaleString()}</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
       <div className="mt-6 flex items-center justify-end">
@@ -52,6 +81,8 @@ export function WorkspaceDocumentParser() {
   const { toast } = useToast();
   // Tracks the WorkspaceFile ID when a file is sent from the Files tab for full traceability
   const sourceFileIdRef = useRef<string | undefined>(undefined);
+  // Tracks the original download URL (SourcePointer) for the Digital Twin ParsingIntent
+  const sourceFileDownloadURLRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (state.error) {
@@ -76,8 +107,9 @@ export function WorkspaceDocumentParser() {
       'workspace:files:sendToParser',
       async (payload) => {
         try {
-          // Capture the source file ID for ParsingIntent traceability (SourcePointer)
+          // Capture the source file ID and download URL for ParsingIntent traceability (SourcePointer)
           sourceFileIdRef.current = payload.fileId;
+          sourceFileDownloadURLRef.current = payload.downloadURL;
           const response = await fetch(payload.downloadURL);
           const blob = await response.blob();
           const file = new File([blob], payload.fileName, {
@@ -138,7 +170,11 @@ export function WorkspaceDocumentParser() {
         workspace.id,
         state.fileName || 'Unknown Document',
         lineItems,
-        { sourceFileId: sourceFileIdRef.current }
+        {
+          sourceFileId: sourceFileIdRef.current,
+          // SourcePointer: immutable link to the original file in Firebase Storage
+          sourceFileDownloadURL: sourceFileDownloadURLRef.current as SourcePointer | undefined,
+        }
       );
     } catch (error: unknown) {
       console.error('Failed to save parsing intent:', error);
@@ -159,8 +195,9 @@ export function WorkspaceDocumentParser() {
         items: lineItems,
     });
 
-    // Reset source file reference after successful import
+    // Reset source file references after successful import
     sourceFileIdRef.current = undefined;
+    sourceFileDownloadURLRef.current = undefined;
     logAuditEvent('Triggered Task Import', `From document: ${state.fileName}`, 'create');
   }
 

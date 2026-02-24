@@ -24,9 +24,14 @@ import {
   FileScan,
 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
-import { useFirebase } from "@/shared/app-providers/firebase-provider";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, arrayUnion, type FieldValue , type Timestamp } from "firebase/firestore";
-import { useMemo, useState, useRef } from "react";
+import { serverTimestamp, type FieldValue } from "firebase/firestore";
+import { useState, useRef, useEffect } from "react";
+import { subscribeToWorkspaceFiles } from '../_queries';
+import {
+  createWorkspaceFile,
+  addWorkspaceFileVersion,
+  restoreWorkspaceFileVersion,
+} from '@/shared/infra/firestore/firestore.facade';
 import { 
   Sheet, 
   SheetContent, 
@@ -65,16 +70,19 @@ const getErrorMessage = (error: unknown, fallback: string) =>
 export function WorkspaceFiles() {
   const { workspace, logAuditEvent, eventBus } = useWorkspace();
   const { state: { user } } = useAuth();
-  const { db } = useFirebase();
   
   const [historyFile, setHistoryFile] = useState<WorkspaceFile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const files = useMemo(() => Object.values(workspace.files || {}).sort((a,b) => {
-    const getMs = (d: Timestamp | Date) => d instanceof Date ? d.getTime() : d.seconds * 1000;
-    return getMs(b.updatedAt) - getMs(a.updatedAt);
-  }), [workspace.files]);
+  // Real-time subscription to the files subcollection.
+  // workspace.files (workspace document field) is not populated by the onSnapshot
+  // on the workspace collection — files live in the `workspaces/{id}/files` subcollection.
+  const [files, setFiles] = useState<WorkspaceFile[]>([]);
+  useEffect(() => {
+    const unsub = subscribeToWorkspaceFiles(workspace.id, setFiles);
+    return () => unsub();
+  }, [workspace.id]);
 
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
@@ -105,7 +113,6 @@ export function WorkspaceFiles() {
         const nextVer = (existingFile.versions?.length || 0) + 1;
         const versionId = Math.random().toString(36).slice(-6);
 
-        // Delegate Firebase Storage upload to the actions layer (boundary fix)
         const downloadURL = await uploadRawFile(workspace.id, existingFile.id, versionId, file);
 
         const newVersion: WorkspaceFileVersion = {
@@ -118,12 +125,7 @@ export function WorkspaceFiles() {
           downloadURL: downloadURL
         };
 
-        const fileRef = doc(db, "workspaces", workspace.id, "files", existingFile.id);
-        await updateDoc(fileRef, {
-          versions: arrayUnion(newVersion),
-          currentVersionId: versionId,
-          updatedAt: serverTimestamp()
-        });
+        await addWorkspaceFileVersion(workspace.id, existingFile.id, newVersion, versionId);
         
         logAuditEvent("File Version Iterated", `${file.name} (v${nextVer})`, 'update');
         toast({ title: "Version Iterated", description: `${file.name} has been upgraded to v${nextVer}.` });
@@ -133,7 +135,6 @@ export function WorkspaceFiles() {
         const fileId = Math.random().toString(36).slice(2, 11);
         const versionId = Math.random().toString(36).slice(-6);
 
-        // Delegate Firebase Storage upload to the actions layer (boundary fix)
         const downloadURL = await uploadRawFile(workspace.id, fileId, versionId, file);
 
         const newFileData: Omit<WorkspaceFile, 'id' | 'updatedAt'> & { updatedAt: FieldValue } = {
@@ -152,7 +153,7 @@ export function WorkspaceFiles() {
           }]
         };
 
-        await addDoc(collection(db, "workspaces", workspace.id, "files"), newFileData);
+        await createWorkspaceFile(workspace.id, newFileData);
         logAuditEvent("Mounted New Document", file.name, 'create');
         toast({ title: "Document Uploaded", description: `${file.name} has been mounted to the space.` });
       }
@@ -171,13 +172,8 @@ export function WorkspaceFiles() {
   };
 
   const handleRestore = async (file: WorkspaceFile, versionId: string) => {
-    const fileRef = doc(db, "workspaces", workspace.id, "files", file.id);
-    const updates = { 
-      currentVersionId: versionId, 
-      updatedAt: serverTimestamp() 
-    };
     try {
-      await updateDoc(fileRef, updates);
+      await restoreWorkspaceFileVersion(workspace.id, file.id, versionId);
       logAuditEvent("Restored File State", `${file.name} to a previous version`, 'update');
       toast({ title: "Version Restored", description: "File sovereignty has been restored to the specified point in time." });
       setHistoryFile(null);
