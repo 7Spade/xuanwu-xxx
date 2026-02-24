@@ -19,15 +19,45 @@ export async function extractDataFromDocument(
   formData: FormData
 ): Promise<ActionState> {
   const file = formData.get('file') as File | null;
+  const downloadURL = formData.get('downloadURL') as string | null;
+  const urlFileName = formData.get('fileName') as string | null;
+  const urlFileType = formData.get('fileType') as string | null;
 
-  if (!file || file.size === 0) {
+  // Resolve the file buffer: either from a direct File upload or by fetching a
+  // Firebase Storage URL on the server (no CORS restrictions in Node.js).
+  let fileBuffer: ArrayBuffer;
+  let mimeType: string;
+  let displayName: string;
+
+  if (file && file.size > 0) {
+    fileBuffer = await file.arrayBuffer();
+    mimeType = file.type;
+    displayName = file.name;
+  } else if (downloadURL) {
+    if (!urlFileName) {
+      return { error: 'Missing file name for URL-based parse.' };
+    }
+    try {
+      const res = await fetch(downloadURL);
+      if (!res.ok) {
+        return { error: `Failed to retrieve file from storage (HTTP ${res.status}).` };
+      }
+      fileBuffer = await res.arrayBuffer();
+      // Prefer the authoritative content-type from the server response; fall
+      // back to the client-provided fileType only when the header is absent.
+      mimeType = res.headers.get('content-type') || (urlFileType || 'application/octet-stream');
+      displayName = urlFileName;
+    } catch (e) {
+      console.error('Server-side fetch failed:', e);
+      return { error: 'Could not retrieve the file from storage.' };
+    }
+  } else {
     return { error: 'Please select a file to upload.' };
   }
 
   try {
-    const fileBuffer = await file.arrayBuffer();
     const base64String = Buffer.from(fileBuffer).toString('base64');
-    const documentDataUri = `data:${file.type};base64,${base64String}`;
+    const documentDataUri = `data:${mimeType};base64,${base64String}`;
 
     const validatedInput = actionInputSchema.safeParse({ documentDataUri });
     if (!validatedInput.success) {
@@ -68,7 +98,7 @@ export async function extractDataFromDocument(
       };
     }
 
-    return { data: { workItems: sanitizedItems }, fileName: file.name };
+    return { data: { workItems: sanitizedItems }, fileName: displayName };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';

@@ -93,32 +93,18 @@ export function WorkspaceDocumentParser() {
     return () => unsub();
   }, [workspace.id]);
 
-  // Helper: fetch a file from a URL and trigger the AI extraction pipeline
-  const triggerParseFromURL = useCallback(async (payload: { fileName: string; downloadURL: string; fileType: string; fileId?: string }) => {
-    try {
-      sourceFileIdRef.current = payload.fileId;
-      sourceFileDownloadURLRef.current = payload.downloadURL;
-      const response = await fetch(payload.downloadURL);
-      const blob = await response.blob();
-      const file = new File([blob], payload.fileName, {
-        type: payload.fileType || blob.type,
-      });
-      const formData = new FormData();
-      formData.append('file', file);
-      startTransition(() => formAction(formData));
-      toast({
-        title: 'File Loaded from Space',
-        description: `Parsing "${payload.fileName}" from workspace files…`,
-      });
-    } catch (error: unknown) {
-      console.error('Failed to load file from workspace for parsing:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Failed to Load File',
-        description: 'Could not fetch the selected workspace file for parsing.',
-      });
-    }
-  }, [formAction, startTransition, toast]);
+  // Helper: trigger the AI extraction pipeline from a Firebase Storage URL.
+  // The URL is passed directly to the Server Action which fetches it server-side,
+  // avoiding the browser CORS restriction on Firebase Storage URLs.
+  const triggerParseFromURL = useCallback((payload: { fileName: string; downloadURL: string; fileType: string; fileId?: string }) => {
+    sourceFileIdRef.current = payload.fileId;
+    sourceFileDownloadURLRef.current = payload.downloadURL;
+    const formData = new FormData();
+    formData.append('downloadURL', payload.downloadURL);
+    formData.append('fileName', payload.fileName);
+    formData.append('fileType', payload.fileType || '');
+    startTransition(() => formAction(formData));
+  }, [formAction, startTransition]);
 
   // On mount: if files-view queued a file via WorkspaceProvider context, auto-trigger.
   // This bridges the cross-tab gap — subscriber only exists when this component is mounted.
@@ -152,11 +138,10 @@ export function WorkspaceDocumentParser() {
 
   // Subscribe to files:sendToParser — handles same-tab publishes (edge case fallback).
   // The primary cross-tab path uses WorkspaceProvider pendingParseFile state.
-  // triggerParseFromURL already has a try/catch; the void discard is safe.
   useEffect(() => {
     const unsubFiles = eventBus.subscribe(
       'workspace:files:sendToParser',
-      (payload) => { void triggerParseFromURL(payload); }
+      (payload) => triggerParseFromURL(payload)
     );
     return () => unsubFiles();
   }, [eventBus, triggerParseFromURL]);
