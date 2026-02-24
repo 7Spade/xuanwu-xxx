@@ -3,7 +3,7 @@
 import { useWorkspace } from '@/features/workspace-core';
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
-import { AlertCircle, Plus, ArrowRight, ShieldAlert, DollarSign, PenTool, MessageSquare, CornerUpLeft } from "lucide-react";
+import { AlertCircle, Plus, ArrowRight, ShieldAlert, DollarSign, PenTool, MessageSquare, CornerUpLeft, CheckCircle2 } from "lucide-react";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/shadcn-ui/dialog";
@@ -21,7 +21,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 export function WorkspaceIssues() {
-  const { workspace, logAuditEvent, protocol, createIssue, addCommentToIssue } = useWorkspace();
+  const { workspace, logAuditEvent, protocol, createIssue, addCommentToIssue, resolveIssue, eventBus } = useWorkspace();
   const { state: authState } = useAuth();
   
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -63,6 +63,28 @@ export function WorkspaceIssues() {
           title: "Failed to Post Comment",
           description: getErrorMessage(error, "An unknown error occurred."),
         });
+    }
+  };
+
+  const handleResolveIssue = async (issue: WorkspaceIssue) => {
+    if (!authState.user) return;
+    try {
+      await resolveIssue(issue.id);
+      eventBus.publish('workspace:issues:resolved', {
+        issueId: issue.id,
+        issueTitle: issue.title,
+        resolvedBy: authState.user.name,
+      });
+      logAuditEvent("B-Track Resolved", `Issue Closed: ${issue.title}`, 'update');
+      setSelectedIssue(null);
+      toast({ title: "Issue Resolved", description: `"${issue.title}" has been closed. A-Track may now resume.` });
+    } catch (error: unknown) {
+      console.error("Error resolving issue:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to Resolve Issue",
+        description: getErrorMessage(error, "An unknown error occurred."),
+      });
     }
   };
 
@@ -147,16 +169,27 @@ export function WorkspaceIssues() {
                 </div>
               </ScrollArea>
               <SheetFooter className="border-t border-border/60 bg-background p-4">
-                <div className="flex w-full items-start gap-3">
-                  <Textarea 
-                    placeholder="Type your comment here..." 
-                    className="flex-1 rounded-xl border-border/50 bg-muted/50 focus-visible:ring-accent"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                  />
-                  <Button size="icon" className="size-10 rounded-xl bg-accent hover:bg-accent/90" onClick={handleAddComment} disabled={!newComment.trim()}>
-                    <CornerUpLeft className="size-4" />
-                  </Button>
+                <div className="flex w-full flex-col gap-3">
+                  {selectedIssue.issueState === 'open' && (
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 border-green-500/30 text-green-600 hover:bg-green-500/10 hover:text-green-700"
+                      onClick={() => handleResolveIssue(selectedIssue)}
+                    >
+                      <CheckCircle2 className="size-4" /> Mark Resolved
+                    </Button>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <Textarea 
+                      placeholder="Type your comment here..." 
+                      className="flex-1 rounded-xl border-border/50 bg-muted/50 focus-visible:ring-accent"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                    <Button size="icon" className="size-10 rounded-xl bg-accent hover:bg-accent/90" onClick={handleAddComment} disabled={!newComment.trim()}>
+                      <CornerUpLeft className="size-4" />
+                    </Button>
+                  </div>
                 </div>
               </SheetFooter>
             </>

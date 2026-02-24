@@ -52,6 +52,7 @@ export const deleteWorkspace = repositories.deleteWorkspace
 // Issues
 export const createIssue = repositories.createIssue
 export const addCommentToIssue = repositories.addCommentToIssue
+export const resolveIssue = repositories.resolveIssue
 
 // Tasks
 export const createTask = repositories.createTask

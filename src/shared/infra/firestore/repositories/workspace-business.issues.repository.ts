@@ -64,6 +64,19 @@ export const addCommentToIssue = async (
   });
 };
 
+/**
+ * Marks an issue as resolved (closes the B-track item).
+ * Publishes `workspace:issues:resolved` via the event bus after calling this.
+ */
+export const resolveIssue = async (
+  workspaceId: string,
+  issueId: string
+): Promise<void> => {
+  await updateDocument(`workspaces/${workspaceId}/issues/${issueId}`, {
+    issueState: 'closed',
+  });
+};
+
 export const getWorkspaceIssues = async (
   workspaceId: string
 ): Promise<WorkspaceIssue[]> => {

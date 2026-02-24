@@ -229,6 +229,17 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    const unsubIssueResolved = eventBus.subscribe(
+      "workspace:issues:resolved",
+      (payload) => {
+        pushNotification(
+          "B-Track Issue Resolved",
+          `Issue "${payload.issueTitle}" closed by ${payload.resolvedBy}. A-Track may now resume.`,
+          "success"
+        );
+      }
+    );
+
     return () => {
       unsubQAApproved();
       unsubAcceptancePassed();
@@ -238,6 +249,7 @@ export function useWorkspaceEventHandler() {
       unsubScheduleRequest();
       unsubTaskCompleted();
       unsubForwardRequested();
+      unsubIssueResolved();
     };
   }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 }

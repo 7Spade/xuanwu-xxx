@@ -57,6 +57,12 @@ export interface FileSendToParserPayload {
   fileType: string
 }
 
+export interface WorkspaceIssueResolvedPayload {
+  issueId: string
+  issueTitle: string
+  resolvedBy: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -70,6 +76,7 @@ export type WorkspaceEventName =
   | "workspace:acceptance:passed"
   | "workspace:document-parser:itemsExtracted"
   | "workspace:files:sendToParser"
+  | "workspace:issues:resolved"
   | "daily:log:forwardRequested"
 
 // =================================================================
@@ -85,6 +92,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:acceptance:passed": WorkspaceAcceptancePassedPayload
   "workspace:document-parser:itemsExtracted": DocumentParserItemsExtractedPayload
   "workspace:files:sendToParser": FileSendToParserPayload
+  "workspace:issues:resolved": WorkspaceIssueResolvedPayload
   "daily:log:forwardRequested": DailyLogForwardRequestedPayload
 }
 

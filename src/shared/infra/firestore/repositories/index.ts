@@ -7,7 +7,7 @@ export * from './account.repository'                          // createUserAccou
 export * from './user.repository'                             // getUserProfile, updateUserProfile, addBookmark, removeBookmark
 export * from './workspace-core.repository'                   // createWorkspace, authorizeWorkspaceTeam, revokeWorkspaceTeam, grantIndividualWorkspaceAccess, revokeIndividualWorkspaceAccess, mountCapabilities, unmountCapability, updateWorkspaceSettings, deleteWorkspace, getWorkspaceFiles, getWorkspaceGrants
 export * from './workspace-business.tasks.repository'         // createTask, updateTask, deleteTask, getWorkspaceTasks
-export * from './workspace-business.issues.repository'        // createIssue, addCommentToIssue, getWorkspaceIssues
+export * from './workspace-business.issues.repository'        // createIssue, addCommentToIssue, resolveIssue, getWorkspaceIssues
 export * from './workspace-business.document-parser.repository' // createParsingIntent, updateParsingIntentStatus, getParsingIntents
 export * from './schedule.repository'                         // createScheduleItem, updateScheduleItemStatus, assignMemberToScheduleItem, unassignMemberFromScheduleItem, getScheduleItems
 export * from './daily.repository'                            // toggleDailyLogLike, addDailyLogComment, getDailyLogs

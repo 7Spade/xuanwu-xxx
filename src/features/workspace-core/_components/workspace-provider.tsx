@@ -29,6 +29,7 @@ import {
 import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
+  resolveIssue as resolveIssueAction,
 } from '@/features/workspace-business.issues'
 import {
   createScheduleItem as createScheduleItemAction,
@@ -61,6 +62,7 @@ interface WorkspaceContextType {
   // Issue Management
   createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => Promise<void>;
   addCommentToIssue: (issueId: string, author: string, content: string) => Promise<void>;
+  resolveIssue: (issueId: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
 }
@@ -113,6 +115,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => createIssueAction(workspaceId, title, type, priority), [workspaceId]);
   const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
+  const resolveIssue = useCallback(async (issueId: string) => resolveIssueAction(workspaceId, issueId), [workspaceId]);
 
   const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
 
@@ -149,6 +152,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     deleteWorkspace,
     createIssue,
     addCommentToIssue,
+    resolveIssue,
     createScheduleItem,
   };
 
