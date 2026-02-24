@@ -4,8 +4,7 @@
 import type React from 'react';
 import { createContext, useContext, useMemo, useCallback, useEffect, useState } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
-import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName } from '@/features/workspace-core.event-bus';
-import type { FileSendToParserPayload } from '@/features/workspace-core.event-bus';
+import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName, type FileSendToParserPayload } from '@/features/workspace-core.event-bus';
 import { registerNotificationRouter } from '@/features/account-governance.notification-router';
 import { registerOrgPolicyCache, runTransaction } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';

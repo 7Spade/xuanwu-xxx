@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useTransition, useRef, useEffect, useCallback, useState } from 'react';
+import { useActionState, useTransition, useRef, useEffect, useCallback, useState, type ChangeEvent } from 'react';
 import { Loader2, UploadCloud, File as FileIcon, ClipboardList, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/shared/utility-hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/shadcn-ui/card';
@@ -12,8 +12,8 @@ import {
 } from '../_actions';
 import { saveParsingIntent } from '../_intent-actions';
 import { subscribeToParsingIntents } from '../_queries';
+import type { WorkItem } from '@/shared/ai/schemas/docu-parse';
 import type { SourcePointer, ParsingIntent } from '@/shared/types';
-type WorkItem = { item: string; quantity: number; unitPrice: number; discount?: number; price: number };
 import { useWorkspace } from '@/features/workspace-core';
 
 const initialState: ActionState = {
@@ -146,7 +146,7 @@ export function WorkspaceDocumentParser() {
     return () => unsubFiles();
   }, [eventBus, triggerParseFromURL]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       if (formRef.current) {
         const formData = new FormData(formRef.current);
