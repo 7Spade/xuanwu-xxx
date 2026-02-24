@@ -9,6 +9,7 @@ import {
   uploadDailyPhoto as uploadDailyPhotoFacade,
   uploadTaskAttachment as uploadTaskAttachmentFacade,
   uploadProfilePicture as uploadProfilePictureFacade,
+  uploadWorkspaceDocument,
 } from "@/shared/infra/storage/storage.facade"
 
 /**
@@ -50,4 +51,26 @@ export async function uploadProfilePicture(
   file: File
 ): Promise<string> {
   return uploadProfilePictureFacade(userId, file)
+}
+
+/**
+ * Uploads a raw workspace document to Firebase Storage.
+ *
+ * Single-responsibility boundary for workspace-business.files:
+ * all Firebase Storage SDK interaction lives in the storage facade and adapters,
+ * not in UI components.
+ *
+ * @param workspaceId The workspace that owns the file.
+ * @param fileId      The logical file document ID (stable across versions).
+ * @param versionId   A unique ID for this specific version upload.
+ * @param file        The raw file to store.
+ * @returns A promise resolving with the public download URL for this version.
+ */
+export async function uploadRawFile(
+  workspaceId: string,
+  fileId: string,
+  versionId: string,
+  file: File
+): Promise<string> {
+  return uploadWorkspaceDocument(workspaceId, fileId, versionId, file)
 }

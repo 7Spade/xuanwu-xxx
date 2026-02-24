@@ -25,18 +25,23 @@ import type { WorkspaceIssue, IssueComment } from '@/shared/types';
 
 /**
  * Creates a new issue in a workspace (e.g., when a task is rejected).
+ * @param sourceTaskId - Optional SourcePointer to the A-track task that created this issue.
+ *                       Used by the Discrete Recovery Principle: when the issue is resolved,
+ *                       the A-track task is automatically unblocked via IssueResolved event.
  */
 export const createIssue = async (
   workspaceId: string,
   title: string,
   type: 'technical' | 'financial',
-  priority: 'high' | 'medium'
+  priority: 'high' | 'medium',
+  sourceTaskId?: string
 ): Promise<void> => {
   const issueData: Omit<WorkspaceIssue, 'id' | 'createdAt'> & { createdAt: FieldValue } = {
     title,
     type,
     priority,
     issueState: 'open',
+    ...(sourceTaskId !== undefined ? { sourceTaskId } : {}),
     createdAt: serverTimestamp(),
     comments: [],
   };

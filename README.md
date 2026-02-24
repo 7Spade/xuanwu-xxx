@@ -1,44 +1,95 @@
-# Xuanwu
+# Next.js Agent Skills
 
-A collaborative workspace platform built with **Next.js 16 App Router**, **Firebase**, and **TypeScript**.
+Agent skills for common Next.js workflows.
 
-## Tech Stack
+## Essential Skills
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript (strict) |
-| Styling | Tailwind CSS + shadcn/ui |
-| Backend | Firebase (Firestore, Auth, Storage) |
-| AI | Genkit (Google Generative AI) |
-| State | React Context + useReducer |
+Start here. These background skills are auto-applied to prevent common mistakes.
 
-## One-Way Dependency Architecture
+### `next-best-practices`
+
+Core Next.js knowledge:
+
+- [File Conventions](./skills/next-best-practices/file-conventions.md) - Project structure and special files
+- [RSC Boundaries](./skills/next-best-practices/rsc-boundaries.md) - Server/Client Component rules
+- [Data Patterns](./skills/next-best-practices/data-patterns.md) - Fetching and mutation strategies
+- [Async Patterns](./skills/next-best-practices/async-patterns.md) - Next.js 15+ async APIs
+- [Directives](./skills/next-best-practices/directives.md) - `'use client'`, `'use server'`, `'use cache'`
+- [Functions](./skills/next-best-practices/functions.md) - Navigation hooks, server functions, generate functions
+- [Runtime Selection](./skills/next-best-practices/runtime-selection.md) - Node.js vs Edge runtime
+- [Error Handling](./skills/next-best-practices/error-handling.md) - Error boundaries and redirects
+- [Route Handlers](./skills/next-best-practices/route-handlers.md) - API routes with `route.ts`
+- [Metadata](./skills/next-best-practices/metadata.md) - SEO, OG images, sitemaps
+- [Image](./skills/next-best-practices/image.md) - `next/image` optimization
+- [Font](./skills/next-best-practices/font.md) - `next/font` optimization
+- [Bundling](./skills/next-best-practices/bundling.md) - Package compatibility, CSS imports, polyfills
+- [Scripts](./skills/next-best-practices/scripts.md) - Third-party scripts, Google Analytics
+- [Hydration Errors](./skills/next-best-practices/hydration-error.md) - Debugging mismatches
+- [Suspense Boundaries](./skills/next-best-practices/suspense-boundaries.md) - CSR bailout, Cache Components requirements
+- [Parallel Routes](./skills/next-best-practices/parallel-routes.md) - Modal patterns with intercepting routes
+- [Self-Hosting](./skills/next-best-practices/self-hosting.md) - Docker, standalone output, ISR
+- [Debug Tricks](./skills/next-best-practices/debug-tricks.md) - MCP endpoint, rebuild specific routes
+
+## Installation
+
+```bash
+# Install essentials (recommended)
+npx skills add vercel-labs/next-skills --skill next-best-practices
+
+# Or install everything
+npx skills add vercel-labs/next-skills
+```
+
+## Advanced Use Cases
+
+Optional skills for specific needs. Invoke via slash commands.
+
+### `next-upgrade`
+
+Upgrading between Next.js versions with official migration guides.
+
+```bash
+npx skills add vercel-labs/next-skills --skill next-upgrade
+```
+
+### `next-cache-components`
+
+Next.js 16 Cache Components and PPR. Covers `cacheComponents: true`, `'use cache'` directive, cache profiles, `cacheLife()`, `cacheTag()`, and `updateTag()`.
+
+```bash
+npx skills add vercel-labs/next-skills --skill next-cache-components
+```
+
+## Usage
+
+**Background skills** (`next-best-practices`) are automatically applied when relevant.
+
+**Slash commands** for advanced skills:
 
 ```
-app → features/{slice}/index.ts → shared
+/next-upgrade
+/next-cache-components
 ```
 
-Each feature slice may only import from `shared/*` and other slices' `index.ts` public APIs. Violating this causes circular dependencies.
+## Related Skills
 
-## Source Layout
+For React-specific patterns (hooks, state management, component composition):
 
-| Directory | Role |
-|-----------|------|
-| `src/app` | Next.js App Router pages and layouts (pure composition) |
-| `src/features` | 42 vertical feature slices — each owns its domain end-to-end |
-| `src/shared/types` | TypeScript domain types — zero dependencies |
-| `src/shared/lib` | Pure utility functions and domain rules |
-| `src/shared/infra` | Firebase SDK wrappers (repositories + adapters) |
-| `src/shared/ai` | Genkit AI flows (server-only) |
-| `src/shared/ui` | shadcn/ui components, app-providers, i18n, constants |
-| `src/styles` | Global CSS (`globals.css`, Tailwind base) |
+```bash
+npx skills add vercel-labs/agent-skills --skill react-best-practices
+```
 
-## Key Docs
+## Contributing
 
-- `docs/overview/logic-overview.v3.md` — Canonical domain logic flow (source of truth)
-- `docs/overview/architecture-overview.md` — Feature slice directory structure
-- `docs/overview/command-event-overview.v3.md` — Commands and events
-- `docs/overview/infrastructure-overview.v3.md` — Firebase infrastructure
-- `docs/overview/persistence-model-overview.v3.md` — Firestore data schema
+Each skill follows the [Agent Skills open standard](https://github.com/anthropics/skills):
 
+1. Create a directory under `skills/` with the skill name (prefix with `next-`)
+2. Add a `SKILL.md` file with YAML frontmatter:
+   ```yaml
+   ---
+   name: next-skill-name
+   description: Brief description
+   user-invocable: false  # for background skills
+   ---
+   ```
+3. For complex skills, add additional `.md` files and reference them from `SKILL.md`

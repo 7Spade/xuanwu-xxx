@@ -1,5 +1,6 @@
 // [職責] 事件名稱與 Payload 的 TypeScript 類型定義 (Contract)
 import type { WorkspaceTask, DailyLog } from "@/shared/types"
+import type { SkillRequirement } from "@/shared/types"
 
 // =================================================================
 // == Payload Interfaces
@@ -43,6 +44,8 @@ export interface DocumentParserItemsExtractedPayload {
     discount?: number
     subtotal: number
   }>
+  /** Skill requirements extracted from the document, forwarded to schedule proposals. */
+  skillRequirements?: SkillRequirement[]
 }
 
 export interface DailyLogForwardRequestedPayload {
@@ -55,12 +58,16 @@ export interface FileSendToParserPayload {
   fileName: string
   downloadURL: string
   fileType: string
+  /** The WorkspaceFile document ID — used by the parser to record a SourcePointer in ParsingIntent. */
+  fileId?: string
 }
 
 export interface WorkspaceIssueResolvedPayload {
   issueId: string
   issueTitle: string
   resolvedBy: string
+  /** SourcePointer: ID of the A-track task to unblock after resolution (Discrete Recovery). */
+  sourceTaskId?: string
 }
 
 export interface WorkspaceFinanceDisbursementFailedPayload {
@@ -75,6 +82,18 @@ export interface WorkspaceTaskBlockedPayload {
   reason?: string
 }
 
+export interface WorkspaceScheduleProposedPayload {
+  /** Schedule item ID created in Firestore by workspace-business.schedule */
+  scheduleItemId: string
+  workspaceId: string
+  /** Organization that owns the workspace (WORKSPACE_OUTBOX → ORGANIZATION_SCHEDULE) */
+  orgId: string
+  title: string
+  startDate: string
+  endDate: string
+  proposedBy: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -83,6 +102,7 @@ export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
   | "workspace:tasks:blocked"
+  | "workspace:schedule:proposed"
   | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
   | "workspace:quality-assurance:approved"
@@ -101,6 +121,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
   "workspace:tasks:blocked": WorkspaceTaskBlockedPayload
+  "workspace:schedule:proposed": WorkspaceScheduleProposedPayload
   "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
   "workspace:quality-assurance:approved": WorkspaceQualityAssuranceApprovedPayload
