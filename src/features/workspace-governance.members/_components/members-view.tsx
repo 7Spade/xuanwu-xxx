@@ -10,7 +10,7 @@ import { type MemberReference } from "@/shared/types"
 import { useApp } from "@/features/workspace-core"
 import { useMemberManagement } from "@/features/account-organization.member"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 export function MembersView() {
   const [mounted, setMounted] = useState(false)

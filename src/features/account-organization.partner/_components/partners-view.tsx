@@ -21,7 +21,7 @@ import { useApp } from "@/features/workspace-core"
 import { usePartnerManagement } from "@/features/account-organization.partner"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import type { Team } from "@/shared/types"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 /**
  * PartnersView - Manages logical groupings of EXTERNAL partners (Partner Teams).

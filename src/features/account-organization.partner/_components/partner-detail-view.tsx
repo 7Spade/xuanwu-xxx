@@ -30,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tab
 import { useApp } from "@/features/workspace-core"
 import { useAccount } from "@/features/workspace-core"
 import { usePartnerManagement } from "@/features/account-organization.partner"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 /**
  * PartnerDetailView - Manages recruitment and identity governance within a specific partner team.

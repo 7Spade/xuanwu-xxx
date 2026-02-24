@@ -13,7 +13,7 @@ import { Input } from "@/shared/shadcn-ui/input";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
-import { PageHeader } from "@/shared/shadcn-ui/page-header";
+import { PageHeader } from "@/shared/ui/page-header";
 
 interface WorkspaceListHeaderProps {
   activeAccountName: string;

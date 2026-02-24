@@ -9,7 +9,7 @@ import { toast } from "@/shared/utility-hooks/use-toast"
 import { useApp } from "@/features/workspace-core"
 import { useTeamManagement } from "@/features/account-organization.team"
 import type { MemberReference, Team } from "@/shared/types"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 /**
  * TeamDetailView - 職責：管理特定團隊內的成員 (Team Member 清單)
