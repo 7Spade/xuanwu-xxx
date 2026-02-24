@@ -98,7 +98,7 @@ export function WorkspaceFinance() {
       eventBus.publish('workspace:finance:disburseFailed', {
         taskId: task.id,
         taskTitle: task.name,
-        amount: Number(task.subtotal) ?? 0,
+        amount: Number(task.subtotal) || 0,
         reason,
       });
       toast({ variant: "destructive", title: "Disbursement Failed", description: reason });

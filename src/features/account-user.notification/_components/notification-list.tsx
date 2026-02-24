@@ -29,26 +29,28 @@ export function NotificationList({ notifications, onMarkRead }: NotificationList
     <ScrollArea className="max-h-80">
       <ul className="divide-y divide-border">
         {notifications.map((notif) => (
-          <li
-            key={notif.id}
-            className={cn(
-              'flex flex-col gap-1 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors',
-              !notif.read && 'bg-primary/5'
-            )}
-            onClick={() => !notif.read && onMarkRead(notif.id)}
-          >
-            <div className="flex items-center gap-2">
-              {!notif.read && (
-                <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+          <li key={notif.id}>
+            <button
+              type="button"
+              className={cn(
+                'w-full flex flex-col gap-1 px-4 py-3 text-left hover:bg-muted/50 transition-colors',
+                !notif.read && 'bg-primary/5'
               )}
-              <span className={cn('text-sm font-medium', notif.read && 'text-muted-foreground')}>
-                {notif.title}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground pl-4">{notif.message}</p>
-            <time className="text-xs text-muted-foreground/60 pl-4">
-              {new Date(notif.timestamp).toLocaleString('zh-TW')}
-            </time>
+              onClick={() => !notif.read && onMarkRead(notif.id)}
+            >
+              <div className="flex items-center gap-2">
+                {!notif.read && (
+                  <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                )}
+                <span className={cn('text-sm font-medium', notif.read && 'text-muted-foreground')}>
+                  {notif.title}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground pl-4">{notif.message}</p>
+              <time className="text-xs text-muted-foreground/60 pl-4">
+                {new Date(notif.timestamp).toLocaleString('zh-TW')}
+              </time>
+            </button>
           </li>
         ))}
       </ul>
