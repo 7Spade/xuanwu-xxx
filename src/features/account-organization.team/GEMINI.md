@@ -23,16 +23,18 @@ Both slices draw from the same `SKILL_TAG_POOL` in `account-organization.skill-t
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_actions.ts` | `createTeam`, `addTeamMember`, `removeTeamMember` |
-| `_queries.ts` | Team list and member subscription |
-| `_components/` | `TeamList`, `TeamCard`, `TeamMemberForm` |
-| `_hooks/` | `useTeams` |
+| `_actions.ts` | `createTeam`, `updateTeamMembers` |
+| `_queries.ts` | `getOrgTeams`, `subscribeToOrgTeams` |
+| `_components/` | `TeamsView`, `TeamDetailView` |
+| `_hooks/` | `useTeamManagement` |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+export { useTeamManagement } from './_hooks/use-team-management';
+export { TeamsView, TeamDetailView } from './_components/...';
+export { getOrgTeams, subscribeToOrgTeams } from './_queries';
 ```
 
 ## Dependencies

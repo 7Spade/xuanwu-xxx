@@ -23,16 +23,18 @@ Both slices draw from the same `SKILL_TAG_POOL` in `account-organization.skill-t
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_actions.ts` | `createPartner`, `addPartnerMember`, `removePartnerMember` |
-| `_queries.ts` | Partner list and member subscription |
-| `_components/` | `PartnerList`, `PartnerCard`, `PartnerForm` |
-| `_hooks/` | `usePartners` |
+| `_actions.ts` | `createPartnerGroup`, `sendPartnerInvite`, `dismissPartnerMember` |
+| `_queries.ts` | `getOrgPartners`, `subscribeToOrgPartners` |
+| `_components/` | `PartnersView`, `PartnerDetailView` |
+| `_hooks/` | `usePartnerManagement` |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+export { usePartnerManagement } from './_hooks/use-partner-management';
+export { PartnersView, PartnerDetailView } from './_components/...';
+export { getOrgPartners, subscribeToOrgPartners } from './_queries';
 ```
 
 ## Dependencies
