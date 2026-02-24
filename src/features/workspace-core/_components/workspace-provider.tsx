@@ -18,6 +18,7 @@ import {
   createTask as createTaskAction,
   updateTask as updateTaskAction,
   deleteTask as deleteTaskAction,
+  getWorkspaceTask as getWorkspaceTaskAction,
 } from '@/features/workspace-business.tasks'
 import {
   authorizeWorkspaceTeam as authorizeWorkspaceTeamAction,
@@ -127,12 +128,12 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createTask = useCallback(async (task: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>) => createTaskAction(workspaceId, task), [workspaceId]);
   const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => {
-    // Capture task data before write so the event payload reflects the stable name.
-    const taskData = workspace.tasks?.[taskId];
     await updateTaskAction(workspaceId, taskId, updates);
     // Schedule trigger chain: task assignment change → workspace:tasks:assigned → W_B_SCHEDULE.
     // Only publish when a non-empty assigneeId is provided (assignment, not un-assignment).
     if (updates.assigneeId) {
+      // Fetch task data from workspace-business.tasks BC boundary (not from workspace aggregate).
+      const taskData = await getWorkspaceTaskAction(workspaceId, taskId);
       eventBus.publish('workspace:tasks:assigned', {
         taskId,
         taskName: taskData?.name ?? taskId,
@@ -141,7 +142,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
         sourceIntentId: taskData?.sourceIntentId,
       });
     }
-  }, [workspaceId, workspace.tasks, eventBus]);
+  }, [workspaceId, eventBus]);
   const deleteTask = useCallback(async (taskId: string) => deleteTaskAction(workspaceId, taskId), [workspaceId]);
   
   const authorizeWorkspaceTeam = useCallback(async (teamId: string) => authorizeWorkspaceTeamAction(workspaceId, teamId), [workspaceId]);

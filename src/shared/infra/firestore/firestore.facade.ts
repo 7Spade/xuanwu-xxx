@@ -58,6 +58,7 @@ export const resolveIssue = repositories.resolveIssue
 export const createTask = repositories.createTask
 export const updateTask = repositories.updateTask
 export const deleteTask = repositories.deleteTask
+export const getWorkspaceTask = repositories.getWorkspaceTask
 
 // Schedule
 export const createScheduleItem = repositories.createScheduleItem

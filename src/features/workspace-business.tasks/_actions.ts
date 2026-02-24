@@ -10,6 +10,7 @@ import {
   updateTask as updateTaskFacade,
   deleteTask as deleteTaskFacade,
   getWorkspaceTasks as getWorkspaceTasksFacade,
+  getWorkspaceTask as getWorkspaceTaskFacade,
 } from "@/shared/infra/firestore/firestore.facade"
 import type { WorkspaceTask } from "@/shared/types"
 
@@ -58,4 +59,16 @@ export async function getWorkspaceTasks(
   workspaceId: string
 ): Promise<WorkspaceTask[]> {
   return getWorkspaceTasksFacade(workspaceId)
+}
+
+/**
+ * Fetches a single task by ID from a workspace (one-time read, not real-time).
+ * @param workspaceId The ID of the workspace.
+ * @param taskId The ID of the task.
+ */
+export async function getWorkspaceTask(
+  workspaceId: string,
+  taskId: string
+): Promise<WorkspaceTask | null> {
+  return getWorkspaceTaskFacade(workspaceId, taskId)
 }
