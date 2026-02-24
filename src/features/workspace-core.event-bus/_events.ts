@@ -92,6 +92,13 @@ export interface WorkspaceScheduleProposedPayload {
   startDate: string
   endDate: string
   proposedBy: string
+  /**
+   * SourcePointer: IntentID of the ParsingIntent that triggered this proposal.
+   * Enables traceability back to the Digital Twin (SourcePointer contract).
+   */
+  intentId?: string
+  /** Skill requirements forwarded from ParsingIntent to org-level Schedule for validation. */
+  skillRequirements?: SkillRequirement[]
 }
 
 // =================================================================

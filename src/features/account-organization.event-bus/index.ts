@@ -12,10 +12,13 @@
 export { onOrgEvent, publishOrgEvent } from './_bus';
 export type {
   ScheduleAssignedPayload,
+  ScheduleAssignRejectedPayload,
   OrgPolicyChangedPayload,
   OrgMemberJoinedPayload,
   OrgMemberLeftPayload,
   OrgTeamUpdatedPayload,
+  SkillXpAddedPayload,
+  SkillXpDeductedPayload,
   OrganizationEventPayloadMap,
   OrganizationEventKey,
 } from './_events';

@@ -15,6 +15,8 @@
  *     → ACCOUNT_PROJECTION_AUDIT
  *     → ACCOUNT_PROJECTION_SCHEDULE
  *     → ORGANIZATION_PROJECTION_VIEW
+ *     → ACCOUNT_SKILL_VIEW
+ *     → ORG_ELIGIBLE_MEMBER_VIEW
  *     → PROJECTION_VERSION (updates stream offset)
  *
  *   WORKSPACE_EVENT_STORE -.→ EVENT_FUNNEL_INPUT (event replay can rebuild all projections)
@@ -30,6 +32,12 @@ import { applyScheduleAssigned } from '@/features/projection.account-schedule';
 import { onOrgEvent } from '@/features/account-organization.event-bus';
 import { applyMemberJoined, applyMemberLeft } from '@/features/projection.organization-view';
 import { handleScheduleProposed } from '@/features/account-organization.schedule';
+import { applySkillXpAdded, applySkillXpDeducted } from '@/features/projection.account-skill-view';
+import {
+  applyOrgMemberSkillXp,
+  initOrgMemberEntry,
+  removeOrgMemberEntry,
+} from '@/features/projection.org-eligible-member-view';
 
 /**
  * Registers workspace event handlers on the event bus to keep projections in sync.
@@ -100,19 +108,40 @@ export function registerOrganizationFunnel(): () => void {
     })
   );
 
-  // Member joined → organization-view projection
+  // Member joined → organization-view + org-eligible-member-view projections
   unsubscribers.push(
     onOrgEvent('organization:member:joined', async (payload) => {
       await applyMemberJoined(payload.orgId, payload.accountId);
+      await initOrgMemberEntry(payload.orgId, payload.accountId);
       await upsertProjectionVersion('organization-view', Date.now(), new Date().toISOString());
     })
   );
 
-  // Member left → organization-view projection
+  // Member left → organization-view + org-eligible-member-view projections
   unsubscribers.push(
     onOrgEvent('organization:member:left', async (payload) => {
       await applyMemberLeft(payload.orgId, payload.accountId);
+      await removeOrgMemberEntry(payload.orgId, payload.accountId);
       await upsertProjectionVersion('organization-view', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // SkillXpAdded → account-skill-view + org-eligible-member-view projections
+  // Invariant #12: newXp is stored; tier is NEVER stored — derived at query time via resolveSkillTier(xp).
+  unsubscribers.push(
+    onOrgEvent('organization:skill:xpAdded', async (payload) => {
+      await applySkillXpAdded(payload.accountId, payload.skillId, payload.newXp);
+      await applyOrgMemberSkillXp(payload.orgId, payload.accountId, payload.skillId, payload.newXp);
+      await upsertProjectionVersion('account-skill-view', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // SkillXpDeducted → account-skill-view + org-eligible-member-view projections
+  unsubscribers.push(
+    onOrgEvent('organization:skill:xpDeducted', async (payload) => {
+      await applySkillXpDeducted(payload.accountId, payload.skillId, payload.newXp);
+      await applyOrgMemberSkillXp(payload.orgId, payload.accountId, payload.skillId, payload.newXp);
+      await upsertProjectionVersion('account-skill-view', Date.now(), new Date().toISOString());
     })
   );
 
