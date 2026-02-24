@@ -40,6 +40,7 @@ flowchart TD
 %% A1) user-account 僅作身份主體；wallet 為獨立 aggregate（強一致），profile / notification 為弱一致資料
 %% A2) organization-account.binding 與 organization-core.aggregate 只允許 ACL / projection 對接，不共享同一提交邊界
 %% A3) A 軌 tasks/qa/acceptance/finance 視為 workflow.aggregate 的階段視圖，不定義為四個獨立原子流程
+%%     （WORKFLOW_AGGREGATE 為設計意圖節點；目前 A 軌各切片透過 progressState 欄位協調，尚未獨立成 aggregate 切片）
 %% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
 %% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
 %% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
@@ -201,6 +202,10 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_MEMBER[workspace-governance.members（工作區成員）]
         WORKSPACE_ROLE[workspace-governance.role（角色管理）]
     end
+
+    %% workspace-governance.audit 為實務交付暫置切片（UI 稽核視圖）
+    %% 不屬於 WORKSPACE_GOVERNANCE 架構邊界；長期遷移目標：workspace-core.event-store + projection.account-audit
+    WORKSPACE_AUDIT[workspace-governance.audit（稽核視圖 · 實務暫置）]
 
     %% --- AB 雙軌業務邏輯核心 ---
     subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
@@ -469,6 +474,7 @@ classDef capabilityBc fill:#f0e6ff,stroke:#9333ea,color:#000;
 classDef accountSkill fill:#bbf7d0,stroke:#22c55e,color:#000;
 classDef tierFunction fill:#fdf4ff,stroke:#c084fc,color:#000;
 classDef skillProjection fill:#fefce8,stroke:#eab308,color:#000;
+classDef practicalDeviation fill:#f9fafb,stroke:#9ca3af,stroke-dasharray:5 5,color:#6b7280;
 
 classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
 classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
@@ -510,3 +516,4 @@ class SERVER_ACTION_SKILL serverAction;
 class USER_WALLET_AGGREGATE accountSkill;
 class SKILL_TAG_POOL_AGGREGATE organization;
 class WORKFLOW_AGGREGATE workspace;
+class WORKSPACE_AUDIT practicalDeviation;

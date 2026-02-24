@@ -61,7 +61,8 @@ src/features/
 │   │   ── User sub-type ──
 │   ├── account-user.profile/              ✅  使用者個人資料 · 偏好設定 · FCM Token
 │   ├── account-user.wallet/               🔧  個人錢包 · 代幣積分
-│   └── account-user.notification/         🔧  個人推播通知（FCM 第 3 層）
+│   ├── account-user.notification/         🔧  個人推播通知（FCM 第 3 層）
+│   └── account-user.skill/               🔧  個人技能 XP 成長 · Ledger · Tier 推導（Invariant #11-13）
 │   │
 │   │   ── Organization sub-type ──
 │   ├── account-organization.core/         🔧  組織聚合實體（aggregate）· binding
@@ -88,7 +89,7 @@ src/features/
 │   ├── workspace-governance.teams/        🔧  Stub — 視圖已遷移至 account-organization.team
 │   ├── workspace-governance.partners/     🔧  Stub — 視圖已遷移至 account-organization.partner
 │   ├── workspace-governance.schedule/     🔧  Stub — 實作已遷移至 workspace-business.schedule
-│   └── workspace-governance.audit/        ✅  稽核足跡 · 事件時序
+│   └── workspace-governance.audit/        ✅  稽核足跡 · 事件時序（實務暫置；非 WORKSPACE_GOVERNANCE 架構邊界）
 │
 ├── ── Workspace Business · 輔助與靜態單元 ────────────────────────
 │   ├── workspace-business.daily/          ✅  手寫施工日誌 · 留言 · 書籤
@@ -97,6 +98,10 @@ src/features/
 │   └── workspace-business.document-parser/ ✅  AI 文件解析 · ParsingIntent（Digital Twin）
 │
 ├── ── Workspace Business · A 軌（主流程）─────────────────────────
+│   │   ※ 架構設計意圖（logic-overview.v3.md A3）：
+│   │     tasks / qa / acceptance / finance 為 workspace-business.workflow.aggregate
+│   │     的「階段視圖」（stage-view），不是四個獨立原子流程。
+│   │     WORKFLOW_AGGREGATE 為整體 A 軌狀態機的不變量邊界（尚未獨立實作切片）。
 │   ├── workspace-business.tasks/          ✅  任務樹 · CRUD（A 軌起點）
 │   ├── workspace-business.quality-assurance/ ✅  品質驗證（A 軌）
 │   ├── workspace-business.acceptance/     ✅  驗收（A 軌）
@@ -112,6 +117,8 @@ src/features/
     ├── projection.account-audit/           🔧  帳號稽核投影
     ├── projection.account-schedule/        🔧  帳號排程投影（過濾可用帳號）
     ├── projection.organization-view/       🔧  組織讀模型
+    ├── projection.account-skill-view/      🔧  帳號技能讀模型（accountId / skillId / xp · 不存 tier）
+    ├── projection.org-eligible-member-view/ 🔧  排程資格讀模型（orgId / accountId / eligible · Invariant #14）
     └── projection.registry/               🔧  事件串流偏移量 · 讀模型版本對照表
 ```
 
@@ -123,7 +130,7 @@ src/features/
 |-----------------|-----------|-----------|------|
 | Identity Layer | 1 | 0 | **1** |
 | Account Layer (共用 + governance) | 0 | 3 | **3** |
-| Account Layer (user sub-type) | 1 | 2 | **3** |
+| Account Layer (user sub-type) | 1 | 3 | **4** |
 | Account Layer (organization sub-type) | 0 | 8 | **8** |
 | Workspace Application | 0 | 1 | **1** |
 | Workspace Core | 2 | 1 | **3** |
@@ -131,8 +138,8 @@ src/features/
 | Workspace Business (support) | 4 | 0 | **4** |
 | Workspace Business (A-track) | 4 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | **1** |
-| Projection Layer | 0 | 7 | **7** |
-| **Total** | **15** | **26** | **41** |
+| Projection Layer | 0 | 9 | **9** |
+| **Total** | **15** | **29** | **44** |
 
 ---
 
@@ -242,6 +249,15 @@ account-organization.event-bus ──政策變更事件──► workspace-appli
 ```
 
 Scope Guard 只讀本地 `projection.workspace-scope-guard`，不直接依賴外部 Event Bus（遵循不變量 #7）。
+
+---
+
+## 架構偏差備註
+
+| 切片 | 偏差說明 | 長期目標 |
+|------|----------|----------|
+| `workspace-governance.audit/` | 不在 `logic-overview.v3.md` 的 `WORKSPACE_GOVERNANCE` 架構邊界內；為實務交付暫置的 UI 稽核視圖 | 遷移至 `workspace-core.event-store` + `projection.account-audit` |
+| `workspace-business.workflow.aggregate` | 架構圖定義節點（A3 決策）；目前 A 軌透過 `progressState` 欄位協調，尚未獨立成切片 | 獨立成 aggregate 切片，統一 A 軌狀態機 |
 
 ---
 
