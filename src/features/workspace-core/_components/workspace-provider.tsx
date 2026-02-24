@@ -11,6 +11,7 @@ import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/fires
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { addDocument } from '@/shared/infra/firestore/firestore.write.adapter';
+import { firestoreTimestampToISO } from '@/shared/lib';
 import { useApp } from '../_hooks/use-app';
 import { Loader2 } from 'lucide-react';
 import { 
@@ -160,7 +161,29 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     }
   }, [workspaceId, eventBus]);
 
-  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
+  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => {
+    const itemId = await createScheduleItemAction(itemData);
+    // Cross-layer Outbox event: WORKSPACE_OUTBOX →|workspace:schedule:proposed| ORGANIZATION_SCHEDULE
+    // Per logic-overview.v3.md: W_B_SCHEDULE publishes this event so account-organization.schedule
+    // can persist an orgScheduleProposal and start the HR governance approval flow.
+    if (workspace?.dimensionId) {
+      eventBus.publish('workspace:schedule:proposed', {
+        scheduleItemId: itemId,
+        workspaceId: workspaceId,
+        orgId: workspace.dimensionId,
+        title: itemData.title,
+        startDate: firestoreTimestampToISO(itemData.startDate),
+        endDate: firestoreTimestampToISO(itemData.endDate),
+        proposedBy: activeAccount?.id ?? 'system',
+        skillRequirements: itemData.requiredSkills,
+      });
+    } else {
+      console.warn(
+        `[W_B_SCHEDULE] workspace:schedule:proposed not published for item "${itemId}" — workspace.dimensionId is missing. Org-level scheduling will not be triggered.`
+      );
+    }
+    return itemId;
+  }, [workspaceId, workspace?.dimensionId, activeAccount?.id, eventBus]);
 
 
   if (!workspace || !db) {

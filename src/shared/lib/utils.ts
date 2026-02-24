@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Converts a Firestore Timestamp (or any object with a `.toDate()` method) to
+ * an ISO 8601 string. Falls back to `new Date().toISOString()` for non-Timestamp values.
+ * Uses duck-typing to avoid a direct `firebase/firestore` import dependency.
+ */
+export function firestoreTimestampToISO(ts: unknown): string {
+  if (ts && typeof ts === 'object' && 'toDate' in ts && typeof (ts as { toDate: unknown }).toDate === 'function') {
+    return (ts as { toDate: () => Date }).toDate().toISOString();
+  }
+  return new Date().toISOString();
+}
+
+/**
  * Converts a hex color string to an HSL string compatible with ShadCN CSS variables.
  * Format returned: "H S% L%" (e.g., "221 83% 53%")
  */
