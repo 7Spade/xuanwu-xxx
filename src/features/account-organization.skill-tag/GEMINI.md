@@ -34,7 +34,8 @@ Two aggregates:
 | File | Purpose |
 |------|---------|
 | `_skill-tag-pool.ts` | `addSkillTagToPool`, `removeSkillTagFromPool`, `incrementTagRefCount`, `decrementTagRefCount` |
-| `_org-skill-recognition.ts` | `grantSkillRecognition`, `revokeSkillRecognition`, `getSkillRecognition` |
+| `_org-skill-recognition.ts` | `grantSkillRecognition`, `revokeSkillRecognition` (domain writes + event publish) |
+| `_queries.ts` | `getOrgSkillTag`, `getOrgSkillTags`, `getSkillRecognition`, `getMemberSkillRecognitions` (read queries) |
 | `index.ts` | Public API |
 
 ## Firestore Paths
@@ -50,7 +51,9 @@ Two aggregates:
 // Skill Tag Pool
 export { addSkillTagToPool, removeSkillTagFromPool, incrementTagRefCount, decrementTagRefCount } from './_skill-tag-pool';
 // Org Skill Recognition
-export { grantSkillRecognition, revokeSkillRecognition, getSkillRecognition } from './_org-skill-recognition';
+export { grantSkillRecognition, revokeSkillRecognition } from './_org-skill-recognition';
+// Read queries
+export { getOrgSkillTag, getOrgSkillTags, getSkillRecognition, getMemberSkillRecognitions } from './_queries';
 ```
 
 ## Dependencies

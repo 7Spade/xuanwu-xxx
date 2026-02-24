@@ -33,9 +33,16 @@ export type { OrgSkillTagEntry } from './_skill-tag-pool';
 export {
   grantSkillRecognition,
   revokeSkillRecognition,
-  getSkillRecognition,
 } from './_org-skill-recognition';
 export type {
   OrgSkillRecognitionRecord,
   SkillRecognitionStatus,
 } from './_org-skill-recognition';
+
+// Read queries (Skill Tag Pool + Org Skill Recognition)
+export {
+  getOrgSkillTag,
+  getOrgSkillTags,
+  getSkillRecognition,
+  getMemberSkillRecognitions,
+} from './_queries';
