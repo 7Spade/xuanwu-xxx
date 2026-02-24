@@ -19,6 +19,7 @@ import {
 import { canTransitionScheduleStatus } from "@/shared/lib";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import type { ScheduleItem } from "@/shared/types";
+import { getAccountActiveAssignments } from "@/features/projection.account-schedule";
 
 export function useScheduleActions() {
   const { state: appState } = useApp();
@@ -32,6 +33,21 @@ export function useScheduleActions() {
         variant: "destructive",
         title: "Authentication Error",
         description: "You must be in an organization to assign members.",
+      });
+      return;
+    }
+
+    // W_B_SCHEDULE -.→ ACCOUNT_PROJECTION_SCHEDULE: filter available accounts via projection
+    // (Invariant #2: read cross-BC data only via Projection, not Domain Core)
+    const activeAssignments = await getAccountActiveAssignments(memberId).catch(() => []);
+    const conflicting = activeAssignments.some(
+      (a) => a.workspaceId !== item.workspaceId && a.status !== 'completed'
+    );
+    if (conflicting) {
+      toast({
+        variant: "destructive",
+        title: "Member Unavailable",
+        description: "This member already has an active assignment in another workspace.",
       });
       return;
     }

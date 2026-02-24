@@ -75,6 +75,18 @@ export interface WorkspaceTaskBlockedPayload {
   reason?: string
 }
 
+export interface WorkspaceScheduleProposedPayload {
+  /** Schedule item ID created in Firestore by workspace-business.schedule */
+  scheduleItemId: string
+  workspaceId: string
+  /** Organization that owns the workspace (WORKSPACE_OUTBOX → ORGANIZATION_SCHEDULE) */
+  orgId: string
+  title: string
+  startDate: string
+  endDate: string
+  proposedBy: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -83,6 +95,7 @@ export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
   | "workspace:tasks:blocked"
+  | "workspace:schedule:proposed"
   | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
   | "workspace:quality-assurance:approved"
@@ -101,6 +114,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
   "workspace:tasks:blocked": WorkspaceTaskBlockedPayload
+  "workspace:schedule:proposed": WorkspaceScheduleProposedPayload
   "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
   "workspace:quality-assurance:approved": WorkspaceQualityAssuranceApprovedPayload

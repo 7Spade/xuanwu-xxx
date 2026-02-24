@@ -14,5 +14,6 @@ export { UnifiedCalendarGrid } from './_components/unified-calendar-grid'
 export { useGlobalSchedule } from './_hooks/use-global-schedule'
 export { useScheduleActions } from './_hooks/use-schedule-commands'
 export { useWorkspaceSchedule } from './_hooks/use-workspace-schedule'
+export { useScheduleEventHandler } from './_hooks/use-schedule-event-handler'
 // Actions (server)
 export { createScheduleItem, assignMember, unassignMember, updateScheduleItemStatus, getScheduleItems } from './_actions'
