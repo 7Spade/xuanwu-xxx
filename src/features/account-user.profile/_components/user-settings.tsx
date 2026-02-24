@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { useI18n } from "@/shared/app-providers/i18n-provider";
 import { useUser } from "../_hooks/use-user";
-import { type ExpertiseBadge } from "@/shared/types";
+import { type SkillGrant } from "@/shared/types";
+import { findSkill } from "@/shared/constants/skills";
 
 import { ProfileCard } from "./profile-card";
 import { PreferencesCard } from "./preferences-card";
@@ -29,7 +30,7 @@ export function UserSettings() {
   const [isMounted, setIsMounted] = useState(false);
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState("");
-  const [selectedBadges, setSelectedBadges] = useState<ExpertiseBadge[]>([]);
+  const [skillGrants, setSkillGrants] = useState<SkillGrant[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -39,12 +40,11 @@ export function UserSettings() {
     if (user) setName(user.name);
     if (profile) {
       setBio(profile.bio || "");
-      setSelectedBadges(profile.expertiseBadges || []);
+      setSkillGrants(profile.skillGrants || []);
     }
   }, [user, profile]);
 
   if (!isMounted || !user) {
-      // You can return a loading skeleton here
       return null;
   }
 
@@ -54,7 +54,7 @@ export function UserSettings() {
       if (user?.name !== name) {
         authDispatch({ type: 'UPDATE_USER_PROFILE', payload: { name } });
       }
-      await updateProfile({ bio, expertiseBadges: selectedBadges });
+      await updateProfile({ bio, skillGrants });
       toast({
         title: "Profile Updated",
         description: "Your personal information has been successfully saved.",
@@ -93,14 +93,20 @@ export function UserSettings() {
     }
   };
 
-  const handleBadgeToggle = (badge: ExpertiseBadge) => {
-    setSelectedBadges(prev => {
-      const isSelected = prev.some(b => b.id === badge.id);
-      if (isSelected) {
-        return prev.filter(b => b.id !== badge.id);
-      } else {
-        return [...prev, badge];
+  const handleSkillToggle = (slug: string) => {
+    setSkillGrants(prev => {
+      const existing = prev.find(g => g.tagSlug === slug);
+      if (existing) {
+        return prev.filter(g => g.tagSlug !== slug);
       }
+      const skillDefinition = findSkill(slug);
+      const newGrant: SkillGrant = {
+        tagSlug: slug,
+        tagName: skillDefinition?.name,
+        tier: 'apprentice',
+        xp: 0,
+      };
+      return [...prev, newGrant];
     });
   };
 
@@ -112,8 +118,8 @@ export function UserSettings() {
           setName={setName}
           bio={bio}
           setBio={setBio}
-          selectedBadges={selectedBadges}
-          handleBadgeToggle={handleBadgeToggle}
+          skillGrants={skillGrants}
+          onSkillToggle={handleSkillToggle}
           handleSaveProfile={handleSaveProfile}
           handleAvatarUpload={handleAvatarUpload}
           isSaving={isSaving || profileLoading}

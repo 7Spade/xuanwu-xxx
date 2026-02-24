@@ -1,2 +1,2 @@
-// workspace-core.event-store — Event store (append-only, replay/audit only, not CRUD)
-// Pre-created slice stub. Implementation deferred.
+// workspace-core.event-store — Append-only domain event store (replay/audit only)
+export { appendDomainEvent, getDomainEvents, type StoredWorkspaceEvent } from './_store'

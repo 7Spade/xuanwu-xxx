@@ -13,7 +13,7 @@
 | 2 | `user-account.settings` 獨立節點 | 有 `user-account.settings` 獨立節點 | 合併至 `account-user.profile` | 新設計將設定納入個人資料切片，避免碎片化 |
 | 3 | `organization-account.aggregate` 缺失 | 只有 `organization-account` 與 `.settings` | 新增 `organization-account.aggregate` 節點 | 作為組織帳號的聚合根並連接 Organization Layer |
 | 4 | `workspace-settings` 獨立於容器頂層 | `workspace-settings` 懸掛在容器外層 | 移入 `workspace-core` 成為 `workspace-core.settings` | 設定是聚合根的核心配置，屬於 Core 職責 |
-| 5 | `workspace-business.audit-log` 放在業務層 | `audit-log` 在 `workspace-business` 子圖中 | 移入 `workspace-governance` 成為 `workspace-governance.audit-log` | 工作區操作稽核是治理／合規職責，不是業務功能 |
+| 5 | `workspace-business.audit-log` 放在業務層 | `audit-log` 在 `workspace-business` 子圖中 | 移入 `workspace-governance` 成為 `workspace-governance.audit` | 工作區操作稽核是治理／合規職責，不是業務功能 |
 | 6 | 業務模組順序無結構 | 模組排列無明確流向 | tasks → quality-assurance → acceptance → finance → daily → document-parser → files → issues → schedule | 反映業務執行流向：任務產生 → 品質把關 → 驗收結案 → 財務結算 |
 | 7 | `issues` 模式未標注 | `issues` 作為普通業務模組 | 標注為 AB 雙軌問題單 | 任何問題（任務、品質、驗收等）都透過開問題單（issues）進行追蹤，採 AB 雙軌：A = 問題描述軌，B = 解決方案軌 |
 | 8 | `workspace-business` 內部流向不可見 | 業務模組為無邊的平鋪節點清單 | 細化為帶流向邊的 AB 雙軌圖：A 軌正常順位箭頭、異常箭頭指向 B 軌六角形節點、處理完成虛線回流、輔助模組虛線關聯 | 讓圖表直接表達業務邏輯流轉，不需額外文字說明 |
@@ -56,72 +56,75 @@
 
 ## 三、Features 資料夾階層設計
 
+實際程式碼採**扁平化**結構，所有切片直接位於 `src/features/` 下（無巢狀子目錄）。命名空間以切片名稱前綴隱式表達群組關係。
+
 ```
-src/
-└── features/
-    ├── GEMINI.md                              ← AI 開發指南（整層）
-    │
-    ├── identity/                              ← 身份層（Identity Layer）
-    │   ├── authenticated-identity/            ← 已驗證身份
-    │   ├── account-identity-link/             ← firebaseUserId ↔ accountId
-    │   ├── active-account-context/            ← 作用中帳號上下文
-    │   └── custom-claims/                     ← 自訂權限宣告
-    │
-    ├── account/                               ← 帳號層（Account Layer）
-    │   ├── identity-account.auth/             ← 登入／註冊／重設密碼
-    │   ├── account-user.profile/              ← 使用者資料、設定、FCM Token 儲存
-    │   ├── account-user.wallet/               ← 錢包（代幣／積分，stub）
-    │   ├── account-user.notification/         ← 個人推播通知（FCM 閘道協調）
-    │   ├── account-organization/              ← 組織帳號群組
-    │   │   ├── organization-account.settings/ ← 組織設定
-    │   │   └── organization-account.aggregate/← 組織帳號聚合根
-    │   └── account-governance/                ← 帳號治理群組
-    │       ├── account-governance.role/       ← 帳號角色
-    │       ├── account-governance.policy/     ← 帳號政策
-    │       ├── account-governance.notification-router/ ← 通知路由器（三層通知架構層二）
-    │       └── account-governance.audit-log/  ← 帳號稽核記錄
-    │
-    ├── organization/                          ← 組織層（Organization Layer）
-    │   ├── organization-core/                 ← 組織核心群組
-    │   │   ├── organization-core.aggregate/   ← 組織聚合實體
-    │   │   └── organization-core.event-bus/   ← 組織事件總線
-    │   ├── organization-governance/           ← 組織治理群組
-    │   │   ├── organization-governance.member/  ← 組織成員（扁平化資源池）
-    │   │   ├── organization-governance.team/    ← 團隊管理（內部組視圖）
-    │   │   ├── organization-governance.partner/ ← 合作夥伴（外部組視圖）
-    │   │   ├── organization-governance.policy/  ← 政策管理
-    │   │   ├── organization-governance.skill-tag/ ← 職能標籤庫（Skills / Certs）
-    │   │   └── organization-governance.audit-log/ ← 稽核紀錄
-    │   └── organization-schedule/             ← 人力排程管理
-    │
-    └── workspace/                             ← 工作區容器（Workspace Container）
-        ├── workspace-application/             ← 應用層群組（請求管道）
-        │   ├── workspace-application.command-handler/    ← 指令處理器
-        │   ├── workspace-application.scope-guard/        ← 作用域守衛
-        │   ├── workspace-application.policy-engine/      ← 政策引擎
-        │   ├── workspace-application.transaction-runner/ ← 交易執行器
-        │   └── workspace-application.outbox/             ← 交易內發信箱
-        ├── workspace-core/                    ← 核心層群組（聚合根 + 設定）
-        │   ├── workspace-core.settings/       ← 工作區設定（屬於核心配置）
-        │   ├── workspace-core.aggregate/      ← 核心聚合實體
-        │   ├── workspace-core.event-bus/      ← 事件總線
-        │   └── workspace-core.event-store/    ← 事件儲存（可選）
-        ├── workspace-governance/              ← 工作區治理群組（存取控制 + 稽核）
-        │   ├── workspace-governance.members/  ← 工作區成員
-        │   ├── workspace-governance.teams/    ← 團隊管理
-        │   ├── workspace-governance.partners/ ← 合作夥伴
-        │   ├── workspace-governance.schedule/ ← 排程、提案、審核決策
-        │   └── workspace-governance.audit/    ← 工作區操作稽核（治理職責）
-        └── workspace-business/                ← 業務層群組（任務流水線 + 輔助功能）
-            ├── workspace-business.tasks/           ← 任務管理
-            ├── workspace-business.quality-assurance/ ← 品質保證
-            ├── workspace-business.acceptance/      ← 業務受理／驗收
-            ├── workspace-business.finance/         ← 財務處理
-            ├── workspace-business.daily/           ← 日常作業
-            ├── workspace-business.document-parser/ ← 文件解析
-            ├── workspace-business.files/           ← 檔案管理
-            ├── workspace-business.issues/          ← 問題追蹤（AB 雙軌問題單，見下方說明）
-            └── workspace-business.schedule/        ← 任務排程產生
+src/features/
+├── GEMINI.md                                ← AI 開發指南（整層）
+│
+│── ── Identity Layer ──────────────────────────────────────────────────
+├── identity-account.auth/                   ← 登入 · 註冊 · 重設密碼（Firebase Auth 入口）
+│
+│── ── Account Layer — 帳號共用 ────────────────────────────────────────
+├── account-governance.role/                 ← 帳號角色管理 → CUSTOM_CLAIMS 簽發
+├── account-governance.policy/               ← 帳號政策管理
+├── account-governance.notification-router/  ← 通知路由器（FCM 第 2 層 · 依 TargetAccountID 分發）
+│
+│── ── Account Layer — User sub-type ──────────────────────────────────
+├── account-user.profile/                    ← 使用者個人資料 · 偏好設定 · FCM Token
+├── account-user.wallet/                     ← 個人錢包（代幣／積分，stub）
+├── account-user.notification/               ← 個人推播通知（FCM 第 3 層）
+│
+│── ── Account Layer — Organization sub-type ──────────────────────────
+├── account-organization.core/               ← 組織聚合實體（aggregate）· binding
+├── account-organization.event-bus/          ← 組織事件總線
+├── account-organization.member/             ← 組織成員邀請／移除
+├── account-organization.team/               ← 團隊管理（內部組視圖，由 workspace-governance.teams 遷移）
+├── account-organization.partner/            ← 合作夥伴管理（外部組視圖，由 workspace-governance.partners 遷移）
+├── account-organization.policy/             ← 組織政策管理
+├── account-organization.skill-tag/          ← 職能標籤庫（扁平化資源池）
+├── account-organization.schedule/           ← 人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
+│
+│── ── Workspace Application Layer ─────────────────────────────────────
+├── workspace-application/                   ← 指令處理器 · Scope Guard · 政策引擎
+│                                                · org-policy 防腐層快取 · 交易執行器 · Outbox
+│
+│── ── Workspace Core ──────────────────────────────────────────────────
+├── workspace-core/                          ← CRUD · shell · provider · list · settings · aggregate
+├── workspace-core.event-bus/                ← 工作區事件總線
+├── workspace-core.event-store/              ← 事件儲存（僅供重播／稽核，非 CRUD）
+│
+│── ── Workspace Governance ────────────────────────────────────────────
+├── workspace-governance.members/            ← 工作區成員存取管理
+├── workspace-governance.role/               ← 角色管理（從 members 拆分）
+├── workspace-governance.teams/              ← Stub（視圖已遷移至 account-organization.team）
+├── workspace-governance.partners/           ← Stub（視圖已遷移至 account-organization.partner）
+├── workspace-governance.schedule/           ← Stub（實作已遷移至 workspace-business.schedule）
+├── workspace-governance.audit/              ← 稽核足跡 · 事件時序
+│
+│── ── Workspace Business · 輔助與靜態單元 ─────────────────────────────
+├── workspace-business.daily/                ← 手寫施工日誌 · 留言 · 書籤
+├── workspace-business.schedule/             ← 排程管理 · 提案 · 決策（由 workspace-governance.schedule 遷移）
+├── workspace-business.files/                ← 檔案上傳 · 管理
+├── workspace-business.document-parser/      ← AI 文件解析 · ParsingIntent（Digital Twin）
+│
+│── ── Workspace Business · A 軌（主流程） ──────────────────────────────
+├── workspace-business.tasks/                ← 任務樹 · CRUD（A 軌起點）
+├── workspace-business.quality-assurance/    ← 品質驗證（A 軌）
+├── workspace-business.acceptance/           ← 驗收（A 軌）
+├── workspace-business.finance/              ← 財務處理（A 軌終點）
+│
+│── ── Workspace Business · B 軌（異常處理中心） ─────────────────────────
+├── workspace-business.issues/               ← 問題追蹤單 · IssueResolved 事件（B 軌）
+│
+│── ── Projection Layer ────────────────────────────────────────────────
+├── projection.workspace-view/               ← 工作區讀模型（Workspace 投影視圖）
+├── projection.workspace-scope-guard/        ← Scope Guard 專用讀模型
+├── projection.account-view/                 ← 帳號讀模型 · 權限快照（authority-snapshot 合約）
+├── projection.account-audit/                ← 帳號稽核投影
+├── projection.account-schedule/             ← 帳號排程投影（過濾可用帳號）
+├── projection.organization-view/            ← 組織讀模型
+└── projection.registry/                     ← 事件串流偏移量 · 讀模型版本對照表
 ```
 
 ### workspace-business.issues — AB 雙軌問題單
@@ -159,10 +162,10 @@ src/
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
 | `identity-account.auth` | Firebase 登入／註冊／重設密碼的 UI 與 Server Action | `ACCOUNT_AUTH` |
-| `identity/authenticated-identity` | 持有 Firebase User，提供已驗證狀態 | `AUTHENTICATED_IDENTITY` |
-| `identity/account-identity-link` | 維護 `firebaseUserId ↔ accountId` 映射 | `ACCOUNT_IDENTITY_LINK` |
-| `identity/active-account-context` | 組織／工作區的作用中帳號 Context | `ACTIVE_ACCOUNT_CONTEXT` |
-| `identity/custom-claims` | 解析 Firebase Custom Claims 作為授權資料 | `CUSTOM_CLAIMS` |
+| （Identity Layer 內部狀態，非獨立切片） | 持有 Firebase User，提供已驗證狀態 | `AUTHENTICATED_IDENTITY` |
+| （Identity Layer 內部狀態，非獨立切片） | 維護 `firebaseUserId ↔ accountId` 映射 | `ACCOUNT_IDENTITY_LINK` |
+| （Identity Layer 內部狀態，非獨立切片） | 組織／工作區的作用中帳號 Context | `ACTIVE_ACCOUNT_CONTEXT` |
+| （Identity Layer 內部狀態，非獨立切片） | 解析 Firebase Custom Claims 作為授權資料 | `CUSTOM_CLAIMS` |
 
 ### Account Layer（帳號層）
 
@@ -171,26 +174,23 @@ src/
 | `account-user.profile` | 使用者個人資料、偏好設定、安全設定、FCM Token 儲存（**帳號數據中心共置**） | `USER_ACCOUNT_PROFILE` |
 | `account-user.wallet` | 個人錢包（代幣／積分，stub） | `USER_ACCOUNT_WALLET` |
 | `account-user.notification` | 個人推播通知：訂閱 `ScheduleAssigned` 事件，讀取 FCM Token，呼叫 FCM 閘道；通知結果投影至 `ACCOUNT_PROJECTION_VIEW`（**帳號數據中心共置，FCM-only，不支援 Email/SMS**） | `ACCOUNT_USER_NOTIFICATION` |
-| `account-organization/organization-account.settings` | 組織設定 CRUD | `ORGANIZATION_ACCOUNT_SETTINGS` |
-| `account-organization/organization-account.aggregate` | 組織帳號聚合根，連接 Organization Layer | `ORGANIZATION_ACCOUNT_AGGREGATE` |
-| `account-governance/account-governance.role` | 帳號層角色定義 | `ACCOUNT_ROLE` |
-| `account-governance/account-governance.policy` | 帳號層政策規則 | `ACCOUNT_POLICY` |
-| `account-governance/account-governance.notification-router` | 通知路由器：依 TargetAccountID 分發 ScheduleAssigned 至目標帳號（三層通知架構層二） | `ACCOUNT_NOTIFICATION_ROUTER` |
-| `account-governance/account-governance.audit-log` | 帳號層稽核記錄 | `ACCOUNT_AUDIT_LOG` |
+| `account-organization.core` | 組織設定 CRUD · 組織帳號聚合根，連接 Organization Layer | `ORGANIZATION_ACCOUNT_SETTINGS` / `ORGANIZATION_ACCOUNT_BINDING` |
+| `account-governance.role` | 帳號層角色定義 | `ACCOUNT_ROLE` |
+| `account-governance.policy` | 帳號層政策規則 | `ACCOUNT_POLICY` |
+| `account-governance.notification-router` | 通知路由器：依 TargetAccountID 分發 ScheduleAssigned 至目標帳號（三層通知架構層二） | `ACCOUNT_NOTIFICATION_ROUTER` |
 
 ### Organization Layer（組織層）
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `organization-core/organization-core.aggregate` | 組織聚合實體，擁有工作區 | `ORGANIZATION_ENTITY` |
-| `organization-core/organization-core.event-bus` | 組織領域事件總線 | `ORGANIZATION_EVENT_BUS` |
-| `organization-governance/organization-governance.member` | 組織成員管理（扁平化資源池） | `ORGANIZATION_MEMBER` |
-| `organization-governance/organization-governance.team` | 團隊結構管理（內部組視圖） | `ORGANIZATION_TEAM` |
-| `organization-governance/organization-governance.partner` | 外部合作夥伴（外部組視圖） | `ORGANIZATION_PARTNER` |
-| `organization-governance/organization-governance.policy` | 組織政策管理 | `ORGANIZATION_POLICY` |
-| `organization-governance/organization-governance.skill-tag` | 職能標籤庫（Skills / Certs）管理 | `SKILL_TAG_POOL` |
-| `organization-governance/organization-governance.audit-log` | 組織稽核紀錄 | `ORGANIZATION_AUDIT_LOG` |
-| `organization-schedule` | 人力排程管理 | `ORGANIZATION_SCHEDULE` |
+| `account-organization.core` | 組織聚合實體，擁有工作區 | `ORGANIZATION_ENTITY` |
+| `account-organization.event-bus` | 組織領域事件總線 | `ORGANIZATION_EVENT_BUS` |
+| `account-organization.member` | 組織成員管理（扁平化資源池） | `ORGANIZATION_MEMBER` |
+| `account-organization.team` | 團隊結構管理（內部組視圖） | `ORGANIZATION_TEAM` |
+| `account-organization.partner` | 外部合作夥伴（外部組視圖） | `ORGANIZATION_PARTNER` |
+| `account-organization.policy` | 組織政策管理 | `ORGANIZATION_POLICY` |
+| `account-organization.skill-tag` | 職能標籤庫（Skills / Certs）管理 | `SKILL_TAG_POOL` |
+| `account-organization.schedule` | 人力排程管理 | `ORGANIZATION_SCHEDULE` |
 
 ### Workspace Container（工作區容器）
 
@@ -198,52 +198,48 @@ src/
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-core/workspace-core.settings` | 工作區設定（聚合根核心配置） | `WORKSPACE_SETTINGS` |
-| `workspace-core/workspace-core.aggregate` | 工作區聚合根 | `WORKSPACE_AGGREGATE` |
-| `workspace-core/workspace-core.event-bus` | 工作區事件總線 | `WORKSPACE_EVENT_BUS` |
-| `workspace-core/workspace-core.event-store` | 事件溯源儲存（可選） | `WORKSPACE_EVENT_STORE` |
+| `workspace-core` | Workspace CRUD · shell · provider · list · settings（聚合根核心配置） | `WORKSPACE_SETTINGS` / `WORKSPACE_AGGREGATE` |
+| `workspace-core.event-bus` | 工作區事件總線 | `WORKSPACE_EVENT_BUS` |
+| `workspace-core.event-store` | 事件溯源儲存（可選） | `WORKSPACE_EVENT_STORE` |
 
 #### workspace-application（應用層）
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-application/workspace-application.command-handler` | 接收業務指令，分派至 scope-guard | `WORKSPACE_COMMAND_HANDLER` |
-| `workspace-application/workspace-application.scope-guard` | 驗證 identity context + custom-claims | `WORKSPACE_SCOPE_GUARD` |
-| `workspace-application/workspace-application.policy-engine` | 評估業務政策規則 | `WORKSPACE_POLICY_ENGINE` |
-| `workspace-application/workspace-application.transaction-runner` | 執行聚合交易並協調 outbox | `WORKSPACE_TRANSACTION_RUNNER` |
-| `workspace-application/workspace-application.outbox` | Transactional Outbox，保證事件投遞 | `WORKSPACE_OUTBOX` |
+| `workspace-application` | 指令處理器 · 作用域守衛 · 政策引擎 · org-policy 防腐層快取 · 交易執行器 · Outbox | `WORKSPACE_COMMAND_HANDLER` / `WORKSPACE_SCOPE_GUARD` / `WORKSPACE_POLICY_ENGINE` / `WORKSPACE_TRANSACTION_RUNNER` / `WORKSPACE_OUTBOX` |
 
 #### workspace-governance（工作區治理）
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-governance/workspace-governance.members` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
-| `workspace-governance/workspace-governance.teams` | 工作區團隊管理 | `WORKSPACE_ROLE` |
-| `workspace-governance/workspace-governance.partners` | 合作夥伴關係 | — |
-| `workspace-governance/workspace-governance.schedule` | 排程、提案、審核決策 | — |
-| `workspace-governance/workspace-governance.audit` | 工作區操作稽核 | — |
+| `workspace-governance.members` | 工作區成員存取控制 | `WORKSPACE_MEMBER` |
+| `workspace-governance.role` | 角色管理（從 members 拆分） | `WORKSPACE_ROLE` |
+| `workspace-governance.teams` | **Stub** — 視圖已遷移至 `account-organization.team` | — |
+| `workspace-governance.partners` | **Stub** — 視圖已遷移至 `account-organization.partner` | — |
+| `workspace-governance.schedule` | **Stub** — 實作已遷移至 `workspace-business.schedule` | — |
+| `workspace-governance.audit` | 工作區操作稽核 | — |
 
-> `workspace-governance.audit`、`account-governance.audit-log`、`organization-governance.audit-log` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
+> `workspace-governance.audit` 切片仍作為事件訂閱者存在（程式碼中保留），但不再作為邏輯圖的主動路由節點。所有稽核歷史統一由 `PROJECTION_LAYER` 的 `projection.account-audit` 讀取模型提供。
 
 #### workspace-business（業務層，按執行流向排序）
 
 | Feature Slice | 領域職責 | logic-overview 節點 |
 |---------------|----------|---------------------|
-| `workspace-business/workspace-business.tasks` | 任務管理 | `WORKSPACE_BUSINESS_TASKS` |
-| `workspace-business/workspace-business.quality-assurance` | 品質保證 | `WORKSPACE_BUSINESS_QUALITY_ASSURANCE` |
-| `workspace-business/workspace-business.acceptance` | 業務受理／驗收 | `WORKSPACE_BUSINESS_ACCEPTANCE` |
-| `workspace-business/workspace-business.finance` | 財務處理 | `WORKSPACE_BUSINESS_FINANCE` |
-| `workspace-business/workspace-business.daily` | 日常作業記錄 | `WORKSPACE_BUSINESS_DAILY` |
-| `workspace-business/workspace-business.document-parser` | AI 文件解析 | `WORKSPACE_BUSINESS_DOCUMENT_PARSER` |
-| `workspace-business/workspace-business.files` | 檔案管理 | `WORKSPACE_BUSINESS_FILES` |
-| `workspace-business/workspace-business.issues` | 問題追蹤（AB 雙軌問題單） | `WORKSPACE_BUSINESS_ISSUES` |
-| `workspace-business/workspace-business.schedule` | 任務排程計算 → 發布 ScheduleProposed 事件至 workspace-event-bus | `W_B_SCHEDULE` |
+| `workspace-business.tasks` | 任務管理 | `TRACK_A_TASKS` |
+| `workspace-business.quality-assurance` | 品質保證 | `TRACK_A_QA` |
+| `workspace-business.acceptance` | 業務受理／驗收 | `TRACK_A_ACCEPTANCE` |
+| `workspace-business.finance` | 財務處理 | `TRACK_A_FINANCE` |
+| `workspace-business.daily` | 日常作業記錄 | `W_B_DAILY` |
+| `workspace-business.document-parser` | AI 文件解析 | `W_B_PARSER` |
+| `workspace-business.files` | 檔案管理 | `W_B_FILES` |
+| `workspace-business.issues` | 問題追蹤（AB 雙軌問題單） | `TRACK_B_ISSUES` |
+| `workspace-business.schedule` | 排程管理 · 提案 · 決策（由 `workspace-governance.schedule` 遷移）→ 發布 ScheduleProposed 事件 | `W_B_SCHEDULE` |
 
 ---
 
 ## 五、標準切片內部結構
 
-每個 `features/{domain}/{slice}/` 資料夾遵循：
+每個 `features/{slice}/` 資料夾遵循：
 
 ```
 {slice}/
@@ -265,7 +261,7 @@ src/
 ### 單向依賴流
 
 ```
-app/  →  features/{domain}/{slice}/index.ts  →  shared/*
+app/  →  features/{slice}/index.ts  →  shared/*
 ```
 
 - `app/` 只從 `features/*/index.ts`（公開 API）和 `shared/*` 匯入
@@ -303,13 +299,13 @@ account-user.notification  -.->|通知投影至個人中心|  projection.account
 
 ```ts
 // ✅ 允許：透過公開 API 跨切片
-import { useWorkspaceCommands } from "@/features/workspace/workspace-application/workspace-application.command-handler";
+import { useWorkspaceCommands } from "@/features/workspace-application";
 
 // ❌ 禁止：直接存取其他切片的私有路徑
-import { someHook } from "@/features/workspace/workspace-core/_hooks/some-hook";
+import { someHook } from "@/features/workspace-core/_hooks/some-hook";
 
 // ❌ 禁止：跨領域直接耦合（應透過 event-bus）
-import { orgEntity } from "@/features/organization/organization-core/organization-core.aggregate";
+import { orgEntity } from "@/features/account-organization.core/_aggregate";
 ```
 
 ---
@@ -332,13 +328,17 @@ src/shared/
 | logic-overview 層 | features 資料夾群組 |
 |-------------------|---------------------|
 | Firebase Authentication | 外部服務（不在 features） |
-| Identity Layer | `features/identity/` |
-| Account Layer | `features/account/` |
-| Organization Layer | `features/organization/` |
-| Workspace Container | `features/workspace/` |
-| Projection Layer | `shared/infra/` 讀取模型（不建切片） |
-| Observability Layer | `shared/infra/` 可觀測性（不建切片） |
-| Firebase Cloud Messaging (FCM_GATEWAY) | `shared/infra/` FCM 適配器（外部服務，不建切片） |
+| Identity Layer | `features/identity-account.auth/` 等 `identity-*` 切片 |
+| Account Layer (shared + governance) | `features/account-governance.*` 切片 |
+| Account Layer (User sub-type) | `features/account-user.*` 切片 |
+| Account Layer (Organization sub-type) | `features/account-organization.*` 切片 |
+| Workspace Container — Application | `features/workspace-application/` 切片 |
+| Workspace Container — Core | `features/workspace-core/`、`workspace-core.*` 切片 |
+| Workspace Container — Governance | `features/workspace-governance.*` 切片 |
+| Workspace Container — Business | `features/workspace-business.*` 切片 |
+| Projection Layer | `features/projection.*` 切片（`projection.workspace-view`、`projection.account-*` 等） |
+| Observability Layer | `shared/infra/observability/`（橫切，不建獨立切片） |
+| Firebase Cloud Messaging (FCM_GATEWAY) | `shared/infra/messaging/` FCM 適配器（外部服務，不建切片） |
 | USER_DEVICE | 裝置端（不在 features，為推播終點） |
 
 > 詳細領域邏輯流程請參閱 [`logic-overview.v3.md`](./logic-overview.v3.md)。  

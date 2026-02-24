@@ -2,7 +2,7 @@
 
 ## Domain
 
-Task management — task tree hierarchy, CRUD, batch import.
+Task management — task tree hierarchy, CRUD, batch import (A-track start).
 
 ## Internal Files
 
@@ -10,7 +10,7 @@ Task management — task tree hierarchy, CRUD, batch import.
 |-----------|---------|
 | `_actions.ts` | `createTask`, `updateTask`, `deleteTask`, `batchImportTasks` |
 | `_queries.ts` | Firestore listeners for task list |
-| `_components/` | `TasksPlugin` |
+| `_components/` | `WorkspaceTasks` |
 | `index.ts` | Public exports |
 
 ## Business Rules
@@ -20,9 +20,9 @@ Task management — task tree hierarchy, CRUD, batch import.
 ## Public API (`index.ts`)
 
 ```ts
-export { TasksPlugin } from "./_components/tasks-plugin";
+export { WorkspaceTasks } from "./_components/tasks-view";
 ```
 
 ## Who Uses This Slice?
 
-- `app/dashboard/workspaces/[id]/@plugin-tab/tasks/page.tsx`
+- `app/(shell)/(account)/(workspaces)/workspaces/[id]/@businesstab/tasks/page.tsx`

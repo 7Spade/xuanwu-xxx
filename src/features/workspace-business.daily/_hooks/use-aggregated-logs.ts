@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAccount } from "@/features/account";
+import { useAccount } from "@/features/workspace-core";
 import type { DailyLog } from "@/shared/types";
 
 export function useAggregatedLogs() {

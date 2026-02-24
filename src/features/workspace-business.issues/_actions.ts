@@ -8,6 +8,7 @@
 import {
   createIssue as createIssueFacade,
   addCommentToIssue as addCommentToIssueFacade,
+  resolveIssue as resolveIssueFacade,
 } from "@/shared/infra/firestore/firestore.facade"
 
 export async function createIssue(
@@ -26,4 +27,11 @@ export async function addCommentToIssue(
   content: string
 ): Promise<void> {
   return addCommentToIssueFacade(workspaceId, issueId, author, content)
+}
+
+export async function resolveIssue(
+  workspaceId: string,
+  issueId: string
+): Promise<void> {
+  return resolveIssueFacade(workspaceId, issueId)
 }

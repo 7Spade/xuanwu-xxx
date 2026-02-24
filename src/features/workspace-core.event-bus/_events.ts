@@ -13,7 +13,7 @@ export interface WorkspaceTaskScheduleRequestedPayload {
   taskName: string
 }
 
-export interface QARejectedPayload {
+export interface QualityAssuranceRejectedPayload {
   task: WorkspaceTask
   rejectedBy: string
 }
@@ -23,7 +23,7 @@ export interface WorkspaceAcceptanceFailedPayload {
   rejectedBy: string
 }
 
-export interface WorkspaceQAApprovedPayload {
+export interface WorkspaceQualityAssuranceApprovedPayload {
   task: WorkspaceTask
   approvedBy: string
 }
@@ -35,6 +35,7 @@ export interface WorkspaceAcceptancePassedPayload {
 
 export interface DocumentParserItemsExtractedPayload {
   sourceDocument: string
+  intentId: string
   items: Array<{
     name: string
     quantity: number
@@ -50,6 +51,30 @@ export interface DailyLogForwardRequestedPayload {
   action: "create"
 }
 
+export interface FileSendToParserPayload {
+  fileName: string
+  downloadURL: string
+  fileType: string
+}
+
+export interface WorkspaceIssueResolvedPayload {
+  issueId: string
+  issueTitle: string
+  resolvedBy: string
+}
+
+export interface WorkspaceFinanceDisbursementFailedPayload {
+  taskId: string
+  taskTitle: string
+  amount: number
+  reason: string
+}
+
+export interface WorkspaceTaskBlockedPayload {
+  task: WorkspaceTask
+  reason?: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -57,11 +82,15 @@ export interface DailyLogForwardRequestedPayload {
 export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
-  | "workspace:qa:rejected"
+  | "workspace:tasks:blocked"
+  | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
-  | "workspace:qa:approved"
+  | "workspace:quality-assurance:approved"
   | "workspace:acceptance:passed"
   | "workspace:document-parser:itemsExtracted"
+  | "workspace:files:sendToParser"
+  | "workspace:issues:resolved"
+  | "workspace:finance:disburseFailed"
   | "daily:log:forwardRequested"
 
 // =================================================================
@@ -71,11 +100,15 @@ export type WorkspaceEventName =
 export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
-  "workspace:qa:rejected": QARejectedPayload
+  "workspace:tasks:blocked": WorkspaceTaskBlockedPayload
+  "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
-  "workspace:qa:approved": WorkspaceQAApprovedPayload
+  "workspace:quality-assurance:approved": WorkspaceQualityAssuranceApprovedPayload
   "workspace:acceptance:passed": WorkspaceAcceptancePassedPayload
   "workspace:document-parser:itemsExtracted": DocumentParserItemsExtractedPayload
+  "workspace:files:sendToParser": FileSendToParserPayload
+  "workspace:issues:resolved": WorkspaceIssueResolvedPayload
+  "workspace:finance:disburseFailed": WorkspaceFinanceDisbursementFailedPayload
   "daily:log:forwardRequested": DailyLogForwardRequestedPayload
 }
 

@@ -37,7 +37,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_BUSINESS_ISSUES[workspace-business.issues（問題追蹤）]
         WORKSPACE_BUSINESS_QUALITY_ASSURANCE[workspace-business.quality-assurance（品質保證）]
         WORKSPACE_BUSINESS_TASKS[workspace-business.tasks（任務管理）]
-        WORKSPACE_BUSINESS_SCHEDULE["workspace-business.schedule（任務排程產生）"]
+        WORKSPACE_BUSINESS_SCHEDULE["workspace-business.schedule（排程管理 · 提案 · 決策）"]
 
 end
 
@@ -55,7 +55,9 @@ end
 %% REQUEST EXECUTION FLOW（請求執行流程）
 %% =================================================
 
-WORKSPACE_BUSINESS --> WORKSPACE_COMMAND_HANDLER
+SERVER_ACTION["_actions.ts（Server Action — 業務觸發入口）"]
+SERVER_ACTION -->|發送 Command| WORKSPACE_COMMAND_HANDLER
+WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 
 WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
 ACTIVE_ACCOUNT_CONTEXT --> WORKSPACE_SCOPE_GUARD
@@ -83,7 +85,9 @@ WORKSPACE_EVENT_BUS --> DOMAIN_METRICS
 classDef identity fill:#dbeafe,stroke:#93c5fd,color:#000;
 classDef workspace fill:#ede9fe,stroke:#c4b5fd,color:#000;
 classDef observability fill:#f3f4f6,stroke:#d1d5db,color:#000;
+classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 
 class IDENTITY_LAYER identity;
 class WORKSPACE_CONTAINER workspace;
 class OBSERVABILITY_LAYER observability;
+class SERVER_ACTION serverAction;

@@ -67,17 +67,17 @@ it owns types, server actions, queries, hooks, and UI components.
 |-------|--------|--------|
 | `workspace-governance.members/` | Workspace member access & roles | ✅ |
 | `workspace-governance.role/` | Role management (split from members) | 🆕 |
-| `workspace-governance.teams/` | Team structure management | ✅ |
-| `workspace-governance.partners/` | External partner relationships | ✅ |
-| `workspace-governance.schedule/` | Schedule proposals & decisions (workspace layer) | ✅ |
-| `workspace-governance.audit/` | Audit trail, event timeline | ✅ |
+| `workspace-governance.teams/` | Stub — team views migrated to `account-organization.team` | 🔧 |
+| `workspace-governance.partners/` | Stub — partner views migrated to `account-organization.partner` | 🔧 |
+| `workspace-governance.schedule/` | Stub — implementation migrated to `workspace-business.schedule` | 🔧 |
+| `workspace-governance.audit/` | Audit trail viewer (workspace + account) · deferred to `workspace-core.event-store` + `projection.account-audit` | ✅ |
 
 ### Workspace Business — Support & Static Units
 
 | Slice | Domain | Status |
 |-------|--------|--------|
 | `workspace-business.daily/` | Daily logs, comments, bookmarks | ✅ |
-| `workspace-business.schedule/` | Task schedule generation (triggered by task assignment/time changes) | 🆕 |
+| `workspace-business.schedule/` | Schedule items, proposals, governance (migrated from `workspace-governance.schedule`) | ✅ |
 | `workspace-business.files/` | File upload, management | ✅ |
 | `workspace-business.document-parser/` | AI document parsing · ParsingIntent (Digital Twin) | ✅ |
 
@@ -87,7 +87,7 @@ it owns types, server actions, queries, hooks, and UI components.
 |-------|--------|--------|
 | `workspace-business.tasks/` | Task tree, CRUD (A-track start) | ✅ |
 | `workspace-business.quality-assurance/` | Quality assurance (A-track) | ✅ |
-| `workspace-business.acceptance/` | Acceptance plugin (A-track) | ✅ |
+| `workspace-business.acceptance/` | Acceptance view (A-track) | ✅ |
 | `workspace-business.finance/` | Finance processing (A-track end) | ✅ |
 
 ### Workspace Business — B-Track (Exception Center)
@@ -133,11 +133,11 @@ import { scheduleRepository } from "@/shared/infra";
 import { Button } from "@/shared/ui/shadcn-ui/button";
 
 // ✅ Allowed: other slices via public API only
-import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
+import { AccountScheduleSection } from "@/features/workspace-business.schedule";
 //                                  ↑ root only, never subpath
 
 // ❌ Forbidden: other slice private paths
-import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-business.schedule/_hooks/use-workspace-schedule";
 ```
 
 ## Who Depends on This Layer?

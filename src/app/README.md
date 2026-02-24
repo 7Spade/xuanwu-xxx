@@ -18,7 +18,7 @@ Every route group corresponds to a folder. Only these files belong directly in r
 | `error.tsx` | Error boundary (use shadcn `<Button>` + lucide icon) |
 | `default.tsx` | Parallel-slot inactive default |
 
-Parallel-route slots use the `@slotName/` convention: `@capability/`, `@modal/`, `@panel/`.
+Parallel-route slots use the `@slotName/` convention: `@sidebar/`, `@header/`, `@modal/`, `@panel/`, `@businesstab/`.
 
 ### 2. Server / Client Components — Explicit Split
 
@@ -58,7 +58,7 @@ Shared utilities live in `lib/` or `features/`.
 
 ```tsx
 // ✅ Correct active-tab detection in workspace nav
-const active = useSelectedLayoutSegment("capability")
+const active = useSelectedLayoutSegment("businesstab")
 ```
 
 ### 6. Streaming / Suspense for All Async UI
@@ -123,7 +123,7 @@ src/app/
 │   ├── workspaces/
 │   │   └── [id]/
 │   │       ├── layout.tsx           # Slot compositor
-│   │       ├── @capability/         # Parallel slot — workspace tabs
+│   │       ├── @businesstab/        # Parallel slot — workspace business tabs
 │   │       │   └── tasks/
 │   │       │       ├── page.tsx
 │   │       │       ├── loading.tsx  # shadcn Skeleton

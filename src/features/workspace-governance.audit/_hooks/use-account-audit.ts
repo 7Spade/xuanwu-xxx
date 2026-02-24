@@ -14,7 +14,7 @@
 
 import { useMemo, useState } from "react";
 import { useApp } from "@/features/workspace-core";
-import { useAccount } from "@/features/account";
+import { useAccount } from "@/features/workspace-core";
 import { type AuditLog } from "@/shared/types";
 
 export function useAccountAudit() {

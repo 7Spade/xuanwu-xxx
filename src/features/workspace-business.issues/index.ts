@@ -1,3 +1,3 @@
-export { WorkspaceIssues } from './_components/issues-plugin'
+export { WorkspaceIssues } from './_components/issues-view'
 // Actions (server)
-export { createIssue, addCommentToIssue } from './_actions'
+export { createIssue, addCommentToIssue, resolveIssue } from './_actions'

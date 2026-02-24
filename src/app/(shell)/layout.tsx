@@ -21,7 +21,7 @@ import { Loader2 } from "lucide-react";
 
 import { SidebarProvider } from "@/shared/shadcn-ui/sidebar";
 import { useAuth } from "@/shared/app-providers/auth-provider";
-import { AccountProvider } from "@/features/account";
+import { AccountProvider } from "@/features/workspace-core";
 
 type ShellLayoutProps = {
   children: ReactNode;

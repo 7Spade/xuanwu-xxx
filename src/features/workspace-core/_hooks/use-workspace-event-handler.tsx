@@ -7,12 +7,14 @@ import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";
 import { createIssue } from "@/features/workspace-business.issues";
-import { createScheduleItem } from "@/features/workspace-governance.schedule";
+import { createScheduleItem } from "@/features/workspace-business.schedule";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
+import { markParsingIntentImported } from "@/features/workspace-business.document-parser";
 import { Timestamp } from "firebase/firestore";
 
 type DocParserPayload = {
   sourceDocument: string;
+  intentId: string;
   items: Array<{
     name: string;
     quantity: number;
@@ -44,7 +46,7 @@ export function useWorkspaceEventHandler() {
     };
 
     const unsubQAApproved = eventBus.subscribe(
-      "workspace:qa:approved",
+      "workspace:quality-assurance:approved",
       (payload) => {
         pushNotification(
           "QA Approved",
@@ -65,8 +67,8 @@ export function useWorkspaceEventHandler() {
       }
     );
 
-    const unsubQARejected = eventBus.subscribe(
-      "workspace:qa:rejected",
+    const unsubQualityAssuranceRejected = eventBus.subscribe(
+      "workspace:quality-assurance:rejected",
       async (payload) => {
         await createIssue(
           workspace.id,
@@ -117,10 +119,14 @@ export function useWorkspaceEventHandler() {
             type: "Imported",
             priority: "medium",
             progressState: "todo",
+            sourceIntentId: payload.intentId,
           }));
 
         batchImportTasks(workspace.id, items)
-          .then(() => {
+          .then(async () => {
+            await markParsingIntentImported(workspace.id, payload.intentId).catch(
+              (err: unknown) => console.error("Failed to mark intent imported:", err)
+            );
             toast({
               title: "Import Successful",
               description: `${payload.items.length} tasks have been added.`,
@@ -223,15 +229,65 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    const unsubIssueResolved = eventBus.subscribe(
+      "workspace:issues:resolved",
+      (payload) => {
+        pushNotification(
+          "B-Track Issue Resolved",
+          `Issue "${payload.issueTitle}" closed by ${payload.resolvedBy}. A-Track may now resume.`,
+          "success"
+        );
+      }
+    );
+
+    // TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
+    const unsubFinanceFailed = eventBus.subscribe(
+      "workspace:finance:disburseFailed",
+      async (payload) => {
+        await createIssue(
+          workspace.id,
+          `Disbursement Failed: ${payload.taskTitle}`,
+          "financial",
+          "high"
+        );
+        pushNotification(
+          "Finance Failure & Issue Logged",
+          `Disbursement for "${payload.taskTitle}" failed. A financial issue has been created.`,
+          "alert"
+        );
+      }
+    );
+
+    // TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
+    const unsubTaskBlocked = eventBus.subscribe(
+      "workspace:tasks:blocked",
+      async (payload) => {
+        await createIssue(
+          workspace.id,
+          `Task Blocked: ${payload.task.name}`,
+          "technical",
+          "high"
+        );
+        pushNotification(
+          "Task Blocked & Issue Logged",
+          `Task "${payload.task.name}" is blocked. A B-track issue has been created.`,
+          "alert"
+        );
+      }
+    );
+
     return () => {
       unsubQAApproved();
       unsubAcceptancePassed();
-      unsubQARejected();
+      unsubQualityAssuranceRejected();
       unsubAcceptanceFailed();
       unsubDocParse();
       unsubScheduleRequest();
       unsubTaskCompleted();
       unsubForwardRequested();
+      unsubIssueResolved();
+      unsubFinanceFailed();
+      unsubTaskBlocked();
     };
   }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 }

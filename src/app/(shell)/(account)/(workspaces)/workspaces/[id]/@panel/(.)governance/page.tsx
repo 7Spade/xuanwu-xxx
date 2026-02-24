@@ -5,8 +5,8 @@ import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/shadcn-ui/sheet"
 import { useWorkspace } from "@/features/workspace-core"
-import { useAccount } from "@/features/account"
-import { GovernanceSidebar , useScheduleActions } from "@/features/workspace-governance.schedule"
+import { useAccount } from "@/features/workspace-core"
+import { GovernanceSidebar , useScheduleActions } from "@/features/workspace-business.schedule"
 import type { ScheduleItem } from "@/shared/types"
 
 export default function GovernancePanelPage() {

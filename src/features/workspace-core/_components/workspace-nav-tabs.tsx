@@ -58,7 +58,7 @@ export function WorkspaceNavTabs({ workspaceId }: WorkspaceNavTabsProps) {
   const { workspace } = useWorkspace()
   const { state } = useApp()
   const { activeAccount } = state
-  const activeCapability = useSelectedLayoutSegment("plugin-tab")
+  const activeCapability = useSelectedLayoutSegment("businesstab")
 
   // Show governance tabs (Members) only for org-owned workspaces.
   // We avoid hiding them unless we can definitively confirm a personal workspace

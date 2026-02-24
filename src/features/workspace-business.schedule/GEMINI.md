@@ -2,43 +2,65 @@
 
 ## Domain
 
-Task schedule generation — generates and manages task schedules within a workspace, triggered by task assignments and time changes. Distinct from HR scheduling (`account-organization.schedule`).
+Schedule management — schedule items, shift proposals, member assignment, governance (approve/reject).
+Migrated from `workspace-governance.schedule` per `logic-overview.v3.md` (`W_B_SCHEDULE` is in `WORKSPACE_BUSINESS`; `WORKSPACE_GOVERNANCE` only contains `members` + `role`).
 
-## Distinction from `workspace-governance.schedule` and `account-organization.schedule`
+Distinct from HR scheduling (`account-organization.schedule`).
+
+## Distinction from `account-organization.schedule`
 
 | Slice | Scope | Trigger |
 |-------|-------|---------|
-| `workspace-governance.schedule` | Workspace-level schedule proposals & decisions | Governance actions |
-| `workspace-business.schedule` | Task schedule generation within workspace | Task assignment / time changes |
+| `workspace-business.schedule` | Workspace schedule items, proposals & decisions | Governance actions / task assignment |
 | `account-organization.schedule` | HR scheduling (workforce) | Organization-level assignments |
 
 ## Responsibilities
 
-- Generate task schedules based on task assignments and time changes
-- Filter available accounts using `projection.account-schedule`
-- Provide schedule proposals for task planning
+- CRUD for schedule items
+- Assign / unassign members to schedule items
+- Proposal workflow (create → review → approve / reject)
+- Governance sidebar with decision history
+- Account-level and workspace-level schedule views
+- Unified calendar grid
+- Fire `ScheduleProposed` cross-layer event → `WORKSPACE_OUTBOX → ORGANIZATION_SCHEDULE`
 
 ## Internal Files
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_actions.ts` | `generateSchedule`, `updateSchedule` |
-| `_queries.ts` | Task schedule subscription |
-| `_components/` | `TaskScheduleView`, `ScheduleProposalCard` |
-| `_hooks/` | `useTaskSchedule` |
+| `_actions.ts` | `createScheduleItem`, `updateScheduleItemStatus`, `assignMember`, `unassignMember`, `getScheduleItems` |
+| `_hooks/` | `useGlobalSchedule`, `useWorkspaceSchedule`, `useScheduleActions` |
+| `_components/` | `AccountScheduleSection`, `WorkspaceSchedule`, `GovernanceSidebar`, `ScheduleProposalContent`, `ScheduleDataTable`, `UnifiedCalendarGrid`, `ProposalDialog` |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+export { AccountScheduleSection } from "./_components/schedule.account-view";
+export { WorkspaceSchedule } from "./_components/schedule.workspace-view";
+export { GovernanceSidebar } from "./_components/governance-sidebar";
+export { ProposalDialog } from "./_components/proposal-dialog";
+export { ScheduleProposalContent } from "./_components/schedule-proposal-content";
+export { ScheduleDataTable } from "./_components/schedule-data-table";
+export { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
+export { useGlobalSchedule, useScheduleActions, useWorkspaceSchedule } from "./_hooks/...";
+export { createScheduleItem, assignMember, unassignMember, updateScheduleItemStatus, getScheduleItems } from "./_actions";
 ```
 
-## Dependencies
+## Business Rules
 
-- `@/shared/types` — `ScheduleItem`, `Task`
-- `@/features/projection.account-schedule` — filtered available accounts (via public API)
-- `@/shared/infra/firestore/` — Firestore reads/writes
+- `canTransitionScheduleStatus(from, to)` → lives in `@/shared/lib`
+- Only OFFICIAL status triggers entity XP calculation
+- Governance uses dual-role approval (proposer ≠ approver)
+
+## Who Uses This Slice?
+
+- `app/dashboard/account/schedule/page.tsx`
+- `app/dashboard/workspaces/[id]/@businesstab/schedule/page.tsx`
+- `app/dashboard/workspaces/[id]/@modal/(.)schedule-proposal/page.tsx`
+- `app/dashboard/workspaces/[id]/@panel/(.)governance/page.tsx`
+- `app/dashboard/workspaces/[id]/schedule-proposal/page.tsx`
+- `app/dashboard/workspaces/[id]/governance/page.tsx`
 
 ## Architecture Note
 

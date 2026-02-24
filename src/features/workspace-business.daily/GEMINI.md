@@ -34,6 +34,6 @@ export { DailyLogDialog } from "./_components/daily-log-dialog";
 ## Who Uses This Slice?
 
 - `app/dashboard/account/daily/page.tsx`
-- `app/dashboard/workspaces/[id]/@plugin-tab/daily/page.tsx`
+- `app/dashboard/workspaces/[id]/@businesstab/daily/page.tsx`
 - `app/dashboard/workspaces/[id]/@modal/(.)daily-log/[logId]/page.tsx`
 - `app/dashboard/workspaces/[id]/daily-log/[logId]/page.tsx`
