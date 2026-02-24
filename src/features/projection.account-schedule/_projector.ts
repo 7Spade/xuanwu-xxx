@@ -11,8 +11,9 @@
  *   W_B_SCHEDULE -.→ ACCOUNT_PROJECTION_SCHEDULE (過濾可用帳號)
  */
 
-import { serverTimestamp } from 'firebase/firestore';
-import { setDocument, updateDocument } from '@/shared/infra/firestore/firestore.write.adapter';
+import { serverTimestamp, arrayUnion, arrayRemove, doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/shared/infra/firestore/firestore.client';
+import { setDocument } from '@/shared/infra/firestore/firestore.write.adapter';
 
 export interface AccountScheduleProjection {
   accountId: string;
@@ -47,13 +48,17 @@ export async function initAccountScheduleProjection(accountId: string): Promise<
 
 /**
  * Adds a schedule assignment to the projection.
+ * Updates both `assignmentIndex` (for detail lookups) and `activeAssignmentIds`
+ * (for fast availability filtering).
  */
 export async function applyScheduleAssigned(
   accountId: string,
   assignment: AccountScheduleAssignment
 ): Promise<void> {
-  await updateDocument(`scheduleProjection/${accountId}`, {
+  const docRef = doc(db, `scheduleProjection/${accountId}`);
+  await updateDoc(docRef, {
     [`assignmentIndex.${assignment.scheduleItemId}`]: assignment,
+    activeAssignmentIds: arrayUnion(assignment.scheduleItemId),
     readModelVersion: Date.now(),
     updatedAt: serverTimestamp(),
   });
@@ -61,13 +66,16 @@ export async function applyScheduleAssigned(
 
 /**
  * Marks a schedule assignment as completed in the projection.
+ * Removes from `activeAssignmentIds` so availability filters exclude it.
  */
 export async function applyScheduleCompleted(
   accountId: string,
   scheduleItemId: string
 ): Promise<void> {
-  await updateDocument(`scheduleProjection/${accountId}`, {
+  const docRef = doc(db, `scheduleProjection/${accountId}`);
+  await updateDoc(docRef, {
     [`assignmentIndex.${scheduleItemId}.status`]: 'completed',
+    activeAssignmentIds: arrayRemove(scheduleItemId),
     readModelVersion: Date.now(),
     updatedAt: serverTimestamp(),
   });
