@@ -28,7 +28,12 @@ Workspace application layer — coordinates the command processing pipeline. Rec
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+import { executeCommand, type WorkspaceCommand, type CommandResult } from '@/features/workspace-application'
+import { checkWorkspaceAccess, type ScopeGuardResult } from '@/features/workspace-application'
+import { evaluatePolicy, type WorkspaceRole, type PolicyDecision } from '@/features/workspace-application'
+import { runTransaction, type TransactionContext, type TransactionResult } from '@/features/workspace-application'
+import { createOutbox, type Outbox, type OutboxEvent } from '@/features/workspace-application'
+import { registerOrgPolicyCache, getCachedOrgPolicy, getAllCachedPolicies, clearOrgPolicyCache } from '@/features/workspace-application'
 ```
 
 ## Dependencies

@@ -5,6 +5,8 @@ import type React from 'react';
 import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
 import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel } from '@/features/workspace-core.event-bus';
+import { registerNotificationRouter } from '@/features/account-governance.notification-router';
+import { registerOrgPolicyCache } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
@@ -80,12 +82,17 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const eventBus = useMemo(() => new WorkspaceEventBus(), [workspaceId]);
 
   // Register Event Funnel — routes events from both buses to the Projection Layer
+  // Also register Notification Router (FCM Layer 2) and Org Policy Cache
   useEffect(() => {
     const unsubWorkspace = registerWorkspaceFunnel(eventBus);
     const unsubOrg = registerOrganizationFunnel();
+    const { unsubscribe: unsubNotif } = registerNotificationRouter();
+    const unsubPolicy = registerOrgPolicyCache();
     return () => {
       unsubWorkspace();
       unsubOrg();
+      unsubNotif();
+      unsubPolicy();
     };
   }, [eventBus]);
 
