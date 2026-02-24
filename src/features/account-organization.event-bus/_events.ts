@@ -96,6 +96,32 @@ export interface ScheduleAssignRejectedPayload {
   rejectedAt: string;
 }
 
+/**
+ * Fired by ORG_SKILL_RECOGNITION when an organization grants skill recognition
+ * to a member.  Per logic-overview.v3.md:
+ *   ORG_SKILL_RECOGNITION →|SkillRecognitionGranted| ORGANIZATION_EVENT_BUS
+ */
+export interface SkillRecognitionGrantedPayload {
+  organizationId: string;
+  accountId: string;
+  skillId: string;
+  /** Org-controlled XP threshold (0 = no gate). */
+  minXpRequired: number;
+  grantedBy: string;
+}
+
+/**
+ * Fired by ORG_SKILL_RECOGNITION when an organization revokes a skill recognition.
+ * Per logic-overview.v3.md:
+ *   ORG_SKILL_RECOGNITION →|SkillRecognitionRevoked| ORGANIZATION_EVENT_BUS
+ */
+export interface SkillRecognitionRevokedPayload {
+  organizationId: string;
+  accountId: string;
+  skillId: string;
+  revokedBy: string;
+}
+
 // =================================================================
 // == Event Key Map
 // =================================================================
@@ -109,6 +135,8 @@ export interface OrganizationEventPayloadMap {
   'organization:team:updated': OrgTeamUpdatedPayload;
   'organization:skill:xpAdded': SkillXpAddedPayload;
   'organization:skill:xpDeducted': SkillXpDeductedPayload;
+  'organization:skill:recognitionGranted': SkillRecognitionGrantedPayload;
+  'organization:skill:recognitionRevoked': SkillRecognitionRevokedPayload;
 }
 
 export type OrganizationEventKey = keyof OrganizationEventPayloadMap;

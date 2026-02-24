@@ -19,6 +19,8 @@ export type {
   OrgTeamUpdatedPayload,
   SkillXpAddedPayload,
   SkillXpDeductedPayload,
+  SkillRecognitionGrantedPayload,
+  SkillRecognitionRevokedPayload,
   OrganizationEventPayloadMap,
   OrganizationEventKey,
 } from './_events';
