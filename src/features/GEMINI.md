@@ -133,11 +133,11 @@ import { scheduleRepository } from "@/shared/infra";
 import { Button } from "@/shared/ui/shadcn-ui/button";
 
 // ✅ Allowed: other slices via public API only
-import { AccountScheduleSection } from "@/features/workspace-governance.schedule";
+import { AccountScheduleSection } from "@/features/workspace-business.schedule";
 //                                  ↑ root only, never subpath
 
 // ❌ Forbidden: other slice private paths
-import { useWorkspaceSchedule } from "@/features/workspace-governance.schedule/_hooks/use-workspace-schedule";
+import { useWorkspaceSchedule } from "@/features/workspace-business.schedule/_hooks/use-workspace-schedule";
 ```
 
 ## Who Depends on This Layer?

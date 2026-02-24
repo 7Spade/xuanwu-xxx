@@ -26,7 +26,7 @@ Each feature slice may only import from `shared/*` and other slices' `index.ts` 
 | Directory | Role |
 |-----------|------|
 | `src/app` | Next.js App Router pages and layouts (pure composition) |
-| `src/features` | 20 vertical feature slices — each owns its domain end-to-end |
+| `src/features` | 42 vertical feature slices — each owns its domain end-to-end |
 | `src/shared/types` | TypeScript domain types — zero dependencies |
 | `src/shared/lib` | Pure utility functions and domain rules |
 | `src/shared/infra` | Firebase SDK wrappers (repositories + adapters) |
