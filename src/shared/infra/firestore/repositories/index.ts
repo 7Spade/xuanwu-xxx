@@ -9,6 +9,8 @@ export * from './workspace-core.repository'                   // createWorkspace
 export * from './workspace-business.tasks.repository'         // createTask, updateTask, deleteTask, getWorkspaceTasks
 export * from './workspace-business.issues.repository'        // createIssue, addCommentToIssue, resolveIssue, getWorkspaceIssues
 export * from './workspace-business.document-parser.repository' // createParsingIntent, updateParsingIntentStatus, getParsingIntents
+export * from './workspace-core.event-store.repository'       // appendDomainEvent, getDomainEvents, StoredWorkspaceEvent
+export * from './projection.registry.repository'              // getProjectionVersion, upsertProjectionVersion, ProjectionVersionRecord
 export * from './schedule.repository'                         // createScheduleItem, updateScheduleItemStatus, assignMemberToScheduleItem, unassignMemberFromScheduleItem, getScheduleItems
 export * from './daily.repository'                            // toggleDailyLogLike, addDailyLogComment, getDailyLogs
 export * from './audit.repository'                            // getAuditLogs

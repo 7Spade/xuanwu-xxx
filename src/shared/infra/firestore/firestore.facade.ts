@@ -86,3 +86,17 @@ export const getWorkspaceGrants = repositories.getWorkspaceGrants
 export const createParsingIntent = repositories.createParsingIntent
 export const updateParsingIntentStatus = repositories.updateParsingIntentStatus
 export const getParsingIntents = repositories.getParsingIntents
+
+// ==================================================================
+// == workspace-core.event-store — Append-only domain event log
+// ==================================================================
+export const appendDomainEvent = repositories.appendDomainEvent
+export const getDomainEvents = repositories.getDomainEvents
+export type { StoredWorkspaceEvent } from './repositories'
+
+// ==================================================================
+// == projection.registry — Event stream offset + read model versions
+// ==================================================================
+export const getProjectionVersion = repositories.getProjectionVersion
+export const upsertProjectionVersion = repositories.upsertProjectionVersion
+export type { ProjectionVersionRecord } from './repositories'
