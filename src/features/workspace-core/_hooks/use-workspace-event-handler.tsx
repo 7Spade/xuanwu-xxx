@@ -7,7 +7,6 @@ import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";
 import { createIssue } from "@/features/workspace-business.issues";
-import { createScheduleItem } from "@/features/workspace-business.schedule";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
 import { markParsingIntentImported } from "@/features/workspace-business.document-parser";
 import { Timestamp } from "firebase/firestore";
@@ -30,7 +29,7 @@ type DocParserPayload = {
  * Subscribes to workspace-level events and orchestrates cross-capability reactions.
  */
 export function useWorkspaceEventHandler() {
-  const { eventBus, workspace, logAuditEvent, updateTask } = useWorkspace();
+  const { eventBus, workspace, logAuditEvent, updateTask, createScheduleItem } = useWorkspace();
   const { dispatch } = useApp();
 
   useEffect(() => {

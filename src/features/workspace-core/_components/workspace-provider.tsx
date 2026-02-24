@@ -2,21 +2,23 @@
 "use client";
 
 import type React from 'react';
-import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
+import { createContext, useContext, useMemo, useCallback, useEffect, useState } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
-import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName } from '@/features/workspace-core.event-bus';
+import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel, type WorkspaceEventName, type FileSendToParserPayload } from '@/features/workspace-core.event-bus';
 import { registerNotificationRouter } from '@/features/account-governance.notification-router';
 import { registerOrgPolicyCache, runTransaction } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
 import { addDocument } from '@/shared/infra/firestore/firestore.write.adapter';
+import { firestoreTimestampToISO } from '@/shared/lib';
 import { useApp } from '../_hooks/use-app';
 import { Loader2 } from 'lucide-react';
 import { 
   createTask as createTaskAction,
   updateTask as updateTaskAction,
   deleteTask as deleteTaskAction,
+  getWorkspaceTask as getWorkspaceTaskAction,
 } from '@/features/workspace-business.tasks'
 import {
   authorizeWorkspaceTeam as authorizeWorkspaceTeamAction,
@@ -68,6 +70,10 @@ interface WorkspaceContextType {
   resolveIssue: (issueId: string, issueTitle: string, resolvedBy: string, sourceTaskId?: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
+  // Pending parse file — set by files-view when "Parse with AI" is clicked;
+  // read by document-parser on mount to auto-trigger parsing cross-tab.
+  pendingParseFile: FileSendToParserPayload | null;
+  setPendingParseFile: (payload: FileSendToParserPayload | null) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
@@ -81,6 +87,10 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const workspace = workspaces[workspaceId];
 
   const eventBus = useMemo(() => new WorkspaceEventBus(), [workspaceId]);
+
+  // Pending parse file — bridges the cross-tab gap between files-view (publisher)
+  // and document-parser-view (subscriber), which are on separate @businesstab slots.
+  const [pendingParseFile, setPendingParseFile] = useState<FileSendToParserPayload | null>(null);
 
   // Register Event Funnel — routes events from both buses to the Projection Layer
   // Also register Notification Router (FCM Layer 2) and Org Policy Cache
@@ -118,12 +128,12 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createTask = useCallback(async (task: Omit<WorkspaceTask, 'id' | 'createdAt' | 'updatedAt'>) => createTaskAction(workspaceId, task), [workspaceId]);
   const updateTask = useCallback(async (taskId: string, updates: Partial<WorkspaceTask>) => {
-    // Capture task data before write so the event payload reflects the stable name.
-    const taskData = workspace.tasks?.[taskId];
     await updateTaskAction(workspaceId, taskId, updates);
     // Schedule trigger chain: task assignment change → workspace:tasks:assigned → W_B_SCHEDULE.
     // Only publish when a non-empty assigneeId is provided (assignment, not un-assignment).
     if (updates.assigneeId) {
+      // Fetch task data from workspace-business.tasks BC boundary (not from workspace aggregate).
+      const taskData = await getWorkspaceTaskAction(workspaceId, taskId);
       eventBus.publish('workspace:tasks:assigned', {
         taskId,
         taskName: taskData?.name ?? taskId,
@@ -132,7 +142,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
         sourceIntentId: taskData?.sourceIntentId,
       });
     }
-  }, [workspaceId, workspace.tasks, eventBus]);
+  }, [workspaceId, eventBus]);
   const deleteTask = useCallback(async (taskId: string) => deleteTaskAction(workspaceId, taskId), [workspaceId]);
   
   const authorizeWorkspaceTeam = useCallback(async (teamId: string) => authorizeWorkspaceTeamAction(workspaceId, teamId), [workspaceId]);
@@ -160,7 +170,29 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     }
   }, [workspaceId, eventBus]);
 
-  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
+  const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => {
+    const itemId = await createScheduleItemAction(itemData);
+    // Cross-layer Outbox event: WORKSPACE_OUTBOX →|workspace:schedule:proposed| ORGANIZATION_SCHEDULE
+    // Per logic-overview.v3.md: W_B_SCHEDULE publishes this event so account-organization.schedule
+    // can persist an orgScheduleProposal and start the HR governance approval flow.
+    if (workspace?.dimensionId) {
+      eventBus.publish('workspace:schedule:proposed', {
+        scheduleItemId: itemId,
+        workspaceId: workspaceId,
+        orgId: workspace.dimensionId,
+        title: itemData.title,
+        startDate: firestoreTimestampToISO(itemData.startDate),
+        endDate: firestoreTimestampToISO(itemData.endDate),
+        proposedBy: activeAccount?.id ?? 'system',
+        skillRequirements: itemData.requiredSkills,
+      });
+    } else {
+      console.warn(
+        `[W_B_SCHEDULE] workspace:schedule:proposed not published for item "${itemId}" — workspace.dimensionId is missing. Org-level scheduling will not be triggered.`
+      );
+    }
+    return itemId;
+  }, [workspaceId, workspace?.dimensionId, activeAccount?.id, eventBus]);
 
 
   if (!workspace || !db) {
@@ -197,6 +229,8 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     addCommentToIssue,
     resolveIssue,
     createScheduleItem,
+    pendingParseFile,
+    setPendingParseFile,
   };
 
     return (

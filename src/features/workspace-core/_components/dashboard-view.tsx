@@ -13,7 +13,7 @@ import { StatCards } from "./stat-cards"
 import { AccountGrid } from "@/features/account-organization.core"
 import { PermissionTree } from "@/features/account-governance.role"
 import { WorkspaceList } from "./workspace-list"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 
 /**

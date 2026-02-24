@@ -58,6 +58,7 @@ export const resolveIssue = repositories.resolveIssue
 export const createTask = repositories.createTask
 export const updateTask = repositories.updateTask
 export const deleteTask = repositories.deleteTask
+export const getWorkspaceTask = repositories.getWorkspaceTask
 
 // Schedule
 export const createScheduleItem = repositories.createScheduleItem
@@ -81,6 +82,12 @@ export const getWorkspaceTasks = repositories.getWorkspaceTasks
 export const getWorkspaceIssues = repositories.getWorkspaceIssues
 export const getWorkspaceFiles = repositories.getWorkspaceFiles
 export const getWorkspaceGrants = repositories.getWorkspaceGrants
+
+// workspace-business.files — subcollection CRUD
+export const createWorkspaceFile = repositories.createWorkspaceFile
+export const addWorkspaceFileVersion = repositories.addWorkspaceFileVersion
+export const restoreWorkspaceFileVersion = repositories.restoreWorkspaceFileVersion
+export const getWorkspaceFilesFromSubcollection = repositories.getWorkspaceFilesFromSubcollection
 
 // ParsingIntent (document-parser Digital Twin)
 export const createParsingIntent = repositories.createParsingIntent

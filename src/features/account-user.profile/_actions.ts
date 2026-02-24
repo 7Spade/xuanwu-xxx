@@ -7,7 +7,6 @@
 
 import {
   createUserAccount as createUserAccountFacade,
-  getUserProfile as getUserProfileFacade,
   updateUserProfile as updateUserProfileFacade,
 } from "@/shared/infra/firestore/firestore.facade"
 import type { Account } from "@/shared/types"
@@ -18,10 +17,6 @@ export async function createUserAccount(
   email: string
 ): Promise<void> {
   return createUserAccountFacade(userId, name, email)
-}
-
-export async function getUserProfile(userId: string): Promise<Account | null> {
-  return getUserProfileFacade(userId)
 }
 
 export async function updateUserProfile(

@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/shared/shadcn-ui/dialog";
-import { PageHeader } from "@/shared/shadcn-ui/page-header";
+import { PageHeader } from "@/shared/ui/page-header";
 
 /**
  * WorkspaceLayoutInner - The actual UI layout component.

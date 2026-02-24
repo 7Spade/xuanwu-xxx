@@ -20,7 +20,7 @@ import { useApp } from "@/features/workspace-core"
 import { useTeamManagement } from "@/features/account-organization.team"
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import type { Team } from "@/shared/types"
-import { PageHeader } from "@/shared/shadcn-ui/page-header"
+import { PageHeader } from "@/shared/ui/page-header"
 
 /**
  * TeamsView - Manages the logical groupings of INTERNAL members within the dimension.

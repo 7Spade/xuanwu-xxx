@@ -11,3 +11,11 @@ export type {
   ScheduleApprovalResult,
 } from './_schedule';
 
+export {
+  getOrgScheduleProposal,
+  subscribeToOrgScheduleProposals,
+  subscribeToPendingProposals,
+} from './_queries';
+
+export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-schedule';
+

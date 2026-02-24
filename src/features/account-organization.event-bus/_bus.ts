@@ -7,8 +7,10 @@
  * Per logic-overview.v3.md:
  *   ORGANIZATION_ENTITY → ORGANIZATION_EVENT_BUS
  *   ORGANIZATION_EVENT_BUS → all downstream listeners
+ *   ORGANIZATION_EVENT_BUS -.→ shared-kernel.event-envelope（契約遵循）
  */
 
+import type { ImplementsEventEnvelopeContract } from '@/shared/kernel/event-envelope';
 import type { OrganizationEventPayloadMap, OrganizationEventKey } from './_events';
 
 type OrgEventHandler<K extends OrganizationEventKey> = (
@@ -18,6 +20,9 @@ type OrgEventHandler<K extends OrganizationEventKey> = (
 type OrgEventHandlerMap = {
   [K in OrganizationEventKey]?: Array<OrgEventHandler<K>>;
 };
+
+/** Marker: this module implements the shared-kernel.event-envelope contract (Invariant #8). */
+export const implementsEventEnvelope: ImplementsEventEnvelopeContract['implementsEventEnvelope'] = true;
 
 const handlers: OrgEventHandlerMap = {};
 

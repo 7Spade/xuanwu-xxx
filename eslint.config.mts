@@ -28,7 +28,6 @@ export default tseslint.config(
       "build/**",
       "next-env.d.ts",
       "functions/**",
-      "src/shared/shadcn-ui/**",
     ],
   },
   {
@@ -148,6 +147,62 @@ export default tseslint.config(
       "jsx-a11y/anchor-has-content": "off",
       "jsx-a11y/click-events-have-key-events": "off",
       "jsx-a11y/no-noninteractive-element-interactions": "off",
+    },
+  },
+
+  // shadcn-ui — official UI primitives. DO NOT MODIFY.
+  // These files are scaffolded by the shadcn-ui CLI and must be kept in their original state.
+  // All inherited quality rules are disabled to avoid noise from generated component patterns.
+  // The single active rule flags any new assignment that is not a standard .displayName setter,
+  // making accidental edits immediately visible during linting.
+  {
+    files: ["src/shared/shadcn-ui/**/*.{ts,tsx}"],
+    rules: {
+      // Disable TypeScript rules that fire on generated component code
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/strict-boolean-expressions": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/prefer-as-const": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      // Disable React rules (primitive wrappers are intentionally low-level)
+      "react/jsx-key": "off",
+      "react/no-array-index-key": "off",
+      "react/jsx-no-useless-fragment": "off",
+      "react/self-closing-comp": "off",
+      "react/prop-types": "off",
+      "react/no-unknown-property": "off",
+      "react/display-name": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "off",
+      // Disable accessibility rules (shadcn-ui delegates a11y responsibility to consumers)
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "jsx-a11y/interactive-supports-focus": "off",
+      "jsx-a11y/heading-has-content": "off",
+      "jsx-a11y/anchor-has-content": "off",
+      "jsx-a11y/anchor-is-valid": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      // Disable import / tailwind style rules
+      "import/no-relative-parent-imports": "off",
+      "tailwindcss/no-custom-classname": "off",
+      "tailwindcss/classnames-order": "off",
+      "tailwindcss/no-contradicting-classname": "off",
+      // ── Modification guard ──────────────────────────────────────────────────
+      // Flags any assignment that is NOT a standard `.displayName = "..."` setter.
+      // React.forwardRef components always set .displayName — those are excluded.
+      // Any other assignment indicates an unsanctioned modification to these files.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "AssignmentExpression:not([left.type='MemberExpression'][left.property.name='displayName'])",
+          message: "禁止修改 shadcn-ui 內部檔案",
+        },
+      ],
     },
   },
 
