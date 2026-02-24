@@ -111,6 +111,7 @@ src/features/
 │   └── workspace-business.issues/         ✅  問題追蹤單 · IssueResolved 事件（B 軌）
 │
 └── ── Projection Layer ───────────────────────────────────────────
+    ├── projection.event-funnel/            ✅  事件漏斗（EVENT_FUNNEL_INPUT · Projection Layer 唯一外部入口）
     ├── projection.workspace-view/          🔧  工作區讀模型（Workspace 投影視圖）
     ├── projection.workspace-scope-guard/   🔧  Scope Guard 專用讀模型
     ├── projection.account-view/            🔧  帳號讀模型 · 權限快照（authority-snapshot 合約）
@@ -119,7 +120,7 @@ src/features/
     ├── projection.organization-view/       🔧  組織讀模型
     ├── projection.account-skill-view/      🔧  帳號技能讀模型（accountId / skillId / xp · 不存 tier）
     ├── projection.org-eligible-member-view/ 🔧  排程資格讀模型（orgId / accountId / eligible · Invariant #14）
-    └── projection.registry/               🔧  事件串流偏移量 · 讀模型版本對照表
+    └── projection.registry/               ✅  事件串流偏移量 · 讀模型版本對照表
 ```
 
 ---
@@ -138,8 +139,8 @@ src/features/
 | Workspace Business (support) | 4 | 0 | **4** |
 | Workspace Business (A-track) | 4 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | **1** |
-| Projection Layer | 0 | 9 | **9** |
-| **Total** | **15** | **29** | **44** |
+| Projection Layer | 2 | 8 | **10** |
+| **Total** | **17** | **28** | **45** |
 
 ---
 

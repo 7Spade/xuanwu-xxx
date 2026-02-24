@@ -101,6 +101,7 @@ it owns types, server actions, queries, hooks, and UI components.
 
 | Slice | Domain | Status |
 |-------|--------|--------|
+| `projection.event-funnel/` | Event Funnel — EVENT_FUNNEL_INPUT · Projection Layer unified entry point | ✅ |
 | `projection.workspace-view/` | Workspace read model (workspace projection view) | 🆕 |
 | `projection.workspace-scope-guard/` | Scope Guard dedicated read model | 🆕 |
 | `projection.account-view/` | Account read model · authority snapshot contract | 🆕 |
@@ -109,7 +110,7 @@ it owns types, server actions, queries, hooks, and UI components.
 | `projection.organization-view/` | Organization read model | 🆕 |
 | `projection.account-skill-view/` | Account skill read model (accountId / skillId / xp · tier derived, not stored) | 🆕 |
 | `projection.org-eligible-member-view/` | Schedule eligibility read model (orgId / accountId / eligible · Invariant #14) | 🆕 |
-| `projection.registry/` | Event stream offset · read model version table | 🆕 |
+| `projection.registry/` | Event stream offset · read model version table | ✅ |
 
 > **Status legend:** ✅ implemented · 🔧 partial stub (structure created, implementation deferred)
 
