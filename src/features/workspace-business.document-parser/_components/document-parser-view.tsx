@@ -50,6 +50,8 @@ export function WorkspaceDocumentParser() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
+  // Tracks the WorkspaceFile ID when a file is sent from the Files tab for full traceability
+  const sourceFileIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (state.error) {
@@ -74,6 +76,8 @@ export function WorkspaceDocumentParser() {
       'workspace:files:sendToParser',
       async (payload) => {
         try {
+          // Capture the source file ID for ParsingIntent traceability (SourcePointer)
+          sourceFileIdRef.current = payload.fileId;
           const response = await fetch(payload.downloadURL);
           const blob = await response.blob();
           const file = new File([blob], payload.fileName, {
@@ -120,18 +124,21 @@ export function WorkspaceDocumentParser() {
   const handleImport = async () => {
     if (!state.data?.workItems) return;
 
+    const lineItems = state.data.workItems.map((item) => ({
+      name: item.item,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      discount: item.discount,
+      subtotal: item.price,
+    }));
+
     let intentId: string;
     try {
       intentId = await saveParsingIntent(
         workspace.id,
         state.fileName || 'Unknown Document',
-        state.data.workItems.map((item) => ({
-          name: item.item,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          discount: item.discount,
-          subtotal: item.price,
-        }))
+        lineItems,
+        { sourceFileId: sourceFileIdRef.current }
       );
     } catch (error: unknown) {
       console.error('Failed to save parsing intent:', error);
@@ -143,19 +150,17 @@ export function WorkspaceDocumentParser() {
       return;
     }
 
-    // Publish event with intentId so tasks can reference the Digital Twin
+    // Publish event with intentId so tasks and schedule proposals can reference the Digital Twin.
+    // skillRequirements is omitted here — the current AI flow extracts invoice line items only.
+    // When the AI flow is extended to extract skill requirements, pass them here.
     eventBus.publish('workspace:document-parser:itemsExtracted', {
         sourceDocument: state.fileName || 'Unknown Document',
         intentId,
-        items: state.data.workItems.map(item => ({
-            name: item.item,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            discount: item.discount,
-            subtotal: item.price,
-        })),
+        items: lineItems,
     });
 
+    // Reset source file reference after successful import
+    sourceFileIdRef.current = undefined;
     logAuditEvent('Triggered Task Import', `From document: ${state.fileName}`, 'create');
   }
 
