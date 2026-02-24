@@ -2,6 +2,17 @@ export type WorkspaceRole = 'Manager' | 'Contributor' | 'Viewer';
 export type WorkspaceLifecycleState = 'preparatory' | 'active' | 'stopped';
 
 import type { Timestamp } from 'firebase/firestore'
+import type { SkillRequirement } from './skill.types'
+
+// =================================================================
+// Brand Types — nominal type safety for cross-module references
+// =================================================================
+
+/** Branded ID for a ParsingIntent document — prevents mixing with plain strings. */
+export type IntentID = string & { readonly _brand: 'IntentID' }
+
+/** Branded pointer to a source file download URL — immutable contract anchor. */
+export type SourcePointer = string & { readonly _brand: 'SourcePointer' }
 
 export interface Workspace {
   id: string;
@@ -137,12 +148,18 @@ export interface ParsedLineItem {
 }
 
 export interface ParsingIntent {
-  id: string;
+  /** Branded ID — use `IntentID` cast when constructing references. */
+  id: IntentID;
   workspaceId: string;
   sourceFileName: string;
-  sourceFileDownloadURL?: string;
+  /** Immutable pointer to the original file in Firebase Storage. */
+  sourceFileDownloadURL?: SourcePointer;
+  /** Reference to the WorkspaceFile document that was parsed (for full traceability). */
+  sourceFileId?: string;
   intentVersion: number;
   lineItems: ParsedLineItem[];
+  /** Skill requirements extracted from the document — fed to organization.schedule proposals. */
+  skillRequirements?: SkillRequirement[];
   status: 'pending' | 'imported' | 'failed';
   createdAt: Timestamp;
   importedAt?: Timestamp;

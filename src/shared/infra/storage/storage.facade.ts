@@ -64,3 +64,28 @@ export const uploadProfilePicture = async (
 
   return getFileDownloadURL(storagePath);
 };
+
+/**
+ * Uploads a raw workspace document to Firebase Storage under a versioned path.
+ * Returns both the download URL and the storage path for external reference.
+ *
+ * This is the single-responsibility upload boundary for workspace-business.files.
+ * Firestore metadata writes remain the caller's responsibility so they can use
+ * atomic operations (arrayUnion, serverTimestamp).
+ *
+ * @param workspaceId The workspace that owns the file.
+ * @param fileId      The logical file ID (stable across versions).
+ * @param versionId   A unique ID for this specific version.
+ * @param file        The raw file to upload.
+ * @returns The public download URL for the uploaded version.
+ */
+export const uploadWorkspaceDocument = async (
+  workspaceId: string,
+  fileId: string,
+  versionId: string,
+  file: File
+): Promise<string> => {
+  const storagePath = `files-plugin/${workspaceId}/${fileId}/${versionId}/${file.name}`;
+  await uploadFile(storagePath, file);
+  return getFileDownloadURL(storagePath);
+};

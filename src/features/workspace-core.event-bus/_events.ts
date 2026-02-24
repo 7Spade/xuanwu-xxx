@@ -1,5 +1,6 @@
 // [職責] 事件名稱與 Payload 的 TypeScript 類型定義 (Contract)
 import type { WorkspaceTask, DailyLog } from "@/shared/types"
+import type { SkillRequirement } from "@/shared/types"
 
 // =================================================================
 // == Payload Interfaces
@@ -43,6 +44,8 @@ export interface DocumentParserItemsExtractedPayload {
     discount?: number
     subtotal: number
   }>
+  /** Skill requirements extracted from the document, forwarded to schedule proposals. */
+  skillRequirements?: SkillRequirement[]
 }
 
 export interface DailyLogForwardRequestedPayload {
@@ -55,6 +58,8 @@ export interface FileSendToParserPayload {
   fileName: string
   downloadURL: string
   fileType: string
+  /** The WorkspaceFile document ID — used by the parser to record a SourcePointer in ParsingIntent. */
+  fileId?: string
 }
 
 export interface WorkspaceIssueResolvedPayload {
