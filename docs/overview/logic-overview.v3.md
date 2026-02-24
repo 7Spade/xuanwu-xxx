@@ -19,6 +19,20 @@ flowchart TD
 %% =================================================
 
 %% =================================================
+%% ATOMICITY AUDIT DECISIONS（原子邊界審計決策）
+%% A1) user-account 僅作身份主體；wallet 為獨立 aggregate（強一致），profile / notification 為弱一致資料
+%% A2) organization-account.binding 與 organization-core.aggregate 只允許 ACL / projection 對接，不共享同一提交邊界
+%% A3) A 軌 tasks/qa/acceptance/finance 視為 workflow.aggregate 的階段視圖，不定義為四個獨立原子流程
+%% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
+%% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
+%% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
+%% A7) Event Funnel 僅負責 projection compose，不承擔跨 BC 不變量
+%% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
+%% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
+%% A10) Notification Router 僅做無狀態路由；跨 BC 業務決策需留在來源 BC 或 projection 層
+%% =================================================
+
+%% =================================================
 %% AUTHENTICATION + IDENTITY（身份驗證與識別）
 %% =================================================
 
@@ -60,7 +74,7 @@ subgraph ACCOUNT_LAYER[Account Layer（帳號層）]
     subgraph USER_PERSONAL_CENTER[個人用戶中心（User Personal Center）]
         USER_ACCOUNT[user-account（個人帳號）]
         USER_ACCOUNT_PROFILE["account-user.profile（使用者資料與設定 · FCM Token）"]
-        USER_ACCOUNT_WALLET["account-user.wallet（錢包：代幣／積分）"]
+        USER_WALLET_AGGREGATE["account-user.wallet.aggregate（強一致帳本／餘額不變量）"]
         ACCOUNT_USER_NOTIFICATION[account-user.notification（個人推播通知）]
     end
 
@@ -85,8 +99,8 @@ end
 ACCOUNT_IDENTITY_LINK --> USER_ACCOUNT
 ACCOUNT_IDENTITY_LINK --> ORGANIZATION_ACCOUNT
 
-USER_ACCOUNT --> USER_ACCOUNT_PROFILE
-USER_ACCOUNT --> USER_ACCOUNT_WALLET
+USER_ACCOUNT -.->|弱一致資料關聯| USER_ACCOUNT_PROFILE
+USER_ACCOUNT -->|強一致資產邊界| USER_WALLET_AGGREGATE
 
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_SETTINGS
 ORGANIZATION_ACCOUNT --> ORGANIZATION_ACCOUNT_BINDING
@@ -122,7 +136,7 @@ end
 %% end SUBJECT_CENTER
 end
 
-ORGANIZATION_ACCOUNT_BINDING --> ORGANIZATION_ENTITY
+ORGANIZATION_ACCOUNT_BINDING -.->|ACL / projection 對接（非共享提交）| ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 
@@ -178,7 +192,9 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
         W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
 
-        %% A 軌：主流程
+        WORKFLOW_AGGREGATE["workspace-business.workflow.aggregate（A 軌狀態機不變量）"]
+
+        %% A 軌：主流程（workflow 的階段視圖）
         TRACK_A_TASKS[workspace-business.tasks（任務管理）]
         TRACK_A_QA[workspace-business.quality-assurance（品質驗證）]
         TRACK_A_ACCEPTANCE[workspace-business.acceptance（驗收）]
@@ -196,7 +212,12 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
         %% Digital Twin：PARSING_INTENT 為唯讀合約；TRACK_A_TASKS 透過 SourcePointer 引用 IntentID
         TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT
-        PARSING_INTENT -.->|版本差異比對提議| TRACK_A_TASKS
+        PARSING_INTENT -.->|IntentDeltaProposed 事件提議（不可直接回寫）| TRACK_A_TASKS
+
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_TASKS
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_QA
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_ACCEPTANCE
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_FINANCE
 
         %% A 軌流轉與異常判定（AB 雙軌交互）
         TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
@@ -231,9 +252,11 @@ ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 %% 職能標籤庫 — 扁平化資源池（Team/Partner 為組視圖）
 %% 所有帳號（內部/外部）統一擁有職能標籤；Team/Partner 為同一資源池的「組視圖」
 %% =================================================
-ORGANIZATION_MEMBER -.->|內部帳號擁有標籤| SKILL_TAG_POOL
-ORGANIZATION_PARTNER -.->|外部帳號擁有標籤| SKILL_TAG_POOL
-ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（內部組）| SKILL_TAG_POOL
+SKILL_TAG_POOL_AGGREGATE["organization.skill-tag-pool.aggregate（唯一性／刪除規則控制）"]
+SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
+ORGANIZATION_MEMBER -.->|內部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_PARTNER -.->|外部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（唯讀）| SKILL_TAG_POOL
 
 
 %% =================================================
@@ -247,11 +270,12 @@ WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
 ACTIVE_ACCOUNT_CONTEXT -->|查詢鍵| WORKSPACE_SCOPE_READ_MODEL
 WORKSPACE_SCOPE_READ_MODEL --> WORKSPACE_SCOPE_GUARD
+WORKSPACE_SCOPE_GUARD -.->|高風險授權二次確認（寫入、升權、敏感資源）| WORKSPACE_AGGREGATE
 
 WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
-WORKSPACE_TRANSACTION_RUNNER --> WORKSPACE_AGGREGATE
+WORKSPACE_TRANSACTION_RUNNER -->|單一 command 僅允許單一 aggregate 寫入| WORKSPACE_AGGREGATE
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
 WORKSPACE_TRANSACTION_RUNNER -->|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
 
@@ -265,7 +289,7 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
 ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
 WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MODEL
-WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件）| ORGANIZATION_SCHEDULE
+WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件 · saga / 可補償）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 W_B_SCHEDULE -.->|查詢可用帳號（eligible=true · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
 
@@ -307,7 +331,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
 end
 
-%% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖
+%% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖（projection compose，非全域不變量）
 WORKSPACE_EVENT_BUS -->|所有業務事件| EVENT_FUNNEL_INPUT
 ORGANIZATION_EVENT_BUS -->|所有組織事件| EVENT_FUNNEL_INPUT
 
@@ -360,7 +384,7 @@ ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
 
 %% 層二：路由層 — 依 TargetAccountID 分發至對應帳號
 ORGANIZATION_EVENT_BUS -->|ScheduleAssigned（含 TargetAccountID）| ACCOUNT_NOTIFICATION_ROUTER
-ACCOUNT_NOTIFICATION_ROUTER -->|路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
+ACCOUNT_NOTIFICATION_ROUTER -->|無狀態路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
 
 %% 層三：交付層 — 依帳號標籤過濾內容後推播
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
@@ -446,3 +470,6 @@ class ORG_SKILL_RECOGNITION organization;
 class SKILL_TIER_FUNCTION tierFunction;
 class ACCOUNT_SKILL_VIEW,ORG_ELIGIBLE_MEMBER_VIEW skillProjection;
 class SERVER_ACTION_SKILL serverAction;
+class USER_WALLET_AGGREGATE accountSkill;
+class SKILL_TAG_POOL_AGGREGATE organization;
+class WORKFLOW_AGGREGATE workspace;
