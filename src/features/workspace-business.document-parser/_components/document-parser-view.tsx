@@ -1,16 +1,19 @@
 'use client';
 
-import { useActionState, useTransition, useRef, useEffect } from 'react';
-import { Loader2, UploadCloud, File as FileIcon } from 'lucide-react';
+import { useActionState, useTransition, useRef, useEffect, useCallback, useState, type ChangeEvent } from 'react';
+import { Loader2, UploadCloud, File as FileIcon, ClipboardList, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { useToast } from '@/shared/utility-hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/shadcn-ui/card';
+import { Badge } from '@/shared/shadcn-ui/badge';
 import { Button } from '@/shared/shadcn-ui/button';
 import {
   extractDataFromDocument,
   type ActionState,
 } from '../_actions';
 import { saveParsingIntent } from '../_intent-actions';
-type WorkItem = { item: string; quantity: number; unitPrice: number; discount?: number; price: number };
+import { subscribeToParsingIntents } from '../_queries';
+import type { WorkItem } from '@/shared/ai/schemas/docu-parse';
+import type { SourcePointer, ParsingIntent } from '@/shared/types';
 import { useWorkspace } from '@/features/workspace-core';
 
 const initialState: ActionState = {
@@ -26,10 +29,38 @@ function WorkItemsTable({
   initialData: WorkItem[];
   onImport: () => Promise<void>;
 }) {
+  const total = initialData.reduce((sum, item) => sum + item.price, 0);
   return (
     <div>
       <div className="overflow-x-auto rounded-md border">
-         <pre className="rounded-lg bg-muted/50 p-4 text-xs">{JSON.stringify(initialData, null, 2)}</pre>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="px-4 py-2 text-left font-bold uppercase tracking-widest text-muted-foreground">Item</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Qty</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Unit Price</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Discount</th>
+              <th className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {initialData.map((item, idx) => (
+              <tr key={idx} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-4 py-2">{item.item}</td>
+                <td className="px-4 py-2 text-right">{item.quantity}</td>
+                <td className="px-4 py-2 text-right">{item.unitPrice.toLocaleString()}</td>
+                <td className="px-4 py-2 text-right">{item.discount !== undefined ? `${item.discount}%` : '—'}</td>
+                <td className="px-4 py-2 text-right font-medium">{item.price.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="border-t bg-muted/50">
+              <td colSpan={4} className="px-4 py-2 text-right font-bold uppercase tracking-widest text-muted-foreground">Total</td>
+              <td className="px-4 py-2 text-right font-bold">{total.toLocaleString()}</td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
       <div className="mt-6 flex items-center justify-end">
@@ -45,13 +76,48 @@ export function WorkspaceDocumentParser() {
     extractDataFromDocument,
     initialState
   );
-  const { eventBus, logAuditEvent, workspace, createIssue } = useWorkspace();
+  const { eventBus, logAuditEvent, workspace, createIssue, pendingParseFile, setPendingParseFile } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
   // Tracks the WorkspaceFile ID when a file is sent from the Files tab for full traceability
   const sourceFileIdRef = useRef<string | undefined>(undefined);
+  // Tracks the original download URL (SourcePointer) for the Digital Twin ParsingIntent
+  const sourceFileDownloadURLRef = useRef<string | undefined>(undefined);
+
+  // Real-time ParsingIntent history (Digital Twin 解析合約 list)
+  const [parsingIntents, setParsingIntents] = useState<ParsingIntent[]>([]);
+  useEffect(() => {
+    const unsub = subscribeToParsingIntents(workspace.id, setParsingIntents);
+    return () => unsub();
+  }, [workspace.id]);
+
+  // Helper: trigger the AI extraction pipeline from a Firebase Storage URL.
+  // The URL is passed directly to the Server Action which fetches it server-side,
+  // avoiding the browser CORS restriction on Firebase Storage URLs.
+  const triggerParseFromURL = useCallback((payload: { fileName: string; downloadURL: string; fileType: string; fileId?: string }) => {
+    sourceFileIdRef.current = payload.fileId;
+    sourceFileDownloadURLRef.current = payload.downloadURL;
+    const formData = new FormData();
+    formData.append('downloadURL', payload.downloadURL);
+    formData.append('fileName', payload.fileName);
+    formData.append('fileType', payload.fileType || '');
+    startTransition(() => formAction(formData));
+  }, [formAction, startTransition]);
+
+  // On mount: if files-view queued a file via WorkspaceProvider context, auto-trigger.
+  // This bridges the cross-tab gap — subscriber only exists when this component is mounted.
+  // Deps intentionally empty: pendingParseFile/setPendingParseFile are stable React state
+  // references, triggerParseFromURL is stable via useCallback, and we only want to run once
+  // on mount (not re-run whenever pendingParseFile changes later).
+  useEffect(() => {
+    if (pendingParseFile) {
+      setPendingParseFile(null);
+      triggerParseFromURL(pendingParseFile);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (state.error) {
@@ -70,40 +136,17 @@ export function WorkspaceDocumentParser() {
     }
   }, [state.error, state.fileName, toast, createIssue, logAuditEvent]);
 
-  // Subscribe to files:sendToParser — files view provides raw files for parsing
+  // Subscribe to files:sendToParser — handles same-tab publishes (edge case fallback).
+  // The primary cross-tab path uses WorkspaceProvider pendingParseFile state.
   useEffect(() => {
     const unsubFiles = eventBus.subscribe(
       'workspace:files:sendToParser',
-      async (payload) => {
-        try {
-          // Capture the source file ID for ParsingIntent traceability (SourcePointer)
-          sourceFileIdRef.current = payload.fileId;
-          const response = await fetch(payload.downloadURL);
-          const blob = await response.blob();
-          const file = new File([blob], payload.fileName, {
-            type: payload.fileType || blob.type,
-          });
-          const formData = new FormData();
-          formData.append('file', file);
-          startTransition(() => formAction(formData));
-          toast({
-            title: 'File Loaded from Space',
-            description: `Parsing "${payload.fileName}" from workspace files…`,
-          });
-        } catch (error: unknown) {
-          console.error('Failed to load file from workspace for parsing:', error);
-          toast({
-            variant: 'destructive',
-            title: 'Failed to Load File',
-            description: 'Could not fetch the selected workspace file for parsing.',
-          });
-        }
-      }
+      (payload) => triggerParseFromURL(payload)
     );
     return () => unsubFiles();
-  }, [eventBus, formAction, startTransition, toast]);
+  }, [eventBus, triggerParseFromURL]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       if (formRef.current) {
         const formData = new FormData(formRef.current);
@@ -128,7 +171,8 @@ export function WorkspaceDocumentParser() {
       name: item.item,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      discount: item.discount,
+      // Omit discount entirely when undefined to avoid Firestore "Unsupported field value: undefined"
+      ...(item.discount !== undefined ? { discount: item.discount } : {}),
       subtotal: item.price,
     }));
 
@@ -138,7 +182,11 @@ export function WorkspaceDocumentParser() {
         workspace.id,
         state.fileName || 'Unknown Document',
         lineItems,
-        { sourceFileId: sourceFileIdRef.current }
+        {
+          sourceFileId: sourceFileIdRef.current,
+          // SourcePointer: immutable link to the original file in Firebase Storage
+          sourceFileDownloadURL: sourceFileDownloadURLRef.current as SourcePointer | undefined,
+        }
       );
     } catch (error: unknown) {
       console.error('Failed to save parsing intent:', error);
@@ -159,8 +207,9 @@ export function WorkspaceDocumentParser() {
         items: lineItems,
     });
 
-    // Reset source file reference after successful import
+    // Reset source file references after successful import
     sourceFileIdRef.current = undefined;
+    sourceFileDownloadURLRef.current = undefined;
     logAuditEvent('Triggered Task Import', `From document: ${state.fileName}`, 'create');
   }
 
@@ -234,6 +283,42 @@ export function WorkspaceDocumentParser() {
                 </CardContent>
             </Card>
         </div>
+      )}
+
+      {/* ParsingIntent History — Digital Twin 解析合約 */}
+      {parsingIntents.length > 0 && (
+        <Card className="mt-8 bg-card/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-black uppercase tracking-widest">
+              <ClipboardList className="size-4" /> Parsing Intent History
+            </CardTitle>
+            <CardDescription>Digital Twin records — each entry anchors tasks via SourcePointer.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {parsingIntents.map((intent) => (
+                <div key={intent.id} className="flex items-center justify-between rounded-lg border px-4 py-3 text-xs">
+                  <div className="flex items-center gap-3">
+                    {intent.status === 'imported' ? (
+                      <CheckCircle2 className="size-4 shrink-0 text-green-500" />
+                    ) : intent.status === 'failed' ? (
+                      <AlertCircle className="size-4 shrink-0 text-destructive" />
+                    ) : (
+                      <Clock className="size-4 shrink-0 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-semibold">{intent.sourceFileName}</p>
+                      <p className="text-muted-foreground">{intent.lineItems.length} line item(s)</p>
+                    </div>
+                  </div>
+                  <Badge variant={intent.status === 'imported' ? 'default' : intent.status === 'failed' ? 'destructive' : 'secondary'} className="text-[10px] uppercase">
+                    {intent.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
