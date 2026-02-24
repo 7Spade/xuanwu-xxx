@@ -45,7 +45,7 @@ export function WorkspaceDocumentParser() {
     extractDataFromDocument,
     initialState
   );
-  const { eventBus, logAuditEvent, workspace } = useWorkspace();
+  const { eventBus, logAuditEvent, workspace, createIssue } = useWorkspace();
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -58,8 +58,15 @@ export function WorkspaceDocumentParser() {
         title: 'Extraction Failed',
         description: state.error,
       });
+      // PARSING_INTENT -->|解析異常| TRACK_B_ISSUES
+      createIssue(
+        `Parser Error: ${state.fileName || 'Document'}`,
+        'technical',
+        'high'
+      ).catch((err: unknown) => console.error('Failed to create parser issue:', err));
+      logAuditEvent('Parsing Failed', `Document: ${state.fileName || 'Unknown'}`, 'create');
     }
-  }, [state.error, toast]);
+  }, [state.error, state.fileName, toast, createIssue, logAuditEvent]);
 
   // Subscribe to files:sendToParser — files view provides raw files for parsing
   useEffect(() => {

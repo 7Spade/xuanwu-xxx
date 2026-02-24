@@ -63,6 +63,13 @@ export interface WorkspaceIssueResolvedPayload {
   resolvedBy: string
 }
 
+export interface WorkspaceFinanceDisbursementFailedPayload {
+  taskId: string
+  taskTitle: string
+  amount: number
+  reason: string
+}
+
 // =================================================================
 // Event Name Registry (Discriminated Union)
 // =================================================================
@@ -77,6 +84,7 @@ export type WorkspaceEventName =
   | "workspace:document-parser:itemsExtracted"
   | "workspace:files:sendToParser"
   | "workspace:issues:resolved"
+  | "workspace:finance:disburseFailed"
   | "daily:log:forwardRequested"
 
 // =================================================================
@@ -93,6 +101,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:document-parser:itemsExtracted": DocumentParserItemsExtractedPayload
   "workspace:files:sendToParser": FileSendToParserPayload
   "workspace:issues:resolved": WorkspaceIssueResolvedPayload
+  "workspace:finance:disburseFailed": WorkspaceFinanceDisbursementFailedPayload
   "daily:log:forwardRequested": DailyLogForwardRequestedPayload
 }
 

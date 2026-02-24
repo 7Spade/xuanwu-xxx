@@ -240,6 +240,24 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    // TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
+    const unsubFinanceFailed = eventBus.subscribe(
+      "workspace:finance:disburseFailed",
+      async (payload) => {
+        await createIssue(
+          workspace.id,
+          `Disbursement Failed: ${payload.taskTitle}`,
+          "financial",
+          "high"
+        );
+        pushNotification(
+          "Finance Failure & Issue Logged",
+          `Disbursement for "${payload.taskTitle}" failed. A financial issue has been created.`,
+          "alert"
+        );
+      }
+    );
+
     return () => {
       unsubQAApproved();
       unsubAcceptancePassed();
@@ -250,6 +268,7 @@ export function useWorkspaceEventHandler() {
       unsubTaskCompleted();
       unsubForwardRequested();
       unsubIssueResolved();
+      unsubFinanceFailed();
     };
   }, [eventBus, dispatch, workspace.id, workspace.dimensionId, workspace.name, logAuditEvent]);
 }
