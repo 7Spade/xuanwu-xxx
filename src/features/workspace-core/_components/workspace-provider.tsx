@@ -2,9 +2,11 @@
 "use client";
 
 import type React from 'react';
-import { createContext, useContext, useMemo, useCallback } from 'react';
+import { createContext, useContext, useMemo, useCallback, useEffect } from 'react';
 import { type Workspace, type AuditLog, type WorkspaceTask, type WorkspaceRole, type Capability, type WorkspaceLifecycleState, type ScheduleItem } from '@/shared/types';
-import { WorkspaceEventBus , WorkspaceEventContext } from '@/features/workspace-core.event-bus';
+import { WorkspaceEventBus , WorkspaceEventContext, registerWorkspaceFunnel, registerOrganizationFunnel } from '@/features/workspace-core.event-bus';
+import { registerNotificationRouter } from '@/features/account-governance.notification-router';
+import { registerOrgPolicyCache } from '@/features/workspace-application';
 import { serverTimestamp, type FieldValue, type Firestore } from 'firebase/firestore';
 import { useAccount } from '../_hooks/use-account';
 import { useFirebase } from '@/shared/app-providers/firebase-provider';
@@ -29,10 +31,11 @@ import {
 import {
   createIssue as createIssueAction,
   addCommentToIssue as addCommentToIssueAction,
+  resolveIssue as resolveIssueAction,
 } from '@/features/workspace-business.issues'
 import {
   createScheduleItem as createScheduleItemAction,
-} from '@/features/workspace-governance.schedule'
+} from '@/features/workspace-business.schedule'
 
 
 interface WorkspaceContextType {
@@ -61,6 +64,7 @@ interface WorkspaceContextType {
   // Issue Management
   createIssue: (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => Promise<void>;
   addCommentToIssue: (issueId: string, author: string, content: string) => Promise<void>;
+  resolveIssue: (issueId: string) => Promise<void>;
   // Schedule Management
   createScheduleItem: (itemData: Omit<ScheduleItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
 }
@@ -76,6 +80,21 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
   const workspace = workspaces[workspaceId];
 
   const eventBus = useMemo(() => new WorkspaceEventBus(), [workspaceId]);
+
+  // Register Event Funnel — routes events from both buses to the Projection Layer
+  // Also register Notification Router (FCM Layer 2) and Org Policy Cache
+  useEffect(() => {
+    const unsubWorkspace = registerWorkspaceFunnel(eventBus);
+    const unsubOrg = registerOrganizationFunnel();
+    const { unsubscribe: unsubNotif } = registerNotificationRouter();
+    const unsubPolicy = registerOrgPolicyCache();
+    return () => {
+      unsubWorkspace();
+      unsubOrg();
+      unsubNotif();
+      unsubPolicy();
+    };
+  }, [eventBus]);
 
   const localAuditLogs = useMemo(() => {
     if (!auditLogs || !workspaceId) return [];
@@ -113,6 +132,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
 
   const createIssue = useCallback(async (title: string, type: 'technical' | 'financial', priority: 'high' | 'medium') => createIssueAction(workspaceId, title, type, priority), [workspaceId]);
   const addCommentToIssue = useCallback(async (issueId: string, author: string, content: string) => addCommentToIssueAction(workspaceId, issueId, author, content), [workspaceId]);
+  const resolveIssue = useCallback(async (issueId: string) => resolveIssueAction(workspaceId, issueId), [workspaceId]);
 
   const createScheduleItem = useCallback(async (itemData: Omit<ScheduleItem, 'id' | 'createdAt'>) => createScheduleItemAction(itemData), []);
 
@@ -149,6 +169,7 @@ export function WorkspaceProvider({ workspaceId, children }: { workspaceId: stri
     deleteWorkspace,
     createIssue,
     addCommentToIssue,
+    resolveIssue,
     createScheduleItem,
   };
 

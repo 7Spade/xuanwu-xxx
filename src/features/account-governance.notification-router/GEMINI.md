@@ -28,7 +28,8 @@ Notification router — FCM Layer 2. Receives events from the organization event
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+import { registerNotificationRouter } from '@/features/account-governance.notification-router'
+// Returns { unsubscribe } — call at workspace/app startup
 ```
 
 ## Dependencies

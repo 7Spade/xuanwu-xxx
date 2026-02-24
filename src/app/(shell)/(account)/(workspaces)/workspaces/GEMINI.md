@@ -107,7 +107,7 @@ The account-level components are consumed by `/dashboard/account/{audit,daily,sc
 - Always use `{capability}.workspace.tsx` for the workspace-scoped view
 - Always use `{capability}.account.tsx` for the account-scoped aggregated view
 - Export function names: `WorkspaceXxx` for workspace views, `AccountXxxComponent` for account views
-- Barrel re-exports for workspace views live in `plugins/index.ts` (workspace views only)
+- Barrel re-exports for workspace views live in `@businesstab/` (workspace views only)
 
 ---
 

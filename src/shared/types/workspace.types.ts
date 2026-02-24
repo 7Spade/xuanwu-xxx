@@ -66,7 +66,7 @@ export interface WorkspaceTask {
   id: string;
   name: string;
   description?: string;
-  progressState: 'todo' | 'doing' | 'completed' | 'verified' | 'accepted';
+  progressState: 'todo' | 'doing' | 'blocked' | 'completed' | 'verified' | 'accepted';
   priority: 'low' | 'medium' | 'high';
   type?: string;
   progress?: number;
@@ -81,6 +81,7 @@ export interface WorkspaceTask {
   dueDate?: Timestamp; // Firestore Timestamp
   photoURLs?: string[];
   location?: Location; // The specific place within the workspace address.
+  sourceIntentId?: string; // SourcePointer —唯讀引用 ParsingIntent（Digital Twin）
   createdAt: Timestamp; // FirestoreTimestamp
   updatedAt?: Timestamp; // FirestoreTimestamp
   [key: string]: unknown;
@@ -120,4 +121,29 @@ export interface WorkspaceFile {
   currentVersionId: string;
   updatedAt: Timestamp | Date; // Can be Date for client-side, becomes Timestamp on server
   versions: WorkspaceFileVersion[];
+}
+
+// =================================================================
+// ParsingIntent — Digital Twin 解析合約
+// 由 workspace-business.document-parser 產出，唯讀合約供 tasks 引用
+// =================================================================
+
+export interface ParsedLineItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  discount?: number;
+  subtotal: number;
+}
+
+export interface ParsingIntent {
+  id: string;
+  workspaceId: string;
+  sourceFileName: string;
+  sourceFileDownloadURL?: string;
+  intentVersion: number;
+  lineItems: ParsedLineItem[];
+  status: 'pending' | 'imported' | 'failed';
+  createdAt: Timestamp;
+  importedAt?: Timestamp;
 }

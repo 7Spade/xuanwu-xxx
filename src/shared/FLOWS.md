@@ -59,7 +59,7 @@ sequenceDiagram
     participant SliceA as features/workspace-business.tasks
     participant Bus as features/workspace-core.event-bus
     participant Handler as workspace-core/_hooks/use-workspace-event-handler.tsx
-    participant SliceB as features/workspace-governance.schedule
+    participant SliceB as features/workspace-business.schedule
 
     SliceA->>Bus: publish("workspace:tasks:completed", { task })
     Bus->>Handler: subscriber callback fires

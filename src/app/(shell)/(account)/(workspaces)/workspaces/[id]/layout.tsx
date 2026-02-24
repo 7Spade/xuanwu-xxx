@@ -21,7 +21,7 @@ import { PageHeader } from "@/shared/shadcn-ui/page-header";
  * WorkspaceLayoutInner - The actual UI layout component.
  * It consumes the context provided by WorkspaceLayout.
  */
-function WorkspaceLayoutInner({ workspaceId, plugintab, modal, panel }: { workspaceId: string; plugintab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
+function WorkspaceLayoutInner({ workspaceId, businesstab, modal, panel }: { workspaceId: string; businesstab: React.ReactNode; modal: React.ReactNode; panel: React.ReactNode }) {
   useWorkspaceEventHandler()
   const { workspace } = useWorkspace()
   const router = useRouter();
@@ -96,7 +96,7 @@ function WorkspaceLayoutInner({ workspaceId, plugintab, modal, panel }: { worksp
       )}
 
       <WorkspaceNavTabs workspaceId={workspaceId} />
-      {plugintab}
+      {businesstab}
       {panel}
       {modal}
 
@@ -132,12 +132,12 @@ function WorkspaceLayoutInner({ workspaceId, plugintab, modal, panel }: { worksp
  * Its sole responsibility is to provide the WorkspaceContext.
  */
 export default function WorkspaceLayout({
-  plugintab: plugintab,
+  businesstab: businesstab,
   modal,
   panel,
   params,
 }: {
-  plugintab: React.ReactNode;
+  businesstab: React.ReactNode;
   modal: React.ReactNode;
   panel: React.ReactNode;
   params: Promise<{ id: string }>;
@@ -145,7 +145,7 @@ export default function WorkspaceLayout({
   const resolvedParams = use(params);
   return (
     <WorkspaceProvider workspaceId={resolvedParams.id}>
-      <WorkspaceLayoutInner workspaceId={resolvedParams.id} plugintab={plugintab} modal={modal} panel={panel} />
+      <WorkspaceLayoutInner workspaceId={resolvedParams.id} businesstab={businesstab} modal={modal} panel={panel} />
     </WorkspaceProvider>
   );
 }

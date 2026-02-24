@@ -85,14 +85,14 @@ src/features/
 ├── ── Workspace Governance ───────────────────────────────────────
 │   ├── workspace-governance.members/      ✅  工作區成員存取管理
 │   ├── workspace-governance.role/         🔧  角色管理（從 members 拆分）
-│   ├── workspace-governance.teams/        ✅  團隊結構管理
-│   ├── workspace-governance.partners/     ✅  外部合作夥伴關係
-│   ├── workspace-governance.schedule/     ✅  排程提案 · 決策（工作區層）
+│   ├── workspace-governance.teams/        🔧  Stub — 視圖已遷移至 account-organization.team
+│   ├── workspace-governance.partners/     🔧  Stub — 視圖已遷移至 account-organization.partner
+│   ├── workspace-governance.schedule/     🔧  Stub — 實作已遷移至 workspace-business.schedule
 │   └── workspace-governance.audit/        ✅  稽核足跡 · 事件時序
 │
 ├── ── Workspace Business · 輔助與靜態單元 ────────────────────────
 │   ├── workspace-business.daily/          ✅  手寫施工日誌 · 留言 · 書籤
-│   ├── workspace-business.schedule/       🔧  任務排程產生（由任務分配／時間變動觸發）
+│   ├── workspace-business.schedule/       ✅  排程管理 · 提案 · 決策（由 workspace-governance.schedule 遷移）
 │   ├── workspace-business.files/          ✅  檔案上傳 · 管理
 │   └── workspace-business.document-parser/ ✅  AI 文件解析 · ParsingIntent（Digital Twin）
 │
@@ -127,12 +127,12 @@ src/features/
 | Account Layer (organization sub-type) | 0 | 8 | **8** |
 | Workspace Application | 0 | 1 | **1** |
 | Workspace Core | 2 | 1 | **3** |
-| Workspace Governance | 5 | 1 | **6** |
-| Workspace Business (support) | 3 | 1 | **4** |
+| Workspace Governance | 2 | 4 | **6** |
+| Workspace Business (support) | 4 | 0 | **4** |
 | Workspace Business (A-track) | 4 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | **1** |
 | Projection Layer | 0 | 7 | **7** |
-| **Total** | **17** | **24** | **41** |
+| **Total** | **15** | **26** | **41** |
 
 ---
 

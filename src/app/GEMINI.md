@@ -15,7 +15,7 @@ Root of the Next.js App Router. **Pure UI composition layer** — assembles view
 
 `layout.tsx` · `page.tsx` · `loading.tsx` · `error.tsx` · `default.tsx`
 
-Parallel-route slots: `@slotName/` convention (`@sidebar/`, `@header/`, `@modal/`, `@panel/`, `@plugintab/`).
+Parallel-route slots: `@slotName/` convention (`@sidebar/`, `@header/`, `@modal/`, `@panel/`, `@businesstab/`).
 
 ## Allowed Imports
 

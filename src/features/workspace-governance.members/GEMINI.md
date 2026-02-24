@@ -2,13 +2,13 @@
 
 ## Domain
 
-Member management — both account-level (org members) and workspace-level (plugin members).
+Workspace member management — who has access to a specific workspace.
 
 ## Responsibilities
 
 - List, add, remove workspace members
 - Account-level members view
-- Workspace plugin members tab
+- Workspace members panel
 
 ## Internal Files
 
@@ -16,17 +16,17 @@ Member management — both account-level (org members) and workspace-level (plug
 |-----------|---------|
 | `_actions.ts` | `addMember`, `removeMember`, `updateMemberRole`, `getWorkspaceMembers` |
 | `_queries.ts` | Firestore listeners |
-| `_components/` | `MembersView`, `MembersPlugin` |
+| `_components/` | `MembersView`, `WorkspaceMembers` |
 | `index.ts` | Public exports |
 
 ## Public API (`index.ts`)
 
 ```ts
 export { MembersView } from "./_components/members-view";
-export { MembersPlugin } from "./_components/members-plugin";
+export { WorkspaceMembers } from "./_components/members-panel";
 ```
 
 ## Who Uses This Slice?
 
 - `app/dashboard/account/members/page.tsx`
-- `app/dashboard/workspaces/[id]/@plugin-tab/members/page.tsx`
+- `app/(shell)/(account)/(workspaces)/workspaces/[id]/@businesstab/members/page.tsx`

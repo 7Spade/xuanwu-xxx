@@ -2,24 +2,14 @@
 
 ## Domain
 
-Team management — create teams, manage team members and skills.
+Workspace-level team structure management (stub — workspace-specific team access rules).
 
-## Internal Files
-
-| File / Dir | Purpose |
-|-----------|---------|
-| `_actions.ts` | Team CRUD, team member operations |
-| `_components/` | `TeamsView`, `TeamDetailView` |
-| `index.ts` | Public exports |
+> **Note**: Org-level team management views (`TeamsView`, `TeamDetailView`) were migrated to
+> `account-organization.team` per `logic-overview.v3.md` (teams are SUBJECT CENTER, not WORKSPACE CONTAINER).
+> This slice is reserved for future workspace-scoped team access rules.
 
 ## Public API (`index.ts`)
 
 ```ts
-export { TeamsView } from "./_components/teams-view";
-export { TeamDetailView } from "./_components/team-detail-view";
+// Stub — no exports until workspace-level team access rules are implemented
 ```
-
-## Who Uses This Slice?
-
-- `app/dashboard/account/teams/page.tsx`
-- `app/dashboard/account/teams/[id]/page.tsx`

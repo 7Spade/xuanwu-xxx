@@ -1,1 +1,1 @@
-export { WorkspaceFinance } from './_components/finance-plugin'
+export { WorkspaceFinance } from './_components/finance-view'

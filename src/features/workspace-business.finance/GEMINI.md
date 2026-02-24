@@ -2,21 +2,21 @@
 
 ## Domain
 
-Finance workspace plugin — financial data within a workspace context.
+Finance — A-track business view for financial processing within a workspace context.
 
 ## Internal Files
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_components/` | `FinancePlugin` |
+| `_components/` | `WorkspaceFinance` |
 | `index.ts` | Public exports |
 
 ## Public API (`index.ts`)
 
 ```ts
-export { FinancePlugin } from "./_components/finance-plugin";
+export { WorkspaceFinance } from "./_components/finance-view";
 ```
 
 ## Who Uses This Slice?
 
-- `app/dashboard/workspaces/[id]/@plugin-tab/finance/page.tsx`
+- `app/(shell)/(account)/(workspaces)/workspaces/[id]/@businesstab/finance/page.tsx`

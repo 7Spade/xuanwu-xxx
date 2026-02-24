@@ -52,6 +52,7 @@ export const deleteWorkspace = repositories.deleteWorkspace
 // Issues
 export const createIssue = repositories.createIssue
 export const addCommentToIssue = repositories.addCommentToIssue
+export const resolveIssue = repositories.resolveIssue
 
 // Tasks
 export const createTask = repositories.createTask
@@ -80,3 +81,22 @@ export const getWorkspaceTasks = repositories.getWorkspaceTasks
 export const getWorkspaceIssues = repositories.getWorkspaceIssues
 export const getWorkspaceFiles = repositories.getWorkspaceFiles
 export const getWorkspaceGrants = repositories.getWorkspaceGrants
+
+// ParsingIntent (document-parser Digital Twin)
+export const createParsingIntent = repositories.createParsingIntent
+export const updateParsingIntentStatus = repositories.updateParsingIntentStatus
+export const getParsingIntents = repositories.getParsingIntents
+
+// ==================================================================
+// == workspace-core.event-store — Append-only domain event log
+// ==================================================================
+export const appendDomainEvent = repositories.appendDomainEvent
+export const getDomainEvents = repositories.getDomainEvents
+export type { StoredWorkspaceEvent } from './repositories'
+
+// ==================================================================
+// == projection.registry — Event stream offset + read model versions
+// ==================================================================
+export const getProjectionVersion = repositories.getProjectionVersion
+export const upsertProjectionVersion = repositories.upsertProjectionVersion
+export type { ProjectionVersionRecord } from './repositories'
