@@ -221,6 +221,37 @@ export function useWorkspaceEventHandler() {
       }
     );
 
+    // Schedule trigger chain: task assignment change → W_B_SCHEDULE domain event flow.
+    // When a task is assigned to a member, a PROPOSAL schedule item is created so the
+    // organization can review and confirm the assignment window.
+    const unsubTaskAssigned = eventBus.subscribe(
+      "workspace:tasks:assigned",
+      async (payload) => {
+        if (!workspace.dimensionId) return;
+        try {
+          await createScheduleItem({
+            accountId: workspace.dimensionId,
+            workspaceId: workspace.id,
+            workspaceName: workspace.name,
+            title: `Assignment: ${payload.taskName}`,
+            startDate: Timestamp.fromDate(new Date()),
+            endDate: Timestamp.fromDate(new Date()),
+            status: "PROPOSAL",
+            originType: "TASK_AUTOMATION",
+            originTaskId: payload.taskId,
+            assigneeIds: [payload.assigneeId],
+          });
+          logAuditEvent(
+            "Auto-Generated Assignment Proposal",
+            `Task "${payload.taskName}" assigned to ${payload.assigneeId}`,
+            "create"
+          );
+        } catch (error) {
+          console.error("Failed to create assignment schedule proposal:", error);
+        }
+      }
+    );
+
     const unsubForwardRequested = eventBus.subscribe(
       "daily:log:forwardRequested",
       (payload) => {
@@ -296,6 +327,7 @@ export function useWorkspaceEventHandler() {
       unsubDocParse();
       unsubScheduleRequest();
       unsubTaskCompleted();
+      unsubTaskAssigned();
       unsubForwardRequested();
       unsubIssueResolved();
       unsubFinanceFailed();

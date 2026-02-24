@@ -82,6 +82,16 @@ export interface WorkspaceTaskBlockedPayload {
   reason?: string
 }
 
+export interface WorkspaceTaskAssignedPayload {
+  taskId: string
+  taskName: string
+  /** Branded assignee account ID */
+  assigneeId: string
+  workspaceId: string
+  /** SourcePointer: the IntentID that originated this task, if any. */
+  sourceIntentId?: string
+}
+
 export interface WorkspaceScheduleProposedPayload {
   /** Schedule item ID created in Firestore by workspace-business.schedule */
   scheduleItemId: string
@@ -109,6 +119,7 @@ export type WorkspaceEventName =
   | "workspace:tasks:completed"
   | "workspace:tasks:scheduleRequested"
   | "workspace:tasks:blocked"
+  | "workspace:tasks:assigned"
   | "workspace:schedule:proposed"
   | "workspace:quality-assurance:rejected"
   | "workspace:acceptance:failed"
@@ -128,6 +139,7 @@ export interface WorkspaceEventPayloadMap {
   "workspace:tasks:completed": WorkspaceTaskCompletedPayload
   "workspace:tasks:scheduleRequested": WorkspaceTaskScheduleRequestedPayload
   "workspace:tasks:blocked": WorkspaceTaskBlockedPayload
+  "workspace:tasks:assigned": WorkspaceTaskAssignedPayload
   "workspace:schedule:proposed": WorkspaceScheduleProposedPayload
   "workspace:quality-assurance:rejected": QualityAssuranceRejectedPayload
   "workspace:acceptance:failed": WorkspaceAcceptanceFailedPayload
