@@ -46,6 +46,10 @@ flowchart TD
 %%     Member（內部）與 Partner（外部）均可持有標籤（唯讀引用）；
 %%     Team 為內部帳號標籤的組視圖（唯讀聚合，非獨立標籤來源）；
 %%     標籤唯一性與刪除規則由 skill-tag-pool.aggregate 統一管理（Invariant A6）
+%% 18) workspace-governance 為「策略執行層」（非數據錄入層）：
+%%     workspace-governance.members 廢除獨立 Aggregate；成員動態視圖由 ORG_ELIGIBLE_MEMBER_VIEW 提供（eligible=true · 具備工作區准入標籤）
+%%     workspace-governance.audit 由 WORKSPACE_EVENT_STORE 透過 EVENT_FUNNEL 自動投影；SK_EVENT_ENVELOPE trace-identifier 確保稽核因果鏈完整
+%%     workspace-governance.role 定義職務分工，所有配置繼承 organization-governance.policy 硬約束；WORKSPACE_SCOPE_GUARD 讀預計算快照，無獨立校驗邏輯
 %% =================================================
 
 %% =================================================
@@ -179,6 +183,7 @@ end
 
 ORGANIZATION_ACCOUNT_BINDING -.->|ACL / projection 對接（非共享提交）| ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
+ORGANIZATION_POLICY -->|政策變更事件（Authority Snapshot 計算根源）| ORGANIZATION_EVENT_BUS
 
 
 %% =================================================
@@ -211,14 +216,10 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，僅供重播／稽核）"]
     end
 
-    subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
-        WORKSPACE_MEMBER[workspace-governance.members（工作區成員）]
-        WORKSPACE_ROLE[workspace-governance.role（角色管理）]
+    subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理 · 策略執行層）]
+        WORKSPACE_ROLE["workspace-governance.role（角色管理 · 繼承 organization-governance.policy 約束）"]
+        WORKSPACE_AUDIT[workspace-governance.audit（稽核視圖 · trace-identifier 事件溯源）]
     end
-
-    %% workspace-governance.audit 為實務交付暫置切片（UI 稽核視圖）
-    %% 不屬於 WORKSPACE_GOVERNANCE 架構邊界；長期遷移目標：workspace-core.event-store + projection.account-audit
-    WORKSPACE_AUDIT[workspace-governance.audit（稽核視圖 · 實務暫置）]
 
     %% --- AB 雙軌業務邏輯核心 ---
     subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
@@ -315,6 +316,7 @@ WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
 WORKSPACE_TRANSACTION_RUNNER -->|單一 command 僅允許單一 aggregate 寫入| WORKSPACE_AGGREGATE
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
+WORKSPACE_EVENT_STORE -.->|trace-identifier 稽核投影（SK_EVENT_ENVELOPE · 不可篡改）| WORKSPACE_AUDIT
 WORKSPACE_TRANSACTION_RUNNER -->|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
@@ -486,7 +488,6 @@ classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
 classDef accountSkill fill:#bbf7d0,stroke:#22c55e,color:#000;
 classDef tierFunction fill:#fdf4ff,stroke:#c084fc,color:#000;
 classDef skillProjection fill:#fefce8,stroke:#eab308,color:#000;
-classDef practicalDeviation fill:#f9fafb,stroke:#9ca3af,stroke-dasharray:5 5,color:#6b7280;
 
 classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
 classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
@@ -527,5 +528,5 @@ class SERVER_ACTION_SKILL serverAction;
 class USER_WALLET_AGGREGATE accountSkill;
 class SKILL_TAG_POOL_AGGREGATE organization;
 class WORKFLOW_AGGREGATE workspace;
-class WORKSPACE_AUDIT practicalDeviation;
+class WORKSPACE_AUDIT workspace;
 class TALENT_REPOSITORY talentRepository;
