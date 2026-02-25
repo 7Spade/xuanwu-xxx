@@ -10,7 +10,7 @@
  *   ORGANIZATION_EVENT_BUS -.→ shared-kernel.event-envelope（契約遵循）
  */
 
-import type { ImplementsEventEnvelopeContract } from '@/shared/kernel/event-envelope';
+import type { ImplementsEventEnvelopeContract } from '@/shared-kernel/event-envelope';
 import type { OrganizationEventPayloadMap, OrganizationEventKey } from './_events';
 
 type OrgEventHandler<K extends OrganizationEventKey> = (
