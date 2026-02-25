@@ -15,7 +15,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useApp } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { toggleLike as toggleLikeAction } from "../_actions";
 import { toast } from "@/shared/utility-hooks/use-toast";

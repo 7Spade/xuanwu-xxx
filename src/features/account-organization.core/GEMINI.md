@@ -18,7 +18,7 @@ Organization aggregate entity — its lifecycle (create, update, delete), the UI
 | `_actions.ts` | `createOrganization`, `updateOrganizationSettings`, `deleteOrganization`, `setupOrganizationWithTeam` |
 | `_components/account-new-form.tsx` | Form UI for creating a new organization |
 | `_components/account-grid.tsx` | Grid UI listing organization accounts |
-| `_hooks/use-org-management.ts` | `useOrgManagement` — hook wrapping org CRUD actions |
+| `_hooks/use-organization-management.ts` | `useOrganizationManagement` — hook wrapping org CRUD actions |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
@@ -26,7 +26,7 @@ Organization aggregate entity — its lifecycle (create, update, delete), the UI
 ```ts
 export { AccountNewForm } from './_components/account-new-form'
 export { AccountGrid } from './_components/account-grid'
-export { useOrgManagement } from './_hooks/use-org-management'
+export { useOrganizationManagement } from './_hooks/use-organization-management'
 export { setupOrganizationWithTeam } from './_actions'
 ```
 
@@ -34,7 +34,7 @@ export { setupOrganizationWithTeam } from './_actions'
 
 - `@/shared/types` — `Account`, `ThemeConfig`
 - `@/shared/infra/firestore/firestore.facade` — Firestore writes
-- `@/features/workspace-core` — `useApp` for active account context
+- `@/shared/app-providers/app-context` — `useApp` for active account context (Subject Center must not depend on workspace-core)
 
 ## Architecture Note
 

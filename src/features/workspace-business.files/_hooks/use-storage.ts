@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { useApp } from '@/features/workspace-core';
+import { useApp } from '@/shared/app-providers/app-context';
 import {
   uploadDailyPhoto as uploadDailyPhotoAction,
   uploadTaskAttachment as uploadTaskAttachmentAction,

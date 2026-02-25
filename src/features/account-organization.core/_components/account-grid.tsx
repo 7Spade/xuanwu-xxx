@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/shared/shadcn-ui/card"
 import { Globe, MoreVertical, Users, ArrowUpRight } from "lucide-react"
-import { useApp } from "@/features/workspace-core"
+import { useApp } from "@/shared/app-providers/app-context"
 import { type Account } from "@/shared/types"
 
 interface AccountGridProps {

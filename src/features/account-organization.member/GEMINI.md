@@ -31,3 +31,4 @@ Organization-level member management — who belongs to the organization/account
 
 - `@/shared/types` — `Account`, `MemberReference`
 - `@/shared/infra/firestore/` — Firestore reads/writes
+- `@/shared/app-providers/app-context` — `useApp` for active account context

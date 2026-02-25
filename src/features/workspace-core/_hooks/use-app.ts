@@ -1,11 +1,3 @@
-
-import { useContext } from 'react';
-import { AppContext } from '../_components/app-provider';
-
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
-};
+// Re-exported from shared/app-providers/app-context for backward compatibility.
+// All new code should import directly from '@/shared/app-providers/app-context'.
+export { useApp } from '@/shared/app-providers/app-context'

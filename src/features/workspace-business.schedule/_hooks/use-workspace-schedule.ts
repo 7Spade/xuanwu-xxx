@@ -13,8 +13,9 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { useWorkspace , useApp } from "@/features/workspace-core";
+import { useWorkspace } from "@/features/workspace-core";
 import { useAccount } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 import { useRouter } from "next/navigation";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { addMonths, subMonths, format } from "date-fns";

@@ -29,22 +29,28 @@ Distinct from HR scheduling (`account-organization.schedule`).
 | File / Dir | Purpose |
 |-----------|---------|
 | `_actions.ts` | `createScheduleItem`, `updateScheduleItemStatus`, `assignMember`, `unassignMember`, `getScheduleItems` |
-| `_hooks/` | `useGlobalSchedule`, `useWorkspaceSchedule`, `useScheduleActions` |
+| `_hooks/use-global-schedule.ts` | `useGlobalSchedule` — account-wide schedule data (pending proposals, decision history, upcoming/present events) |
+| `_hooks/use-workspace-schedule.ts` | `useWorkspaceSchedule` — workspace-scoped schedule state and calendar navigation |
+| `_hooks/use-schedule-commands.ts` | `useScheduleActions` — assign/unassign member, approve/reject item; reads `projection.account-schedule` for availability checks |
+| `_hooks/use-schedule-event-handler.ts` | `useScheduleEventHandler` — subscribes to `workspace:issues:resolved` for discrete B-track recovery (Invariant #2) |
 | `_components/` | `AccountScheduleSection`, `WorkspaceSchedule`, `GovernanceSidebar`, `ScheduleProposalContent`, `ScheduleDataTable`, `UnifiedCalendarGrid`, `ProposalDialog` |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-export { AccountScheduleSection } from "./_components/schedule.account-view";
-export { WorkspaceSchedule } from "./_components/schedule.workspace-view";
-export { GovernanceSidebar } from "./_components/governance-sidebar";
-export { ProposalDialog } from "./_components/proposal-dialog";
-export { ScheduleProposalContent } from "./_components/schedule-proposal-content";
-export { ScheduleDataTable } from "./_components/schedule-data-table";
-export { UnifiedCalendarGrid } from "./_components/unified-calendar-grid";
-export { useGlobalSchedule, useScheduleActions, useWorkspaceSchedule } from "./_hooks/...";
-export { createScheduleItem, assignMember, unassignMember, updateScheduleItemStatus, getScheduleItems } from "./_actions";
+export { AccountScheduleSection } from './_components/schedule.account-view';
+export { WorkspaceSchedule } from './_components/schedule.workspace-view';
+export { GovernanceSidebar } from './_components/governance-sidebar';
+export { ProposalDialog } from './_components/proposal-dialog';
+export { ScheduleProposalContent } from './_components/schedule-proposal-content';
+export { ScheduleDataTable } from './_components/schedule-data-table';
+export { UnifiedCalendarGrid } from './_components/unified-calendar-grid';
+export { useGlobalSchedule } from './_hooks/use-global-schedule';
+export { useScheduleActions } from './_hooks/use-schedule-commands';
+export { useWorkspaceSchedule } from './_hooks/use-workspace-schedule';
+export { useScheduleEventHandler } from './_hooks/use-schedule-event-handler';
+export { createScheduleItem, assignMember, unassignMember, updateScheduleItemStatus, getScheduleItems } from './_actions';
 ```
 
 ## Business Rules
