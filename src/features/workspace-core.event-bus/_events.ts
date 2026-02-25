@@ -2,6 +2,12 @@
 import type { WorkspaceTask, DailyLog } from "@/shared/types"
 import type { SkillRequirement } from "@/shared/types"
 
+// WorkspaceScheduleProposedPayload is a cross-BC contract — defined in shared-kernel.
+// Imported for local use (WorkspaceEventPayloadMap) and re-exported for backward compatibility
+// with existing consumers that import from workspace-core.event-bus.
+import type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/schedule-proposed-payload';
+export type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/schedule-proposed-payload';
+
 // =================================================================
 // == Payload Interfaces
 // =================================================================
@@ -90,25 +96,6 @@ export interface WorkspaceTaskAssignedPayload {
   workspaceId: string
   /** SourcePointer: the IntentID that originated this task, if any. */
   sourceIntentId?: string
-}
-
-export interface WorkspaceScheduleProposedPayload {
-  /** Schedule item ID created in Firestore by workspace-business.schedule */
-  scheduleItemId: string
-  workspaceId: string
-  /** Organization that owns the workspace (WORKSPACE_OUTBOX → ORGANIZATION_SCHEDULE) */
-  orgId: string
-  title: string
-  startDate: string
-  endDate: string
-  proposedBy: string
-  /**
-   * SourcePointer: IntentID of the ParsingIntent that triggered this proposal.
-   * Enables traceability back to the Digital Twin (SourcePointer contract).
-   */
-  intentId?: string
-  /** Skill requirements forwarded from ParsingIntent to org-level Schedule for validation. */
-  skillRequirements?: SkillRequirement[]
 }
 
 // =================================================================

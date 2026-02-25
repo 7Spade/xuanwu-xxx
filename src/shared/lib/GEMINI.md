@@ -21,7 +21,7 @@ Pure utilities and domain business rules. No React, no I/O, no async. Determinis
 
 ## Rules
 
-- Only depends on `@/shared/types`
+- May import from `@/shared/types` and `@/shared-kernel`
 - No React, no Firebase, no network calls
 - Pure functions with no side effects
 
