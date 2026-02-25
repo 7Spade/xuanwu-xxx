@@ -8,6 +8,7 @@
  * Per logic-overview.v3.md:
  * - SERVER_ACTION →|發送 Command| WORKSPACE_COMMAND_HANDLER
  * - WORKSPACE_COMMAND_HANDLER → WORKSPACE_SCOPE_GUARD
+ * - WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER (Observability)
  * - WORKSPACE_SCOPE_GUARD → WORKSPACE_POLICY_ENGINE
  * - WORKSPACE_POLICY_ENGINE → WORKSPACE_TRANSACTION_RUNNER
  * - WORKSPACE_OUTBOX → WORKSPACE_EVENT_BUS
@@ -30,6 +31,7 @@
 import { checkWorkspaceAccess } from './_scope-guard';
 import { evaluatePolicy, type WorkspaceRole } from './_policy-engine';
 import { runTransaction, type TransactionContext } from './_transaction-runner';
+import { recordDomainError } from '@/shared/infra/observability';
 
 export interface WorkspaceCommand {
   workspaceId: string;
@@ -86,6 +88,14 @@ export async function executeCommand<T>(
     return { success: true, value };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Command execution failed';
+    // WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER / DOMAIN_ERROR_LOG (Observability)
+    recordDomainError({
+      traceId: `cmd-${Date.now()}`,
+      occurredAt: new Date().toISOString(),
+      source: 'workspace-application.command-handler',
+      message,
+      context: { workspaceId: command.workspaceId, userId: command.userId, action: command.action },
+    });
     return { success: false, error: message };
   }
 }
