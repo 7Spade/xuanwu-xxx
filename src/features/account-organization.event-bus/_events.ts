@@ -123,6 +123,26 @@ export interface SkillRecognitionRevokedPayload {
   revokedBy: string;
 }
 
+/**
+ * Compensating event (Invariant A5) — published when an HR operator manually cancels
+ * a pending schedule proposal (SchedulingSlice Saga).
+ * Mirrors ScheduleAssignRejectedPayload but represents a deliberate governance action
+ * rather than an automatic skill-check failure.
+ *
+ * Per logic-overview_v5.md VS6:
+ *   SCHEDULE_SAGA["scheduling-saga\nScheduleAssignRejected\nScheduleProposalCancelled"]
+ *   SCHEDULE_SAGA -.->|"#A5 compensating event"| ORG_EVENT_BUS
+ */
+export interface ScheduleProposalCancelledPayload {
+  scheduleItemId: string;
+  orgId: string;
+  workspaceId: string;
+  cancelledBy: string;
+  cancelledAt: string;
+  /** Human-readable reason for cancellation. */
+  reason?: string;
+}
+
 // =================================================================
 // == Event Key Map
 // =================================================================
@@ -130,6 +150,7 @@ export interface SkillRecognitionRevokedPayload {
 export interface OrganizationEventPayloadMap {
   'organization:schedule:assigned': ScheduleAssignedPayload;
   'organization:schedule:assignRejected': ScheduleAssignRejectedPayload;
+  'organization:schedule:proposalCancelled': ScheduleProposalCancelledPayload;
   'organization:policy:changed': OrgPolicyChangedPayload;
   'organization:member:joined': OrgMemberJoinedPayload;
   'organization:member:left': OrgMemberLeftPayload;

@@ -3,9 +3,10 @@
  *
  * Two aggregates live in this slice:
  *
- * 1. Skill Tag Pool (SKILL_TAG_POOL_AGGREGATE)
- *    Manages uniqueness and deletion rules for org-level skill tags.
- *    Members/Partners hold read-only references by tagSlug.
+ * 1. Skill Tag Pool (SKILL_TAG_POOL)
+ *    Organization-scoped view of the global Tag Authority Center (centralized-tag).
+ *    Per v5: passively updated by TagLifecycleEvents; orgs activate tags from global dictionary.
+ *    Per Invariant T2: SKILL_TAG_POOL = Tag Authority's org-scope projection.
  *
  * 2. Org Skill Recognition (ORG_SKILL_RECOGNITION)
  *    Records that an org has recognised a member's skill, optionally gating
@@ -14,18 +15,21 @@
  *    Organization may set minXpRequired thresholds but CANNOT modify Account XP
  *    (Invariant #11).
  *
- * Per logic-overview.v3.md:
- *   SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
- *   ORG_SKILL_RECOGNITION -->|SkillRecognitionGranted / SkillRecognitionRevoked| ORGANIZATION_EVENT_BUS
- *   SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId · 唯讀）| ORG_SKILL_RECOGNITION
+ * Per logic-overview_v5.md:
+ *   SKILL_TAG_POOL = "= Tag Authority 的組織作用域快照\n消費 TagLifecycleEvent 被動更新"
+ *   ORG_SKILL_RECOGNITION --> ORG_EVENT_BUS (SkillRecognitionGranted/Revoked)
  */
 
-// Skill Tag Pool aggregate
+// Skill Tag Pool aggregate (active operations — org activates tags from global dictionary)
 export {
   addSkillTagToPool,
   removeSkillTagFromPool,
   incrementTagRefCount,
   decrementTagRefCount,
+  // Passive consumer operations (called by projection.event-funnel on TagLifecycleEvents)
+  syncTagUpdateToPool,
+  syncTagDeprecationToPool,
+  syncTagDeletionToPool,
 } from './_skill-tag-pool';
 export type { OrgSkillTagEntry } from './_skill-tag-pool';
 
