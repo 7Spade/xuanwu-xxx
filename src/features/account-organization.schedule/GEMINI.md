@@ -6,9 +6,10 @@ HR schedule management — FCM Layer 1. Manages human resource scheduling at the
 
 ## Responsibilities
 
-- Manage workforce scheduling assignments for organization accounts
-- Publish `ScheduleAssigned` events (Layer 1 trigger — declares fact, does not handle routing)
-- Consume schedule-related events from `account-organization.event-bus`
+- Receive `ScheduleProposed` cross-layer saga events from `WORKSPACE_OUTBOX` and persist them as `proposed` org schedule proposals
+- Validate member skill eligibility via `projection.org-eligible-member-view` (Invariant #14 — never reads Account aggregate directly)
+- Confirm or cancel proposals; publish `organization:schedule:assigned` or `organization:schedule:assignRejected` compensating events (Invariant A5)
+- Provide read queries and React hooks for the org governance UI to review pending proposals
 
 ## FCM Three-Layer Architecture
 
@@ -22,24 +23,34 @@ HR schedule management — FCM Layer 1. Manages human resource scheduling at the
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_actions.ts` | `assignSchedule`, `updateSchedule`, `cancelSchedule` |
-| `_queries.ts` | Schedule subscription for org accounts |
-| `_components/` | `ScheduleBoard`, `ScheduleAssignForm` |
-| `_hooks/` | `useOrgSchedule` |
+| `_schedule.ts` | Domain service: `handleScheduleProposed`, `approveOrgScheduleProposal`; aggregate state machine (`draft → proposed → confirmed | cancelled`) |
+| `_queries.ts` | `getOrgScheduleProposal`, `subscribeToOrgScheduleProposals`, `subscribeToPendingProposals` |
+| `_hooks/use-org-schedule.ts` | `useOrgSchedule`, `usePendingScheduleProposals` React hooks |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-// future exports
+export { handleScheduleProposed, approveOrgScheduleProposal, orgScheduleProposalSchema, ORG_SCHEDULE_STATUSES } from './_schedule';
+export type { OrgScheduleProposal, OrgScheduleStatus, ScheduleApprovalResult } from './_schedule';
+export { getOrgScheduleProposal, subscribeToOrgScheduleProposals, subscribeToPendingProposals } from './_queries';
+export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-schedule';
 ```
 
 ## Dependencies
 
-- `@/shared/types` — `ScheduleItem`, `Account`
-- `@/shared/infra/firestore/` — Firestore reads/writes
+- `@/features/account-organization.event-bus` — `publishOrgEvent`
+- `@/features/projection.org-eligible-member-view` — `getOrgMemberEligibility` (Invariant #14)
+- `@/features/workspace-core.event-bus` — `WorkspaceScheduleProposedPayload` type
+- `@/shared/infra/firestore/` — `setDocument`, `updateDocument`
+- `@/shared/lib` — `resolveSkillTier`, `tierSatisfies`
+- `@/shared/types` — `SkillRequirement`
 
 ## Architecture Note
 
-`logic-overview.v3.md`: `ORGANIZATION_SCHEDULE → ScheduleAssigned event → ORGANIZATION_EVENT_BUS`.
-This slice is the **trigger layer only**. It announces facts; it must not know who receives the notification.
+`logic-overview.v3.md`:
+- `WORKSPACE_OUTBOX →|ScheduleProposed（跨層事件 · saga）| ORGANIZATION_SCHEDULE`
+- `ORGANIZATION_SCHEDULE →|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS`
+- Invariant #14: reads `projection.org-eligible-member-view` only — never Account aggregate
+- Invariant #12: tier derived via `resolveSkillTier(xp)` at runtime — never stored in DB
+- Invariant A5: `ScheduleAssignRejected` is the compensating event for failed assignments
