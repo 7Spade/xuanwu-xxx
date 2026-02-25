@@ -4,7 +4,7 @@
 // Tier derived via resolveSkillTier(xp), never stored in DB (Invariant #12).
 // ScheduleAssignRejected is the compensating event for failed assignments (Invariant A5).
 
-export { handleScheduleProposed, approveOrgScheduleProposal, orgScheduleProposalSchema, ORG_SCHEDULE_STATUSES } from './_schedule';
+export { handleScheduleProposed, approveOrgScheduleProposal, cancelOrgScheduleProposal, orgScheduleProposalSchema, ORG_SCHEDULE_STATUSES } from './_schedule';
 export type {
   OrgScheduleProposal,
   OrgScheduleStatus,
@@ -18,4 +18,6 @@ export {
 } from './_queries';
 
 export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-schedule';
+
+export { OrgScheduleGovernance } from './_components/org-schedule-governance';
 

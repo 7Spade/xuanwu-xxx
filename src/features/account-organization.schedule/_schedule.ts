@@ -44,6 +44,13 @@ export type OrgScheduleStatus = (typeof ORG_SCHEDULE_STATUSES)[number];
 // Zod Schemas — strict validation on input data
 // =================================================================
 
+const skillRequirementSchema = z.object({
+  tagSlug: z.string().min(1),
+  tagId: z.string().optional(),
+  minimumTier: z.enum(['apprentice', 'journeyman', 'expert', 'artisan', 'grandmaster', 'legendary', 'titan']),
+  quantity: z.number().int().min(1),
+});
+
 export const orgScheduleProposalSchema = z.object({
   scheduleItemId: z.string().min(1),
   workspaceId: z.string().min(1),
@@ -56,6 +63,8 @@ export const orgScheduleProposalSchema = z.object({
   receivedAt: z.string(),
   /** SourcePointer: IntentID of the ParsingIntent that triggered this proposal (optional). */
   intentId: z.string().optional(),
+  /** Skill requirements carried over from the workspace proposal — used during org approval. */
+  skillRequirements: z.array(skillRequirementSchema).optional(),
 });
 
 export type OrgScheduleProposal = z.infer<typeof orgScheduleProposalSchema>;
@@ -85,6 +94,8 @@ export async function handleScheduleProposed(
     status: 'proposed',
     receivedAt: new Date().toISOString(),
     intentId: payload.intentId,
+    // Persist skill requirements so org governance can validate without re-fetching workspace data.
+    ...(payload.skillRequirements?.length ? { skillRequirements: payload.skillRequirements } : {}),
   });
   await setDocument(`orgScheduleProposals/${payload.scheduleItemId}`, proposal);
 }
@@ -205,5 +216,27 @@ async function _cancelProposal(
     targetAccountId,
     reason,
     rejectedAt: new Date().toISOString(),
+  });
+}
+
+// =================================================================
+// Domain Service: cancelOrgScheduleProposal
+// =================================================================
+
+/**
+ * Manually cancels a pending org schedule proposal by HR governance.
+ *
+ * Distinct from the compensating-event path inside approveOrgScheduleProposal:
+ * this is an explicit HR decision to withdraw the proposal without
+ * assigning any member (no ScheduleAssignRejected event — no assignment
+ * was ever attempted).
+ *
+ * Invariant #1: only writes to this BC's own aggregate (orgScheduleProposals).
+ */
+export async function cancelOrgScheduleProposal(
+  scheduleItemId: string
+): Promise<void> {
+  await updateDocument(`orgScheduleProposals/${scheduleItemId}`, {
+    status: 'cancelled' satisfies OrgScheduleStatus,
   });
 }
