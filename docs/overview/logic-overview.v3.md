@@ -40,7 +40,7 @@ flowchart TD
 %% A1) user-account 僅作身份主體；wallet 為獨立 aggregate（強一致），profile / notification 為弱一致資料
 %% A2) organization-account.binding 與 organization-core.aggregate 只允許 ACL / projection 對接，不共享同一提交邊界
 %% A3) A 軌 tasks/qa/acceptance/finance 視為 workflow.aggregate 的階段視圖，不定義為四個獨立原子流程
-%%     （WORKFLOW_AGGREGATE 為設計意圖節點；目前 A 軌各切片透過 progressState 欄位協調，尚未獨立成 aggregate 切片）
+%%     blockWorkflow(issueId) 由 A 軌異常路徑呼叫；unblockWorkflow(resolvedIssueId) 由 A 軌訂閱 IssueResolved 事件後自行呼叫（離散恢復）
 %% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
 %% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
 %% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
@@ -218,7 +218,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         W_B_DAILY[workspace-business.daily（手寫施工日誌）]
         W_B_SCHEDULE[workspace-business.schedule（任務排程產生）]
 
-        WORKFLOW_AGGREGATE["workspace-business.workflow.aggregate（A 軌狀態機不變量）"]
+        WORKFLOW_AGGREGATE["workspace-business.workflow.aggregate（A 軌狀態機 · advanceStage / blockWorkflow / unblockWorkflow）"]
 
         %% A 軌：主流程（workflow 的階段視圖）
         TRACK_A_TASKS[workspace-business.tasks（任務管理）]
@@ -246,18 +246,19 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_FINANCE
 
         %% A 軌流轉與異常判定（AB 雙軌交互）
-        TRACK_A_TASKS -->|異常| TRACK_B_ISSUES
+        %% 異常路徑呼叫 blockWorkflow(issueId) 封鎖聚合；IssueResolved 事件觸發 A 軌自訂閱 unblockWorkflow（離散恢復）
+        TRACK_A_TASKS -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_TASKS -->|正常順位| TRACK_A_QA
 
-        TRACK_A_QA -->|異常| TRACK_B_ISSUES
+        TRACK_A_QA -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_QA -->|正常順位| TRACK_A_ACCEPTANCE
 
-        TRACK_A_ACCEPTANCE -->|異常| TRACK_B_ISSUES
+        TRACK_A_ACCEPTANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_ACCEPTANCE -->|正常順位| TRACK_A_FINANCE
 
-        TRACK_A_FINANCE -->|異常| TRACK_B_ISSUES
+        TRACK_A_FINANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
 
-        %% B 軌解鎖：統一發送 IssueResolved 事件，A 軌自行訂閱後恢復（不直接回流）
+        %% B 軌解鎖：統一發送 IssueResolved 事件；A 軌自訂閱後呼叫 unblockWorkflow（離散恢復 · 禁止跨模組回寫）
 
         %% 日誌與排程關聯
         TRACK_A_TASKS -.-> W_B_DAILY
@@ -266,8 +267,9 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
     end
 
-    %% B 軌 IssueResolved 事件（A 軌訂閱後自行恢復進度）
+    %% B 軌 IssueResolved 事件（A 軌自訂閱後呼叫 unblockWorkflow · 離散恢復原則）
     TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
+    WORKSPACE_EVENT_BUS -.->|workspace:issues:resolved 自訂閱 unblockWorkflow| TRACK_A_TASKS
 
 end
 

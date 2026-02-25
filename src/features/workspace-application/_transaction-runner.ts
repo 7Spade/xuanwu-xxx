@@ -16,7 +16,6 @@
  */
 
 import { appendDomainEvent } from '@/features/workspace-core.event-store';
-import { createTraceContext, recordDomainError } from '@/shared/infra/observability';
 import { createOutbox, type Outbox, type OutboxEvent } from './_outbox';
 import { generateTraceId, logDomainError } from '@/shared/observability';
 
@@ -74,7 +73,7 @@ export async function runTransaction<T>(
         traceId: resolvedCorrelationId,
         source: 'workspace-application:transaction-runner',
         message: 'Failed to append event to store',
-        detail: err instanceof Error ? err.stack : String(err),
+        detail: appendErr instanceof Error ? appendErr.stack : String(appendErr),
       });
     });
   }

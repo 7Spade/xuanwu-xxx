@@ -175,6 +175,26 @@ export function WorkspaceTasks() {
     }
   }, [isAddOpen]);
 
+  // Discrete Recovery Principle (AB dual-track):
+  //   TRACK_B_ISSUES →|IssueResolved 事件| WORKSPACE_EVENT_BUS
+  //   A 軌自行訂閱後恢復（not direct back-flow）
+  // When an issue is resolved with a sourceTaskId, unblock the blocked task.
+  useEffect(() => {
+    const unsub = eventBus.subscribe('workspace:issues:resolved', async (payload) => {
+      if (!payload.sourceTaskId) return;
+      try {
+        await updateTask(payload.sourceTaskId, { progressState: 'doing' });
+        toast({
+          title: 'Task Unblocked',
+          description: `Task resumed after issue "${payload.issueTitle}" was resolved.`,
+        });
+      } catch {
+        // Non-critical: task unblock is best-effort; user can manually update state.
+      }
+    });
+    return () => unsub();
+  }, [eventBus, updateTask]);
+
   const handleLocationChange = (field: keyof Location, value: string) => {
     setEditingTask(prev => ({
         ...prev,

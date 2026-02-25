@@ -74,7 +74,12 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
     })
   );
 
-  // workspace:issues:resolved → ACCOUNT_PROJECTION_AUDIT
+  // workspace:issues:resolved → ACCOUNT_PROJECTION_AUDIT + workflow unblock stream offset
+  // Per logic-overview.v3.md:
+  //   TRACK_B_ISSUES →|IssueResolved 事件| WORKSPACE_EVENT_BUS
+  //   A 軌自行訂閱後恢復（Discrete Recovery Principle — not direct back-flow）
+  // The funnel records audit + stream offset for replay consistency (Invariant A7).
+  // A-track task recovery is handled by the tasks slice subscribing to this event.
   unsubscribers.push(
     bus.subscribe('workspace:issues:resolved', async (payload) => {
       await appendAuditEntry(payload.resolvedBy, {
@@ -85,6 +90,14 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
         summary: `Issue "${payload.issueTitle}" resolved`,
       });
       await upsertProjectionVersion('account-audit', Date.now(), new Date().toISOString());
+      // Track stream offset for workflow unblock (per Invariant A7 — Event Funnel is projection compose only)
+      if (payload.sourceTaskId) {
+        await upsertProjectionVersion(
+          `workflow-unblock-${payload.sourceTaskId}`,
+          Date.now(),
+          new Date().toISOString()
+        );
+      }
     })
   );
 

@@ -3,5 +3,7 @@ export {
   createWorkflowAggregate,
   canAdvanceWorkflowStage,
   advanceWorkflowStage,
+  blockWorkflow,
+  unblockWorkflow,
 } from './_aggregate';
 export type { WorkflowStage, WorkflowAggregateState } from './_aggregate';
