@@ -1,87 +1,30 @@
 /**
- * @fileoverview shared/lib/skill — Pure skill-tier domain rules.
+ * @fileoverview shared/lib/skill — Skill domain utilities backed by shared-kernel.
  * No async, no I/O, no React, no Firebase.
- */
-
-import type { SkillTier, TierDefinition, SkillGrant, SkillRequirement } from '@/shared/types'
-
-// ---------------------------------------------------------------------------
-// Tier definitions (ordered lowest → highest)
-// ---------------------------------------------------------------------------
-
-/**
- * Canonical tier table.  Single source of truth for XP bounds, labels and
- * design tokens.  Update this array to add / rename tiers — all downstream
- * helpers derive from it automatically.
- */
-export const TIER_DEFINITIONS: readonly TierDefinition[] = [
-  { tier: 'apprentice',   rank: 1, label: 'Apprentice',   minXp: 0,   maxXp: 75,  color: '#CCEDEB', cssVar: '--tier-1-apprentice'   },
-  { tier: 'journeyman',   rank: 2, label: 'Journeyman',   minXp: 75,  maxXp: 150, color: '#A2C7C7', cssVar: '--tier-2-journeyman'   },
-  { tier: 'expert',       rank: 3, label: 'Expert',       minXp: 150, maxXp: 225, color: '#78A1A3', cssVar: '--tier-3-expert'       },
-  { tier: 'artisan',      rank: 4, label: 'Artisan',      minXp: 225, maxXp: 300, color: '#4D7A7F', cssVar: '--tier-4-artisan'      },
-  { tier: 'grandmaster',  rank: 5, label: 'Grandmaster',  minXp: 300, maxXp: 375, color: '#23545B', cssVar: '--tier-5-grandmaster'  },
-  { tier: 'legendary',    rank: 6, label: 'Legendary',    minXp: 375, maxXp: 450, color: '#17393E', cssVar: '--tier-6-legendary'    },
-  { tier: 'titan',        rank: 7, label: 'Titan',        minXp: 450, maxXp: 525, color: '#0A1F21', cssVar: '--tier-7-titan'        },
-] as const;
-
-// Indexed lookup maps for O(1) access
-const TIER_BY_ID = new Map<SkillTier, TierDefinition>(
-  TIER_DEFINITIONS.map(d => [d.tier, d] as [SkillTier, TierDefinition])
-);
-
-// ---------------------------------------------------------------------------
-// Tier lookups
-// ---------------------------------------------------------------------------
-
-/** Returns the TierDefinition for the given SkillTier identifier. */
-export function getTierDefinition(tier: SkillTier): TierDefinition {
-  const def = TIER_BY_ID.get(tier);
-  if (!def) throw new Error(`Unknown SkillTier: "${tier}"`);
-  return def;
-}
-
-/**
- * Derives the SkillTier from a raw XP value.
- * Returns 'apprentice' for out-of-range values below 0,
- * and 'titan' for values above the maximum.
- */
-export function resolveSkillTier(xp: number): SkillTier {
-  for (const def of TIER_DEFINITIONS) {
-    if (xp < def.maxXp) return def.tier;
-  }
-  return 'titan';
-}
-
-/**
- * Alias for resolveSkillTier — canonical name used in logic-overview.v3.md.
  *
- * Pure function: no side effects, no I/O, no React.
- * Used by: projection.account-skill-view, projection.org-eligible-member-view,
- *          account-organization.schedule (skill validation).
- *
- * Invariant #12: tier is NEVER stored in DB — always computed at runtime.
+ * Cross-BC tier types and computation functions live in @/shared-kernel/skill-tier.
+ * This module re-exports them for convenience and adds Account-BC-specific helpers
+ * that require SkillGrant (a Firestore-backed Account BC type).
  */
-export const getTier = resolveSkillTier;
 
-/**
- * Returns the numeric rank for a tier (1 = lowest, 7 = highest).
- * Useful for comparison operations.
- */
-export function getTierRank(tier: SkillTier): number {
-  return getTierDefinition(tier).rank;
-}
+import type { SkillGrant } from '@/shared/types'
+import type { SkillRequirement } from '@/shared-kernel/skill-requirement'
+import { getTierRank } from '@/shared-kernel/skill-tier'
+
+// Re-export everything from shared-kernel so callers can use @/shared/lib
+// as a single import point for skill rules.
+export {
+  TIER_DEFINITIONS,
+  resolveSkillTier,
+  getTier,
+  getTierDefinition,
+  getTierRank,
+  tierSatisfies,
+} from '@/shared-kernel/skill-tier';
 
 // ---------------------------------------------------------------------------
-// Matching helpers
+// Account BC helper — requires SkillGrant (has Timestamp; stays in shared/lib)
 // ---------------------------------------------------------------------------
-
-/**
- * Returns true if `grantedTier` satisfies the `minimumTier` requirement.
- * A higher (or equal) tier always satisfies a lower minimum.
- */
-export function tierSatisfies(grantedTier: SkillTier, minimumTier: SkillTier): boolean {
-  return getTierRank(grantedTier) >= getTierRank(minimumTier);
-}
 
 /**
  * Returns true if the given SkillGrant array satisfies a single SkillRequirement.
@@ -96,6 +39,7 @@ export function grantSatisfiesRequirement(
   return grants.some(g => {
     const slugMatch = g.tagSlug === requirement.tagSlug;
     const idMatch = requirement.tagId !== undefined && g.tagId !== undefined && g.tagId === requirement.tagId;
-    return (slugMatch || idMatch) && tierSatisfies(g.tier, requirement.minimumTier);
+    return (slugMatch || idMatch) && getTierRank(g.tier) >= getTierRank(requirement.minimumTier);
   });
 }
+

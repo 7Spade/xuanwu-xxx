@@ -9,3 +9,4 @@ export { app as firebaseApp } from "./app.client";
 export { auth } from "./auth/auth.client";
 export { db } from "./firestore/firestore.client";
 export { storage } from "./storage/storage.client";
+

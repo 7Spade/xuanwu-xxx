@@ -18,6 +18,7 @@
 import { appendDomainEvent } from '@/features/workspace-core.event-store';
 import { createTraceContext, recordDomainError } from '@/shared/infra/observability';
 import { createOutbox, type Outbox, type OutboxEvent } from './_outbox';
+import { generateTraceId, logDomainError } from '@/shared/observability';
 
 export interface TransactionContext {
   workspaceId: string;
@@ -48,29 +49,14 @@ export interface TransactionResult<T> {
 export async function runTransaction<T>(
   workspaceId: string,
   userId: string,
-  handler: (ctx: TransactionContext) => Promise<T>
+  handler: (ctx: TransactionContext) => Promise<T>,
+  correlationId?: string
 ): Promise<TransactionResult<T>> {
-  // WORKSPACE_TRANSACTION_RUNNER --> TRACE_IDENTIFIER
-  const trace = createTraceContext();
-  const correlationId = trace.traceId;
+  const resolvedCorrelationId = correlationId ?? generateTraceId();
   const outbox = createOutbox();
 
-  const ctx: TransactionContext = { workspaceId, correlationId, outbox };
-
-  let value: T;
-  try {
-    value = await handler(ctx);
-  } catch (err: unknown) {
-    // WORKSPACE_TRANSACTION_RUNNER --> DOMAIN_ERROR_LOG
-    recordDomainError({
-      traceId: correlationId,
-      occurredAt: new Date().toISOString(),
-      source: 'workspace-application.transaction-runner',
-      message: err instanceof Error ? err.message : 'Unknown transaction error',
-      context: { workspaceId, userId },
-    });
-    throw err;
-  }
+  const ctx: TransactionContext = { workspaceId, correlationId: resolvedCorrelationId, outbox };
+  const value = await handler(ctx);
 
   // Drain events from the outbox and append to the event store (best-effort)
   const events = outbox.drain();
@@ -79,20 +65,16 @@ export async function runTransaction<T>(
       eventType: event.type,
       payload: event.payload as unknown as Record<string, unknown>,
       aggregateId: workspaceId,
-      correlationId,
+      correlationId: resolvedCorrelationId,
       causedBy: userId,
     }).catch((appendErr: unknown) => {
       // Event store append is best-effort — do not fail the command
-      recordDomainError({
-        traceId: correlationId,
+      logDomainError({
         occurredAt: new Date().toISOString(),
-        source: 'workspace-application.transaction-runner',
+        traceId: resolvedCorrelationId,
+        source: 'workspace-application:transaction-runner',
         message: 'Failed to append event to store',
-        context: {
-          workspaceId,
-          eventType: event.type,
-          error: appendErr instanceof Error ? appendErr.message : String(appendErr),
-        },
+        detail: err instanceof Error ? err.stack : String(err),
       });
     });
   }

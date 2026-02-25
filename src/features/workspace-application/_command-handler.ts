@@ -31,7 +31,7 @@
 import { checkWorkspaceAccess } from './_scope-guard';
 import { evaluatePolicy, type WorkspaceRole } from './_policy-engine';
 import { runTransaction, type TransactionContext } from './_transaction-runner';
-import { recordDomainError } from '@/shared/infra/observability';
+import { createTraceContext, logDomainError } from '@/shared/observability';
 
 export interface WorkspaceCommand {
   workspaceId: string;
@@ -58,6 +58,9 @@ export async function executeCommand<T>(
   handler: (ctx: TransactionContext) => Promise<T>,
   publish?: (type: string, payload: unknown) => void
 ): Promise<CommandResult<T>> {
+  // TRACE_IDENTIFIER — create trace context for this command chain
+  const trace = createTraceContext(`executeCommand:${command.action}`);
+
   try {
     // 1. Scope Guard — verify workspace access
     const scopeResult = await checkWorkspaceAccess(command.workspaceId, command.userId);
@@ -75,7 +78,8 @@ export async function executeCommand<T>(
     const { value, events } = await runTransaction(
       command.workspaceId,
       command.userId,
-      handler
+      handler,
+      trace.traceId
     );
 
     // 4. Outbox flush — deliver collected events to the event bus
@@ -88,13 +92,12 @@ export async function executeCommand<T>(
     return { success: true, value };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Command execution failed';
-    // WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER / DOMAIN_ERROR_LOG (Observability)
-    recordDomainError({
-      traceId: `cmd-${Date.now()}`,
+    logDomainError({
       occurredAt: new Date().toISOString(),
-      source: 'workspace-application.command-handler',
+      traceId: trace.traceId,
+      source: 'workspace-application:command-handler',
       message,
-      context: { workspaceId: command.workspaceId, userId: command.userId, action: command.action },
+      detail: error instanceof Error ? error.stack : undefined,
     });
     return { success: false, error: message };
   }

@@ -21,7 +21,7 @@ import { z } from 'zod';
 import { setDocument, updateDocument } from '@/shared/infra/firestore/firestore.write.adapter';
 import { publishOrgEvent } from '@/features/account-organization.event-bus';
 import { getOrgMemberEligibility } from '@/features/projection.org-eligible-member-view';
-import { resolveSkillTier, tierSatisfies } from '@/shared/lib';
+import { resolveSkillTier, tierSatisfies } from '@/shared-kernel/skill-tier';
 import type { WorkspaceScheduleProposedPayload } from '@/features/workspace-core.event-bus';
 import type { SkillRequirement } from '@/shared/types';
 

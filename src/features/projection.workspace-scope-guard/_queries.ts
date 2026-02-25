@@ -8,7 +8,7 @@
 import { getDocument } from '@/shared/infra/firestore/firestore.read.adapter';
 import type { WorkspaceScopeGuardView } from './_read-model';
 import { buildAuthoritySnapshot } from './_read-model';
-import type { AuthoritySnapshot } from '@/shared/kernel/authority-snapshot';
+import type { AuthoritySnapshot } from '@/shared-kernel/authority-snapshot';
 
 /**
  * Fetches the scope guard read model for a workspace.

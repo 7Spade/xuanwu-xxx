@@ -6,7 +6,7 @@
  *                       (see shared/constants/skills.ts — no Firestore, no org dependency)
  *   - SkillGrant      = assignment of a skill + tier to an individual user (the "who has it")
  *                       Stored permanently on accounts/{userId} — survives org deletion.
- *   - SkillRequirement = what a schedule proposal needs (the "what is needed")
+ *   - SkillRequirement = cross-BC staffing contract — see @/shared-kernel/skill-requirement
  *
  * Key decisions:
  *   - The skill library is static code, not a Firestore collection.
@@ -18,33 +18,12 @@
 
 import type { Timestamp } from 'firebase/firestore'
 
-// ---------------------------------------------------------------------------
-// Tier system
-// ---------------------------------------------------------------------------
-
-/**
- * Seven-tier proficiency scale.
- * Values are stable identifiers (safe for Firestore storage & AI prompts).
- */
-export type SkillTier =
-  | 'apprentice'    // Tier 1 — 0–75 XP
-  | 'journeyman'    // Tier 2 — 75–150 XP
-  | 'expert'        // Tier 3 — 150–225 XP
-  | 'artisan'       // Tier 4 — 225–300 XP
-  | 'grandmaster'   // Tier 5 — 300–375 XP  (core colour)
-  | 'legendary'     // Tier 6 — 375–450 XP
-  | 'titan';        // Tier 7 — 450–525 XP
-
-/** Static metadata for a single tier. Used by UI and shared/lib. */
-export interface TierDefinition {
-  tier: SkillTier;
-  rank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  label: string;     // Display name  (e.g. "Expert")
-  minXp: number;     // Inclusive lower bound
-  maxXp: number;     // Exclusive upper bound (except Tier 7 which is open-ended)
-  color: string;     // Hex colour for badge background
-  cssVar: string;    // CSS custom property name (e.g. "--tier-3-expert")
-}
+// SkillTier and SkillRequirement are cross-BC contracts — defined in shared-kernel.
+// Imported locally so they are available within this file, and re-exported so
+// existing @/shared/types imports continue to work.
+import type { SkillTier } from '@/shared-kernel/skill-tier';
+export type { SkillTier, TierDefinition } from '@/shared-kernel/skill-tier';
+export type { SkillRequirement } from '@/shared-kernel/skill-requirement';
 
 // ---------------------------------------------------------------------------
 // Global skill-tag library (static reference type)
@@ -98,12 +77,12 @@ export interface SkillGrant {
   tagId?: string;
   /**
    * Proficiency tier — set manually by an admin or derived from `xp` via
-   * resolveSkillTier() in shared/lib/skill.
+   * resolveSkillTier() in @/shared-kernel/skill-tier.
    */
   tier: SkillTier;
   /**
    * Accumulated XP (0–525).
-   * Drives tier progression; use resolveSkillTier(xp) to get the tier.
+   * Drives tier progression; use resolveSkillTier(xp) from @/shared-kernel/skill-tier.
    */
   xp: number;
   /** The organisation in which this XP was earned (audit trail). */
@@ -112,24 +91,3 @@ export interface SkillGrant {
   grantedAt?: Timestamp; // Firestore Timestamp
 }
 
-// ---------------------------------------------------------------------------
-// Schedule staffing requirements
-// ---------------------------------------------------------------------------
-
-/**
- * Expresses a staffing need inside a ScheduleItem proposal.
- * Workspace managers specify what skills they require and how many people.
- */
-export interface SkillRequirement {
-  /**
-   * Portable skill identifier — the primary matching key.
-   * Matches SkillGrant.tagSlug on individual user profiles.
-   */
-  tagSlug: string;
-  /** Org-local tag UUID — optional, for UI linking to the tag library. */
-  tagId?: string;
-  /** Minimum acceptable tier — entities below this tier are excluded. */
-  minimumTier: SkillTier;
-  /** Number of individuals needed with this skill. */
-  quantity: number;
-}
