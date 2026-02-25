@@ -3,7 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/shadcn-ui/table"
 import { ShieldCheck, ShieldAlert, Users, AlertCircle } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
-import { useApp } from "@/features/workspace-core"
+import { useApp } from "@/shared/app-providers/app-context"
 import { useAccount } from "@/features/workspace-core"
 
 // DEPRECATED FOR WRITE: This permission matrix visualises mappings between internal teams and

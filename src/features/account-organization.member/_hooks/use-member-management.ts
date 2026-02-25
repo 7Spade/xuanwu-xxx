@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from 'react';
-import { useApp } from '@/features/workspace-core';
+import { useApp } from '@/shared/app-providers/app-context';
 import {
   recruitMember as recruitMemberAction,
   dismissMember as dismissMemberAction,

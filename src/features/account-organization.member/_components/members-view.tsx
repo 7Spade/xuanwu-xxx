@@ -7,7 +7,7 @@ import { UserPlus, Trash2, Mail, AlertCircle } from "lucide-react"
 import { toast } from "@/shared/utility-hooks/use-toast"
 import { useState, useEffect, useMemo } from "react"
 import { type MemberReference } from "@/shared/types"
-import { useApp } from "@/features/workspace-core"
+import { useApp } from "@/shared/app-providers/app-context"
 import { useMemberManagement } from '../_hooks/use-member-management'
 import { useI18n } from "@/shared/app-providers/i18n-provider"
 import { PageHeader } from "@/shared/ui/page-header"
