@@ -36,3 +36,9 @@ export {
 
 // Skill requirement — cross-BC staffing contract for schedule proposals
 export type { SkillRequirement } from './skill-requirement';
+
+// Schedule proposed payload — cross-BC event payload (Workspace BC → Organization BC saga)
+export type {
+  WorkspaceScheduleProposedPayload,
+  ImplementsScheduleProposedPayloadContract,
+} from './schedule-proposed-payload';

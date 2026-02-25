@@ -22,6 +22,7 @@ Per logic-overview.v3.md Invariant #8:
 | `authority-snapshot.ts` | `AuthoritySnapshot`, `ImplementsAuthoritySnapshotContract` | `projection.workspace-scope-guard`, `projection.account-view` |
 | `skill-tier.ts` | `SkillTier`, `TierDefinition`, `TIER_DEFINITIONS`, `resolveSkillTier()`, `getTier()`, `getTierRank()`, `tierSatisfies()` | `account-user.skill`, `account-organization.schedule`, `workspace-business.schedule`, `projection.account-skill-view`, `projection.org-eligible-member-view` |
 | `skill-requirement.ts` | `SkillRequirement` | `workspace-business.schedule`, `workspace-business.document-parser`, `workspace-core.event-bus`, `account-organization.schedule` |
+| `schedule-proposed-payload.ts` | `WorkspaceScheduleProposedPayload`, `ImplementsScheduleProposedPayloadContract` | `workspace-core.event-bus` (produces), `account-organization.schedule` (consumes) |
 | `index.ts` | Re-exports all of the above | All consumers |
 
 ## Import
