@@ -1,5 +1,5 @@
 /**
- * shared/infra/observability/index.ts
+ * shared/observability/index.ts
  *
  * OBSERVABILITY_LAYER — public API
  *

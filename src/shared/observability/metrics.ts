@@ -1,5 +1,5 @@
 /**
- * shared/infra/observability/metrics.ts
+ * shared/observability/metrics.ts
  *
  * DOMAIN_METRICS node — in-process domain event counter.
  *

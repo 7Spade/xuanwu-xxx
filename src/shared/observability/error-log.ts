@@ -1,5 +1,5 @@
 /**
- * shared/infra/observability/error-log.ts
+ * shared/observability/error-log.ts
  *
  * DOMAIN_ERROR_LOG node — structured domain error logger.
  *

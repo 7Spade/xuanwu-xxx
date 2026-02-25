@@ -1,5 +1,5 @@
 /**
- * shared/infra/observability/trace.ts
+ * shared/observability/trace.ts
  *
  * TRACE_IDENTIFIER node — correlation/trace ID generation and propagation.
  *
