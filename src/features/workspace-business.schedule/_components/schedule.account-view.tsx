@@ -28,7 +28,7 @@ import {
 } from "@/shared/shadcn-ui/dropdown-menu";
 import { Button } from "@/shared/shadcn-ui/button";
 import { useScheduleActions } from "../_hooks/use-schedule-commands";
-import { useApp } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 
 export function AccountScheduleSection() {
   const { state } = useApp();

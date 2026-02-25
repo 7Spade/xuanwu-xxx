@@ -1,6 +1,7 @@
 "use client";
 
-import { useWorkspace , useApp } from '@/features/workspace-core';
+import { useWorkspace } from '@/features/workspace-core';
+import { useApp } from '@/shared/app-providers/app-context';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/shared/shadcn-ui/card";
 import { Button } from "@/shared/shadcn-ui/button";
 import { Badge } from "@/shared/shadcn-ui/badge";
