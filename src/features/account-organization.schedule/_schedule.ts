@@ -229,15 +229,29 @@ async function _cancelProposal(
  *
  * Distinct from the compensating-event path inside approveOrgScheduleProposal:
  * this is an explicit HR decision to withdraw the proposal without
- * assigning any member (no ScheduleAssignRejected event — no assignment
- * was ever attempted).
+ * assigning any member.
+ *
+ * Publishes `organization:schedule:proposalCancelled` (Scheduling Saga, Invariant A5).
  *
  * Invariant #1: only writes to this BC's own aggregate (orgScheduleProposals).
  */
 export async function cancelOrgScheduleProposal(
-  scheduleItemId: string
+  scheduleItemId: string,
+  orgId: string,
+  workspaceId: string,
+  cancelledBy: string,
+  reason?: string
 ): Promise<void> {
   await updateDocument(`orgScheduleProposals/${scheduleItemId}`, {
     status: 'cancelled' satisfies OrgScheduleStatus,
+  });
+
+  await publishOrgEvent('organization:schedule:proposalCancelled', {
+    scheduleItemId,
+    orgId,
+    workspaceId,
+    cancelledBy,
+    cancelledAt: new Date().toISOString(),
+    ...(reason ? { reason } : {}),
   });
 }

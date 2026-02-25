@@ -3,9 +3,10 @@
  *
  * EVENT_FUNNEL_INPUT: unified entry point for the Projection Layer.
  *
- * Per logic-overview.v3.md (PROJECTION_LAYER subgraph):
+ * Per logic-overview_v5.md (VS8 Projection Bus):
  *   WORKSPACE_EVENT_BUS  → |所有業務事件|  EVENT_FUNNEL_INPUT
  *   ORGANIZATION_EVENT_BUS → |所有組織事件| EVENT_FUNNEL_INPUT
+ *   TAG_LIFECYCLE_BUS → |TagLifecycleEvent| EVENT_FUNNEL_INPUT  (v5 新增)
  *
  *   EVENT_FUNNEL_INPUT routes to:
  *     → WORKSPACE_PROJECTION_VIEW
@@ -16,12 +17,13 @@
  *     → ORGANIZATION_PROJECTION_VIEW
  *     → ACCOUNT_SKILL_VIEW
  *     → ORG_ELIGIBLE_MEMBER_VIEW
+ *     → TAG_SNAPSHOT (v5 新增)
  *     → PROJECTION_VERSION (updates stream offset)
  *
  *   WORKSPACE_EVENT_STORE -.→ EVENT_FUNNEL_INPUT (replay rebuilds all projections)
  *
- * Call `registerWorkspaceFunnel(bus)` and `registerOrganizationFunnel()` once at app
- * startup (e.g. inside workspace-provider.tsx after the bus is created).
+ * Call `registerWorkspaceFunnel(bus)`, `registerOrganizationFunnel()`, and
+ * `registerTagFunnel()` once at app startup.
  */
 
 import type { WorkspaceEventBus } from '@/features/workspace-core.event-bus';
@@ -38,6 +40,13 @@ import {
   removeOrgMemberEntry,
   updateOrgMemberEligibility,
 } from '@/features/projection.org-eligible-member-view';
+import { onTagEvent } from '@/features/centralized-tag';
+import {
+  applyTagCreated,
+  applyTagUpdated,
+  applyTagDeprecated,
+  applyTagDeleted,
+} from '@/features/projection.tag-snapshot';
 
 /**
  * Registers workspace event handlers on the bus to keep projections in sync.
@@ -221,6 +230,54 @@ export function registerOrganizationFunnel(): () => void {
         Date.now(),
         new Date().toISOString()
       );
+    })
+  );
+
+  return () => unsubscribers.forEach((u) => u());
+}
+
+/**
+ * Registers tag lifecycle event handlers to keep the TAG_SNAPSHOT projection in sync.
+ * Returns a cleanup function.
+ *
+ * Per logic-overview_v5.md (VS8):
+ *   IER ==>|"#9 唯一寫入路徑"| FUNNEL
+ *   FUNNEL --> TAG_SNAPSHOT
+ *
+ * Invariant A7: Event Funnel only composes projections; does not enforce cross-BC invariants.
+ */
+export function registerTagFunnel(): () => void {
+  const unsubscribers: Array<() => void> = [];
+
+  // tag:created → TAG_SNAPSHOT
+  unsubscribers.push(
+    onTagEvent('tag:created', async (payload) => {
+      await applyTagCreated(payload);
+      await upsertProjectionVersion('tag-snapshot', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // tag:updated → TAG_SNAPSHOT
+  unsubscribers.push(
+    onTagEvent('tag:updated', async (payload) => {
+      await applyTagUpdated(payload);
+      await upsertProjectionVersion('tag-snapshot', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // tag:deprecated → TAG_SNAPSHOT (merges deprecatedAt into existing entry)
+  unsubscribers.push(
+    onTagEvent('tag:deprecated', async (payload) => {
+      await applyTagDeprecated(payload);
+      await upsertProjectionVersion('tag-snapshot', Date.now(), new Date().toISOString());
+    })
+  );
+
+  // tag:deleted → TAG_SNAPSHOT (removes entry)
+  unsubscribers.push(
+    onTagEvent('tag:deleted', async (payload) => {
+      await applyTagDeleted(payload);
+      await upsertProjectionVersion('tag-snapshot', Date.now(), new Date().toISOString());
     })
   );
 

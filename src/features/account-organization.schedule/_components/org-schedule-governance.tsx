@@ -88,7 +88,12 @@ function ProposalRow({
   const handleCancel = useCallback(async () => {
     setLoading(true);
     try {
-      await cancelOrgScheduleProposal(proposal.scheduleItemId);
+      await cancelOrgScheduleProposal(
+        proposal.scheduleItemId,
+        proposal.orgId,
+        proposal.workspaceId,
+        approvedBy
+      );
       toast({ title: '提案已取消', description: `「${proposal.title}」已由 HR 撤回。` });
       onCancelled();
     } catch {
@@ -96,7 +101,7 @@ function ProposalRow({
     } finally {
       setLoading(false);
     }
-  }, [proposal.scheduleItemId, proposal.title, onCancelled]);
+  }, [proposal.scheduleItemId, proposal.orgId, proposal.workspaceId, proposal.title, approvedBy, onCancelled]);
 
   return (
     <div className="space-y-3 rounded-lg border bg-background p-4">

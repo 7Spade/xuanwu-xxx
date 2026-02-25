@@ -1,6 +1,6 @@
 # Features Tree — 理想化架構
 
-> 依據 `docs/overview/logic-overview.v3.md` 設計。
+> 依據 `docs/overview/logic-overview_v5.md` 設計。
 > 本文件定義 `src/features/` 的**目標狀態**（target state）。
 
 ## 命名規則
@@ -48,6 +48,12 @@
 ```
 src/features/
 │
+├── ── VS0 · Shared Kernel + Tag Authority Center ─────────────────
+│   └── centralized-tag/                  ✅  全域標籤語義字典（Tag Authority Center）
+│                                               · createTag / updateTag / deprecateTag / deleteTag
+│                                               · TagLifecycleEvent → Integration Event Router
+│                                               · Invariants: #17, A6, T1
+│
 ├── ── Identity Layer ─────────────────────────────────────────────
 │   └── identity-account.auth/            ✅  登入 · 註冊 · 重設密碼（Firebase Auth 入口）
 │
@@ -66,13 +72,14 @@ src/features/
 │   │
 │   │   ── Organization sub-type ──
 │   ├── account-organization.core/         🔧  組織聚合實體（aggregate）· binding
-│   ├── account-organization.event-bus/    🔧  組織事件總線
+│   ├── account-organization.event-bus/    🔧  組織事件總線（含 ScheduleProposalCancelled 補償事件）
 │   ├── account-organization.member/       🔧  組織成員邀請／移除
 │   ├── account-organization.team/         🔧  團隊管理（內部組視圖）
 │   ├── account-organization.partner/      🔧  合作夥伴管理（外部組視圖）
 │   ├── account-organization.policy/       🔧  組織政策管理
-│   ├── account-organization.skill-tag/    🔧  職能標籤庫（扁平化資源池）
+│   ├── account-organization.skill-tag/    🔧  職能標籤庫（Tag Authority 組織作用域快照 · 被動消費 TagLifecycleEvent）
 │   └── account-organization.schedule/     🔧  人力排程管理 · ScheduleAssigned 事件（FCM 第 1 層）
+│                                               · Scheduling Saga: ScheduleAssignRejected / ScheduleProposalCancelled
 │
 ├── ── Workspace Application Layer ────────────────────────────────
 │   └── workspace-application/             🔧  指令處理器 · Scope Guard · 政策引擎
@@ -98,7 +105,7 @@ src/features/
 │   └── workspace-business.document-parser/ ✅  AI 文件解析 · ParsingIntent（Digital Twin）
 │
 ├── ── Workspace Business · A 軌（主流程）─────────────────────────
-│   │   ※ 架構設計意圖（logic-overview.v3.md A3）：
+│   │   ※ 架構設計意圖（logic-overview_v5.md A3）：
 │   │     tasks / qa / acceptance / finance 為 workspace-business.workflow.aggregate
 │   │     的「階段視圖」（stage-view），不是四個獨立原子流程。
 │   │     WORKFLOW_AGGREGATE 為整體 A 軌狀態機的不變量邊界（尚未獨立實作切片）。
@@ -112,6 +119,7 @@ src/features/
 │
 └── ── Projection Layer ───────────────────────────────────────────
     ├── projection.event-funnel/            ✅  事件漏斗（EVENT_FUNNEL_INPUT · Projection Layer 唯一外部入口）
+    │                                           · registerWorkspaceFunnel / registerOrganizationFunnel / registerTagFunnel
     ├── projection.workspace-view/          🔧  工作區讀模型（Workspace 投影視圖）
     ├── projection.workspace-scope-guard/   🔧  Scope Guard 專用讀模型
     ├── projection.account-view/            🔧  帳號讀模型 · 權限快照（authority-snapshot 合約）
@@ -120,6 +128,7 @@ src/features/
     ├── projection.organization-view/       🔧  組織讀模型
     ├── projection.account-skill-view/      🔧  帳號技能讀模型（accountId / skillId / xp · 不存 tier）
     ├── projection.org-eligible-member-view/ 🔧  排程資格讀模型（orgId / accountId / eligible · Invariant #14）
+    ├── projection.tag-snapshot/            ✅  Tag Authority 全域語義字典讀模型（T5 · 消費方唯讀）
     └── projection.registry/               ✅  事件串流偏移量 · 讀模型版本對照表
 ```
 
@@ -129,6 +138,7 @@ src/features/
 
 | Bounded Context | ✅ 已實作 | 🔧 需擴充 | 小計 |
 |-----------------|-----------|-----------|------|
+| VS0 Tag Authority Center | 1 | 0 | **1** |
 | Identity Layer | 1 | 0 | **1** |
 | Account Layer (共用 + governance) | 0 | 3 | **3** |
 | Account Layer (user sub-type) | 1 | 3 | **4** |
@@ -139,8 +149,8 @@ src/features/
 | Workspace Business (support) | 4 | 0 | **4** |
 | Workspace Business (A-track) | 4 | 0 | **4** |
 | Workspace Business (B-track) | 1 | 0 | **1** |
-| Projection Layer | 2 | 8 | **10** |
-| **Total** | **17** | **28** | **45** |
+| Projection Layer | 3 | 8 | **11** |
+| **Total** | **19** | **28** | **47** |
 
 ---
 
@@ -265,6 +275,6 @@ Scope Guard 只讀本地 `projection.workspace-scope-guard`，不直接依賴外
 
 ## 參考
 
-- 架構圖：[`docs/overview/logic-overview.v3.md`](../../docs/overview/logic-overview.v3.md)
+- 架構圖：[`docs/overview/logic-overview_v5.md`](../../docs/overview/logic-overview_v5.md)
 - 切片開發規範：[`src/features/GEMINI.md`](./GEMINI.md)
 - 全域設計原則：[`GEMINI.md`](../../GEMINI.md)（倉庫根目錄）
