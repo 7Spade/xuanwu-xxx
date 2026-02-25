@@ -11,14 +11,14 @@
  *   ORGANIZATION_PARTNER -.->|外部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
  *
  * Boundary constraint:
- *   These queries read ONLY from this org's account document.
+ *   These queries read ONLY from this org's account document and subcollections.
  *   Skill tag data is referenced by tagSlug — read from account-organization.skill-tag.
  */
 
-import { doc, onSnapshot, type Unsubscribe } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query, type Unsubscribe } from 'firebase/firestore';
 import { db } from '@/shared/infra/firestore/firestore.client';
 import { getDocument } from '@/shared/infra/firestore/firestore.read.adapter';
-import type { Account, Team } from '@/shared/types';
+import type { Account, PartnerInvite, Team } from '@/shared/types';
 
 /**
  * Fetches all external partner groups for an organization.
@@ -46,5 +46,29 @@ export function subscribeToOrgPartners(
     }
     const data = snap.data() as Account;
     onUpdate((data.teams ?? []).filter((t: Team) => t.type === 'external'));
+  });
+}
+
+/**
+ * Subscribes to real-time partner invite updates for an organization.
+ *
+ * Invites are stored at `accounts/{orgId}/invites` — this is Account BC (Subject Center) data.
+ * Components in account-organization.partner MUST use this query instead of reading
+ * invites through useAccount (WorkspaceContainer) to respect BC boundaries.
+ *
+ * Boundary invariant: Subject Center components must not cross into WorkspaceContainer
+ * to read data that belongs to the Subject Center.
+ */
+export function subscribeToOrgPartnerInvites(
+  orgId: string,
+  onUpdate: (invites: PartnerInvite[]) => void
+): Unsubscribe {
+  const ref = query(
+    collection(db, 'accounts', orgId, 'invites'),
+    orderBy('invitedAt', 'desc')
+  );
+  return onSnapshot(ref, (snap) => {
+    const invites = snap.docs.map((d) => ({ id: d.id, ...d.data() } as PartnerInvite));
+    onUpdate(invites);
   });
 }

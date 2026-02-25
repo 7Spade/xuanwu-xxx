@@ -24,7 +24,7 @@ Both slices draw from the same `SKILL_TAG_POOL` in `account-organization.skill-t
 | File / Dir | Purpose |
 |-----------|---------|
 | `_actions.ts` | `createPartnerGroup`, `sendPartnerInvite`, `dismissPartnerMember` |
-| `_queries.ts` | `getOrgPartners`, `subscribeToOrgPartners` |
+| `_queries.ts` | `getOrgPartners`, `subscribeToOrgPartners`, `subscribeToOrgPartnerInvites` |
 | `_components/` | `PartnersView`, `PartnerDetailView` |
 | `_hooks/` | `usePartnerManagement` |
 | `index.ts` | Public API |
@@ -34,10 +34,11 @@ Both slices draw from the same `SKILL_TAG_POOL` in `account-organization.skill-t
 ```ts
 export { usePartnerManagement } from './_hooks/use-partner-management';
 export { PartnersView, PartnerDetailView } from './_components/...';
-export { getOrgPartners, subscribeToOrgPartners } from './_queries';
+export { getOrgPartners, subscribeToOrgPartners, subscribeToOrgPartnerInvites } from './_queries';
 ```
 
 ## Dependencies
 
 - `@/shared/types` — `Partner`, `Organization`
 - `@/shared/infra/firestore/` — Firestore reads/writes
+- `@/shared/app-providers/app-context` — `useApp` for active account context

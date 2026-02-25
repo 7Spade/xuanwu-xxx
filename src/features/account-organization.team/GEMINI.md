@@ -41,3 +41,4 @@ export { getOrgTeams, subscribeToOrgTeams } from './_queries';
 
 - `@/shared/types` — `Team`, `Organization`
 - `@/shared/infra/firestore/` — Firestore reads/writes
+- `@/shared/app-providers/app-context` — `useApp` for active account context

@@ -8,6 +8,13 @@ import { useAccount } from "@/features/workspace-core"
 
 // DEPRECATED FOR WRITE: This permission matrix visualises mappings between internal teams and
 // workspaces. The WorkspaceMembersManagement component handles writes. This is read-only.
+//
+// ARCHITECTURAL NOTE (cross-BC read):
+// This view intentionally reads `workspaces` from WorkspaceContainer (useAccount) because its
+// sole purpose is to display the CROSS-BC permission mapping between Subject Center teams and
+// Workspace Container workspaces. This is an accepted read-only view-layer cross-BC dependency.
+// Long-term: this component should migrate to workspace-governance.role (WorkspaceContainer)
+// where the workspace data dependency is natural.
 export function PermissionMatrixView() {
   const { state: appState } = useApp()
   const { state: accountState } = useAccount()
