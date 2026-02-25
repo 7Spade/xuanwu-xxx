@@ -15,16 +15,16 @@
 export type {
   EventEnvelope,
   ImplementsEventEnvelopeContract,
-} from './event-envelope';
+} from './events/event-envelope';
 
 // Authority snapshot — projection slices that expose permission data implement this
 export type {
   AuthoritySnapshot,
   ImplementsAuthoritySnapshotContract,
-} from './authority-snapshot';
+} from './identity/authority-snapshot';
 
 // Skill tier — canonical seven-tier proficiency scale and its pure-function computation
-export type { SkillTier, TierDefinition } from './skill-tier';
+export type { SkillTier, TierDefinition } from './skills/skill-tier';
 export {
   TIER_DEFINITIONS,
   getTierDefinition,
@@ -32,13 +32,13 @@ export {
   getTier,
   getTierRank,
   tierSatisfies,
-} from './skill-tier';
+} from './skills/skill-tier';
 
 // Skill requirement — cross-BC staffing contract for schedule proposals
-export type { SkillRequirement } from './skill-requirement';
+export type { SkillRequirement } from './workforce/skill-requirement';
 
 // Schedule proposed payload — cross-BC event payload (Workspace BC → Organization BC saga)
 export type {
   WorkspaceScheduleProposedPayload,
   ImplementsScheduleProposedPayloadContract,
-} from './schedule-proposed-payload';
+} from './workforce/schedule-proposed-payload';
