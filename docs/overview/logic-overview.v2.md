@@ -15,7 +15,6 @@ flowchart TD
 %% Module: 功能切片／技術封裝，不等於原子邊界
 %% Projection/View: 由事件衍生的讀模型，預設最終一致，不回推 Domain 寫入
 %% Application Coordinator: 指令協調與流程編排（Scope Guard / Policy Engine / Transaction Runner / Event Funnel）
-%% Talent Repository: CENTRALIZED_TAG_AGGREGATE 內的全域人力資源池契約（Vertical Slice 共享語義）= Member + Partner + Team → ORG_ELIGIBLE_MEMBER_VIEW（#16）
 %% =================================================
 
 %% =================================================
@@ -34,26 +33,27 @@ flowchart TD
 %% 12) Tier 永遠是推導值（純函式 getTier(xp)），不得存入任何 DB 欄位
 %% 13) XP 任何異動必須產生 Ledger 記錄（account-skill-xp-ledger）；不可直接 update xp 欄位
 %% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
-%% 15) schedule:assigned → EVENT_FUNNEL → ORG_ELIGIBLE_MEMBER_VIEW.eligible=false（防雙重排班，非靜態成員狀態）
-%% 16) Talent Repository（由 CENTRALIZED_TAG_AGGREGATE 統一定義）= member（內部）+ partner（外部）+ team（組視圖）→ ORG_ELIGIBLE_MEMBER_VIEW；Schedule 只讀此 Projection（#14）
-%% 17) centralized-tag.aggregate（Shared Kernel）統一管理 tagSlug 唯一性與刪除規則（A6）；Member/Partner 唯讀引用；Team 為組視圖
-%% 18) workspace-governance = 策略執行層：members → ORG_ELIGIBLE_MEMBER_VIEW；audit → EVENT_FUNNEL 自動投影；role 繼承 policy 硬約束
+%% 15) organization:schedule:assigned 事件必須由 EVENT_FUNNEL（registerOrganizationFunnel）
+%%     更新 ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標；旗標代表「目前無衝突排程」而非靜態成員狀態
 %% =================================================
 
 %% =================================================
 %% ATOMICITY AUDIT DECISIONS（原子邊界審計決策）
 %% A1) user-account 僅作身份主體；wallet 為獨立 aggregate（強一致），profile / notification 為弱一致資料
 %% A2) organization-account.binding 與 organization-core.aggregate 只允許 ACL / projection 對接，不共享同一提交邊界
-%% A3) A 軌為 workflow.aggregate 的階段視圖；blockWorkflow → WORKFLOW_AGGREGATE（Anomaly State Machine）→ issues:resolved 中介解鎖（禁 B→A 直寫）
+%% A3) A 軌 tasks/qa/acceptance/finance 視為 workflow.aggregate 的階段視圖，不定義為四個獨立原子流程
+%%     blockWorkflow(issueId) 由 A 軌異常路徑呼叫；unblockWorkflow(resolvedIssueId) 由 A 軌訂閱 IssueResolved 事件後自行呼叫（離散恢復）
 %% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
 %% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
-%% A6) CENTRALIZED_TAG_AGGREGATE（Shared Kernel）需統一管理 tagSlug 唯一性與刪除規則，其他模組僅可引用
+%% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
 %% A7) Event Funnel 僅負責 projection compose，不承擔跨 BC 不變量
 %% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
 %% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
 %% A10) Notification Router 僅做無狀態路由；跨 BC 業務決策需留在來源 BC 或 projection 層
-%% A11) eligible 生命週期（#15）：member:joined→true · schedule:assigned→false · completed/cancelled→true（待補）
-%%      旗標 = 「無衝突排班」快照，非靜態成員狀態
+%% A11) ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標目前僅由 member:joined 設為 true，
+%%      schedule:assigned 後未自動更新為 false（雙重排程漏洞）；
+%%      需在 registerOrganizationFunnel 補充 applyScheduleAssigned → updateOrgMemberEligibility(false)；
+%%      排程結束後需恢復 eligible=true（需 schedule:completed / schedule:cancelled 事件配合）
 %% =================================================
 
 %% =================================================
@@ -84,7 +84,10 @@ AUTHENTICATED_IDENTITY -->|登入後觸發簽發／刷新| CUSTOM_CLAIMS
 
 
 %% =================================================
-%% SUBJECT CENTER: Who（帳號主體 · Account + Organization）vs Workspace（What）
+%% SUBJECT CENTER（主體中心）
+%% 包含 Account Layer 與 Organization Layer
+%% 兩者共用 ACCOUNT_IDENTITY_LINK 身份根，同屬「主體」邊界（Who）
+%% Workspace Container = 「做什麼（What）」，在主體中心之外
 %% =================================================
 
 subgraph SUBJECT_CENTER[主體中心（Subject Center）]
@@ -146,14 +149,15 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
     end
 
     subgraph ORGANIZATION_GOVERNANCE[organization-governance（組織治理）]
-        ORGANIZATION_MEMBER["account-organization.member（組織成員 · 內部人員）"]
-        ORGANIZATION_TEAM["account-organization.team（團隊管理 · 內部組視圖）"]
-        ORGANIZATION_PARTNER["account-organization.partner（合作夥伴 · 外部人員）"]
-        ORGANIZATION_POLICY["account-organization.policy（政策管理）"]
+        ORGANIZATION_MEMBER[organization-governance.member（組織成員）]
+        ORGANIZATION_TEAM["organization-governance.team（團隊管理 · 內部組視圖）"]
+        ORGANIZATION_PARTNER["organization-governance.partner（合作夥伴 · 外部組視圖）"]
+        ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
+        SKILL_TAG_POOL[(職能標籤庫（Skills / Certs）)]
         ORG_SKILL_RECOGNITION["organization-skill-recognition.aggregate（organizationId / accountId / skillId / minXpRequired / status）"]
     end
 
-    ORGANIZATION_SCHEDULE["account-organization.schedule（人力排程管理 · HR Scheduling）"]
+    ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
 
 end
 
@@ -162,10 +166,24 @@ end
 
 ORGANIZATION_ACCOUNT_BINDING -.->|ACL / projection 對接（非共享提交）| ORGANIZATION_ENTITY
 ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
-ORGANIZATION_POLICY -->|PolicyChanged → AuthoritySnapshot| ORGANIZATION_EVENT_BUS
 
 
-%% CAPABILITY BC: skill-definition = shared/constants/skills.ts 靜態庫（#17 · 標籤唯一性由 CENTRALIZED_TAG_AGGREGATE 管理）
+%% =================================================
+%% CAPABILITY BC（能力定義邊界）
+%% 只負責「能力是什麼」— 不處理成長、歸屬、組織
+%% 實作備注：SKILL_DEFINITION_AGGREGATE 目前以 shared/constants/skills.ts 靜態常數庫實作
+%%           （非 Firestore aggregate）。邊界概念有效，初期技能定義不需動態讀寫；
+%%           ACCOUNT_SKILL_AGGREGATE 透過 tagSlug 字串 FK 引用，
+%%           ORG_SKILL_RECOGNITION 透過 findSkill(skillId) 驗證合法性。
+%% =================================================
+
+subgraph CAPABILITY_BC[Capability BC（能力定義邊界）]
+    SKILL_DEFINITION_AGGREGATE["skill-definition.aggregate（skillId / name / maxXp=525 / tierConfig）"]
+end
+
+SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId / tierConfig · 唯讀）| ACCOUNT_SKILL_AGGREGATE
+SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId · 唯讀）| ORG_SKILL_RECOGNITION
+SKILL_TAG_POOL -.->|職能標籤參照自| SKILL_DEFINITION_AGGREGATE
 
 
 %% =================================================
@@ -178,6 +196,7 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
         WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
         WORKSPACE_POLICY_ENGINE[workspace-application.policy-engine（政策引擎）]
+        WORKSPACE_ORG_POLICY_CACHE["workspace-application.org-policy-cache（組織政策本地快取）"]
         WORKSPACE_TRANSACTION_RUNNER[workspace-application.transaction-runner（交易執行器）]
         WORKSPACE_OUTBOX["workspace-application.outbox（交易內發信箱）"]
     end
@@ -189,10 +208,14 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_EVENT_STORE["workspace-core.event-store（事件儲存，僅供重播／稽核）"]
     end
 
-    subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理 · 策略執行層）]
-        WORKSPACE_ROLE["workspace-governance.role（角色管理 · 繼承 organization-governance.policy 約束）"]
-        WORKSPACE_AUDIT[workspace-governance.audit（稽核視圖 · trace-identifier 事件溯源）]
+    subgraph WORKSPACE_GOVERNANCE[workspace-governance（工作區治理）]
+        WORKSPACE_MEMBER[workspace-governance.members（工作區成員）]
+        WORKSPACE_ROLE[workspace-governance.role（角色管理）]
     end
+
+    %% workspace-governance.audit 為實務交付暫置切片（UI 稽核視圖）
+    %% 不屬於 WORKSPACE_GOVERNANCE 架構邊界；長期遷移目標：workspace-core.event-store + projection.account-audit
+    WORKSPACE_AUDIT[workspace-governance.audit（稽核視圖 · 實務暫置）]
 
     %% --- AB 雙軌業務邏輯核心 ---
     subgraph WORKSPACE_BUSINESS[workspace-business（業務層）]
@@ -227,13 +250,23 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT
         PARSING_INTENT -.->|IntentDeltaProposed 事件提議（不可直接回寫）| TRACK_A_TASKS
 
-        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_TASKS & TRACK_A_QA & TRACK_A_ACCEPTANCE & TRACK_A_FINANCE
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_TASKS
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_QA
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_ACCEPTANCE
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_FINANCE
 
-        %% A 軌正常順位流轉（WORKFLOW_AGGREGATE 為異常狀態機：任一 A 軌異常 → blockWorkflow → 路由至 B 軌）
+        %% A 軌流轉與異常判定（AB 雙軌交互）
+        %% 異常路徑呼叫 blockWorkflow(issueId) 封鎖聚合；IssueResolved 事件觸發 A 軌自訂閱 unblockWorkflow（離散恢復）
+        TRACK_A_TASKS -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_TASKS -->|正常順位| TRACK_A_QA
+
+        TRACK_A_QA -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_QA -->|正常順位| TRACK_A_ACCEPTANCE
+
+        TRACK_A_ACCEPTANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_ACCEPTANCE -->|正常順位| TRACK_A_FINANCE
-        WORKFLOW_AGGREGATE -->|A 軌任一階段異常 → blockWorkflow| TRACK_B_ISSUES
+
+        TRACK_A_FINANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
 
         %% B 軌解鎖：統一發送 IssueResolved 事件；A 軌自訂閱後呼叫 unblockWorkflow（離散恢復 · 禁止跨模組回寫）
 
@@ -244,33 +277,30 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
     end
 
-    %% B 軌 IssueResolved 事件（WORKFLOW_AGGREGATE 作為 Anomaly State Machine 中介 · 離散恢復原則）
+    %% B 軌 IssueResolved 事件（A 軌自訂閱後呼叫 unblockWorkflow · 離散恢復原則）
     TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
-    WORKSPACE_EVENT_BUS -.->|workspace:issues:resolved（Anomaly State Machine 中介）| WORKFLOW_AGGREGATE
+    WORKSPACE_EVENT_BUS -.->|workspace:issues:resolved 自訂閱 unblockWorkflow| TRACK_A_TASKS
 
 end
 
 ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 
 
-%% 職能標籤庫與人才資源池（#17/#16）：由 Shared Kernel 的 CENTRALIZED_TAG_AGGREGATE 管理；Member/Partner 唯讀引用；Team = 組視圖
-CENTRALIZED_TAG_AGGREGATE --> SKILL_TAG_POOL
-CENTRALIZED_TAG_AGGREGATE --> TALENT_REPOSITORY
-CENTRALIZED_TAG_AGGREGATE -.->|#A6: tag-lifecycle authority| ORG_SKILL_RECOGNITION
-CENTRALIZED_TAG_AGGREGATE -->|TagCreated / TagUpdated / TagDeleted| ORGANIZATION_EVENT_BUS
-ORGANIZATION_MEMBER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
-ORGANIZATION_PARTNER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
-ORGANIZATION_TEAM -.->|組視圖引用（derived）| SKILL_TAG_POOL
-ORGANIZATION_MEMBER -.->|內部人員來源| TALENT_REPOSITORY
-ORGANIZATION_PARTNER -.->|外部人員來源| TALENT_REPOSITORY
-ORGANIZATION_TEAM -.->|組視圖來源| TALENT_REPOSITORY
-
-
-%% TALENT_REPOSITORY: MemberJoined/Left → ORGANIZATION_EVENT_BUS → EVENT_FUNNEL_INPUT → ORG_ELIGIBLE_MEMBER_VIEW（#16）
+%% =================================================
+%% 職能標籤庫 — 扁平化資源池（Team/Partner 為組視圖）
+%% 所有帳號（內部/外部）統一擁有職能標籤；Team/Partner 為同一資源池的「組視圖」
+%% =================================================
+SKILL_TAG_POOL_AGGREGATE["organization.skill-tag-pool.aggregate（唯一性／刪除規則控制）"]
+SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
+ORGANIZATION_MEMBER -.->|內部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_PARTNER -.->|外部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（唯讀）| SKILL_TAG_POOL
 
 
 %% =================================================
 %% S2) APPLICATION COORDINATION LAYER（流程協調 / 技術構件）
+%% =================================================
+%% 下列區塊描述的是協調器與流程編排，不是 Domain Aggregate 本體
 %% =================================================
 
 %% =================================================
@@ -278,32 +308,20 @@ ORGANIZATION_TEAM -.->|組視圖來源| TALENT_REPOSITORY
 %% =================================================
 
 SERVER_ACTION["_actions.ts（Server Action — 業務觸發入口）"]
-UNIFIED_COMMAND_GATEWAY["unified-command-gateway（統一指令閘道器 · TraceID / Context 注入）"]
-UNIVERSAL_AUTHORITY_INTERCEPTOR["universal-authority-interceptor（統一權限攔截器 · AuthoritySnapshot 快照檢查）"]
-SERVER_ACTION -->|發送 Command| UNIFIED_COMMAND_GATEWAY
-SERVER_ACTION_SKILL -->|發送 Command| UNIFIED_COMMAND_GATEWAY
-UNIFIED_COMMAND_GATEWAY -->|Workspace Command| WORKSPACE_COMMAND_HANDLER
-UNIFIED_COMMAND_GATEWAY -->|Skill Command| ACCOUNT_SKILL_AGGREGATE
-UNIFIED_COMMAND_GATEWAY -->|Org Command| ORGANIZATION_ENTITY
+SERVER_ACTION -->|發送 Command| WORKSPACE_COMMAND_HANDLER
 WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 
-WORKSPACE_COMMAND_HANDLER --> UNIVERSAL_AUTHORITY_INTERCEPTOR
+WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
 ACTIVE_ACCOUNT_CONTEXT -->|查詢鍵| WORKSPACE_SCOPE_READ_MODEL
-WORKSPACE_SCOPE_READ_MODEL --> UNIVERSAL_AUTHORITY_INTERCEPTOR
-ACCOUNT_PROJECTION_VIEW --> UNIVERSAL_AUTHORITY_INTERCEPTOR
-UNIVERSAL_AUTHORITY_INTERCEPTOR --> WORKSPACE_SCOPE_GUARD
-UNIVERSAL_AUTHORITY_INTERCEPTOR -.->|高風險授權二次確認（寫入、升權、敏感資源）| ACCOUNT_SKILL_AGGREGATE
-UNIVERSAL_AUTHORITY_INTERCEPTOR -.->|高風險授權二次確認（寫入、升權、敏感資源）| ORGANIZATION_ENTITY
+WORKSPACE_SCOPE_READ_MODEL --> WORKSPACE_SCOPE_GUARD
 WORKSPACE_SCOPE_GUARD -.->|高風險授權二次確認（寫入、升權、敏感資源）| WORKSPACE_AGGREGATE
-WORKSPACE_ROLE -.->|#18 eligible=true · 唯讀| ORG_ELIGIBLE_MEMBER_VIEW
 
 WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
-WORKSPACE_TRANSACTION_RUNNER -->|#A8: 1 cmd / 1 agg| WORKSPACE_AGGREGATE
+WORKSPACE_TRANSACTION_RUNNER -->|單一 command 僅允許單一 aggregate 寫入| WORKSPACE_AGGREGATE
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
-WORKSPACE_AUDIT -.->|#9 store→funnel→audit| ACCOUNT_PROJECTION_AUDIT
-WORKSPACE_TRANSACTION_RUNNER -->|pending events → outbox| WORKSPACE_OUTBOX
+WORKSPACE_TRANSACTION_RUNNER -->|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 
@@ -313,21 +331,22 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% =================================================
 
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-INTEGRATION_EVENT_ROUTER[["integration-event-router（跨 BC 事件路由器）"]]
-WORKSPACE_EVENT_BUS --> INTEGRATION_EVENT_ROUTER
-ORGANIZATION_EVENT_BUS --> INTEGRATION_EVENT_ROUTER
-WORKSPACE_OUTBOX -->|integration events| INTEGRATION_EVENT_ROUTER
-INTEGRATION_EVENT_ROUTER -.->|route: ScheduleProposed · #A5 saga| ORGANIZATION_SCHEDULE
+ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
+WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MODEL
+WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件 · saga / 可補償）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
-W_B_SCHEDULE -.->|#14 Universal Scheduler · eligible=true| ORG_ELIGIBLE_MEMBER_VIEW
-ORGANIZATION_SCHEDULE -.->|#14 Universal Scheduler · eligible=true| ORG_ELIGIBLE_MEMBER_VIEW
+W_B_SCHEDULE -.->|查詢可用帳號（eligible=true · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
 
 
-%% SKILL XP：_actions → Aggregate → #13 Ledger → Event → Projection（禁止跨 Ledger 直接更新 xp）
+%% =================================================
+%% SKILL XP COMMAND FLOW（技能 XP 指令流程）
+%% Server Action → Aggregate → Ledger → Event → Projection
+%% 不可跨越 Ledger 直接更新 xp；不可跨 BC 直接寫入
+%% =================================================
 
 SERVER_ACTION_SKILL["_actions.ts（Skill Server Action — addXp / deductXp）"]
 SERVER_ACTION_SKILL -->|addXp / deductXp Command| ACCOUNT_SKILL_AGGREGATE
-ACCOUNT_SKILL_AGGREGATE -->|addXp · #13: -> Ledger| ACCOUNT_SKILL_XP_LEDGER
+ACCOUNT_SKILL_AGGREGATE -->|addXp · clamp 0~525 · 寫入 Ledger| ACCOUNT_SKILL_XP_LEDGER
 ACCOUNT_SKILL_AGGREGATE -->|SkillXpAdded / SkillXpDeducted| ORGANIZATION_EVENT_BUS
 ORG_SKILL_RECOGNITION -->|SkillRecognitionGranted / SkillRecognitionRevoked| ORGANIZATION_EVENT_BUS
 
@@ -357,22 +376,31 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
 
     ACCOUNT_SKILL_VIEW["projection.account-skill-view（accountId / skillId / xp / tier · 來源: SkillXpAdded/Deducted）"]
-    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（Talent Repository 排班可用性快照 · orgId/accountId/skills{tagSlug→xp}/eligible · 來源: MemberJoined/Left · SkillXpAdded/Deducted · ScheduleAssigned/Completed/Cancelled）"]
+    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（orgId / accountId / skillId / xp / tier / eligible · 排程專用 · 來源: MemberJoined/Left · SkillXpAdded/Deducted · ScheduleAssigned/Completed/Cancelled）"]
     SKILL_TIER_FUNCTION[["getTier(xp) → Tier（純函式 · Apprentice/Journeyman/Expert/Artisan/Grandmaster/Legendary/Titan · 不存 DB）"]]
 
 end
 
-%% EVENT_FUNNEL: Integration Event Router → 統一入口 → 各 Projection（#A7：僅 projection compose，非跨 BC 不變量）
-%% Projection 寫入唯一路徑：INTEGRATION_EVENT_ROUTER -> EVENT_FUNNEL_INPUT（#9）
-INTEGRATION_EVENT_ROUTER ==> EVENT_FUNNEL_INPUT
-EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW & WORKSPACE_SCOPE_READ_MODEL & ACCOUNT_PROJECTION_VIEW & ACCOUNT_PROJECTION_AUDIT & ACCOUNT_PROJECTION_SCHEDULE & ORGANIZATION_PROJECTION_VIEW & ACCOUNT_SKILL_VIEW & ORG_ELIGIBLE_MEMBER_VIEW
+%% 漏斗模式：2 個事件源 → 統一入口 → 內部路由至各投影視圖（projection compose，非全域不變量）
+WORKSPACE_EVENT_BUS -->|所有業務事件| EVENT_FUNNEL_INPUT
+ORGANIZATION_EVENT_BUS -->|所有組織事件| EVENT_FUNNEL_INPUT
 
-ACCOUNT_SKILL_VIEW -.->|#12: getTier| SKILL_TIER_FUNCTION
-ORG_ELIGIBLE_MEMBER_VIEW -.->|#12: getTier| SKILL_TIER_FUNCTION
+%% 漏斗內部路由（EVENT_FUNNEL_INPUT 為 PROJECTION_LAYER 唯一外部入口）
+EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> WORKSPACE_SCOPE_READ_MODEL
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_AUDIT
+EVENT_FUNNEL_INPUT --> ACCOUNT_PROJECTION_SCHEDULE
+EVENT_FUNNEL_INPUT --> ORGANIZATION_PROJECTION_VIEW
+EVENT_FUNNEL_INPUT --> ACCOUNT_SKILL_VIEW
+EVENT_FUNNEL_INPUT --> ORG_ELIGIBLE_MEMBER_VIEW
 
-EVENT_FUNNEL_INPUT -->|stream offset| PROJECTION_VERSION
-PROJECTION_VERSION -->|version mapping| READ_MODEL_REGISTRY
-WORKSPACE_EVENT_STORE -.->|#9: replay -> rebuild| EVENT_FUNNEL_INPUT
+ACCOUNT_SKILL_VIEW -.->|tier 由 getTier 計算（不存 DB）| SKILL_TIER_FUNCTION
+ORG_ELIGIBLE_MEMBER_VIEW -.->|tier 由 getTier 計算（不存 DB）| SKILL_TIER_FUNCTION
+
+EVENT_FUNNEL_INPUT -->|更新事件串流偏移量（stream offset）| PROJECTION_VERSION
+PROJECTION_VERSION -->|提供 read-model 對應版本| READ_MODEL_REGISTRY
+WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_INPUT
 
 
 %% =================================================
@@ -380,16 +408,14 @@ WORKSPACE_EVENT_STORE -.->|#9: replay -> rebuild| EVENT_FUNNEL_INPUT
 %% =================================================
 
 %% =================================================
-%% SHARED KERNEL（#8：跨 BC 顯式契約；虛線 = 契約遵循，非讀寫依賴）
+%% SHARED KERNEL（共享核心，需顯式標示）
 %% =================================================
+%% Shared Kernel 區塊的虛線表示「契約遵循（implements contract）」而非跨 BC 讀寫依賴
 subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
-    SK_EVENT_ENVELOPE["shared-kernel.event-envelope（events/event-envelope.ts · 統一事件信封契約）"]
-    SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（identity/authority-snapshot.ts · 權限快照契約）"]
-    SK_SKILL_TIER["shared-kernel.skill-tier（skills/skill-tier.ts · 七階位能力等級 · getTier 純函式 · Invariant #12）"]
-    SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（workforce/skill-requirement.ts · 跨 BC 人力需求契約）"]
-    CENTRALIZED_TAG_AGGREGATE["centralized-tag.aggregate（全域語義字典 · tagSlug 唯一性／刪除規則）"]
-    SKILL_TAG_POOL[("職能標籤庫（Skills / Certs / Roles / Status · Global Tag Dictionary）")]
-    TALENT_REPOSITORY[["人力資源池（Talent Repository · Member + Partner + Team · 排班來源契約）"]]
+    SK_EVENT_ENVELOPE["shared-kernel.event-envelope（事件信封契約）"]
+    SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（權限快照契約）"]
+    SK_SKILL_TIER["shared-kernel.skill-tier（七階位能力等級 · getTier 純函式 · Invariant #12）"]
+    SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（跨 BC 人力需求契約）"]
 end
 
 WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
@@ -403,21 +429,31 @@ W_B_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
 
 
 %% =================================================
-%% FCM NOTIFICATION（#6：三層架構 · 觸發→路由→交付；Token 唯讀 profile）
+%% FCM NOTIFICATION — 三層通知架構
+%% 層一（觸發）：ORGANIZATION_SCHEDULE 宣告事實（ScheduleAssigned），不關心誰要收通知
+%% 層二（路由）：ACCOUNT_NOTIFICATION_ROUTER 依 TargetAccountID 分發至目標帳號
+%% 層三（交付）：ACCOUNT_USER_NOTIFICATION 依 internal/external 標籤過濾敏感內容後推播
+%% FCM Token 儲存於 account-user.profile；通知切片只讀取不寫入 profile
 %% =================================================
 
 FCM_GATEWAY[["Firebase Cloud Messaging（推播閘道）"]]
 USER_DEVICE[使用者裝置（手機／瀏覽器）]
 
+%% 層一：觸發層 — 宣告事實（不關心誰要收通知）
 ORGANIZATION_SCHEDULE -->|ScheduleAssigned 事件| ORGANIZATION_EVENT_BUS
 
+%% 層二：路由層 — 依 TargetAccountID 分發至對應帳號
 ORGANIZATION_EVENT_BUS -->|ScheduleAssigned（含 TargetAccountID）| ACCOUNT_NOTIFICATION_ROUTER
 ACCOUNT_NOTIFICATION_ROUTER -->|無狀態路由至目標帳號（TargetAccountID 匹配）| ACCOUNT_USER_NOTIFICATION
 
+%% 層三：交付層 — 依帳號標籤過濾內容後推播
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
-ACCOUNT_USER_NOTIFICATION -.->|過濾（internal/external）+ 投影至個人中心| ACCOUNT_PROJECTION_VIEW
+ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤快照過濾內容（internal/external）| ACCOUNT_PROJECTION_VIEW
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
+
+%% 通知投影至個人中心（account-user.profile / account-user.notification 共享帳號文件集合，邏輯分離但 DB 同源）
+ACCOUNT_USER_NOTIFICATION -.->|通知投影至個人中心| ACCOUNT_PROJECTION_VIEW
 
 
 %% =================================================
@@ -430,7 +466,9 @@ subgraph OBSERVABILITY_LAYER[Observability Layer（可觀測性層）]
     DOMAIN_ERROR_LOG[domain-error-log（領域錯誤日誌）]
 end
 
-WORKSPACE_COMMAND_HANDLER & WORKSPACE_TRANSACTION_RUNNER & WORKSPACE_EVENT_BUS --> TRACE_IDENTIFIER
+WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER
+WORKSPACE_TRANSACTION_RUNNER --> TRACE_IDENTIFIER
+WORKSPACE_EVENT_BUS --> TRACE_IDENTIFIER
 
 WORKSPACE_TRANSACTION_RUNNER --> DOMAIN_ERROR_LOG
 WORKSPACE_EVENT_BUS --> DOMAIN_METRICS
@@ -450,9 +488,11 @@ classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
+classDef capabilityBc fill:#f0e6ff,stroke:#9333ea,color:#000;
 classDef accountSkill fill:#bbf7d0,stroke:#22c55e,color:#000;
 classDef tierFunction fill:#fdf4ff,stroke:#c084fc,color:#000;
 classDef skillProjection fill:#fefce8,stroke:#eab308,color:#000;
+classDef practicalDeviation fill:#f9fafb,stroke:#9ca3af,stroke-dasharray:5 5,color:#6b7280;
 
 classDef userPersonalCenter fill:#f0fdf4,stroke:#4ade80,color:#000;
 classDef subjectCenter fill:#fefce8,stroke:#facc15,color:#000;
@@ -460,7 +500,6 @@ classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
 classDef sharedKernel fill:#ecfeff,stroke:#22d3ee,color:#000;
-classDef talentRepository fill:#fff1f2,stroke:#fda4af,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -482,7 +521,10 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
+class WORKSPACE_ORG_POLICY_CACHE workspace;
 class WORKSPACE_SCOPE_READ_MODEL projection;
+class CAPABILITY_BC capabilityBc;
+class SKILL_DEFINITION_AGGREGATE capabilityBc;
 class ACCOUNT_SKILL_LAYER accountSkill;
 class ACCOUNT_SKILL_AGGREGATE,ACCOUNT_SKILL_XP_LEDGER accountSkill;
 class ORG_SKILL_RECOGNITION organization;
@@ -490,7 +532,6 @@ class SKILL_TIER_FUNCTION tierFunction;
 class ACCOUNT_SKILL_VIEW,ORG_ELIGIBLE_MEMBER_VIEW skillProjection;
 class SERVER_ACTION_SKILL serverAction;
 class USER_WALLET_AGGREGATE accountSkill;
-class CENTRALIZED_TAG_AGGREGATE sharedKernel;
+class SKILL_TAG_POOL_AGGREGATE organization;
 class WORKFLOW_AGGREGATE workspace;
-class WORKSPACE_AUDIT workspace;
-class TALENT_REPOSITORY talentRepository;
+class WORKSPACE_AUDIT practicalDeviation;
