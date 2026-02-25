@@ -182,21 +182,11 @@ ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 
 
 %% =================================================
-%% CAPABILITY BC（能力定義邊界）
-%% 只負責「能力是什麼」— 不處理成長、歸屬、組織
-%% 實作備注：SKILL_DEFINITION_AGGREGATE 目前以 shared/constants/skills.ts 靜態常數庫實作
-%%           （非 Firestore aggregate）。邊界概念有效，初期技能定義不需動態讀寫；
-%%           ACCOUNT_SKILL_AGGREGATE 透過 tagSlug 字串 FK 引用，
-%%           ORG_SKILL_RECOGNITION 透過 findSkill(skillId) 驗證合法性。
+%% CAPABILITY BC（能力定義邊界 · 無動態節點）
+%% skill-definition 以 shared/constants/skills.ts 靜態常數庫實作（非 Firestore aggregate）
+%% ACCOUNT_SKILL_AGGREGATE 透過 tagSlug 字串 FK 引用；ORG_SKILL_RECOGNITION 透過 findSkill(skillId) 驗證
+%% 標籤生命週期由 SKILL_TAG_POOL_AGGREGATE 統一管理（Invariant #17 · Centralized Tag Aggregate）
 %% =================================================
-
-subgraph CAPABILITY_BC[Capability BC（能力定義邊界）]
-    SKILL_DEFINITION_AGGREGATE["skill-definition.aggregate（skillId / name / maxXp=525 / tierConfig）"]
-end
-
-SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId / tierConfig · 唯讀）| ACCOUNT_SKILL_AGGREGATE
-SKILL_DEFINITION_AGGREGATE -.->|技能定義參照（skillId · 唯讀）| ORG_SKILL_RECOGNITION
-SKILL_TAG_POOL -.->|職能標籤參照自| SKILL_DEFINITION_AGGREGATE
 
 
 %% =================================================
@@ -263,23 +253,13 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         TRACK_A_TASKS -.->|SourcePointer 引用（唯讀 · IntentID）| PARSING_INTENT
         PARSING_INTENT -.->|IntentDeltaProposed 事件提議（不可直接回寫）| TRACK_A_TASKS
 
-        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_TASKS
-        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_QA
-        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_ACCEPTANCE
-        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_FINANCE
+        WORKFLOW_AGGREGATE -.->|stage-view| TRACK_A_TASKS & TRACK_A_QA & TRACK_A_ACCEPTANCE & TRACK_A_FINANCE
 
-        %% A 軌流轉與異常判定（AB 雙軌交互）
-        %% 異常路徑呼叫 blockWorkflow(issueId) 封鎖聚合；IssueResolved 事件觸發 A 軌自訂閱 unblockWorkflow（離散恢復）
-        TRACK_A_TASKS -->|異常 blockWorkflow| TRACK_B_ISSUES
+        %% A 軌正常順位流轉（WORKFLOW_AGGREGATE 為異常狀態機：任一 A 軌異常 → blockWorkflow → 路由至 B 軌）
         TRACK_A_TASKS -->|正常順位| TRACK_A_QA
-
-        TRACK_A_QA -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_QA -->|正常順位| TRACK_A_ACCEPTANCE
-
-        TRACK_A_ACCEPTANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
         TRACK_A_ACCEPTANCE -->|正常順位| TRACK_A_FINANCE
-
-        TRACK_A_FINANCE -->|異常 blockWorkflow| TRACK_B_ISSUES
+        WORKFLOW_AGGREGATE -->|A 軌任一階段異常 → blockWorkflow| TRACK_B_ISSUES
 
         %% B 軌解鎖：統一發送 IssueResolved 事件；A 軌自訂閱後呼叫 unblockWorkflow（離散恢復 · 禁止跨模組回寫）
 
@@ -305,21 +285,10 @@ ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 %% =================================================
 SKILL_TAG_POOL_AGGREGATE["account-organization.skill-tag（skill-tag-pool.aggregate · 唯一性／刪除規則控制）"]
 SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
-ORGANIZATION_MEMBER -.->|內部帳號持有標籤（唯讀引用）| SKILL_TAG_POOL
-ORGANIZATION_PARTNER -.->|外部帳號持有標籤（唯讀引用）| SKILL_TAG_POOL
-ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（唯讀）| SKILL_TAG_POOL
 
 
-%% =================================================
-%% 人力資源池（Talent Repository / Workforce Pool）— Invariant #16
-%% Member（內部）+ Partner（外部）= 人力來源；Team 為組視圖（非獨立人員來源）
-%% 事件驅動：MemberJoined/Left → EVENT_FUNNEL_INPUT → ORG_ELIGIBLE_MEMBER_VIEW
-%% TALENT_REPOSITORY 為概念標籤（非新 Aggregate），確立 Schedule 的人員來源邊界
-%% =================================================
-ORGANIZATION_MEMBER -.->|MemberJoined / MemberLeft（內部人員事件）| TALENT_REPOSITORY
-ORGANIZATION_PARTNER -.->|PartnerJoined / PartnerLeft（外部人員事件）| TALENT_REPOSITORY
-ORGANIZATION_TEAM -.->|組視圖（唯讀聚合 · 非獨立人員來源）| TALENT_REPOSITORY
-TALENT_REPOSITORY -.->|Invariant #16 · 事件驅動投影（MemberJoined/Left → ORGANIZATION_EVENT_BUS）| ORG_ELIGIBLE_MEMBER_VIEW
+%% TALENT_REPOSITORY: Member（內部）+ Partner（外部）+ Team（組視圖）= 人力資源池概念標籤（Invariant #16）
+%% MemberJoined/Left → ORGANIZATION_EVENT_BUS → EVENT_FUNNEL_INPUT → ORG_ELIGIBLE_MEMBER_VIEW（數據路徑）
 
 
 %% =================================================
@@ -453,10 +422,8 @@ WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
 ORGANIZATION_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
 WORKSPACE_SCOPE_READ_MODEL -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
 ACCOUNT_PROJECTION_VIEW -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
-ACCOUNT_SKILL_VIEW -.->|tier 推導契約遵循| SK_SKILL_TIER
-ORG_ELIGIBLE_MEMBER_VIEW -.->|tier 推導契約遵循| SK_SKILL_TIER
-ORGANIZATION_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
-W_B_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
+ACCOUNT_SKILL_VIEW & ORG_ELIGIBLE_MEMBER_VIEW -.->|tier 推導契約遵循| SK_SKILL_TIER
+ORGANIZATION_SCHEDULE & W_B_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
 
 
 %% =================================================
@@ -479,12 +446,9 @@ ACCOUNT_NOTIFICATION_ROUTER -->|無狀態路由至目標帳號（TargetAccountID
 
 %% 層三：交付層 — 依帳號標籤過濾內容後推播
 USER_ACCOUNT_PROFILE -.->|提供 FCM Token（唯讀查詢）| ACCOUNT_USER_NOTIFICATION
-ACCOUNT_USER_NOTIFICATION -.->|依帳號標籤快照過濾內容（internal/external）| ACCOUNT_PROJECTION_VIEW
+ACCOUNT_USER_NOTIFICATION -.->|過濾（internal/external）+ 投影至個人中心| ACCOUNT_PROJECTION_VIEW
 ACCOUNT_USER_NOTIFICATION --> FCM_GATEWAY
 FCM_GATEWAY -.->|推播通知| USER_DEVICE
-
-%% 通知投影至個人中心（account-user.profile / account-user.notification 共享帳號文件集合，邏輯分離但 DB 同源）
-ACCOUNT_USER_NOTIFICATION -.->|通知投影至個人中心| ACCOUNT_PROJECTION_VIEW
 
 
 %% =================================================
@@ -519,7 +483,6 @@ classDef trackB fill:#fee2e2,stroke:#fca5a5,color:#000;
 classDef parsingIntent fill:#fef3c7,stroke:#fbbf24,color:#000;
 classDef serverAction fill:#fed7aa,stroke:#fb923c,color:#000;
 classDef skillTagPool fill:#e0e7ff,stroke:#818cf8,color:#000;
-classDef capabilityBc fill:#f0e6ff,stroke:#9333ea,color:#000;
 classDef accountSkill fill:#bbf7d0,stroke:#22c55e,color:#000;
 classDef tierFunction fill:#fdf4ff,stroke:#c084fc,color:#000;
 classDef skillProjection fill:#fefce8,stroke:#eab308,color:#000;
@@ -555,8 +518,6 @@ class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
 class WORKSPACE_ORG_POLICY_CACHE workspace;
 class WORKSPACE_SCOPE_READ_MODEL projection;
-class CAPABILITY_BC capabilityBc;
-class SKILL_DEFINITION_AGGREGATE capabilityBc;
 class ACCOUNT_SKILL_LAYER accountSkill;
 class ACCOUNT_SKILL_AGGREGATE,ACCOUNT_SKILL_XP_LEDGER accountSkill;
 class ORG_SKILL_RECOGNITION organization;
