@@ -1,5 +1,8 @@
 // [職責] 事件發布/訂閱引擎 (The Bus)
-// Per logic-overview.v3.md: WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+// Per logic-overview.v3.md:
+//   WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+//   WORKSPACE_EVENT_BUS --> TRACE_IDENTIFIER (Observability)
+//   WORKSPACE_EVENT_BUS --> DOMAIN_METRICS   (Observability)
 import type {
   WorkspaceEventName,
   WorkspaceEventHandler,
@@ -7,7 +10,8 @@ import type {
   SubscribeFn,
   WorkspaceEventPayloadMap,
 } from "./_events"
-import type { ImplementsEventEnvelopeContract } from "@/shared/kernel/event-envelope"
+import type { ImplementsEventEnvelopeContract } from "@/shared-kernel/event-envelope"
+import { recordEventPublished } from "@/shared/observability"
 
 // A map where keys are event names (strings) and values are arrays of handler functions (Observers).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +37,8 @@ export class WorkspaceEventBus implements ImplementsEventEnvelopeContract {
     type: T,
     payload: WorkspaceEventPayloadMap[T]
   ) => {
+    // DOMAIN_METRICS — record every published event
+    recordEventPublished(type)
     const eventHandlers = this.handlers.get(type)
     if (eventHandlers) {
       const handlersCopy = [...eventHandlers]

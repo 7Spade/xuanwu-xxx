@@ -31,7 +31,7 @@ Distinct from HR scheduling (`account-organization.schedule`).
 | `_actions.ts` | `createScheduleItem`, `updateScheduleItemStatus`, `assignMember`, `unassignMember`, `getScheduleItems` |
 | `_hooks/use-global-schedule.ts` | `useGlobalSchedule` — account-wide schedule data (pending proposals, decision history, upcoming/present events) |
 | `_hooks/use-workspace-schedule.ts` | `useWorkspaceSchedule` — workspace-scoped schedule state and calendar navigation |
-| `_hooks/use-schedule-commands.ts` | `useScheduleActions` — assign/unassign member, approve/reject item; reads `projection.account-schedule` for availability checks |
+| `_hooks/use-schedule-commands.ts` | `useScheduleActions` — assign/unassign member, approve/reject item; reads `projection.account-schedule` for availability checks and `projection.org-eligible-member-view` for soft skill-eligibility guard (Invariants #14 + #12) |
 | `_hooks/use-schedule-event-handler.ts` | `useScheduleEventHandler` — subscribes to `workspace:issues:resolved` for discrete B-track recovery (Invariant #2) |
 | `_components/` | `AccountScheduleSection`, `WorkspaceSchedule`, `GovernanceSidebar`, `ScheduleProposalContent`, `ScheduleDataTable`, `UnifiedCalendarGrid`, `ProposalDialog` |
 | `index.ts` | Public API |
@@ -73,4 +73,5 @@ export { createScheduleItem, assignMember, unassignMember, updateScheduleItemSta
 `logic-overview.v3.md`:
 - `TRACK_A_TASKS -.→ W_B_SCHEDULE` (task allocation / time change triggers)
 - `W_B_SCHEDULE -.→ ACCOUNT_PROJECTION_SCHEDULE` (filter available accounts from projection)
+- `W_B_SCHEDULE -.→ ORG_ELIGIBLE_MEMBER_VIEW` (soft skill-eligibility check before assignment — Invariants #14 + #12)
 - `WORKSPACE_OUTBOX → ScheduleProposed (cross-layer event) → ORGANIZATION_SCHEDULE`

@@ -76,7 +76,7 @@ const accountReducer = (state: AccountState, action: Action): AccountState => {
     
     case 'SET_SCHEDULE_ITEMS':
         if (!action.payload?.docs) return { ...state, schedule_items: {} };
-        return { ...state, schedule_items: snapshotToRecord(action.payload) };
+        return { ...state, schedule_items: snapshotToRecord<ScheduleItem>(action.payload) };
 
     default:
       return state;

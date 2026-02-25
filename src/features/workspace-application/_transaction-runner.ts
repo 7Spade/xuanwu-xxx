@@ -10,14 +10,19 @@
  * - WORKSPACE_TRANSACTION_RUNNER → WORKSPACE_AGGREGATE
  * - WORKSPACE_AGGREGATE → WORKSPACE_EVENT_STORE
  * - WORKSPACE_TRANSACTION_RUNNER →|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
+ * - WORKSPACE_TRANSACTION_RUNNER --> TRACE_IDENTIFIER (Observability)
+ * - WORKSPACE_TRANSACTION_RUNNER --> DOMAIN_ERROR_LOG (Observability)
  * - Invariant #4: Transaction Runner only aggregates already-produced events.
  */
 
 import { appendDomainEvent } from '@/features/workspace-core.event-store';
+import { createTraceContext, recordDomainError } from '@/shared/infra/observability';
 import { createOutbox, type Outbox, type OutboxEvent } from './_outbox';
+import { generateTraceId, logDomainError } from '@/shared/observability';
 
 export interface TransactionContext {
   workspaceId: string;
+  /** Trace / correlation ID — shared with the Observability Layer (TRACE_IDENTIFIER node). */
   correlationId: string;
   /** Collect domain events produced by the aggregate during this transaction. */
   outbox: Outbox;
@@ -32,20 +37,25 @@ export interface TransactionResult<T> {
 /**
  * Executes a domain command handler inside a transaction context.
  *
- * 1. Creates a fresh Outbox for event collection.
- * 2. Runs the handler (which executes aggregate logic and collects events).
- * 3. Drains and appends all collected events to the workspace event store.
- * 4. Returns the handler result + collected events (for Outbox flush to event bus).
+ * 1. Creates a TraceContext via the Observability Layer (TRACE_IDENTIFIER node).
+ * 2. Creates a fresh Outbox for event collection.
+ * 3. Runs the handler (which executes aggregate logic and collects events).
+ * 4. Drains and appends all collected events to the workspace event store.
+ * 5. Returns the handler result + collected events (for Outbox flush to event bus).
+ *
+ * Errors are recorded via the Observability Layer (DOMAIN_ERROR_LOG node) before
+ * being re-thrown so callers are not required to handle observability themselves.
  */
 export async function runTransaction<T>(
   workspaceId: string,
   userId: string,
-  handler: (ctx: TransactionContext) => Promise<T>
+  handler: (ctx: TransactionContext) => Promise<T>,
+  correlationId?: string
 ): Promise<TransactionResult<T>> {
-  const correlationId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const resolvedCorrelationId = correlationId ?? generateTraceId();
   const outbox = createOutbox();
 
-  const ctx: TransactionContext = { workspaceId, correlationId, outbox };
+  const ctx: TransactionContext = { workspaceId, correlationId: resolvedCorrelationId, outbox };
   const value = await handler(ctx);
 
   // Drain events from the outbox and append to the event store (best-effort)
@@ -55,11 +65,17 @@ export async function runTransaction<T>(
       eventType: event.type,
       payload: event.payload as unknown as Record<string, unknown>,
       aggregateId: workspaceId,
-      correlationId,
+      correlationId: resolvedCorrelationId,
       causedBy: userId,
-    }).catch((err: unknown) => {
+    }).catch((appendErr: unknown) => {
       // Event store append is best-effort — do not fail the command
-      console.error('[workspace-application] Failed to append event to store:', err);
+      logDomainError({
+        occurredAt: new Date().toISOString(),
+        traceId: resolvedCorrelationId,
+        source: 'workspace-application:transaction-runner',
+        message: 'Failed to append event to store',
+        detail: err instanceof Error ? err.stack : String(err),
+      });
     });
   }
 

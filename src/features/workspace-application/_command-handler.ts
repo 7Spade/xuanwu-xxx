@@ -8,6 +8,7 @@
  * Per logic-overview.v3.md:
  * - SERVER_ACTION →|發送 Command| WORKSPACE_COMMAND_HANDLER
  * - WORKSPACE_COMMAND_HANDLER → WORKSPACE_SCOPE_GUARD
+ * - WORKSPACE_COMMAND_HANDLER --> TRACE_IDENTIFIER (Observability)
  * - WORKSPACE_SCOPE_GUARD → WORKSPACE_POLICY_ENGINE
  * - WORKSPACE_POLICY_ENGINE → WORKSPACE_TRANSACTION_RUNNER
  * - WORKSPACE_OUTBOX → WORKSPACE_EVENT_BUS
@@ -30,6 +31,7 @@
 import { checkWorkspaceAccess } from './_scope-guard';
 import { evaluatePolicy, type WorkspaceRole } from './_policy-engine';
 import { runTransaction, type TransactionContext } from './_transaction-runner';
+import { createTraceContext, logDomainError } from '@/shared/observability';
 
 export interface WorkspaceCommand {
   workspaceId: string;
@@ -56,6 +58,9 @@ export async function executeCommand<T>(
   handler: (ctx: TransactionContext) => Promise<T>,
   publish?: (type: string, payload: unknown) => void
 ): Promise<CommandResult<T>> {
+  // TRACE_IDENTIFIER — create trace context for this command chain
+  const trace = createTraceContext(`executeCommand:${command.action}`);
+
   try {
     // 1. Scope Guard — verify workspace access
     const scopeResult = await checkWorkspaceAccess(command.workspaceId, command.userId);
@@ -73,7 +78,8 @@ export async function executeCommand<T>(
     const { value, events } = await runTransaction(
       command.workspaceId,
       command.userId,
-      handler
+      handler,
+      trace.traceId
     );
 
     // 4. Outbox flush — deliver collected events to the event bus
@@ -86,6 +92,13 @@ export async function executeCommand<T>(
     return { success: true, value };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Command execution failed';
+    logDomainError({
+      occurredAt: new Date().toISOString(),
+      traceId: trace.traceId,
+      source: 'workspace-application:command-handler',
+      message,
+      detail: error instanceof Error ? error.stack : undefined,
+    });
     return { success: false, error: message };
   }
 }

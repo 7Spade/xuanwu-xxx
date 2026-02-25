@@ -6,22 +6,11 @@ import { useApp } from './use-app';
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { ToastAction } from "@/shared/shadcn-ui/toast";
 import type { WorkspaceTask } from "@/shared/types";
+import type { DocumentParserItemsExtractedPayload } from '@/features/workspace-core.event-bus';
 import { createIssue } from "@/features/workspace-business.issues";
 import { batchImportTasks } from "@/features/workspace-business.tasks";
 import { markParsingIntentImported } from "@/features/workspace-business.document-parser";
 import { Timestamp } from "firebase/firestore";
-
-type DocParserPayload = {
-  sourceDocument: string;
-  intentId: string;
-  items: Array<{
-    name: string;
-    quantity: number;
-    unitPrice: number;
-    discount?: number;
-    subtotal: number;
-  }>;
-};
 
 /**
  * useWorkspaceEventHandler — side-effect hook (no render output).
@@ -102,7 +91,7 @@ export function useWorkspaceEventHandler() {
       }
     );
 
-    const handleImport = (payload: DocParserPayload) => {
+    const handleImport = (payload: DocumentParserItemsExtractedPayload) => {
       const importItems = () => {
         toast({
           title: "Importing items...",
