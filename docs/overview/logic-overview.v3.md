@@ -15,7 +15,7 @@ flowchart TD
 %% Module: 功能切片／技術封裝，不等於原子邊界
 %% Projection/View: 由事件衍生的讀模型，預設最終一致，不回推 Domain 寫入
 %% Application Coordinator: 指令協調與流程編排（Scope Guard / Policy Engine / Transaction Runner / Event Funnel）
-%% Talent Repository: 人力資源池標籤（非 Aggregate）= Member + Partner + Team → ORG_ELIGIBLE_MEMBER_VIEW（#16）
+%% Talent Repository: CENTRALIZED_TAG_AGGREGATE 內的全域人力資源池契約（Vertical Slice 共享語義）= Member + Partner + Team → ORG_ELIGIBLE_MEMBER_VIEW（#16）
 %% =================================================
 
 %% =================================================
@@ -35,7 +35,7 @@ flowchart TD
 %% 13) XP 任何異動必須產生 Ledger 記錄（account-skill-xp-ledger）；不可直接 update xp 欄位
 %% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
 %% 15) schedule:assigned → EVENT_FUNNEL → ORG_ELIGIBLE_MEMBER_VIEW.eligible=false（防雙重排班，非靜態成員狀態）
-%% 16) Talent Repository = member（內部）+ partner（外部）+ team（組視圖）→ ORG_ELIGIBLE_MEMBER_VIEW；Schedule 只讀此 Projection（#14）
+%% 16) Talent Repository（由 CENTRALIZED_TAG_AGGREGATE 統一定義）= member（內部）+ partner（外部）+ team（組視圖）→ ORG_ELIGIBLE_MEMBER_VIEW；Schedule 只讀此 Projection（#14）
 %% 17) centralized-tag.aggregate（Shared Kernel）統一管理 tagSlug 唯一性與刪除規則（A6）；Member/Partner 唯讀引用；Team 為組視圖
 %% 18) workspace-governance = 策略執行層：members → ORG_ELIGIBLE_MEMBER_VIEW；audit → EVENT_FUNNEL 自動投影；role 繼承 policy 硬約束
 %% =================================================
@@ -150,9 +150,7 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
         ORGANIZATION_TEAM["account-organization.team（團隊管理 · 內部組視圖）"]
         ORGANIZATION_PARTNER["account-organization.partner（合作夥伴 · 外部人員）"]
         ORGANIZATION_POLICY["account-organization.policy（政策管理）"]
-        SKILL_TAG_POOL[("職能標籤庫（Skills / Certs · account-organization.skill-tag）")]
         ORG_SKILL_RECOGNITION["organization-skill-recognition.aggregate（organizationId / accountId / skillId / minXpRequired / status）"]
-        TALENT_REPOSITORY[["人力資源池（Talent Repository · Member = 內部 + Partner = 外部 · 排班人員來源）"]]
     end
 
     ORGANIZATION_SCHEDULE["account-organization.schedule（人力排程管理 · HR Scheduling）"]
@@ -255,13 +253,17 @@ end
 ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 
 
-%% 職能標籤庫（#17）：由 Shared Kernel 的 CENTRALIZED_TAG_AGGREGATE 管理唯一性；Member/Partner 唯讀引用；Team = 組視圖
+%% 職能標籤庫與人才資源池（#17/#16）：由 Shared Kernel 的 CENTRALIZED_TAG_AGGREGATE 管理；Member/Partner 唯讀引用；Team = 組視圖
 CENTRALIZED_TAG_AGGREGATE --> SKILL_TAG_POOL
+CENTRALIZED_TAG_AGGREGATE --> TALENT_REPOSITORY
 CENTRALIZED_TAG_AGGREGATE -.->|#A6: tag-lifecycle authority| ORG_SKILL_RECOGNITION
 CENTRALIZED_TAG_AGGREGATE -->|TagCreated / TagUpdated / TagDeleted| ORGANIZATION_EVENT_BUS
 ORGANIZATION_MEMBER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
 ORGANIZATION_PARTNER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
 ORGANIZATION_TEAM -.->|組視圖引用（derived）| SKILL_TAG_POOL
+ORGANIZATION_MEMBER -.->|內部人員來源| TALENT_REPOSITORY
+ORGANIZATION_PARTNER -.->|外部人員來源| TALENT_REPOSITORY
+ORGANIZATION_TEAM -.->|組視圖來源| TALENT_REPOSITORY
 
 
 %% TALENT_REPOSITORY: MemberJoined/Left → ORGANIZATION_EVENT_BUS → EVENT_FUNNEL_INPUT → ORG_ELIGIBLE_MEMBER_VIEW（#16）
@@ -386,6 +388,8 @@ subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
     SK_SKILL_TIER["shared-kernel.skill-tier（skills/skill-tier.ts · 七階位能力等級 · getTier 純函式 · Invariant #12）"]
     SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（workforce/skill-requirement.ts · 跨 BC 人力需求契約）"]
     CENTRALIZED_TAG_AGGREGATE["centralized-tag.aggregate（全域語義字典 · tagSlug 唯一性／刪除規則）"]
+    SKILL_TAG_POOL[("職能標籤庫（Skills / Certs / Roles / Status · Global Tag Dictionary）")]
+    TALENT_REPOSITORY[["人力資源池（Talent Repository · Member + Partner + Team · 排班來源契約）"]]
 end
 
 WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
