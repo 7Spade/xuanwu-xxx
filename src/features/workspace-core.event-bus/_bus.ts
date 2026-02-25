@@ -7,7 +7,8 @@ import type {
   SubscribeFn,
   WorkspaceEventPayloadMap,
 } from "./_events"
-import type { ImplementsEventEnvelopeContract } from "@/shared/kernel/event-envelope"
+import type { ImplementsEventEnvelopeContract } from "@/shared-kernel/event-envelope"
+import { recordEventPublished } from "@/shared/observability"
 
 // A map where keys are event names (strings) and values are arrays of handler functions (Observers).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +34,8 @@ export class WorkspaceEventBus implements ImplementsEventEnvelopeContract {
     type: T,
     payload: WorkspaceEventPayloadMap[T]
   ) => {
+    // DOMAIN_METRICS — record every published event
+    recordEventPublished(type)
     const eventHandlers = this.handlers.get(type)
     if (eventHandlers) {
       const handlersCopy = [...eventHandlers]

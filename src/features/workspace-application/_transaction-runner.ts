@@ -15,6 +15,7 @@
 
 import { appendDomainEvent } from '@/features/workspace-core.event-store';
 import { createOutbox, type Outbox, type OutboxEvent } from './_outbox';
+import { generateTraceId, logDomainError } from '@/shared/observability';
 
 export interface TransactionContext {
   workspaceId: string;
@@ -40,12 +41,13 @@ export interface TransactionResult<T> {
 export async function runTransaction<T>(
   workspaceId: string,
   userId: string,
-  handler: (ctx: TransactionContext) => Promise<T>
+  handler: (ctx: TransactionContext) => Promise<T>,
+  correlationId?: string
 ): Promise<TransactionResult<T>> {
-  const correlationId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const resolvedCorrelationId = correlationId ?? generateTraceId();
   const outbox = createOutbox();
 
-  const ctx: TransactionContext = { workspaceId, correlationId, outbox };
+  const ctx: TransactionContext = { workspaceId, correlationId: resolvedCorrelationId, outbox };
   const value = await handler(ctx);
 
   // Drain events from the outbox and append to the event store (best-effort)
@@ -55,11 +57,17 @@ export async function runTransaction<T>(
       eventType: event.type,
       payload: event.payload as unknown as Record<string, unknown>,
       aggregateId: workspaceId,
-      correlationId,
+      correlationId: resolvedCorrelationId,
       causedBy: userId,
     }).catch((err: unknown) => {
       // Event store append is best-effort — do not fail the command
-      console.error('[workspace-application] Failed to append event to store:', err);
+      logDomainError({
+        occurredAt: new Date().toISOString(),
+        traceId: resolvedCorrelationId,
+        source: 'workspace-application:transaction-runner',
+        message: 'Failed to append event to store',
+        detail: err instanceof Error ? err.stack : String(err),
+      });
     });
   }
 

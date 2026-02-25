@@ -24,7 +24,7 @@ import { cn } from "@/shared/lib";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import { type Location, type SkillRequirement, type SkillTier } from "@/shared/types";
 import { SKILLS } from "@/shared/constants/skills";
-import { TIER_DEFINITIONS } from "@/shared/lib";
+import { TIER_DEFINITIONS } from "@/shared-kernel/skill-tier";
 
 const MAX_SKILL_REQUIREMENT_QUANTITY = 99;
 

@@ -47,6 +47,18 @@ import {
 export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
   const unsubscribers: Array<() => void> = [];
 
+  // workspace:tasks:assigned → PROJECTION_VERSION (stream offset, A-track → registry consistency)
+  // Per logic-overview.v3.md: EVENT_FUNNEL_INPUT →|更新事件串流偏移量| PROJECTION_VERSION
+  unsubscribers.push(
+    bus.subscribe('workspace:tasks:assigned', async (payload) => {
+      await upsertProjectionVersion(
+        `workspace-tasks-assigned-${payload.workspaceId}`,
+        Date.now(),
+        new Date().toISOString()
+      );
+    })
+  );
+
   // workspace:tasks:blocked → ACCOUNT_PROJECTION_AUDIT
   unsubscribers.push(
     bus.subscribe('workspace:tasks:blocked', async (payload) => {
