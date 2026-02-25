@@ -6,9 +6,10 @@ HR schedule management — FCM Layer 1. Manages human resource scheduling at the
 
 ## Responsibilities
 
-- Receive `ScheduleProposed` cross-layer saga events from `WORKSPACE_OUTBOX` and persist them as `proposed` org schedule proposals
+- Receive `ScheduleProposed` cross-layer saga events from `WORKSPACE_OUTBOX` and persist them as `proposed` org schedule proposals (including skill requirements for HR validation)
 - Validate member skill eligibility via `projection.org-eligible-member-view` (Invariant #14 — never reads Account aggregate directly)
 - Confirm or cancel proposals; publish `organization:schedule:assigned` or `organization:schedule:assignRejected` compensating events (Invariant A5)
+- Allow HR governance to manually cancel proposals without assignment (`cancelOrgScheduleProposal`)
 - Provide read queries and React hooks for the org governance UI to review pending proposals
 
 ## FCM Three-Layer Architecture
@@ -23,19 +24,27 @@ HR schedule management — FCM Layer 1. Manages human resource scheduling at the
 
 | File / Dir | Purpose |
 |-----------|---------|
-| `_schedule.ts` | Domain service: `handleScheduleProposed`, `approveOrgScheduleProposal`; aggregate state machine (`draft → proposed → confirmed | cancelled`) |
+| `_schedule.ts` | Domain service: `handleScheduleProposed`, `approveOrgScheduleProposal`, `cancelOrgScheduleProposal`; aggregate state machine (`draft → proposed → confirmed | cancelled`) |
 | `_queries.ts` | `getOrgScheduleProposal`, `subscribeToOrgScheduleProposals`, `subscribeToPendingProposals` |
 | `_hooks/use-org-schedule.ts` | `useOrgSchedule`, `usePendingScheduleProposals` React hooks |
+| `_components/org-schedule-governance.tsx` | `OrgScheduleGovernance` — HR panel: shows pending proposals with member selection, approve/cancel actions |
 | `index.ts` | Public API |
 
 ## Public API (`index.ts`)
 
 ```ts
-export { handleScheduleProposed, approveOrgScheduleProposal, orgScheduleProposalSchema, ORG_SCHEDULE_STATUSES } from './_schedule';
+export { handleScheduleProposed, approveOrgScheduleProposal, cancelOrgScheduleProposal, orgScheduleProposalSchema, ORG_SCHEDULE_STATUSES } from './_schedule';
 export type { OrgScheduleProposal, OrgScheduleStatus, ScheduleApprovalResult } from './_schedule';
 export { getOrgScheduleProposal, subscribeToOrgScheduleProposals, subscribeToPendingProposals } from './_queries';
 export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-schedule';
+export { OrgScheduleGovernance } from './_components/org-schedule-governance';
 ```
+
+## App Routes
+
+| Route | Usage |
+|-------|-------|
+| `app/dashboard/account/org-schedule/page.tsx` | HR governance panel (org-only) |
 
 ## Dependencies
 
@@ -45,6 +54,8 @@ export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-sc
 - `@/shared/infra/firestore/` — `setDocument`, `updateDocument`
 - `@/shared/lib` — `resolveSkillTier`, `tierSatisfies`
 - `@/shared/types` — `SkillRequirement`
+- `@/shared/app-providers/app-context` — `useApp` (org member list for member selection)
+- `@/shared/utility-hooks/use-toast` — toast notifications
 
 ## Architecture Note
 
@@ -54,3 +65,4 @@ export { useOrgSchedule, usePendingScheduleProposals } from './_hooks/use-org-sc
 - Invariant #14: reads `projection.org-eligible-member-view` only — never Account aggregate
 - Invariant #12: tier derived via `resolveSkillTier(xp)` at runtime — never stored in DB
 - Invariant A5: `ScheduleAssignRejected` is the compensating event for failed assignments
+- `cancelOrgScheduleProposal`: HR explicit withdrawal — no assignment attempted, no compensating event
