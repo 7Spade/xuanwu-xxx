@@ -6,7 +6,7 @@
  *                       (see shared/constants/skills.ts — no Firestore, no org dependency)
  *   - SkillGrant      = assignment of a skill + tier to an individual user (the "who has it")
  *                       Stored permanently on accounts/{userId} — survives org deletion.
- *   - SkillRequirement = cross-BC staffing contract — see @/shared-kernel/skill-requirement
+ *   - SkillRequirement = cross-BC staffing contract — see @/shared-kernel/workforce/skill-requirement
  *
  * Key decisions:
  *   - The skill library is static code, not a Firestore collection.
@@ -21,9 +21,9 @@ import type { Timestamp } from 'firebase/firestore'
 // SkillTier and SkillRequirement are cross-BC contracts — defined in shared-kernel.
 // Imported locally so they are available within this file, and re-exported so
 // existing @/shared/types imports continue to work.
-import type { SkillTier } from '@/shared-kernel/skill-tier';
-export type { SkillTier, TierDefinition } from '@/shared-kernel/skill-tier';
-export type { SkillRequirement } from '@/shared-kernel/skill-requirement';
+import type { SkillTier } from '@/shared-kernel/skills/skill-tier';
+export type { SkillTier, TierDefinition } from '@/shared-kernel/skills/skill-tier';
+export type { SkillRequirement } from '@/shared-kernel/workforce/skill-requirement';
 
 // ---------------------------------------------------------------------------
 // Global skill-tag library (static reference type)
@@ -77,12 +77,12 @@ export interface SkillGrant {
   tagId?: string;
   /**
    * Proficiency tier — set manually by an admin or derived from `xp` via
-   * resolveSkillTier() in @/shared-kernel/skill-tier.
+   * resolveSkillTier() in @/shared-kernel/skills/skill-tier.
    */
   tier: SkillTier;
   /**
    * Accumulated XP (0–525).
-   * Drives tier progression; use resolveSkillTier(xp) from @/shared-kernel/skill-tier.
+   * Drives tier progression; use resolveSkillTier(xp) from @/shared-kernel/skills/skill-tier.
    */
   xp: number;
   /** The organisation in which this XP was earned (audit trail). */

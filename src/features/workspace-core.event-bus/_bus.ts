@@ -10,7 +10,7 @@ import type {
   SubscribeFn,
   WorkspaceEventPayloadMap,
 } from "./_events"
-import type { ImplementsEventEnvelopeContract } from "@/shared-kernel/event-envelope"
+import type { ImplementsEventEnvelopeContract } from "@/shared-kernel/events/event-envelope"
 import { recordEventPublished } from "@/shared/observability"
 
 // A map where keys are event names (strings) and values are arrays of handler functions (Observers).

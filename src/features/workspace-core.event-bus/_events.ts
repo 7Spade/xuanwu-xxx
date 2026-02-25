@@ -3,10 +3,10 @@ import type { WorkspaceTask, DailyLog } from "@/shared/types"
 import type { SkillRequirement } from "@/shared/types"
 
 // WorkspaceScheduleProposedPayload is a cross-BC contract — defined in shared-kernel.
-// Imported for local use (WorkspaceEventPayloadMap) and re-exported for backward compatibility
-// with existing consumers that import from workspace-core.event-bus.
-import type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/schedule-proposed-payload';
-export type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/schedule-proposed-payload';
+// Imported for local use (WorkspaceEventPayloadMap) and re-exported for consumers
+// that import from workspace-core.event-bus.
+import type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/workforce/schedule-proposed-payload';
+export type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/workforce/schedule-proposed-payload';
 
 // =================================================================
 // == Payload Interfaces

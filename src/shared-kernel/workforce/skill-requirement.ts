@@ -16,7 +16,7 @@
  * No Firebase deps — pure domain contract.
  */
 
-import type { SkillTier } from './skill-tier';
+import type { SkillTier } from '../skills/skill-tier';
 
 /**
  * Expresses a staffing need inside a ScheduleItem proposal.

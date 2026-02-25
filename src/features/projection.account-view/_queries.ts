@@ -6,7 +6,7 @@
 
 import { getDocument } from '@/shared/infra/firestore/firestore.read.adapter';
 import type { AccountViewRecord } from './_projector';
-import type { AuthoritySnapshot } from '@/shared-kernel/authority-snapshot';
+import type { AuthoritySnapshot } from '@/shared-kernel/identity/authority-snapshot';
 
 export async function getAccountView(accountId: string): Promise<AccountViewRecord | null> {
   return getDocument<AccountViewRecord>(`accountView/${accountId}`);
