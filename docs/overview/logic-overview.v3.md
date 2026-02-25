@@ -15,6 +15,8 @@ flowchart TD
 %% Module: 功能切片／技術封裝，不等於原子邊界
 %% Projection/View: 由事件衍生的讀模型，預設最終一致，不回推 Domain 寫入
 %% Application Coordinator: 指令協調與流程編排（Scope Guard / Policy Engine / Transaction Runner / Event Funnel）
+%% Talent Repository: 人力資源池概念標籤（非新 Aggregate）= Member（內部）+ Partner（外部）+ Team（組視圖）；
+%%                    具體化為 ORG_ELIGIBLE_MEMBER_VIEW Projection 提供 Schedule 消費（Invariant #16）
 %% =================================================
 
 %% =================================================
@@ -35,6 +37,15 @@ flowchart TD
 %% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
 %% 15) organization:schedule:assigned 事件必須由 EVENT_FUNNEL（registerOrganizationFunnel）
 %%     更新 ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標；旗標代表「目前無衝突排程」而非靜態成員狀態
+%% 16) 人力資源池（Talent Repository / Workforce Pool）：
+%%     account-organization.member（內部成員）＋ account-organization.partner（外部合作方）
+%%     ＋ account-organization.team（組視圖 · 非獨立人員來源，聚合組內成員標籤）
+%%     三者統一構成 ORG_ELIGIBLE_MEMBER_VIEW 的人員來源基底；
+%%     Schedule 模組只消費 ORG_ELIGIBLE_MEMBER_VIEW Projection，不直接查詢 Domain Aggregate（Invariant #14）
+%% 17) 職能標籤庫（Skill Tag Pool）為組織範圍的扁平化能力資源池（account-organization.skill-tag）；
+%%     Member（內部）與 Partner（外部）均可持有標籤（唯讀引用）；
+%%     Team 為內部帳號標籤的組視圖（唯讀聚合，非獨立標籤來源）；
+%%     標籤唯一性與刪除規則由 skill-tag-pool.aggregate 統一管理（Invariant A6）
 %% =================================================
 
 %% =================================================
@@ -50,10 +61,11 @@ flowchart TD
 %% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
 %% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
 %% A10) Notification Router 僅做無狀態路由；跨 BC 業務決策需留在來源 BC 或 projection 層
-%% A11) ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標目前僅由 member:joined 設為 true，
-%%      schedule:assigned 後未自動更新為 false（雙重排程漏洞）；
-%%      需在 registerOrganizationFunnel 補充 applyScheduleAssigned → updateOrgMemberEligibility(false)；
-%%      排程結束後需恢復 eligible=true（需 schedule:completed / schedule:cancelled 事件配合）
+%% A11) ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標生命週期（Invariant #15 部分已實作）：
+%%      member:joined              → eligible = true（成員加入組織投影 · registerOrganizationFunnel · 已實作）
+%%      schedule:assigned          → eligible = false（已排班防止雙重排班 · registerOrganizationFunnel · 已實作）
+%%      schedule:completed / cancelled → eligible = true（排班結束後解鎖 · 待補充 EVENT_FUNNEL 事件處理）
+%%      旗標代表「目前無衝突排班」，非靜態成員狀態；ORG_ELIGIBLE_MEMBER_VIEW 為人力資源池排班可用性快照
 %% =================================================
 
 %% =================================================
@@ -149,15 +161,16 @@ subgraph ORGANIZATION_LAYER[Organization Layer（組織層）]
     end
 
     subgraph ORGANIZATION_GOVERNANCE[organization-governance（組織治理）]
-        ORGANIZATION_MEMBER[organization-governance.member（組織成員）]
-        ORGANIZATION_TEAM["organization-governance.team（團隊管理 · 內部組視圖）"]
-        ORGANIZATION_PARTNER["organization-governance.partner（合作夥伴 · 外部組視圖）"]
-        ORGANIZATION_POLICY[organization-governance.policy（政策管理）]
-        SKILL_TAG_POOL[(職能標籤庫（Skills / Certs）)]
+        ORGANIZATION_MEMBER["account-organization.member（組織成員 · 內部人員）"]
+        ORGANIZATION_TEAM["account-organization.team（團隊管理 · 內部組視圖）"]
+        ORGANIZATION_PARTNER["account-organization.partner（合作夥伴 · 外部人員）"]
+        ORGANIZATION_POLICY["account-organization.policy（政策管理）"]
+        SKILL_TAG_POOL[("職能標籤庫（Skills / Certs · account-organization.skill-tag）")]
         ORG_SKILL_RECOGNITION["organization-skill-recognition.aggregate（organizationId / accountId / skillId / minXpRequired / status）"]
+        TALENT_REPOSITORY[["人力資源池（Talent Repository · Member = 內部 + Partner = 外部 · 排班人員來源）"]]
     end
 
-    ORGANIZATION_SCHEDULE["organization.schedule（人力排程管理）"]
+    ORGANIZATION_SCHEDULE["account-organization.schedule（人力排程管理 · HR Scheduling）"]
 
 end
 
@@ -287,14 +300,26 @@ ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 
 
 %% =================================================
-%% 職能標籤庫 — 扁平化資源池（Team/Partner 為組視圖）
-%% 所有帳號（內部/外部）統一擁有職能標籤；Team/Partner 為同一資源池的「組視圖」
+%% 職能標籤庫 — 扁平化資源池（Invariant #17）
+%% Member / Partner 均可持有標籤（唯讀引用）；Team 為組視圖聚合；Tag 唯一性由 skill-tag-pool.aggregate 管理
 %% =================================================
-SKILL_TAG_POOL_AGGREGATE["organization.skill-tag-pool.aggregate（唯一性／刪除規則控制）"]
+SKILL_TAG_POOL_AGGREGATE["account-organization.skill-tag（skill-tag-pool.aggregate · 唯一性／刪除規則控制）"]
 SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
-ORGANIZATION_MEMBER -.->|內部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
-ORGANIZATION_PARTNER -.->|外部帳號擁有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_MEMBER -.->|內部帳號持有標籤（唯讀引用）| SKILL_TAG_POOL
+ORGANIZATION_PARTNER -.->|外部帳號持有標籤（唯讀引用）| SKILL_TAG_POOL
 ORGANIZATION_TEAM -.->|組內帳號標籤聚合視圖（唯讀）| SKILL_TAG_POOL
+
+
+%% =================================================
+%% 人力資源池（Talent Repository / Workforce Pool）— Invariant #16
+%% Member（內部）+ Partner（外部）= 人力來源；Team 為組視圖（非獨立人員來源）
+%% 事件驅動：MemberJoined/Left → EVENT_FUNNEL_INPUT → ORG_ELIGIBLE_MEMBER_VIEW
+%% TALENT_REPOSITORY 為概念標籤（非新 Aggregate），確立 Schedule 的人員來源邊界
+%% =================================================
+ORGANIZATION_MEMBER -.->|MemberJoined / MemberLeft（內部人員事件）| TALENT_REPOSITORY
+ORGANIZATION_PARTNER -.->|PartnerJoined / PartnerLeft（外部人員事件）| TALENT_REPOSITORY
+ORGANIZATION_TEAM -.->|組視圖（唯讀聚合 · 非獨立人員來源）| TALENT_REPOSITORY
+TALENT_REPOSITORY -.->|Invariant #16 · 事件驅動投影（MemberJoined/Left → ORGANIZATION_EVENT_BUS）| ORG_ELIGIBLE_MEMBER_VIEW
 
 
 %% =================================================
@@ -336,6 +361,7 @@ WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MOD
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件 · saga / 可補償）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 W_B_SCHEDULE -.->|查詢可用帳號（eligible=true · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
+ORGANIZATION_SCHEDULE -.->|Invariant #14: 排班可用性篩選（eligible · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
 
 
 %% =================================================
@@ -376,7 +402,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
 
     ACCOUNT_SKILL_VIEW["projection.account-skill-view（accountId / skillId / xp / tier · 來源: SkillXpAdded/Deducted）"]
-    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（orgId / accountId / skillId / xp / tier / eligible · 排程專用 · 來源: MemberJoined/Left · SkillXpAdded/Deducted · ScheduleAssigned/Completed/Cancelled）"]
+    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（Talent Repository 排班可用性快照 · orgId/accountId/skills{tagSlug→xp}/eligible · 來源: MemberJoined/Left · SkillXpAdded/Deducted · ScheduleAssigned/Completed/Cancelled）"]
     SKILL_TIER_FUNCTION[["getTier(xp) → Tier（純函式 · Apprentice/Journeyman/Expert/Artisan/Grandmaster/Legendary/Titan · 不存 DB）"]]
 
 end
@@ -411,11 +437,16 @@ WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_
 %% SHARED KERNEL（共享核心，需顯式標示）
 %% =================================================
 %% Shared Kernel 區塊的虛線表示「契約遵循（implements contract）」而非跨 BC 讀寫依賴
+%% 契約文件路徑索引（src/shared-kernel/）：
+%% SK_EVENT_ENVELOPE      → events/event-envelope.ts       · WORKSPACE_EVENT_BUS & ORGANIZATION_EVENT_BUS 共同遵循，確保 Event Funnel 路由的事件具備統一元數據格式
+%% SK_AUTHORITY_SNAPSHOT  → identity/authority-snapshot.ts · WORKSPACE_SCOPE_READ_MODEL & ACCOUNT_PROJECTION_VIEW 快照契約，標準化權限結構確保 Scope Guard 校驗一致性
+%% SK_SKILL_TIER          → skills/skill-tier.ts           · Invariant #12 getTier(xp) 純函式；七階位等級定義，供 ACCOUNT_SKILL_VIEW & ORG_ELIGIBLE_MEMBER_VIEW 計算等級（等級不入庫）
+%% SK_SKILL_REQUIREMENT   → workforce/skill-requirement.ts · Schedule 宣告人力需求 ↔ 排程引擎篩選合格成員之標準跨 BC 協議
 subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
-    SK_EVENT_ENVELOPE["shared-kernel.event-envelope（事件信封契約）"]
-    SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（權限快照契約）"]
-    SK_SKILL_TIER["shared-kernel.skill-tier（七階位能力等級 · getTier 純函式 · Invariant #12）"]
-    SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（跨 BC 人力需求契約）"]
+    SK_EVENT_ENVELOPE["shared-kernel.event-envelope（events/event-envelope.ts · 統一事件信封契約）"]
+    SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（identity/authority-snapshot.ts · 權限快照契約）"]
+    SK_SKILL_TIER["shared-kernel.skill-tier（skills/skill-tier.ts · 七階位能力等級 · getTier 純函式 · Invariant #12）"]
+    SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（workforce/skill-requirement.ts · 跨 BC 人力需求契約）"]
 end
 
 WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
@@ -500,6 +531,7 @@ classDef eventFunnel fill:#f5f3ff,stroke:#a78bfa,color:#000;
 classDef fcmGateway fill:#fce7f3,stroke:#f9a8d4,color:#000;
 classDef userDevice fill:#e0f2fe,stroke:#38bdf8,color:#000;
 classDef sharedKernel fill:#ecfeff,stroke:#22d3ee,color:#000;
+classDef talentRepository fill:#fff1f2,stroke:#fda4af,color:#000;
 
 class IDENTITY_LAYER identity;
 class ACCOUNT_AUTH identity;
@@ -535,3 +567,4 @@ class USER_WALLET_AGGREGATE accountSkill;
 class SKILL_TAG_POOL_AGGREGATE organization;
 class WORKFLOW_AGGREGATE workspace;
 class WORKSPACE_AUDIT practicalDeviation;
+class TALENT_REPOSITORY talentRepository;
