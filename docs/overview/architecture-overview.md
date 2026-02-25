@@ -38,6 +38,40 @@
 
 ---
 
+## PR #69 分析（僅分析，不改圖）
+
+### 1) `logic-overview.v3.md` 是否需要新增「人力資源池」？
+
+結論：**不建議在 Workspace Container 內再新增一個「人力資源池 Aggregate」**。
+
+理由（對應現有邏輯圖不變量）：
+
+1. `organization` 邊界已經有扁平化資源池語義：`ORGANIZATION_MEMBER / TEAM / PARTNER + SKILL_TAG_POOL`，且 `ORG_ELIGIBLE_MEMBER_VIEW` 已作為排程查詢入口。
+2. `W_B_SCHEDULE` 在圖中已被約束為只讀 projection（`ACCOUNT_PROJECTION_SCHEDULE` + `ORG_ELIGIBLE_MEMBER_VIEW`），符合不變量 #14。
+3. 若在 Workspace Container 再放一個可寫的人力池，會形成跨 BC 雙寫與真相來源分裂，違反不變量 #1/#2（單一 BC 寫入、跨 BC 走 Event/Projection）。
+
+可接受的最小補強（若要強化語義）：
+
+- 保持「人力資源池」為**讀模型/檢視語彙**，不要升級成新的可寫 Aggregate。
+- 在圖例或註解明確標註：`ORG_ELIGIBLE_MEMBER_VIEW` 即「排程可用人力池（唯讀）」。
+
+### 2) Workspace Container 為了自恰，建議補齊的功能切片（優先序）
+
+> 本段為「切片完備性建議」，不是要求本 PR 立即實作。
+
+| 優先序 | 建議切片 | 目的 | 目前狀態 |
+|---|---|---|---|
+| P0 | `workspace-business.workflow`（或 `workspace-business.workflow.aggregate`） | 落地 A3 決策：A 軌（tasks/qa/acceptance/finance）共用單一狀態機不變量 | 目前僅有邏輯圖節點，尚未成切片 |
+| P1 | `workspace-business.parsing-intent`（可命名為 contract/intents） | 讓 `PARSING_INTENT` 的版本、差異提議、SourcePointer 規則有獨立邊界，不與 parser I/O 混寫 | 目前語義存在於圖與流程，未成獨立切片 |
+| P2 | `workspace-governance.audit` 遷移收斂（非新增切片） | 將暫置 UI 稽核逐步收斂到 `workspace-core.event-store + projection.account-audit`，消除治理層偏差節點 | 目前為實務暫置，文件已標記偏差 |
+
+最小可執行原則（Occam）：
+
+- **先補 `workflow.aggregate` 一個切片即可**，其餘維持現狀。
+- 不新增可寫人力池 Aggregate；持續使用 `ORG_ELIGIBLE_MEMBER_VIEW` 作為排程人力來源。
+
+---
+
 ## 二、核心設計原則
 
 ### Occam's Razor
