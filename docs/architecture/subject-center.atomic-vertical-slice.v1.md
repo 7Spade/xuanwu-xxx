@@ -139,7 +139,7 @@ flowchart TD
   event_funnel --> projection_account_skill_view
   event_funnel --> projection_org_eligible_member_view
   event_funnel --> projection_registry
-  workspace_event_store -.replay.-> event_funnel
+  workspace_event_store -.->|replay| event_funnel
 ```
 
 ## 3) 功能完整性清單（所有功能必須存在）
