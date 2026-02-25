@@ -104,3 +104,24 @@ export async function applyOrgMemberSkillXp(
     } satisfies OrgEligibleMemberEntry);
   }
 }
+
+/**
+ * Updates the eligible flag for a member.
+ *
+ * Called when:
+ *   organization:schedule:assigned → eligible = false (member is now busy)
+ *   organization:schedule:completed / organization:schedule:cancelled → eligible = true (member is free)
+ *
+ * Per Invariant #15: eligible must reflect "no active conflicting assignments".
+ */
+export async function updateOrgMemberEligibility(
+  orgId: string,
+  accountId: string,
+  eligible: boolean
+): Promise<void> {
+  await updateDocument(memberPath(orgId, accountId), {
+    eligible,
+    readModelVersion: Date.now(),
+    updatedAt: serverTimestamp(),
+  });
+}

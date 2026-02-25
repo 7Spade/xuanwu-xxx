@@ -17,6 +17,7 @@
 export interface ScheduleAssignedPayload {
   scheduleItemId: string;
   workspaceId: string;
+  orgId: string;
   targetAccountId: string;
   assignedBy: string;
   startDate: string;
