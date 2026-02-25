@@ -118,7 +118,33 @@ await updateScheduleItemStatus(item.accountId, item.id, 'OFFICIAL'); // always w
 
 ---
 
-### UC-6: B-Track Issue Resolved — Schedule Recovery
+### UC-6: Task Completed — Automatic Schedule Proposal
+
+**Owner:** `workspace-business.schedule` (triggered via `workspace-core` event handler)
+
+1. A task reaches `completed` state and `workspace:tasks:completed` is published to the workspace event bus.
+2. `use-workspace-event-handler.tsx` (mounted in `WorkspaceProvider`) subscribes to this event.
+3. `createScheduleItem` is called with `originType: 'TASK_AUTOMATION'` and `originTaskId: payload.task.id`.
+4. The item is written with `status: PROPOSAL` — it enters the same governance flow as a manual proposal (UC-1).
+5. `workspace:schedule:proposed` is published; Event Funnel delivers it to `account-organization.schedule` for HR review.
+
+The automation path produces the same `ScheduleItem` shape and the same downstream saga as the manual path. UC-1 and UC-6 converge at step 4 of UC-1.
+
+---
+
+### UC-7: Task Assigned — Automatic Assignment Proposal
+
+**Owner:** `workspace-business.schedule` (triggered via `workspace-core` event handler)
+
+1. A task is assigned to a member and `workspace:tasks:assigned` is published.
+2. `use-workspace-event-handler.tsx` subscribes and calls `createScheduleItem` with `assigneeIds: [payload.assigneeId]`, `originType: 'TASK_AUTOMATION'`, and `originTaskId: payload.taskId`.
+3. The same cross-layer saga as UC-1 follows.
+
+This implements `TRACK_A_TASKS -.→|任務分配／時間變動觸發| W_B_SCHEDULE` from `logic-overview.v3.md`.
+
+---
+
+### UC-8: B-Track Issue Resolved — Schedule Recovery
 
 **Owner:** `workspace-business.schedule`
 
@@ -130,7 +156,7 @@ This is the **discrete recovery principle**: B-track resolves independently; it 
 
 ---
 
-### UC-7: Account Schedule Projection Updated
+### UC-9: Account Schedule Projection Updated
 
 **Owner:** `projection.account-schedule` (written by Event Funnel, never by schedule slices)
 
@@ -188,6 +214,12 @@ All events use the `shared-kernel.event-envelope` contract.
 |-----------|-------------|
 | `workspace:issues:resolved` | `useScheduleEventHandler` in `workspace-business.schedule` |
 | `workspace:tasks:scheduleRequested` | `useWorkspaceSchedule` (hint via `scheduleTaskRequest` AppState) |
+| `workspace:tasks:completed` | `use-workspace-event-handler.tsx` — auto-creates TASK_AUTOMATION proposal (UC-6) |
+| `workspace:tasks:assigned` | `use-workspace-event-handler.tsx` — auto-creates assignment proposal (UC-7) |
+
+### `intentId` SourcePointer Contract
+
+When a `ParsingIntent` triggers task creation, the `intentId` is stored as `sourceIntentId` on each imported task. If that task later triggers a schedule proposal (via UC-6 or UC-7), the `workspace:schedule:proposed` payload carries `intentId` forward into `OrgScheduleProposal.intentId`. This creates an unbroken audit trail from document parse → task → schedule → org approval, without any direct write from `workspace-business.document-parser` into the schedule domain.
 
 ---
 
@@ -287,6 +319,14 @@ The schedule domain uses both parallel routes and intercepting routes per `logic
 
 Route composition rule: layouts compose slots and shared chrome only — no business logic in layout files.
 
+### Suspense and Error Boundaries
+
+Each `@businesstab` schedule route has its own `loading.tsx` (Skeleton) and inherits the shared `@businesstab/error.tsx`. When adding a new schedule parallel route tab:
+
+- Add `loading.tsx` alongside `page.tsx` with a skeleton matching the expected layout.
+- Do not add a separate `error.tsx` unless the route has recovery behavior distinct from the shared `@businesstab/error.tsx`.
+- For modal and panel intercepting routes (`@modal`, `@panel`), no `loading.tsx` is needed — the Sheet/Dialog provides its own loading state via component-level guards.
+
 ---
 
 ## Architecture Invariants for Schedule
@@ -339,7 +379,7 @@ Before writing any code, confirm the feature belongs to one of the schedule slic
    - Projection writes → `projection.account-schedule/_projector.ts` (called by Event Funnel only).
 
 5. **Expose the action.**
-   - Server-side mutations → `_actions.ts` in the owning slice.
+   - Firebase client SDK mutations (Firestore direct writes) → `_actions.ts` in the owning slice. These do NOT carry `'use server'` — they run on the client. Only slices that call Next.js-managed server infrastructure (Genkit AI, wallet, role signing) use `'use server'` in their `_actions.ts`.
    - Client-side React hooks → `_hooks/` in the owning slice.
    - Export through `index.ts` only — never import a `_` private file from outside the slice.
 
@@ -364,6 +404,12 @@ Before writing any code, confirm the feature belongs to one of the schedule slic
 ## Anti-Patterns
 
 ```ts
+// Bad: add 'use server' to schedule _actions.ts (schedule uses Firebase client SDK)
+'use server';
+export async function assignMember(...) { await assignMemberToScheduleItem(...); }
+// Good: no directive — Firebase client SDK runs on the client
+export async function assignMember(...) { await assignMemberToScheduleItem(...); }
+
 // Bad: import private file across slice boundary
 import { approveOrgScheduleProposal } from '@/features/account-organization.schedule/_schedule';
 // Good: use the public API
@@ -406,9 +452,9 @@ Each slice in this domain passes the following boundary checks:
 
 | Slice | Owns its Firestore writes | Cross-BC reads via Projection only | No `_` private imports from outside | Business flow is complete end-to-end |
 |-------|--------------------------|-----------------------------------|------------------------------------|--------------------------------------|
-| `workspace-business.schedule` | Yes | Yes (`projection.account-schedule`, `projection.org-eligible-member-view`) | Yes | Yes (UC-1, UC-4, UC-5, UC-6) |
+| `workspace-business.schedule` | Yes | Yes (`projection.account-schedule`, `projection.org-eligible-member-view`) | Yes | Yes (UC-1, UC-4, UC-5, UC-6, UC-7, UC-8) |
 | `account-organization.schedule` | Yes | Yes (`projection.org-eligible-member-view`) | Yes | Yes (UC-2, UC-3) |
 | `workspace-governance.schedule` | No active code | No active code | Yes | Stub — reserved for future workspace governance rules |
-| `projection.account-schedule` | Written by Event Funnel only | Yes (read-only from schedule slices) | Yes | Yes (UC-7) |
+| `projection.account-schedule` | Written by Event Funnel only | Yes (read-only from schedule slices) | Yes | Yes (UC-9) |
 
-Each vertical slice here represents a **complete business flow**, not a technical layer split. `workspace-business.schedule` owns the full proposal → governance decision cycle. `account-organization.schedule` owns the full HR assignment → skill validation → event publish cycle. Neither slice delegates write responsibility to the other.
+Each vertical slice here represents a **complete business flow**, not a technical layer split. `workspace-business.schedule` owns the full proposal → governance decision cycle (manual UC-1 and automated UC-6/UC-7 entry points all converge into the same saga). `account-organization.schedule` owns the full HR assignment → skill validation → event publish cycle (UC-2/UC-3). Neither slice delegates write responsibility to the other.
