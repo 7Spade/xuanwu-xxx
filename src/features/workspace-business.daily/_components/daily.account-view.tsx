@@ -12,7 +12,8 @@
 "use client";
 
 import { useState } from "react";
-import { useApp , WorkspaceProvider } from "@/features/workspace-core";
+import { WorkspaceProvider } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 import { useAuth } from "@/shared/app-providers/auth-provider";
 import { AlertCircle, MessageSquare } from "lucide-react";
 import { DailyLogCard } from "./daily-log-card";

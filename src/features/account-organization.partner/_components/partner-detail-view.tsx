@@ -27,26 +27,26 @@ import {
 import { Input } from "@/shared/shadcn-ui/input"
 import { Label } from "@/shared/shadcn-ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/shadcn-ui/tabs"
-import { useApp } from "@/features/workspace-core"
-import { useAccount } from "@/features/workspace-core"
-import { usePartnerManagement } from "@/features/account-organization.partner"
+import { useApp } from "@/shared/app-providers/app-context"
+import { usePartnerManagement } from "../_hooks/use-partner-management"
+import { subscribeToOrgPartnerInvites } from "../_queries"
 import { PageHeader } from "@/shared/ui/page-header"
 
 /**
  * PartnerDetailView - Manages recruitment and identity governance within a specific partner team.
- * REFACTORED: Now consumes invites from the global AppContext.
+ * Invites are subscribed directly from `accounts/{orgId}/invites` (Account BC / Subject Center)
+ * via subscribeToOrgPartnerInvites — NOT via useAccount (WorkspaceContainer).
  */
 export function PartnerDetailView() {
   const { id: teamId } = useParams()
   const router = useRouter()
 
   const { state: appState } = useApp()
-  const { state: accountState } = useAccount()
   const { accounts, activeAccount } = appState
-  const { invites } = accountState
   const { sendPartnerInvite, dismissPartnerMember } = usePartnerManagement()
-  
+
   const [mounted, setMounted] = useState(false)
+  const [invites, setInvites] = useState<PartnerInvite[]>([])
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("")
 
@@ -54,18 +54,26 @@ export function PartnerDetailView() {
     setMounted(true)
   }, [])
 
-  const activeOrganization = useMemo(() => 
+  // Subscribe to this org's invites directly (Account BC data — accounts/{orgId}/invites)
+  useEffect(() => {
+    const orgId = activeAccount?.id
+    if (!orgId) return
+    const unsub = subscribeToOrgPartnerInvites(orgId, setInvites)
+    return unsub
+  }, [activeAccount?.id])
+
+  const activeOrganization = useMemo(() =>
     activeAccount?.accountType === 'organization' ? accounts[activeAccount.id] : null,
     [accounts, activeAccount]
   )
 
-  const team = useMemo(() => 
+  const team = useMemo(() =>
     activeOrganization?.teams?.find((team: Team) => team.id === teamId && team.type === 'external'),
     [activeOrganization, teamId]
   )
-  
-  const teamInvites = useMemo(() => 
-    Object.values(invites).filter(invite => invite.teamId === teamId),
+
+  const teamInvites = useMemo(() =>
+    invites.filter(invite => invite.teamId === teamId),
     [invites, teamId]
   )
 

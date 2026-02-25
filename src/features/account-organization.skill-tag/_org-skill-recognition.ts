@@ -151,15 +151,4 @@ export async function revokeSkillRecognition(
   });
 }
 
-/**
- * Returns the current recognition record for a member's skill, or null.
- */
-export async function getSkillRecognition(
-  organizationId: string,
-  accountId: string,
-  skillId: string
-): Promise<OrgSkillRecognitionRecord | null> {
-  return getDocument<OrgSkillRecognitionRecord>(
-    `orgSkillRecognition/${organizationId}/members/${accountId}/skills/${skillId}`
-  );
-}
+

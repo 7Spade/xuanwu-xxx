@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useAccount } from "@/features/workspace-core";
-import { useApp } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 import { subDays, isFuture, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 
 /**

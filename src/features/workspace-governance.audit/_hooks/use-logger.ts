@@ -6,7 +6,7 @@ import { serverTimestamp, type FieldValue } from "firebase/firestore";
 import { addDocument } from "@/shared/infra/firestore/firestore.write.adapter";
 import { useCallback } from "react";
 import type { AuditLog, Account } from "@/shared/types";
-import { useApp } from "@/features/workspace-core";
+import { useApp } from "@/shared/app-providers/app-context";
 
 /**
  * useLogger - Zero-cognition logging interface.
