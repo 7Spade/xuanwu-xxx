@@ -110,6 +110,20 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
     })
   );
 
+  // workspace:tasks:assigned → PROJECTION_VERSION (stream offset)
+  // Per logic-overview.v3.md: EVENT_FUNNEL_INPUT →|更新事件串流偏移量| PROJECTION_VERSION
+  // Tracking assignment events ensures the projection registry reflects the A-track
+  // task-assignment → schedule trigger flow (TRACK_A_TASKS -.→ W_B_SCHEDULE).
+  unsubscribers.push(
+    bus.subscribe('workspace:tasks:assigned', async (payload) => {
+      await upsertProjectionVersion(
+        `task-assigned-${payload.taskId}`,
+        Date.now(),
+        new Date().toISOString()
+      );
+    })
+  );
+
   return () => unsubscribers.forEach((u) => u());
 }
 

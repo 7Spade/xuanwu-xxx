@@ -1,5 +1,8 @@
 // [職責] 事件發布/訂閱引擎 (The Bus)
-// Per logic-overview.v3.md: WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+// Per logic-overview.v3.md:
+//   WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
+//   WORKSPACE_EVENT_BUS --> TRACE_IDENTIFIER (Observability)
+//   WORKSPACE_EVENT_BUS --> DOMAIN_METRICS   (Observability)
 import type {
   WorkspaceEventName,
   WorkspaceEventHandler,

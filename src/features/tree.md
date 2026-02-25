@@ -193,6 +193,7 @@ src/shared/
 ├── types/       ← 所有 TypeScript 領域型別
 ├── lib/         ← 純工具函式 + 領域規則
 ├── infra/       ← Firebase 適配器 · repository · Event Funnel（事件漏斗統一入口）
+│                     └── observability/ ✅  trace-identifier · domain-metrics · domain-error-log
 ├── ai/          ← Genkit AI flows
 ├── ui/          ← shadcn-ui · app-providers · i18n · constants
 └── kernel/      🆕  Shared Kernel 顯式合約
@@ -201,7 +202,7 @@ src/shared/
 ```
 
 > **Observability**（trace-identifier · domain-metrics · domain-error-log）屬橫切關注點，
-> 實作置於 `shared/infra/observability/`，不作為獨立功能切片。
+> 實作置於 `shared/infra/observability/`（✅ 已實作），不作為獨立功能切片。
 
 ---
 
