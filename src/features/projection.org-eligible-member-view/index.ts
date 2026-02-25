@@ -20,6 +20,7 @@ export {
   initOrgMemberEntry,
   removeOrgMemberEntry,
   applyOrgMemberSkillXp,
+  updateOrgMemberEligibility,
 } from './_projector';
 
 export {

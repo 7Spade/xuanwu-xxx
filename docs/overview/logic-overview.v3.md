@@ -33,6 +33,8 @@ flowchart TD
 %% 12) Tier 永遠是推導值（純函式 getTier(xp)），不得存入任何 DB 欄位
 %% 13) XP 任何異動必須產生 Ledger 記錄（account-skill-xp-ledger）；不可直接 update xp 欄位
 %% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
+%% 15) organization:schedule:assigned 事件必須由 EVENT_FUNNEL（registerOrganizationFunnel）
+%%     更新 ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標；旗標代表「目前無衝突排程」而非靜態成員狀態
 %% =================================================
 
 %% =================================================
@@ -48,6 +50,10 @@ flowchart TD
 %% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
 %% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
 %% A10) Notification Router 僅做無狀態路由；跨 BC 業務決策需留在來源 BC 或 projection 層
+%% A11) ORG_ELIGIBLE_MEMBER_VIEW.eligible 旗標目前僅由 member:joined 設為 true，
+%%      schedule:assigned 後未自動更新為 false（雙重排程漏洞）；
+%%      需在 registerOrganizationFunnel 補充 applyScheduleAssigned → updateOrgMemberEligibility(false)；
+%%      排程結束後需恢復 eligible=true（需 schedule:completed / schedule:cancelled 事件配合）
 %% =================================================
 
 %% =================================================
@@ -165,6 +171,10 @@ ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 %% =================================================
 %% CAPABILITY BC（能力定義邊界）
 %% 只負責「能力是什麼」— 不處理成長、歸屬、組織
+%% 實作備注：SKILL_DEFINITION_AGGREGATE 目前以 shared/constants/skills.ts 靜態常數庫實作
+%%           （非 Firestore aggregate）。邊界概念有效，初期技能定義不需動態讀寫；
+%%           ACCOUNT_SKILL_AGGREGATE 透過 tagSlug 字串 FK 引用，
+%%           ORG_SKILL_RECOGNITION 透過 findSkill(skillId) 驗證合法性。
 %% =================================================
 
 subgraph CAPABILITY_BC[Capability BC（能力定義邊界）]
@@ -366,7 +376,7 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
     ORGANIZATION_PROJECTION_VIEW[projection.organization-view（組織投影視圖）]
 
     ACCOUNT_SKILL_VIEW["projection.account-skill-view（accountId / skillId / xp / tier · 來源: SkillXpAdded/Deducted）"]
-    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（orgId / accountId / skillId / xp / tier / eligible · 排程專用）"]
+    ORG_ELIGIBLE_MEMBER_VIEW["projection.org-eligible-member-view（orgId / accountId / skillId / xp / tier / eligible · 排程專用 · 來源: MemberJoined/Left · SkillXpAdded/Deducted · ScheduleAssigned/Completed/Cancelled）"]
     SKILL_TIER_FUNCTION[["getTier(xp) → Tier（純函式 · Apprentice/Journeyman/Expert/Artisan/Grandmaster/Legendary/Titan · 不存 DB）"]]
 
 end

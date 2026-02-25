@@ -184,6 +184,7 @@ export async function approveOrgScheduleProposal(
   await publishOrgEvent('organization:schedule:assigned', {
     scheduleItemId,
     workspaceId: opts.workspaceId,
+    orgId: opts.orgId,
     targetAccountId,
     assignedBy,
     startDate: opts.startDate,

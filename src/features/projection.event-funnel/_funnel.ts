@@ -36,6 +36,7 @@ import {
   applyOrgMemberSkillXp,
   initOrgMemberEntry,
   removeOrgMemberEntry,
+  updateOrgMemberEligibility,
 } from '@/features/projection.org-eligible-member-view';
 
 /**
@@ -147,7 +148,8 @@ export function registerWorkspaceFunnel(bus: WorkspaceEventBus): () => void {
 export function registerOrganizationFunnel(): () => void {
   const unsubscribers: Array<() => void> = [];
 
-  // ScheduleAssigned → ACCOUNT_PROJECTION_SCHEDULE
+  // ScheduleAssigned → ACCOUNT_PROJECTION_SCHEDULE + ORG_ELIGIBLE_MEMBER_VIEW (eligible = false)
+  // Per Invariant #15: schedule:assigned must update the eligible flag so double-booking is prevented.
   unsubscribers.push(
     onOrgEvent('organization:schedule:assigned', async (payload) => {
       await applyScheduleAssigned(payload.targetAccountId, {
@@ -157,6 +159,7 @@ export function registerOrganizationFunnel(): () => void {
         endDate: payload.endDate,
         status: 'upcoming',
       });
+      await updateOrgMemberEligibility(payload.orgId, payload.targetAccountId, false);
       await upsertProjectionVersion('account-schedule', Date.now(), new Date().toISOString());
     })
   );
