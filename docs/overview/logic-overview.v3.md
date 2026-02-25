@@ -57,7 +57,8 @@ flowchart TD
 %% A1) user-account 僅作身份主體；wallet 為獨立 aggregate（強一致），profile / notification 為弱一致資料
 %% A2) organization-account.binding 與 organization-core.aggregate 只允許 ACL / projection 對接，不共享同一提交邊界
 %% A3) A 軌 tasks/qa/acceptance/finance 視為 workflow.aggregate 的階段視圖，不定義為四個獨立原子流程
-%%     blockWorkflow(issueId) 由 A 軌異常路徑呼叫；unblockWorkflow(resolvedIssueId) 由 A 軌訂閱 IssueResolved 事件後自行呼叫（離散恢復）
+%%     blockWorkflow(issueId) 由 A 軌異常路徑呼叫；unblockWorkflow(resolvedIssueId) 由 WORKFLOW_AGGREGATE（Anomaly State Machine）
+%%     訂閱 workspace:issues:resolved 事件後中介協調（離散恢復 · 禁止 B 軌直接回寫 A 軌）
 %% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
 %% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
 %% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
@@ -204,7 +205,6 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
         WORKSPACE_COMMAND_HANDLER[workspace-application.command-handler（指令處理器）]
         WORKSPACE_SCOPE_GUARD[workspace-application.scope-guard（作用域守衛）]
         WORKSPACE_POLICY_ENGINE[workspace-application.policy-engine（政策引擎）]
-        WORKSPACE_ORG_POLICY_CACHE["workspace-application.org-policy-cache（組織政策本地快取）"]
         WORKSPACE_TRANSACTION_RUNNER[workspace-application.transaction-runner（交易執行器）]
         WORKSPACE_OUTBOX["workspace-application.outbox（交易內發信箱）"]
     end
@@ -271,9 +271,9 @@ subgraph WORKSPACE_CONTAINER[Workspace Container（工作區容器）]
 
     end
 
-    %% B 軌 IssueResolved 事件（A 軌自訂閱後呼叫 unblockWorkflow · 離散恢復原則）
+    %% B 軌 IssueResolved 事件（WORKFLOW_AGGREGATE 作為 Anomaly State Machine 中介 · 離散恢復原則）
     TRACK_B_ISSUES -->|IssueResolved 事件| WORKSPACE_EVENT_BUS
-    WORKSPACE_EVENT_BUS -.->|workspace:issues:resolved 自訂閱 unblockWorkflow| TRACK_A_TASKS
+    WORKSPACE_EVENT_BUS -.->|workspace:issues:resolved（Anomaly State Machine 中介）| WORKFLOW_AGGREGATE
 
 end
 
@@ -286,6 +286,7 @@ ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 %% =================================================
 SKILL_TAG_POOL_AGGREGATE["account-organization.skill-tag（skill-tag-pool.aggregate · 唯一性／刪除規則控制）"]
 SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
+SKILL_TAG_POOL_AGGREGATE -.->|授權標籤生命週期控制（唯一性驗證 · 刪除規則）| ORG_SKILL_RECOGNITION
 
 
 %% TALENT_REPOSITORY: Member（內部）+ Partner（外部）+ Team（組視圖）= 人力資源池概念標籤（Invariant #16）
@@ -310,13 +311,14 @@ WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
 ACTIVE_ACCOUNT_CONTEXT -->|查詢鍵| WORKSPACE_SCOPE_READ_MODEL
 WORKSPACE_SCOPE_READ_MODEL --> WORKSPACE_SCOPE_GUARD
 WORKSPACE_SCOPE_GUARD -.->|高風險授權二次確認（寫入、升權、敏感資源）| WORKSPACE_AGGREGATE
+WORKSPACE_ROLE -.->|工作區成員動態視圖（eligible=true · 唯讀投影）| ORG_ELIGIBLE_MEMBER_VIEW
 
 WORKSPACE_SCOPE_GUARD --> WORKSPACE_POLICY_ENGINE
 WORKSPACE_POLICY_ENGINE --> WORKSPACE_TRANSACTION_RUNNER
 
 WORKSPACE_TRANSACTION_RUNNER -->|單一 command 僅允許單一 aggregate 寫入| WORKSPACE_AGGREGATE
 WORKSPACE_AGGREGATE --> WORKSPACE_EVENT_STORE
-WORKSPACE_EVENT_STORE -.->|trace-identifier 稽核投影（SK_EVENT_ENVELOPE · 不可篡改）| WORKSPACE_AUDIT
+WORKSPACE_AUDIT -.->|讀取稽核投影（trace-identifier 因果鏈 · WORKSPACE_EVENT_STORE → EVENT_FUNNEL 路徑）| ACCOUNT_PROJECTION_AUDIT
 WORKSPACE_TRANSACTION_RUNNER -->|彙整 Aggregate 未提交事件後寫入| WORKSPACE_OUTBOX
 
 WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
@@ -327,12 +329,9 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% =================================================
 
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-ORGANIZATION_EVENT_BUS -->|政策變更事件| WORKSPACE_ORG_POLICY_CACHE
-WORKSPACE_ORG_POLICY_CACHE -->|更新本地 read model| WORKSPACE_SCOPE_READ_MODEL
 WORKSPACE_OUTBOX -->|ScheduleProposed（跨層事件 · saga / 可補償）| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
-W_B_SCHEDULE -.->|查詢可用帳號（eligible=true · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
-ORGANIZATION_SCHEDULE -.->|Invariant #14: 排班可用性篩選（eligible · 只讀 Projection）| ORG_ELIGIBLE_MEMBER_VIEW
+W_B_SCHEDULE & ORGANIZATION_SCHEDULE -.->|Universal Scheduler · 排班可用性篩選（eligible=true · Invariant #14）| ORG_ELIGIBLE_MEMBER_VIEW
 
 
 %% =================================================
@@ -517,7 +516,6 @@ class EVENT_FUNNEL_INPUT eventFunnel;
 class ACCOUNT_USER_NOTIFICATION account;
 class ACCOUNT_NOTIFICATION_ROUTER account;
 class USER_PERSONAL_CENTER userPersonalCenter;
-class WORKSPACE_ORG_POLICY_CACHE workspace;
 class WORKSPACE_SCOPE_READ_MODEL projection;
 class ACCOUNT_SKILL_LAYER accountSkill;
 class ACCOUNT_SKILL_AGGREGATE,ACCOUNT_SKILL_XP_LEDGER accountSkill;
