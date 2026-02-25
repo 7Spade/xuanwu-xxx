@@ -13,9 +13,6 @@
   "homepage": "https://Ac-Xuanwu.com",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "functions"
-  ],
   "engines": {
     "node": "20"
   },
