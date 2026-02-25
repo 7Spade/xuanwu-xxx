@@ -28,7 +28,7 @@ Scope Guard dedicated read model — a specialized workspace read model used exc
 ## Dependencies
 
 - `@/shared/types` — workspace scope types
-- `@/shared-kernel/authority-snapshot` — authority snapshot contract (must implement)
+- `@/shared-kernel/identity/authority-snapshot` — authority snapshot contract (must implement)
 - `@/shared/infra/firestore/` — read model Firestore collection
 
 ## Architecture Note

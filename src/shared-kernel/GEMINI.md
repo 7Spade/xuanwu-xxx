@@ -18,22 +18,26 @@ Per logic-overview.v3.md Invariant #8:
 
 | File | Contract | Consumers |
 |------|----------|-----------|
-| `event-envelope.ts` | `EventEnvelope<T>`, `ImplementsEventEnvelopeContract` | `workspace-core.event-bus`, `account-organization.event-bus` |
-| `authority-snapshot.ts` | `AuthoritySnapshot`, `ImplementsAuthoritySnapshotContract` | `projection.workspace-scope-guard`, `projection.account-view` |
-| `skill-tier.ts` | `SkillTier`, `TierDefinition`, `TIER_DEFINITIONS`, `resolveSkillTier()`, `getTier()`, `getTierRank()`, `tierSatisfies()` | `account-user.skill`, `account-organization.schedule`, `workspace-business.schedule`, `projection.account-skill-view`, `projection.org-eligible-member-view` |
-| `skill-requirement.ts` | `SkillRequirement` | `workspace-business.schedule`, `workspace-business.document-parser`, `workspace-core.event-bus`, `account-organization.schedule` |
-| `schedule-proposed-payload.ts` | `WorkspaceScheduleProposedPayload`, `ImplementsScheduleProposedPayloadContract` | `workspace-core.event-bus` (produces), `account-organization.schedule` (consumes) |
+| `events/event-envelope.ts` | `EventEnvelope<T>`, `ImplementsEventEnvelopeContract` | `workspace-core.event-bus`, `account-organization.event-bus` |
+| `identity/authority-snapshot.ts` | `AuthoritySnapshot`, `ImplementsAuthoritySnapshotContract` | `projection.workspace-scope-guard`, `projection.account-view` |
+| `skills/skill-tier.ts` | `SkillTier`, `TierDefinition`, `TIER_DEFINITIONS`, `resolveSkillTier()`, `getTier()`, `getTierRank()`, `tierSatisfies()` | `account-user.skill`, `account-organization.schedule`, `workspace-business.schedule`, `projection.account-skill-view`, `projection.org-eligible-member-view` |
+| `workforce/skill-requirement.ts` | `SkillRequirement` | `workspace-business.schedule`, `workspace-business.document-parser`, `workspace-core.event-bus`, `account-organization.schedule` |
+| `workforce/schedule-proposed-payload.ts` | `WorkspaceScheduleProposedPayload`, `ImplementsScheduleProposedPayloadContract` | `workspace-core.event-bus` (produces), `account-organization.schedule` (consumes) |
 | `index.ts` | Re-exports all of the above | All consumers |
 
 ## Import
 
 ```ts
-// Preferred: single entry point
+// Preferred: single barrel entry point
 import type { SkillTier, SkillRequirement } from '@/shared-kernel';
 import { resolveSkillTier, tierSatisfies } from '@/shared-kernel';
 
-// Also valid: granular import
-import type { EventEnvelope } from '@/shared-kernel/event-envelope';
+// Canonical granular imports (by domain subdirectory)
+import type { EventEnvelope } from '@/shared-kernel/events/event-envelope';
+import type { AuthoritySnapshot } from '@/shared-kernel/identity/authority-snapshot';
+import type { SkillTier } from '@/shared-kernel/skills/skill-tier';
+import type { SkillRequirement } from '@/shared-kernel/workforce/skill-requirement';
+import type { WorkspaceScheduleProposedPayload } from '@/shared-kernel/workforce/schedule-proposed-payload';
 ```
 
 ## Rules
@@ -52,9 +56,6 @@ import paths continue to work:
 
 ```ts
 // shared/types/skill.types.ts (excerpt)
-export type { SkillTier, TierDefinition } from '@/shared-kernel/skill-tier';
-export type { SkillRequirement } from '@/shared-kernel/skill-requirement';
+export type { SkillTier, TierDefinition } from '@/shared-kernel/skills/skill-tier';
+export type { SkillRequirement } from '@/shared-kernel/workforce/skill-requirement';
 ```
-
-This means consumers do not need to change existing imports; they can migrate to
-`@/shared-kernel` at their own pace.

@@ -28,7 +28,7 @@ Account projection view — read model for account state, including authority sn
 ## Dependencies
 
 - `@/shared/types` — `Account`, `AccountTag`
-- `@/shared-kernel/authority-snapshot` — authority snapshot contract (must implement)
+- `@/shared-kernel/identity/authority-snapshot` — authority snapshot contract (must implement)
 - `@/shared/infra/firestore/` — read model Firestore collection
 
 ## Architecture Note
