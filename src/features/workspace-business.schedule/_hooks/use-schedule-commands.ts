@@ -16,10 +16,11 @@ import {
     unassignMember as unassignMemberAction,
     updateScheduleItemStatus,
 } from "../_actions";
-import { canTransitionScheduleStatus } from "@/shared/lib";
+import { canTransitionScheduleStatus, tierSatisfies } from "@/shared/lib";
 import { toast } from "@/shared/utility-hooks/use-toast";
 import type { ScheduleItem } from "@/shared/types";
 import { getAccountActiveAssignments } from "@/features/projection.account-schedule";
+import { getOrgMemberEligibilityWithTier } from "@/features/projection.org-eligible-member-view";
 
 export function useScheduleActions() {
   const { state: appState } = useApp();
@@ -50,6 +51,29 @@ export function useScheduleActions() {
         description: "This member already has an active assignment in another workspace.",
       });
       return;
+    }
+
+    // W_B_SCHEDULE -.→ ORG_ELIGIBLE_MEMBER_VIEW: soft skill-eligibility check
+    // (Invariant #14: only reads Projection — never Account aggregate)
+    // (Invariant #12: tier is derived via resolveSkillTier(xp) — never stored in DB)
+    // Warning-only guard; hard validation happens in approveOrgScheduleProposal.
+    if (item.requiredSkills && item.requiredSkills.length > 0) {
+      const memberView = await getOrgMemberEligibilityWithTier(activeAccount.id, memberId).catch(() => null);
+      if (memberView) {
+        const unmetSkills = item.requiredSkills.filter((req) => {
+          const skillEntry = memberView.skills.find((s) => s.skillId === req.tagSlug);
+          if (!skillEntry) return true;
+          return !tierSatisfies(skillEntry.tier, req.minimumTier);
+        });
+        if (unmetSkills.length > 0) {
+          toast({
+            variant: "destructive",
+            title: "Skill Requirements Not Met",
+            description: `Member does not meet skill requirements: ${unmetSkills.map((r) => `${r.tagSlug} ≥ ${r.minimumTier}`).join(', ')}.`,
+          });
+          return;
+        }
+      }
     }
 
     try {
