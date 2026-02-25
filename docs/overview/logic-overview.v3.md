@@ -402,12 +402,18 @@ WORKSPACE_EVENT_STORE -.->|事件重播可完整重建 Projection| EVENT_FUNNEL_
 subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
     SK_EVENT_ENVELOPE["shared-kernel.event-envelope（事件信封契約）"]
     SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（權限快照契約）"]
+    SK_SKILL_TIER["shared-kernel.skill-tier（七階位能力等級 · getTier 純函式 · Invariant #12）"]
+    SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（跨 BC 人力需求契約）"]
 end
 
 WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
 ORGANIZATION_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
 WORKSPACE_SCOPE_READ_MODEL -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
 ACCOUNT_PROJECTION_VIEW -.->|快照契約遵循| SK_AUTHORITY_SNAPSHOT
+ACCOUNT_SKILL_VIEW -.->|tier 推導契約遵循| SK_SKILL_TIER
+ORG_ELIGIBLE_MEMBER_VIEW -.->|tier 推導契約遵循| SK_SKILL_TIER
+ORGANIZATION_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
+W_B_SCHEDULE -.->|人力需求契約遵循| SK_SKILL_REQUIREMENT
 
 
 %% =================================================
