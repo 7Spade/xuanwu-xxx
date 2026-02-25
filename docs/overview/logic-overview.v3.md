@@ -36,7 +36,7 @@ flowchart TD
 %% 14) Schedule 只讀 Projection（org-eligible-member-view），不得直接查詢 Domain Aggregate
 %% 15) schedule:assigned → EVENT_FUNNEL → ORG_ELIGIBLE_MEMBER_VIEW.eligible=false（防雙重排班，非靜態成員狀態）
 %% 16) Talent Repository = member（內部）+ partner（外部）+ team（組視圖）→ ORG_ELIGIBLE_MEMBER_VIEW；Schedule 只讀此 Projection（#14）
-%% 17) skill-tag-pool.aggregate 統一管理標籤唯一性與刪除規則（A6）；Member/Partner 唯讀引用；Team 為組視圖
+%% 17) centralized-tag.aggregate（Shared Kernel）統一管理 tagSlug 唯一性與刪除規則（A6）；Member/Partner 唯讀引用；Team 為組視圖
 %% 18) workspace-governance = 策略執行層：members → ORG_ELIGIBLE_MEMBER_VIEW；audit → EVENT_FUNNEL 自動投影；role 繼承 policy 硬約束
 %% =================================================
 
@@ -47,7 +47,7 @@ flowchart TD
 %% A3) A 軌為 workflow.aggregate 的階段視圖；blockWorkflow → WORKFLOW_AGGREGATE（Anomaly State Machine）→ issues:resolved 中介解鎖（禁 B→A 直寫）
 %% A4) ParsingIntent 對 Tasks 只允許提議事件，不可直接回寫任務決策狀態（Tasks 可訂閱提議事件後自行決策）
 %% A5) schedule 跨 BC 採 saga / compensating event（例：ScheduleAssignRejected / ScheduleProposalCancelled）；若需同步強一致，必須上收同一 aggregate
-%% A6) Skill Tag Pool 需由專屬 aggregate 管理唯一性與刪除規則，其他模組僅可引用
+%% A6) CENTRALIZED_TAG_AGGREGATE（Shared Kernel）需統一管理 tagSlug 唯一性與刪除規則，其他模組僅可引用
 %% A7) Event Funnel 僅負責 projection compose，不承擔跨 BC 不變量
 %% A8) Transaction Runner 僅保證單一 command 內單一 aggregate 原子提交，不協調跨 aggregate 強一致
 %% A9) Scope Guard 讀 projection 作快路徑；高風險授權需回源 aggregate 再確認
@@ -167,7 +167,7 @@ ORGANIZATION_ENTITY --> ORGANIZATION_EVENT_BUS
 ORGANIZATION_POLICY -->|PolicyChanged → AuthoritySnapshot| ORGANIZATION_EVENT_BUS
 
 
-%% CAPABILITY BC: skill-definition = shared/constants/skills.ts 靜態庫（#17 · 標籤唯一性由 SKILL_TAG_POOL_AGGREGATE 管理）
+%% CAPABILITY BC: skill-definition = shared/constants/skills.ts 靜態庫（#17 · 標籤唯一性由 CENTRALIZED_TAG_AGGREGATE 管理）
 
 
 %% =================================================
@@ -255,11 +255,10 @@ end
 ORGANIZATION_ENTITY --> WORKSPACE_CONTAINER
 
 
-%% 職能標籤庫（#17）：skill-tag-pool.aggregate 管理唯一性；Member/Partner 唯讀引用；Team = 組視圖
-SKILL_TAG_POOL_AGGREGATE["account-organization.skill-tag（skill-tag-pool.aggregate · 唯一性／刪除規則控制）"]
-SKILL_TAG_POOL_AGGREGATE --> SKILL_TAG_POOL
-SKILL_TAG_POOL_AGGREGATE -.->|#A6: tag-lifecycle authority| ORG_SKILL_RECOGNITION
-SKILL_TAG_POOL_AGGREGATE -->|TagCreated / TagUpdated / TagDeleted| ORGANIZATION_EVENT_BUS
+%% 職能標籤庫（#17）：由 Shared Kernel 的 CENTRALIZED_TAG_AGGREGATE 管理唯一性；Member/Partner 唯讀引用；Team = 組視圖
+CENTRALIZED_TAG_AGGREGATE --> SKILL_TAG_POOL
+CENTRALIZED_TAG_AGGREGATE -.->|#A6: tag-lifecycle authority| ORG_SKILL_RECOGNITION
+CENTRALIZED_TAG_AGGREGATE -->|TagCreated / TagUpdated / TagDeleted| ORGANIZATION_EVENT_BUS
 ORGANIZATION_MEMBER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
 ORGANIZATION_PARTNER -.->|tagSlug 唯讀引用| SKILL_TAG_POOL
 ORGANIZATION_TEAM -.->|組視圖引用（derived）| SKILL_TAG_POOL
@@ -277,12 +276,22 @@ ORGANIZATION_TEAM -.->|組視圖引用（derived）| SKILL_TAG_POOL
 %% =================================================
 
 SERVER_ACTION["_actions.ts（Server Action — 業務觸發入口）"]
-SERVER_ACTION -->|發送 Command| WORKSPACE_COMMAND_HANDLER
+UNIFIED_COMMAND_GATEWAY["unified-command-gateway（統一指令閘道器 · TraceID / Context 注入）"]
+UNIVERSAL_AUTHORITY_INTERCEPTOR["universal-authority-interceptor（統一權限攔截器 · AuthoritySnapshot 快照檢查）"]
+SERVER_ACTION -->|發送 Command| UNIFIED_COMMAND_GATEWAY
+SERVER_ACTION_SKILL -->|發送 Command| UNIFIED_COMMAND_GATEWAY
+UNIFIED_COMMAND_GATEWAY -->|Workspace Command| WORKSPACE_COMMAND_HANDLER
+UNIFIED_COMMAND_GATEWAY -->|Skill Command| ACCOUNT_SKILL_AGGREGATE
+UNIFIED_COMMAND_GATEWAY -->|Org Command| ORGANIZATION_ENTITY
 WORKSPACE_TRANSACTION_RUNNER -.->|執行業務領域邏輯| WORKSPACE_BUSINESS
 
-WORKSPACE_COMMAND_HANDLER --> WORKSPACE_SCOPE_GUARD
+WORKSPACE_COMMAND_HANDLER --> UNIVERSAL_AUTHORITY_INTERCEPTOR
 ACTIVE_ACCOUNT_CONTEXT -->|查詢鍵| WORKSPACE_SCOPE_READ_MODEL
-WORKSPACE_SCOPE_READ_MODEL --> WORKSPACE_SCOPE_GUARD
+WORKSPACE_SCOPE_READ_MODEL --> UNIVERSAL_AUTHORITY_INTERCEPTOR
+ACCOUNT_PROJECTION_VIEW --> UNIVERSAL_AUTHORITY_INTERCEPTOR
+UNIVERSAL_AUTHORITY_INTERCEPTOR --> WORKSPACE_SCOPE_GUARD
+UNIVERSAL_AUTHORITY_INTERCEPTOR -.->|高風險授權二次確認（寫入、升權、敏感資源）| ACCOUNT_SKILL_AGGREGATE
+UNIVERSAL_AUTHORITY_INTERCEPTOR -.->|高風險授權二次確認（寫入、升權、敏感資源）| ORGANIZATION_ENTITY
 WORKSPACE_SCOPE_GUARD -.->|高風險授權二次確認（寫入、升權、敏感資源）| WORKSPACE_AGGREGATE
 WORKSPACE_ROLE -.->|#18 eligible=true · 唯讀| ORG_ELIGIBLE_MEMBER_VIEW
 
@@ -302,7 +311,11 @@ WORKSPACE_OUTBOX --> WORKSPACE_EVENT_BUS
 %% =================================================
 
 ORGANIZATION_EVENT_BUS --> ORGANIZATION_SCHEDULE
-WORKSPACE_OUTBOX -->|ScheduleProposed · #A5 saga| ORGANIZATION_SCHEDULE
+INTEGRATION_EVENT_ROUTER[["integration-event-router（跨 BC 事件路由器）"]]
+WORKSPACE_EVENT_BUS --> INTEGRATION_EVENT_ROUTER
+ORGANIZATION_EVENT_BUS --> INTEGRATION_EVENT_ROUTER
+WORKSPACE_OUTBOX -->|integration events| INTEGRATION_EVENT_ROUTER
+INTEGRATION_EVENT_ROUTER -.->|route: ScheduleProposed · #A5 saga| ORGANIZATION_SCHEDULE
 W_B_SCHEDULE -.->|根據排程投影過濾可用帳號| ACCOUNT_PROJECTION_SCHEDULE
 W_B_SCHEDULE -.->|#14 Universal Scheduler · eligible=true| ORG_ELIGIBLE_MEMBER_VIEW
 ORGANIZATION_SCHEDULE -.->|#14 Universal Scheduler · eligible=true| ORG_ELIGIBLE_MEMBER_VIEW
@@ -347,9 +360,9 @@ subgraph PROJECTION_LAYER[Projection Layer（資料投影層）]
 
 end
 
-%% EVENT_FUNNEL: 2 事件源 → 統一入口 → 各 Projection（#A7：僅 projection compose，非跨 BC 不變量）
-WORKSPACE_EVENT_BUS --> EVENT_FUNNEL_INPUT
-ORGANIZATION_EVENT_BUS --> EVENT_FUNNEL_INPUT
+%% EVENT_FUNNEL: Integration Event Router → 統一入口 → 各 Projection（#A7：僅 projection compose，非跨 BC 不變量）
+%% Projection 寫入唯一路徑：INTEGRATION_EVENT_ROUTER -> EVENT_FUNNEL_INPUT（#9）
+INTEGRATION_EVENT_ROUTER ==> EVENT_FUNNEL_INPUT
 EVENT_FUNNEL_INPUT --> WORKSPACE_PROJECTION_VIEW & WORKSPACE_SCOPE_READ_MODEL & ACCOUNT_PROJECTION_VIEW & ACCOUNT_PROJECTION_AUDIT & ACCOUNT_PROJECTION_SCHEDULE & ORGANIZATION_PROJECTION_VIEW & ACCOUNT_SKILL_VIEW & ORG_ELIGIBLE_MEMBER_VIEW
 
 ACCOUNT_SKILL_VIEW -.->|#12: getTier| SKILL_TIER_FUNCTION
@@ -372,6 +385,7 @@ subgraph SHARED_KERNEL[Shared Kernel（跨 BC 顯式共享契約）]
     SK_AUTHORITY_SNAPSHOT["shared-kernel.authority-snapshot（identity/authority-snapshot.ts · 權限快照契約）"]
     SK_SKILL_TIER["shared-kernel.skill-tier（skills/skill-tier.ts · 七階位能力等級 · getTier 純函式 · Invariant #12）"]
     SK_SKILL_REQUIREMENT["shared-kernel.skill-requirement（workforce/skill-requirement.ts · 跨 BC 人力需求契約）"]
+    CENTRALIZED_TAG_AGGREGATE["centralized-tag.aggregate（全域語義字典 · tagSlug 唯一性／刪除規則）"]
 end
 
 WORKSPACE_EVENT_BUS -.->|事件契約遵循| SK_EVENT_ENVELOPE
@@ -472,7 +486,7 @@ class SKILL_TIER_FUNCTION tierFunction;
 class ACCOUNT_SKILL_VIEW,ORG_ELIGIBLE_MEMBER_VIEW skillProjection;
 class SERVER_ACTION_SKILL serverAction;
 class USER_WALLET_AGGREGATE accountSkill;
-class SKILL_TAG_POOL_AGGREGATE organization;
+class CENTRALIZED_TAG_AGGREGATE sharedKernel;
 class WORKFLOW_AGGREGATE workspace;
 class WORKSPACE_AUDIT workspace;
 class TALENT_REPOSITORY talentRepository;
